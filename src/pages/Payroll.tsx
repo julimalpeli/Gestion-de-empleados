@@ -169,6 +169,7 @@ const Payroll = () => {
   const [holidayDays, setHolidayDays] = useState("");
   const [advances, setAdvances] = useState("");
   const [discounts, setDiscounts] = useState("");
+  const [whiteWage, setWhiteWage] = useState("");
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
 
@@ -268,25 +269,39 @@ const Payroll = () => {
 
     const basePay = employee.dailyWage * parseInt(workDays);
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
+
+    // Agregar presentismo si no lo perdió
+    const presentismoAmount = employee.losesPresentismo
+      ? 0
+      : employee.presentismo;
+
     const totalAdvances = parseInt(advances) || 0;
     const totalDiscounts = parseInt(discounts) || 0;
+    const manualWhiteWage = parseInt(whiteWage) || 0;
 
-    const grossTotal = basePay + holidayPay;
-    const netTotal = grossTotal - totalAdvances - totalDiscounts;
+    // Total bruto = sueldo base + feriados + presentismo
+    const grossTotal = basePay + holidayPay + presentismoAmount;
 
-    // Assuming 70% white, 30% informal split
-    const whiteAmount = Math.round(netTotal * 0.7);
-    const informalAmount = netTotal - whiteAmount;
+    // Total después de descuentos y adelantos
+    const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
+
+    // Sueldo informal = Total después de deducciones - Sueldo en blanco manual
+    const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
+
+    // Total neto = sueldo en blanco + sueldo informal
+    const netTotal = manualWhiteWage + informalAmount;
 
     return {
       basePay,
       holidayPay,
+      presentismoAmount,
       grossTotal,
       totalAdvances,
       totalDiscounts,
-      netTotal,
-      whiteAmount,
+      totalAfterDeductions,
+      whiteAmount: manualWhiteWage,
       informalAmount,
+      netTotal,
     };
   };
 
@@ -392,6 +407,20 @@ const Payroll = () => {
                     onChange={(e) => setDiscounts(e.target.value)}
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="whiteWage">Sueldo en Blanco (manual)</Label>
+                  <Input
+                    id="whiteWage"
+                    type="number"
+                    placeholder="350000"
+                    value={whiteWage}
+                    onChange={(e) => setWhiteWage(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    El sueldo informal se calculará automáticamente
+                  </p>
+                </div>
               </div>
 
               {/* Preview */}
@@ -410,8 +439,16 @@ const Payroll = () => {
                           <span>{formatCurrency(calculation.holidayPay)}</span>
                         </div>
                       )}
+                      {calculation.presentismoAmount > 0 && (
+                        <div className="flex justify-between text-green-600">
+                          <span>Presentismo:</span>
+                          <span>
+                            +{formatCurrency(calculation.presentismoAmount)}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex justify-between font-medium">
-                        <span>Subtotal:</span>
+                        <span>Subtotal bruto:</span>
                         <span>{formatCurrency(calculation.grossTotal)}</span>
                       </div>
                       {calculation.totalAdvances > 0 && (
@@ -430,23 +467,31 @@ const Payroll = () => {
                           </span>
                         </div>
                       )}
-                      <hr />
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Total Neto:</span>
-                        <span>{formatCurrency(calculation.netTotal)}</span>
+                      <div className="flex justify-between font-medium">
+                        <span>Total después de deducciones:</span>
+                        <span>
+                          {formatCurrency(calculation.totalAfterDeductions)}
+                        </span>
                       </div>
                       <hr />
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span>En blanco (70%):</span>
-                          <span>{formatCurrency(calculation.whiteAmount)}</span>
+                          <span>En blanco (manual):</span>
+                          <span className="font-medium">
+                            {formatCurrency(calculation.whiteAmount)}
+                          </span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Informal (30%):</span>
-                          <span>
+                          <span>Informal (calculado):</span>
+                          <span className="font-medium">
                             {formatCurrency(calculation.informalAmount)}
                           </span>
                         </div>
+                      </div>
+                      <hr />
+                      <div className="flex justify-between font-bold text-lg">
+                        <span>Total Neto:</span>
+                        <span>{formatCurrency(calculation.netTotal)}</span>
                       </div>
                     </CardContent>
                   </Card>
@@ -463,15 +508,34 @@ const Payroll = () => {
 
             <div className="flex gap-2 pt-4">
               <Button
-                onClick={() => setIsNewPayrollOpen(false)}
+                onClick={() => {
+                  // Aquí se guardaría la liquidación
+                  setIsNewPayrollOpen(false);
+                  // Limpiar campos
+                  setSelectedEmployee("");
+                  setWorkDays("");
+                  setHolidayDays("");
+                  setAdvances("");
+                  setDiscounts("");
+                  setWhiteWage("");
+                }}
                 className="w-full"
-                disabled={!calculation}
+                disabled={!calculation || !whiteWage}
               >
                 Generar Liquidación
               </Button>
               <Button
                 variant="outline"
-                onClick={() => setIsNewPayrollOpen(false)}
+                onClick={() => {
+                  setIsNewPayrollOpen(false);
+                  // Limpiar campos
+                  setSelectedEmployee("");
+                  setWorkDays("");
+                  setHolidayDays("");
+                  setAdvances("");
+                  setDiscounts("");
+                  setWhiteWage("");
+                }}
                 className="w-full"
               >
                 Cancelar
