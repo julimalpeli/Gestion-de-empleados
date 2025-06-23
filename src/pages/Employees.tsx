@@ -603,7 +603,7 @@ const Employees = () => {
                 ))}
               </TableBody>
             </Table>
-          </Card>
+          </CardContent>
         </Card>
 
         {/* Vacation Manager */}
