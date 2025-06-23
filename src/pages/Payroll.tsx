@@ -520,7 +520,9 @@ const Payroll = () => {
                   setWhiteWage("");
                 }}
                 className="w-full"
-                disabled={!calculation || !whiteWage}
+                disabled={
+                  !calculation || !whiteWage || parseInt(whiteWage) === 0
+                }
               >
                 Generar Liquidación
               </Button>
