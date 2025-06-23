@@ -35,6 +35,7 @@ import {
   CheckCircle,
   Users,
   Info,
+  TrendingUp,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
