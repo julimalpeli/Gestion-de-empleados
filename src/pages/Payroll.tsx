@@ -33,6 +33,8 @@ import {
   Calendar,
   FileText,
   CheckCircle,
+  Users,
+  Info,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
@@ -94,10 +96,66 @@ const payrollRecords = [
 ];
 
 const employees = [
-  { id: 1, name: "Juan Pérez", dailyWage: 15000 },
-  { id: 2, name: "María González", dailyWage: 12000 },
-  { id: 3, name: "Carlos López", dailyWage: 13500 },
-  { id: 4, name: "Ana Martínez", dailyWage: 11000 },
+  {
+    id: 1,
+    name: "Juan Pérez",
+    position: "Cocinero",
+    whiteWage: 300000,
+    informalWage: 150000,
+    dailyWage: 15000,
+    presentismo: 25000,
+    losesPresentismo: false,
+    status: "active",
+    startDate: "2023-01-15",
+  },
+  {
+    id: 2,
+    name: "María González",
+    position: "Mesera",
+    whiteWage: 240000,
+    informalWage: 120000,
+    dailyWage: 12000,
+    presentismo: 20000,
+    losesPresentismo: true,
+    status: "active",
+    startDate: "2023-03-20",
+  },
+  {
+    id: 3,
+    name: "Carlos López",
+    position: "Cajero",
+    whiteWage: 285000,
+    informalWage: 120000,
+    dailyWage: 13500,
+    presentismo: 22000,
+    losesPresentismo: false,
+    status: "active",
+    startDate: "2022-11-10",
+  },
+  {
+    id: 4,
+    name: "Ana Martínez",
+    position: "Ayudante de Cocina",
+    whiteWage: 210000,
+    informalWage: 120000,
+    dailyWage: 11000,
+    presentismo: 18000,
+    losesPresentismo: false,
+    status: "inactive",
+    startDate: "2023-06-01",
+  },
+  {
+    id: 5,
+    name: "Luis Fernández",
+    position: "Encargado",
+    whiteWage: 525000,
+    informalWage: 225000,
+    dailyWage: 25000,
+    presentismo: 35000,
+    losesPresentismo: false,
+    status: "active",
+    startDate: "2025-05-22",
+  },
 ];
 
 const Payroll = () => {
@@ -107,6 +165,82 @@ const Payroll = () => {
   const [holidayDays, setHolidayDays] = useState("");
   const [advances, setAdvances] = useState("");
   const [discounts, setDiscounts] = useState("");
+  const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
+    useState("2024-2");
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("es-AR");
+  };
+
+  const calculateAguinaldo = (employee: any, period: string) => {
+    const [year, semester] = period.split("-");
+    const currentYear = parseInt(year);
+    const currentSemester = parseInt(semester);
+
+    // Determinar fechas del semestre
+    const semesterStart =
+      currentSemester === 1
+        ? new Date(currentYear, 0, 1) // 1 enero
+        : new Date(currentYear, 6, 1); // 1 julio
+
+    const semesterEnd =
+      currentSemester === 1
+        ? new Date(currentYear, 5, 30) // 30 junio
+        : new Date(currentYear, 11, 31); // 31 diciembre
+
+    const startDate = new Date(employee.startDate);
+
+    // Si empezó después del semestre, no corresponde aguinaldo
+    if (startDate > semesterEnd) {
+      return {
+        corresponds: false,
+        amount: 0,
+        daysWorked: 0,
+        totalDays: 0,
+        proportional: false,
+        reason: "No trabajó en este período",
+      };
+    }
+
+    // Fecha efectiva de inicio (la mayor entre inicio de semestre e inicio de trabajo)
+    const effectiveStart =
+      startDate > semesterStart ? startDate : semesterStart;
+
+    // Calcular días trabajados
+    const totalSemesterDays =
+      Math.ceil(
+        (semesterEnd.getTime() - semesterStart.getTime()) /
+          (1000 * 60 * 60 * 24),
+      ) + 1;
+    const daysWorked =
+      Math.ceil(
+        (semesterEnd.getTime() - effectiveStart.getTime()) /
+          (1000 * 60 * 60 * 24),
+      ) + 1;
+
+    // Mejor remuneración del semestre (sueldo blanco + informal, sin presentismo)
+    const bestSalary = employee.whiteWage + employee.informalWage;
+
+    // Calcular aguinaldo
+    const fullAguinaldo = (bestSalary / 12) * 6; // 6 meses
+    const proportionalAguinaldo = (bestSalary / 12) * (daysWorked / 30); // Proporcional por días
+
+    const isProportional = daysWorked < totalSemesterDays;
+    const finalAmount = isProportional ? proportionalAguinaldo : fullAguinaldo;
+
+    return {
+      corresponds: true,
+      amount: Math.round(finalAmount),
+      daysWorked,
+      totalDays: totalSemesterDays,
+      proportional: isProportional,
+      bestSalary,
+      fullAguinaldo: Math.round(fullAguinaldo),
+      reason: isProportional
+        ? "Aguinaldo proporcional por días trabajados"
+        : "Aguinaldo completo",
+    };
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
@@ -404,7 +538,7 @@ const Payroll = () => {
         <TabsList>
           <TabsTrigger value="current">Período Actual</TabsTrigger>
           <TabsTrigger value="history">Historial</TabsTrigger>
-          <TabsTrigger value="aguinaldo">Aguinaldos</TabsTrigger>
+          <TabsTrigger value="aguinaldo">Calculadora de Aguinaldos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="current">
@@ -485,15 +619,276 @@ const Payroll = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="aguinaldo">
+        <TabsContent value="aguinaldo" className="space-y-6">
+          {/* Aguinaldo Calculator */}
           <Card>
-            <CardContent className="pt-6">
-              <div className="text-center text-muted-foreground">
-                <Calculator className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>El cálculo de aguinaldos estará disponible próximamente</p>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calculator className="h-5 w-5" />
+                Calculadora de Aguinaldos (SAC)
+              </CardTitle>
+              <CardDescription>
+                Cálculo del Sueldo Anual Complementario por período
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Período a calcular:
+                  </label>
+                  <Select
+                    value={selectedAguinaldoPeriod}
+                    onValueChange={setSelectedAguinaldoPeriod}
+                  >
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2024-1">
+                        Primer Semestre 2024
+                      </SelectItem>
+                      <SelectItem value="2024-2">
+                        Segundo Semestre 2024
+                      </SelectItem>
+                      <SelectItem value="2025-1">
+                        Primer Semestre 2025
+                      </SelectItem>
+                      <SelectItem value="2025-2">
+                        Segundo Semestre 2025
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="ml-auto">
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">
+                      Total a pagar:
+                    </p>
+                    <p className="text-2xl font-bold text-primary">
+                      {formatCurrency(
+                        employees
+                          .filter((emp) => emp.status === "active")
+                          .map((emp) =>
+                            calculateAguinaldo(emp, selectedAguinaldoPeriod),
+                          )
+                          .reduce((sum, calc) => sum + calc.amount, 0),
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Info Card */}
+              <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <Info className="h-5 w-5 text-blue-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-blue-900">
+                    Método de Cálculo:
+                  </p>
+                  <p className="text-blue-700 mt-1">
+                    <strong>
+                      Aguinaldo = (Mejor remuneración ÷ 12) × Meses/días
+                      trabajados
+                    </strong>
+                  </p>
+                  <ul className="list-disc list-inside mt-2 text-blue-600 space-y-1">
+                    <li>Se incluye: Sueldo en blanco + Sueldo informal</li>
+                    <li>NO se incluye: Presentismo (no remunerativo)</li>
+                    <li>Proporcional para empleados con menos de 6 meses</li>
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>
+
+          {/* Aguinaldo Results Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Cálculo por Empleado</CardTitle>
+              <CardDescription>
+                Detalle del aguinaldo correspondiente a cada empleado activo
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Empleado</TableHead>
+                    <TableHead>Fecha Ingreso</TableHead>
+                    <TableHead>Mejor Sueldo</TableHead>
+                    <TableHead>Días Trabajados</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Aguinaldo</TableHead>
+                    <TableHead>Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {employees
+                    .filter((emp) => emp.status === "active")
+                    .map((emp) => {
+                      const aguinaldo = calculateAguinaldo(
+                        emp,
+                        selectedAguinaldoPeriod,
+                      );
+                      return (
+                        <TableRow key={emp.id}>
+                          <TableCell className="font-medium">
+                            <div>
+                              <p>{emp.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {emp.position}
+                              </p>
+                            </div>
+                          </TableCell>
+                          <TableCell>{formatDate(emp.startDate)}</TableCell>
+                          <TableCell>
+                            {formatCurrency(aguinaldo.bestSalary || 0)}
+                          </TableCell>
+                          <TableCell>
+                            {aguinaldo.corresponds ? (
+                              <div className="text-center">
+                                <div className="font-medium">
+                                  {aguinaldo.daysWorked}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  de {aguinaldo.totalDays} días
+                                </div>
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {aguinaldo.corresponds ? (
+                              <Badge
+                                variant={
+                                  aguinaldo.proportional
+                                    ? "secondary"
+                                    : "default"
+                                }
+                              >
+                                {aguinaldo.proportional
+                                  ? "Proporcional"
+                                  : "Completo"}
+                              </Badge>
+                            ) : (
+                              <Badge variant="outline">No corresponde</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-bold">
+                            {aguinaldo.corresponds ? (
+                              <div>
+                                <div className="text-lg">
+                                  {formatCurrency(aguinaldo.amount)}
+                                </div>
+                                {aguinaldo.proportional && (
+                                  <div className="text-xs text-muted-foreground">
+                                    Completo:{" "}
+                                    {formatCurrency(aguinaldo.fullAguinaldo)}
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-muted-foreground">$0</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="text-xs">{aguinaldo.reason}</div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Quick Stats for Aguinaldos */}
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Empleados con Aguinaldo
+                </CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {
+                    employees
+                      .filter((emp) => emp.status === "active")
+                      .map((emp) =>
+                        calculateAguinaldo(emp, selectedAguinaldoPeriod),
+                      )
+                      .filter((calc) => calc.corresponds).length
+                  }
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  de {employees.filter((emp) => emp.status === "active").length}{" "}
+                  activos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Aguinaldos Proporcionales
+                </CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {
+                    employees
+                      .filter((emp) => emp.status === "active")
+                      .map((emp) =>
+                        calculateAguinaldo(emp, selectedAguinaldoPeriod),
+                      )
+                      .filter((calc) => calc.proportional).length
+                  }
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Por días trabajados
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Promedio por Empleado
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {(() => {
+                    const calculations = employees
+                      .filter((emp) => emp.status === "active")
+                      .map((emp) =>
+                        calculateAguinaldo(emp, selectedAguinaldoPeriod),
+                      );
+                    const total = calculations.reduce(
+                      (sum, calc) => sum + calc.amount,
+                      0,
+                    );
+                    const count = calculations.filter(
+                      (calc) => calc.corresponds,
+                    ).length;
+                    return formatCurrency(
+                      Math.round(total / Math.max(count, 1)),
+                    );
+                  })()}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Por empleado con aguinaldo
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
