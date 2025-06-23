@@ -99,6 +99,8 @@ const employees = [
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
   const [losesPresentismo, setLosesPresentismo] = useState(false);
 
   const filteredEmployees = employees.filter(
@@ -185,34 +187,6 @@ const Employees = () => {
                 </p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="losesPresentismo">
-                  ¿Pierde el presentismo?
-                </Label>
-                <Select
-                  value={losesPresentismo ? "si" : "no"}
-                  onValueChange={(value) => setLosesPresentismo(value === "si")}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar opción" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="no">No</SelectItem>
-                    <SelectItem value="si">Sí</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {losesPresentismo && (
-                <div className="space-y-2">
-                  <Label htmlFor="presentismoComment">
-                    Motivo de pérdida de presentismo
-                  </Label>
-                  <Input
-                    id="presentismoComment"
-                    placeholder="Ej: Ausencias injustificadas"
-                  />
-                </div>
-              )}
-              <div className="space-y-2">
                 <Label htmlFor="startDate">Fecha de Ingreso</Label>
                 <Input id="startDate" type="date" />
               </div>
@@ -246,6 +220,164 @@ const Employees = () => {
                 </Button>
               </div>
             </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Employee Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Empleado</DialogTitle>
+              <DialogDescription>
+                Modifica la información de {editingEmployee?.name}
+              </DialogDescription>
+            </DialogHeader>
+            {editingEmployee && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editName">Nombre Completo</Label>
+                  <Input id="editName" defaultValue={editingEmployee.name} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editPosition">Puesto</Label>
+                  <Select defaultValue={editingEmployee.position.toLowerCase()}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cocinero">Cocinero</SelectItem>
+                      <SelectItem value="mesero">Mesero/a</SelectItem>
+                      <SelectItem value="cajero">Cajero/a</SelectItem>
+                      <SelectItem value="ayudante">
+                        Ayudante de Cocina
+                      </SelectItem>
+                      <SelectItem value="manager">Encargado/a</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="editWhiteWage">
+                      Sueldo en Blanco (mensual)
+                    </Label>
+                    <Input
+                      id="editWhiteWage"
+                      type="number"
+                      defaultValue={editingEmployee.whiteWage}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="editInformalWage">
+                      Sueldo Informal (mensual)
+                    </Label>
+                    <Input
+                      id="editInformalWage"
+                      type="number"
+                      defaultValue={editingEmployee.informalWage}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editPresentismo">
+                    Presentismo (no remunerativo)
+                  </Label>
+                  <Input
+                    id="editPresentismo"
+                    type="number"
+                    defaultValue={editingEmployee.presentismo}
+                  />
+                </div>
+
+                {/* Presentismo Loss Section - Only in Edit */}
+                <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+                  <h4 className="font-medium text-sm">
+                    Estado del Presentismo
+                  </h4>
+                  <div className="space-y-2">
+                    <Label htmlFor="editLosesPresentismo">
+                      ¿Pierde el presentismo?
+                    </Label>
+                    <Select
+                      value={losesPresentismo ? "si" : "no"}
+                      onValueChange={(value) =>
+                        setLosesPresentismo(value === "si")
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="no">
+                          No - Mantiene presentismo
+                        </SelectItem>
+                        <SelectItem value="si">
+                          Sí - Pierde presentismo
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {losesPresentismo && (
+                    <div className="space-y-2">
+                      <Label htmlFor="editPresentismoComment">
+                        Motivo de pérdida de presentismo
+                      </Label>
+                      <Input
+                        id="editPresentismoComment"
+                        placeholder="Ej: Ausencias sin justificar"
+                        defaultValue={editingEmployee.presentismoComment}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Se registrará la fecha y motivo de la pérdida
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="editStartDate">Fecha de Ingreso</Label>
+                  <Input
+                    id="editStartDate"
+                    type="date"
+                    defaultValue={editingEmployee.startDate}
+                  />
+                </div>
+
+                {/* Calculation Preview */}
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-sm font-medium">
+                    Sueldo Diario Calculado
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
+                  </p>
+                  <div className="text-lg font-semibold mt-2">
+                    {formatCurrency(editingEmployee.dailyWage)} por día
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={() => {
+                      setIsEditDialogOpen(false);
+                      setEditingEmployee(null);
+                    }}
+                    className="w-full"
+                  >
+                    Guardar Cambios
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsEditDialogOpen(false);
+                      setEditingEmployee(null);
+                    }}
+                    className="w-full"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
           </DialogContent>
         </Dialog>
       </div>
@@ -426,7 +558,15 @@ const Employees = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="sm">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingEmployee(employee);
+                          setLosesPresentismo(employee.losesPresentismo);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="sm">
