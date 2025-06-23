@@ -26,7 +26,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Plus, Search, Edit, Trash2, DollarSign, Calendar, Plane } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  DollarSign,
+  Calendar,
+  Plane,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -123,13 +131,16 @@ const Employees = () => {
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [losesPresentismo, setLosesPresentismo] = useState(false);
   const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
-  const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] = useState(null);
+  const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
+    useState(null);
 
   // Calculate vacation days based on seniority
   const calculateVacationDays = (startDate: string) => {
     const start = new Date(startDate);
     const today = new Date();
-    const years = Math.floor((today.getTime() - start.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+    const years = Math.floor(
+      (today.getTime() - start.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
+    );
 
     if (years < 5) return 14;
     if (years < 10) return 21;
@@ -210,12 +221,16 @@ const Employees = () => {
                   <Input id="whiteWage" type="number" placeholder="300000" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="informalWage">Sueldo Informal (mensual)</Label>
+                  <Label htmlFor="informalWage">
+                    Sueldo Informal (mensual)
+                  </Label>
                   <Input id="informalWage" type="number" placeholder="150000" />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="presentismo">Presentismo (no remunerativo)</Label>
+                <Label htmlFor="presentismo">
+                  Presentismo (no remunerativo)
+                </Label>
                 <Input id="presentismo" type="number" placeholder="25000" />
                 <p className="text-xs text-muted-foreground">
                   Este monto no se incluye en el cálculo del sueldo diario
@@ -228,7 +243,9 @@ const Employees = () => {
 
               {/* Calculation Preview */}
               <div className="p-3 bg-muted rounded-lg">
-                <Label className="text-sm font-medium">Sueldo Diario Calculado</Label>
+                <Label className="text-sm font-medium">
+                  Sueldo Diario Calculado
+                </Label>
                 <p className="text-xs text-muted-foreground mt-1">
                   Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
                 </p>
@@ -269,10 +286,7 @@ const Employees = () => {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="editName">Nombre Completo</Label>
-                  <Input
-                    id="editName"
-                    defaultValue={editingEmployee.name}
-                  />
+                  <Input id="editName" defaultValue={editingEmployee.name} />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="editPosition">Puesto</Label>
@@ -284,14 +298,18 @@ const Employees = () => {
                       <SelectItem value="cocinero">Cocinero</SelectItem>
                       <SelectItem value="mesero">Mesero/a</SelectItem>
                       <SelectItem value="cajero">Cajero/a</SelectItem>
-                      <SelectItem value="ayudante">Ayudante de Cocina</SelectItem>
+                      <SelectItem value="ayudante">
+                        Ayudante de Cocina
+                      </SelectItem>
                       <SelectItem value="manager">Encargado/a</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="editWhiteWage">Sueldo en Blanco (mensual)</Label>
+                    <Label htmlFor="editWhiteWage">
+                      Sueldo en Blanco (mensual)
+                    </Label>
                     <Input
                       id="editWhiteWage"
                       type="number"
@@ -299,7 +317,9 @@ const Employees = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="editInformalWage">Sueldo Informal (mensual)</Label>
+                    <Label htmlFor="editInformalWage">
+                      Sueldo Informal (mensual)
+                    </Label>
                     <Input
                       id="editInformalWage"
                       type="number"
@@ -308,7 +328,9 @@ const Employees = () => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="editPresentismo">Presentismo (no remunerativo)</Label>
+                  <Label htmlFor="editPresentismo">
+                    Presentismo (no remunerativo)
+                  </Label>
                   <Input
                     id="editPresentismo"
                     type="number"
@@ -318,19 +340,29 @@ const Employees = () => {
 
                 {/* Presentismo Loss Section - Only in Edit */}
                 <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                  <h4 className="font-medium text-sm">Estado del Presentismo</h4>
+                  <h4 className="font-medium text-sm">
+                    Estado del Presentismo
+                  </h4>
                   <div className="space-y-2">
-                    <Label htmlFor="editLosesPresentismo">¿Pierde el presentismo?</Label>
+                    <Label htmlFor="editLosesPresentismo">
+                      ¿Pierde el presentismo?
+                    </Label>
                     <Select
                       value={losesPresentismo ? "si" : "no"}
-                      onValueChange={(value) => setLosesPresentismo(value === "si")}
+                      onValueChange={(value) =>
+                        setLosesPresentismo(value === "si")
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="no">No - Mantiene presentismo</SelectItem>
-                        <SelectItem value="si">Sí - Pierde presentismo</SelectItem>
+                        <SelectItem value="no">
+                          No - Mantiene presentismo
+                        </SelectItem>
+                        <SelectItem value="si">
+                          Sí - Pierde presentismo
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -362,7 +394,9 @@ const Employees = () => {
 
                 {/* Calculation Preview */}
                 <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-sm font-medium">Sueldo Diario Calculado</Label>
+                  <Label className="text-sm font-medium">
+                    Sueldo Diario Calculado
+                  </Label>
                   <p className="text-xs text-muted-foreground mt-1">
                     Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
                   </p>
@@ -426,7 +460,14 @@ const Employees = () => {
               {formatCurrency(
                 employees
                   .filter((e) => e.status === "active")
-                  .reduce((sum, e) => sum + e.whiteWage + e.informalWage + (e.losesPresentismo ? 0 : e.presentismo), 0),
+                  .reduce(
+                    (sum, e) =>
+                      sum +
+                      e.whiteWage +
+                      e.informalWage +
+                      (e.losesPresentismo ? 0 : e.presentismo),
+                    0,
+                  ),
               )}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -446,7 +487,10 @@ const Employees = () => {
             <div className="text-2xl font-bold">
               {employees
                 .filter((e) => e.status === "active")
-                .reduce((sum, e) => sum + (e.vacationDays - e.vacationsTaken), 0)}
+                .reduce(
+                  (sum, e) => sum + (e.vacationDays - e.vacationsTaken),
+                  0,
+                )}
             </div>
             <p className="text-xs text-muted-foreground">
               Días disponibles totales
@@ -496,116 +540,117 @@ const Employees = () => {
         <CardHeader>
           <CardTitle>Lista de Empleados</CardTitle>
           <CardDescription>
-            Gestiona la información de todos los empleados
+            Gestiona la información de todos los empleados y sus vacaciones
           </CardDescription>
         </CardHeader>
         <CardContent>
-            <Table>
-              <TableHeader>
-                  <TableRow>
-                    <TableHead>Nombre</TableHead>
-                    <TableHead>Puesto</TableHead>
-                    <TableHead>Sueldo Diario</TableHead>
-                    <TableHead>Mensual Blanco</TableHead>
-                    <TableHead>Mensual Informal</TableHead>
-                    <TableHead>Presentismo</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead>Vacaciones</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEmployees.map((employee) => (
-                  <TableRow key={employee.id}>
-                    <TableCell className="font-medium">{employee.name}</TableCell>
-                    <TableCell>{employee.position}</TableCell>
-                    <TableCell className="font-medium text-primary">
-                      {formatCurrency(employee.dailyWage)}
-                      <div className="text-xs text-muted-foreground">
-                        Calculado
-                      </div>
-                    </TableCell>
-                    <TableCell>{formatCurrency(employee.whiteWage)}</TableCell>
-                    <TableCell>{formatCurrency(employee.informalWage)}</TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div>{formatCurrency(employee.presentismo)}</div>
-                        {employee.losesPresentismo ? (
-                          <Badge variant="destructive" className="text-xs">
-                            Perdido
-                          </Badge>
-                        ) : (
-                          <Badge variant="default" className="text-xs">
-                            Vigente
-                          </Badge>
-                        )}
-                        {employee.losesPresentismo && employee.presentismoComment && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Puesto</TableHead>
+                <TableHead>Sueldo Diario</TableHead>
+                <TableHead>Mensual Blanco</TableHead>
+                <TableHead>Mensual Informal</TableHead>
+                <TableHead>Presentismo</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Vacaciones</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredEmployees.map((employee) => (
+                <TableRow key={employee.id}>
+                  <TableCell className="font-medium">{employee.name}</TableCell>
+                  <TableCell>{employee.position}</TableCell>
+                  <TableCell className="font-medium text-primary">
+                    {formatCurrency(employee.dailyWage)}
+                    <div className="text-xs text-muted-foreground">
+                      Calculado
+                    </div>
+                  </TableCell>
+                  <TableCell>{formatCurrency(employee.whiteWage)}</TableCell>
+                  <TableCell>{formatCurrency(employee.informalWage)}</TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div>{formatCurrency(employee.presentismo)}</div>
+                      {employee.losesPresentismo ? (
+                        <Badge variant="destructive" className="text-xs">
+                          Perdido
+                        </Badge>
+                      ) : (
+                        <Badge variant="default" className="text-xs">
+                          Vigente
+                        </Badge>
+                      )}
+                      {employee.losesPresentismo &&
+                        employee.presentismoComment && (
                           <div className="text-xs text-muted-foreground max-w-32 truncate">
                             {employee.presentismoComment}
                           </div>
                         )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        employee.status === "active" ? "default" : "secondary"
+                      }
+                    >
+                      {employee.status === "active" ? "Activo" : "Inactivo"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="default" className="text-xs">
+                          {employee.vacationDays} anuales
+                        </Badge>
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          employee.status === "active" ? "default" : "secondary"
-                        }
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {employee.vacationsTaken} tomados
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {employee.vacationDays - employee.vacationsTaken}{" "}
+                          disponibles
+                        </Badge>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openVacationManager(employee)}
+                        className="h-6 text-xs"
                       >
-                        {employee.status === "active" ? "Activo" : "Inactivo"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="default" className="text-xs">
-                            {employee.vacationDays} anuales
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-xs">
-                            {employee.vacationsTaken} tomados
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {employee.vacationDays - employee.vacationsTaken} disponibles
-                          </Badge>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openVacationManager(employee)}
-                          className="h-6 text-xs"
-                        >
-                          <Plane className="h-3 w-3 mr-1" />
-                          Gestionar
-                        </Button>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setEditingEmployee(employee);
-                            setLosesPresentismo(employee.losesPresentismo);
-                            setIsEditDialogOpen(true);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      </div>
+                        <Plane className="h-3 w-3 mr-1" />
+                        Gestionar
+                      </Button>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingEmployee(employee);
+                          setLosesPresentismo(employee.losesPresentismo);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {/* Vacation Manager */}
       {selectedEmployeeForVacations && (
