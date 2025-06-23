@@ -51,31 +51,33 @@ const payrollRecords = [
   {
     id: 1,
     employeeName: "Juan Pérez",
-    period: "Febrero 2024",
+    period: "Junio 2024",
     baseDays: 22,
     holidayDays: 2,
     baseAmount: 330000,
     holidayBonus: 60000,
+    aguinaldo: 225000, // Aguinaldo de junio
     discounts: 50000,
     advances: 50000,
     whiteAmount: 220000,
     informalAmount: 120000,
-    netTotal: 340000,
+    netTotal: 565000, // Incluye aguinaldo
     status: "processed",
   },
   {
     id: 2,
     employeeName: "María González",
-    period: "Febrero 2024",
+    period: "Junio 2024",
     baseDays: 20,
     holidayDays: 1,
     baseAmount: 240000,
     holidayBonus: 12000,
+    aguinaldo: 180000, // Aguinaldo de junio
     discounts: 0,
     advances: 30000,
     whiteAmount: 160000,
     informalAmount: 62000,
-    netTotal: 222000,
+    netTotal: 402000, // Incluye aguinaldo
     status: "pending",
   },
   {
@@ -86,6 +88,7 @@ const payrollRecords = [
     holidayDays: 0,
     baseAmount: 283500,
     holidayBonus: 0,
+    aguinaldo: 0, // No hay aguinaldo en febrero
     discounts: 15000,
     advances: 0,
     whiteAmount: 199500,
@@ -167,6 +170,10 @@ const Payroll = () => {
   const [discounts, setDiscounts] = useState("");
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
+
+  // Current month for aguinaldo logic
+  const currentMonth = new Date().getMonth() + 1; // 1-12
+  const isAguinaldoMonth = currentMonth === 6 || currentMonth === 12;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-AR");
@@ -544,9 +551,10 @@ const Payroll = () => {
         <TabsContent value="current">
           <Card>
             <CardHeader>
-              <CardTitle>Liquidaciones - Febrero 2024</CardTitle>
+              <CardTitle>Liquidaciones - Junio 2024</CardTitle>
               <CardDescription>
-                Estado actual de las liquidaciones del período
+                Estado actual de las liquidaciones del período (incluye
+                aguinaldo)
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -556,6 +564,7 @@ const Payroll = () => {
                     <TableHead>Empleado</TableHead>
                     <TableHead>Días Base</TableHead>
                     <TableHead>Feriados</TableHead>
+                    {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
                     <TableHead>Adelantos</TableHead>
                     <TableHead>En Blanco</TableHead>
                     <TableHead>Informal</TableHead>
@@ -571,6 +580,13 @@ const Payroll = () => {
                       </TableCell>
                       <TableCell>{record.baseDays} días</TableCell>
                       <TableCell>{record.holidayDays} días</TableCell>
+                      {isAguinaldoMonth && (
+                        <TableCell className="font-medium text-green-600">
+                          {record.aguinaldo > 0
+                            ? formatCurrency(record.aguinaldo)
+                            : "-"}
+                        </TableCell>
+                      )}
                       <TableCell>{formatCurrency(record.advances)}</TableCell>
                       <TableCell>
                         {formatCurrency(record.whiteAmount)}
@@ -580,6 +596,11 @@ const Payroll = () => {
                       </TableCell>
                       <TableCell className="font-medium">
                         {formatCurrency(record.netTotal)}
+                        {record.aguinaldo > 0 && (
+                          <div className="text-xs text-green-600">
+                            Incluye aguinaldo
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge
@@ -606,17 +627,251 @@ const Payroll = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="history">
+        <TabsContent value="history" className="space-y-6">
+          {/* History Filters */}
           <Card>
-            <CardContent className="pt-6">
-              <div className="text-center text-muted-foreground">
-                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>
-                  El historial de liquidaciones estará disponible próximamente
-                </p>
+            <CardHeader>
+              <CardTitle>Historial de Liquidaciones</CardTitle>
+              <CardDescription>
+                Consulta liquidaciones de períodos anteriores
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-4 items-end">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Año:</label>
+                  <Select defaultValue="2024">
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2024">2024</SelectItem>
+                      <SelectItem value="2023">2023</SelectItem>
+                      <SelectItem value="2022">2022</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Empleado:</label>
+                  <Select defaultValue="todos">
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="todos">Todos los empleados</SelectItem>
+                      <SelectItem value="juan">Juan Pérez</SelectItem>
+                      <SelectItem value="maria">María González</SelectItem>
+                      <SelectItem value="carlos">Carlos López</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button variant="outline">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Exportar
+                </Button>
               </div>
             </CardContent>
           </Card>
+
+          {/* Historical Records */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Liquidaciones 2024</CardTitle>
+              <CardDescription>
+                Historial completo de liquidaciones procesadas
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Período</TableHead>
+                    <TableHead>Empleado</TableHead>
+                    <TableHead>Días Trabajados</TableHead>
+                    <TableHead>Sueldo Base</TableHead>
+                    <TableHead>Aguinaldo</TableHead>
+                    <TableHead>Presentismo</TableHead>
+                    <TableHead>Adelantos</TableHead>
+                    <TableHead>Total Neto</TableHead>
+                    <TableHead>Fecha Pago</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {/* Sample historical data */}
+                  <TableRow>
+                    <TableCell className="font-medium">Junio 2024</TableCell>
+                    <TableCell>Juan Pérez</TableCell>
+                    <TableCell>22 días</TableCell>
+                    <TableCell>{formatCurrency(450000)}</TableCell>
+                    <TableCell className="text-green-600 font-medium">
+                      {formatCurrency(225000)}
+                    </TableCell>
+                    <TableCell>{formatCurrency(25000)}</TableCell>
+                    <TableCell className="text-red-600">
+                      -{formatCurrency(50000)}
+                    </TableCell>
+                    <TableCell className="font-bold">
+                      {formatCurrency(650000)}
+                    </TableCell>
+                    <TableCell>30/06/2024</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell className="font-medium">Mayo 2024</TableCell>
+                    <TableCell>Juan Pérez</TableCell>
+                    <TableCell>21 días</TableCell>
+                    <TableCell>{formatCurrency(420000)}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>{formatCurrency(25000)}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell className="font-bold">
+                      {formatCurrency(445000)}
+                    </TableCell>
+                    <TableCell>31/05/2024</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell className="font-medium">Abril 2024</TableCell>
+                    <TableCell>Juan Pérez</TableCell>
+                    <TableCell>22 días</TableCell>
+                    <TableCell>{formatCurrency(450000)}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell>{formatCurrency(25000)}</TableCell>
+                    <TableCell className="text-red-600">
+                      -{formatCurrency(30000)}
+                    </TableCell>
+                    <TableCell className="font-bold">
+                      {formatCurrency(445000)}
+                    </TableCell>
+                    <TableCell>30/04/2024</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell className="font-medium">Junio 2024</TableCell>
+                    <TableCell>María González</TableCell>
+                    <TableCell>20 días</TableCell>
+                    <TableCell>{formatCurrency(360000)}</TableCell>
+                    <TableCell className="text-green-600 font-medium">
+                      {formatCurrency(180000)}
+                    </TableCell>
+                    <TableCell className="text-red-600 line-through">
+                      {formatCurrency(20000)}
+                    </TableCell>
+                    <TableCell className="text-red-600">
+                      -{formatCurrency(25000)}
+                    </TableCell>
+                    <TableCell className="font-bold">
+                      {formatCurrency(515000)}
+                    </TableCell>
+                    <TableCell>30/06/2024</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell className="font-medium">Mayo 2024</TableCell>
+                    <TableCell>María González</TableCell>
+                    <TableCell>19 días</TableCell>
+                    <TableCell>{formatCurrency(342000)}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell className="text-red-600 line-through">
+                      {formatCurrency(20000)}
+                    </TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell className="font-bold">
+                      {formatCurrency(342000)}
+                    </TableCell>
+                    <TableCell>31/05/2024</TableCell>
+                  </TableRow>
+
+                  <TableRow>
+                    <TableCell className="font-medium">
+                      Diciembre 2023
+                    </TableCell>
+                    <TableCell>Carlos López</TableCell>
+                    <TableCell>21 días</TableCell>
+                    <TableCell>{formatCurrency(400000)}</TableCell>
+                    <TableCell className="text-green-600 font-medium">
+                      {formatCurrency(202500)}
+                    </TableCell>
+                    <TableCell>{formatCurrency(22000)}</TableCell>
+                    <TableCell>-</TableCell>
+                    <TableCell className="font-bold">
+                      {formatCurrency(624500)}
+                    </TableCell>
+                    <TableCell>29/12/2023</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          {/* Historical Summary */}
+          <div className="grid gap-4 md:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Pagado 2024
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(3021500)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Incluye aguinaldos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Aguinaldos Pagados
+                </CardTitle>
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(607500)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Junio + Diciembre 2023
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Liquidaciones Procesadas
+                </CardTitle>
+                <CheckCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">36</div>
+                <p className="text-xs text-muted-foreground">
+                  En los últimos 12 meses
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Promedio Mensual
+                </CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {formatCurrency(251792)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Por mes (sin aguinaldos)
+                </p>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         <TabsContent value="aguinaldo" className="space-y-6">
