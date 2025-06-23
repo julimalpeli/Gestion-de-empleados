@@ -94,6 +94,20 @@ const employees = [
     startDate: "2023-06-01",
     vacationDays: 0,
   },
+  {
+    id: 5,
+    name: "Luis Fernández",
+    position: "Encargado",
+    whiteWage: 525000, // 70% de 750,000
+    informalWage: 225000, // 30% de 750,000
+    dailyWage: 25000, // calculado: (525000 + 225000) / 30
+    presentismo: 35000,
+    losesPresentismo: false,
+    presentismoComment: "",
+    status: "active",
+    startDate: "2025-05-22",
+    vacationDays: 0,
+  },
 ];
 
 const Employees = () => {
