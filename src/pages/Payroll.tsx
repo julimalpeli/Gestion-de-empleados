@@ -274,9 +274,8 @@ const Payroll = () => {
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
     // Agregar presentismo según selección en liquidación
-    const presentismoAmount = presentismoStatus === "mantiene"
-      ? employee.presentismo
-      : 0;
+    const presentismoAmount =
+      presentismoStatus === "mantiene" ? employee.presentismo : 0;
 
     const totalAdvances = parseInt(advances) || 0;
     const totalDiscounts = parseInt(discounts) || 0;
@@ -315,7 +314,7 @@ const Payroll = () => {
     setEditingRecord(record);
 
     // Find employee
-    const employee = employees.find(e => e.name === record.employeeName);
+    const employee = employees.find((e) => e.name === record.employeeName);
     if (employee) {
       setSelectedEmployee(employee.id.toString());
     }
@@ -330,7 +329,8 @@ const Payroll = () => {
     // Determine presentismo status based on record
     // This is a simple heuristic - in real app you'd store this info
     const employee_presentismo = employee?.presentismo || 0;
-    const has_presentismo = record.netTotal > (record.whiteAmount + record.informalAmount);
+    const has_presentismo =
+      record.netTotal > record.whiteAmount + record.informalAmount;
     setPresentismoStatus(has_presentismo ? "mantiene" : "pierde");
 
     setIsNewPayrollOpen(true);
@@ -360,13 +360,14 @@ const Payroll = () => {
           <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {isEditMode ? "Editar Liquidación" : "Calcular Nueva Liquidación"}
+                {isEditMode
+                  ? "Editar Liquidación"
+                  : "Calcular Nueva Liquidación"}
               </DialogTitle>
               <DialogDescription>
                 {isEditMode
                   ? "Modifica los datos de la liquidación existente"
-                  : "Completa los datos para generar la liquidación del empleado"
-                }
+                  : "Completa los datos para generar la liquidación del empleado"}
               </DialogDescription>
             </DialogHeader>
 
@@ -427,8 +428,11 @@ const Payroll = () => {
                   </Select>
                   {selectedEmployee && (
                     <p className="text-xs text-muted-foreground">
-                      Monto del presentismo: {formatCurrency(
-                        employees.find(e => e.id.toString() === selectedEmployee)?.presentismo || 0
+                      Monto del presentismo:{" "}
+                      {formatCurrency(
+                        employees.find(
+                          (e) => e.id.toString() === selectedEmployee,
+                        )?.presentismo || 0,
                       )}
                     </p>
                   )}
@@ -692,90 +696,91 @@ const Payroll = () => {
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Empleado</TableHead>
-                    <TableHead>Días Base</TableHead>
-                    <TableHead>Feriados</TableHead>
-                    {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
-                    <TableHead>Adelantos</TableHead>
-                    <TableHead>En Blanco</TableHead>
-                    <TableHead>Informal</TableHead>
-                    <TableHead>Total Neto</TableHead>
-                    <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {payrollRecords.map((record) => (
-                    <TableRow key={record.id}>
-                      <TableCell className="font-medium">
-                        {record.employeeName}
-                      </TableCell>
-                      <TableCell>{record.baseDays} días</TableCell>
-                      <TableCell>{record.holidayDays} días</TableCell>
-                      {isAguinaldoMonth && (
-                        <TableCell className="font-medium text-green-600">
-                          {record.aguinaldo > 0
-                            ? formatCurrency(record.aguinaldo)
-                            : "-"}
-                        </TableCell>
-                      )}
-                      <TableCell>{formatCurrency(record.advances)}</TableCell>
-                      <TableCell>
-                        {formatCurrency(record.whiteAmount)}
-                      </TableCell>
-                      <TableCell>
-                        {formatCurrency(record.informalAmount)}
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {formatCurrency(record.netTotal)}
-                        {record.aguinaldo > 0 && (
-                          <div className="text-xs text-green-600">
-                            Incluye aguinaldo
-                          </div>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            record.status === "processed"
-                              ? "default"
-                              : record.status === "pending"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {record.status === "processed"
-                            ? "Procesada"
-                            : record.status === "pending"
-                              ? "Pendiente"
-                              : "Borrador"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditRecord(record)}
-                            disabled={record.status === "processed"}
-                          >
-                            <Calculator className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            disabled={record.status === "processed"}
-                          >
-                            <FileText className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Empleado</TableHead>
+                      <TableHead>Días Base</TableHead>
+                      <TableHead>Feriados</TableHead>
+                      {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
+                      <TableHead>Adelantos</TableHead>
+                      <TableHead>En Blanco</TableHead>
+                      <TableHead>Informal</TableHead>
+                      <TableHead>Total Neto</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {payrollRecords.map((record) => (
+                      <TableRow key={record.id}>
+                        <TableCell className="font-medium">
+                          {record.employeeName}
+                        </TableCell>
+                        <TableCell>{record.baseDays} días</TableCell>
+                        <TableCell>{record.holidayDays} días</TableCell>
+                        {isAguinaldoMonth && (
+                          <TableCell className="font-medium text-green-600">
+                            {record.aguinaldo > 0
+                              ? formatCurrency(record.aguinaldo)
+                              : "-"}
+                          </TableCell>
+                        )}
+                        <TableCell>{formatCurrency(record.advances)}</TableCell>
+                        <TableCell>
+                          {formatCurrency(record.whiteAmount)}
+                        </TableCell>
+                        <TableCell>
+                          {formatCurrency(record.informalAmount)}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(record.netTotal)}
+                          {record.aguinaldo > 0 && (
+                            <div className="text-xs text-green-600">
+                              Incluye aguinaldo
+                            </div>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              record.status === "processed"
+                                ? "default"
+                                : record.status === "pending"
+                                  ? "secondary"
+                                  : "outline"
+                            }
+                          >
+                            {record.status === "processed"
+                              ? "Procesada"
+                              : record.status === "pending"
+                                ? "Pendiente"
+                                : "Borrador"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleEditRecord(record)}
+                              disabled={record.status === "processed"}
+                            >
+                              <Calculator className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              disabled={record.status === "processed"}
+                            >
+                              <FileText className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
