@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { LogIn, User, Shield } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 // Demo credentials
 const DEMO_USERS = {
