@@ -852,9 +852,11 @@ const Payroll = () => {
                           <TableCell>
                             {record.holidayDays > 0 ? (
                               <div>
-                                <div>{record.holidayDays} días</div>
-                                <div className="text-xs text-muted-foreground">
+                                <div className="font-medium">
                                   {formatCurrency(record.holidayBonus)}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {record.holidayDays} días
                                 </div>
                               </div>
                             ) : (
