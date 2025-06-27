@@ -42,7 +42,7 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border p-6 bg-gradient-to-br from-sidebar-background to-sidebar-accent">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ceramic-gold text-ceramic-emerald font-bold text-lg shadow-lg border-2 border-ceramic-cream/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ceramic-gold text-ceramic-terracotta font-bold text-lg shadow-lg border-2 border-ceramic-cream/20">
             RH
           </div>
           <div>
