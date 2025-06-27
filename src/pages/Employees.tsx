@@ -663,7 +663,7 @@ const Employees = () => {
                           setLosesPresentismo(employee.losesPresentismo);
                           setIsEditDialogOpen(true);
                         }}
-                        className="hover:bg-ceramic-gold/20 hover:text-ceramic-emerald text-ceramic-emerald/70"
+                        className="hover:bg-ceramic-gold/20 hover:text-ceramic-terracotta text-ceramic-terracotta/70"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
