@@ -32,17 +32,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import useFiles, { FileDocument } from "@/hooks/use-files";
 import { useAuth } from "@/hooks/use-auth";
 
-interface FileDocument {
-  id: string;
-  name: string;
-  type: string;
-  size: number;
-  url: string;
-  uploadDate: string;
-  description?: string;
-  category: "payroll" | "personal" | "contract" | "other";
-}
-
 interface FileUploadProps {
   entityId: number;
   entityType: "employee" | "payroll";
