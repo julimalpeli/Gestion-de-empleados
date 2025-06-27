@@ -34,8 +34,8 @@ const DEMO_USERS = {
     email: "admin@cadizbartapas.com",
     permissions: ["all"],
   },
-  manager: {
-    username: "manager",
+  gerente: {
+    username: "gerente",
     password: "gerente123",
     name: "María López",
     role: "manager" as const,
@@ -50,7 +50,7 @@ const DEMO_USERS = {
       "reports:view",
     ],
   },
-  hr: {
+  rrhh: {
     username: "rrhh",
     password: "rrhh123",
     name: "Ana García",
