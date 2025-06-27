@@ -708,6 +708,7 @@ const Payroll = () => {
                       <TableHead>Informal</TableHead>
                       <TableHead>Total Neto</TableHead>
                       <TableHead>Estado</TableHead>
+                      <TableHead>Documentos</TableHead>
                       <TableHead className="text-right">Acciones</TableHead>
                     </TableRow>
                   </TableHeader>
