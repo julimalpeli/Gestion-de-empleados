@@ -20,8 +20,14 @@ export class SupabaseEmployeeService implements IEmployeeService {
       console.log("📊 Respuesta de Supabase:", { data, error });
 
       if (error) {
-        console.error("❌ Error de Supabase:", error);
-        throw error;
+        console.error("❌ Error de Supabase completo:", error);
+        console.error("❌ Error message:", error.message);
+        console.error("❌ Error code:", error.code);
+        console.error("❌ Error details:", error.details);
+        console.error("❌ Error hint:", error.hint);
+        throw new Error(
+          `Supabase error: ${error.message} (Code: ${error.code})`,
+        );
       }
 
       const mappedData = data.map(this.mapFromSupabase);
