@@ -288,6 +288,16 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
 `);
   };
 
+  // Logging temporal para diagnóstico
+  console.log("🔍 Diagnóstico Employees:", {
+    employees,
+    employeesLength: employees.length,
+    loading,
+    error,
+    statusFilter,
+    searchTerm,
+  });
+
   const filteredEmployees = employees.filter((employee) => {
     const matchesSearch =
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -298,6 +308,8 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
 
     return matchesSearch && matchesStatus;
   });
+
+  console.log("🔍 Filtered employees:", filteredEmployees);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
