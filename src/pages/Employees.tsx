@@ -765,6 +765,18 @@ const Employees = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Vacation Manager */}
+      {selectedEmployeeForVacations && (
+        <VacationManager
+          employee={selectedEmployeeForVacations}
+          isOpen={isVacationManagerOpen}
+          onClose={() => {
+            setIsVacationManagerOpen(false);
+            setSelectedEmployeeForVacations(null);
+          }}
+        />
+      )}
     </div>
   );
 };
