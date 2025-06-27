@@ -152,15 +152,15 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Calcular salario diario: (sueldo_blanco + informal) / 30
     NEW.daily_wage := ROUND((NEW.white_wage + NEW.informal_wage) / 30.0, 2);
-    
+
     -- Calcular días de vacaciones según antigüedad
-    NEW.vacation_days := CASE 
-        WHEN (CURRENT_DATE - NEW.start_date) >= INTERVAL '20 years' THEN 35
-        WHEN (CURRENT_DATE - NEW.start_date) >= INTERVAL '10 years' THEN 28  
-        WHEN (CURRENT_DATE - NEW.start_date) >= INTERVAL '5 years' THEN 21
+    NEW.vacation_days := CASE
+        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date)) >= 20 THEN 35
+        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date)) >= 10 THEN 28
+        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date)) >= 5 THEN 21
         ELSE 14
     END;
-    
+
     NEW.updated_at := NOW();
     RETURN NEW;
 END;
@@ -181,13 +181,13 @@ BEGIN
     IF EXTRACT(MONTH FROM CURRENT_DATE) IN (6, 12) THEN
         SELECT (white_wage + informal_wage) INTO monthly_salary
         FROM employees WHERE id = NEW.employee_id;
-        
+
         -- Calcular meses trabajados en el semestre
         worked_months := 6; -- Simplificado - en producción calcular real
-        
+
         NEW.aguinaldo := ROUND((monthly_salary * worked_months) / 12.0, 2);
     END IF;
-    
+
     NEW.updated_at := NOW();
     RETURN NEW;
 END;
@@ -261,17 +261,17 @@ DECLARE
     record_data payroll_records%ROWTYPE;
 BEGIN
     SELECT * INTO record_data FROM payroll_records WHERE id = record_id;
-    
-    total := record_data.white_amount + 
-             record_data.informal_amount + 
-             record_data.holiday_bonus + 
-             record_data.aguinaldo + 
+
+    total := record_data.white_amount +
+             record_data.informal_amount +
+             record_data.holiday_bonus +
+             record_data.aguinaldo +
              record_data.presentismo_amount +
              record_data.overtime_amount +
              record_data.bonus_amount -
              record_data.discounts -
              record_data.advances;
-             
+
     RETURN ROUND(total, 2);
 END;
 $$ LANGUAGE plpgsql;
@@ -300,7 +300,7 @@ INSERT INTO users (username, email, name, role, password_hash) VALUES
 -- COMPLETED SUCCESSFULLY
 -- ===========================================
 -- ✅ Schema creado correctamente sin referencias circulares
--- ✅ Triggers para cálculos automáticos implementados  
+-- ✅ Triggers para cálculos automáticos implementados
 -- ✅ RLS configurado para seguridad
 -- ✅ Índices para performance añadidos
 -- ✅ Datos de ejemplo insertados
