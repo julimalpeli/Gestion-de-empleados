@@ -707,21 +707,209 @@ const Reports = () => {
           </Card>
         </TabsContent>
 
-        <TabsContent value="asistencia">
+        <TabsContent value="asistencia" className="space-y-6">
+          {/* Resumen de Asistencia */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Días Trabajados Totales
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-primary">
+                  {payrollRecords.reduce(
+                    (sum, record) => sum + record.baseDays,
+                    0,
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">Este mes</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Feriados Trabajados
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-orange-600">
+                  {payrollRecords.reduce(
+                    (sum, record) => sum + record.holidayDays,
+                    0,
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">Días extras</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Horas Extras Totales
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-blue-600">
+                  {payrollRecords.reduce(
+                    (sum, record) => sum + record.overtimeHours,
+                    0,
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Horas adicionales
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Promedio Asistencia
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-green-600">
+                  {payrollRecords.length > 0
+                    ? Math.round(
+                        payrollRecords.reduce(
+                          (sum, record) => sum + record.baseDays,
+                          0,
+                        ) / payrollRecords.length,
+                      )
+                    : 0}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Días por empleado
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Tabla de Asistencia por Empleado */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Reportes de Asistencia
+                <Users className="h-5 w-5" />
+                Asistencia por Empleado
               </CardTitle>
               <CardDescription>
-                Control de días trabajados y ausentismo
+                Detalle de días trabajados y ausentismo
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center text-muted-foreground py-8">
-                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Próximamente disponible</p>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Empleado</TableHead>
+                      <TableHead>Días Base</TableHead>
+                      <TableHead>Feriados</TableHead>
+                      <TableHead>Horas Extras</TableHead>
+                      <TableHead>Presentismo</TableHead>
+                      <TableHead>Ausentismo</TableHead>
+                      <TableHead>% Asistencia</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {employees.map((employee) => {
+                      const employeePayrolls = payrollRecords.filter(
+                        (record) => record.employeeName === employee.name,
+                      );
+                      const totalBaseDays = employeePayrolls.reduce(
+                        (sum, record) => sum + record.baseDays,
+                        0,
+                      );
+                      const totalHolidayDays = employeePayrolls.reduce(
+                        (sum, record) => sum + record.holidayDays,
+                        0,
+                      );
+                      const totalOvertimeHours = employeePayrolls.reduce(
+                        (sum, record) => sum + record.overtimeHours,
+                        0,
+                      );
+                      const hasPresentismo = employeePayrolls.some(
+                        (record) => record.presentismoAmount > 0,
+                      );
+                      const expectedDays = 30; // Días esperados por mes
+                      const absentDays = Math.max(
+                        0,
+                        expectedDays - totalBaseDays,
+                      );
+                      const attendancePercentage = Math.round(
+                        (totalBaseDays / expectedDays) * 100,
+                      );
+
+                      return (
+                        <TableRow key={employee.id}>
+                          <TableCell className="font-medium">
+                            {employee.name}
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium">{totalBaseDays}</div>
+                              <div className="text-xs text-muted-foreground">
+                                de {expectedDays} días
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            {totalHolidayDays > 0 ? (
+                              <Badge variant="secondary">
+                                {totalHolidayDays} días
+                              </Badge>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {totalOvertimeHours > 0 ? (
+                              <Badge variant="outline">
+                                {totalOvertimeHours} hs
+                              </Badge>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                hasPresentismo ? "default" : "destructive"
+                              }
+                            >
+                              {hasPresentismo ? "Mantiene" : "Perdido"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {absentDays > 0 ? (
+                              <span className="text-red-600 font-medium">
+                                {absentDays} días
+                              </span>
+                            ) : (
+                              <span className="text-green-600">Perfecto</span>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-2">
+                              <Badge
+                                variant={
+                                  attendancePercentage >= 90
+                                    ? "default"
+                                    : attendancePercentage >= 75
+                                      ? "secondary"
+                                      : "destructive"
+                                }
+                              >
+                                {attendancePercentage}%
+                              </Badge>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
