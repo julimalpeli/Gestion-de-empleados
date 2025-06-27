@@ -455,7 +455,7 @@ const Payroll = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="holidayDays">
-                    D��as Feriados (doble pago)
+                    Días Feriados (doble pago)
                   </Label>
                   <Input
                     id="holidayDays"
@@ -486,6 +486,54 @@ const Payroll = () => {
                     value={discounts}
                     onChange={(e) => setDiscounts(e.target.value)}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="overtimeToggle"
+                      checked={overtimeEnabled}
+                      onChange={(e) => setOvertimeEnabled(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <Label htmlFor="overtimeToggle">Horas Extra</Label>
+                  </div>
+                  {overtimeEnabled && (
+                    <div className="space-y-2">
+                      <Input
+                        id="overtimeHours"
+                        type="number"
+                        placeholder="0"
+                        value={overtimeHours}
+                        onChange={(e) => setOvertimeHours(e.target.value)}
+                      />
+                      {selectedEmployee && (
+                        <p className="text-xs text-muted-foreground">
+                          Tarifa por hora:{" "}
+                          {formatCurrency(
+                            (employees.find(
+                              (e) => e.id.toString() === selectedEmployee,
+                            )?.dailyWage || 0) / 8,
+                          )}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="bonusAmount">Bono Libre</Label>
+                  <Input
+                    id="bonusAmount"
+                    type="number"
+                    placeholder="0"
+                    value={bonusAmount}
+                    onChange={(e) => setBonusAmount(e.target.value)}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Monto adicional que se suma al salario final
+                  </p>
                 </div>
 
                 <div className="space-y-2">
