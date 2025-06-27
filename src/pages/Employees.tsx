@@ -788,19 +788,56 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                     })()}
                   </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex items-center justify-end gap-1">
+                      {/* Info Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => showEmployeeInfo(employee)}
+                        title="Ver información completa del empleado"
+                      >
+                        <Info className="h-4 w-4" />
+                      </Button>
+
+                      {/* Edit Button */}
                       <PermissionGate module="employees" action="edit">
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleEditEmployee(employee)}
+                          title="Editar datos del empleado"
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </PermissionGate>
 
+                      {/* Toggle Status Button */}
+                      <PermissionGate module="employees" action="edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleStatus(employee)}
+                          title={
+                            employee.status === "active"
+                              ? "Desactivar empleado"
+                              : "Activar empleado"
+                          }
+                        >
+                          {employee.status === "active" ? (
+                            <UserX className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <UserCheck className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                      </PermissionGate>
+
+                      {/* Delete Button */}
                       <PermissionGate module="employees" action="delete">
-                        <Button variant="ghost" size="sm">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Eliminar empleado"
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </PermissionGate>
