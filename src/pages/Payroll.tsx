@@ -274,8 +274,9 @@ const Payroll = () => {
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
     // Agregar presentismo según selección en liquidación
-    const presentismoAmount =
-      presentismoStatus === "mantiene" ? employee.presentismo : 0;
+    const presentismoAmount = presentismoStatus === "mantiene"
+      ? employee.presentismo
+      : 0;
 
     const totalAdvances = parseInt(advances) || 0;
     const totalDiscounts = parseInt(discounts) || 0;
@@ -314,7 +315,7 @@ const Payroll = () => {
     setEditingRecord(record);
 
     // Find employee
-    const employee = employees.find((e) => e.name === record.employeeName);
+    const employee = employees.find(e => e.name === record.employeeName);
     if (employee) {
       setSelectedEmployee(employee.id.toString());
     }
@@ -329,8 +330,7 @@ const Payroll = () => {
     // Determine presentismo status based on record
     // This is a simple heuristic - in real app you'd store this info
     const employee_presentismo = employee?.presentismo || 0;
-    const has_presentismo =
-      record.netTotal > record.whiteAmount + record.informalAmount;
+    const has_presentismo = record.netTotal > (record.whiteAmount + record.informalAmount);
     setPresentismoStatus(has_presentismo ? "mantiene" : "pierde");
 
     setIsNewPayrollOpen(true);
@@ -360,14 +360,13 @@ const Payroll = () => {
           <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {isEditMode
-                  ? "Editar Liquidación"
-                  : "Calcular Nueva Liquidación"}
+                {isEditMode ? "Editar Liquidación" : "Calcular Nueva Liquidación"}
               </DialogTitle>
               <DialogDescription>
                 {isEditMode
                   ? "Modifica los datos de la liquidación existente"
-                  : "Completa los datos para generar la liquidación del empleado"}
+                  : "Completa los datos para generar la liquidación del empleado"
+                }
               </DialogDescription>
             </DialogHeader>
 
@@ -428,11 +427,8 @@ const Payroll = () => {
                   </Select>
                   {selectedEmployee && (
                     <p className="text-xs text-muted-foreground">
-                      Monto del presentismo:{" "}
-                      {formatCurrency(
-                        employees.find(
-                          (e) => e.id.toString() === selectedEmployee,
-                        )?.presentismo || 0,
+                      Monto del presentismo: {formatCurrency(
+                        employees.find(e => e.id.toString() === selectedEmployee)?.presentismo || 0
                       )}
                     </p>
                   )}
@@ -694,7 +690,8 @@ const Payroll = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div className="overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Empleado</TableHead>
