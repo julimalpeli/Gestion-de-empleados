@@ -135,6 +135,8 @@ const Employees = () => {
   const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
   const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
     useState(null);
+  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
+    useState(false);
 
   // Calculate vacation days based on seniority
   const calculateVacationDays = (startDate: string) => {
