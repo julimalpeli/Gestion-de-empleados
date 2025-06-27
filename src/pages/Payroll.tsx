@@ -359,9 +359,15 @@ const Payroll = () => {
           </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Calcular Nueva Liquidación</DialogTitle>
+              <DialogTitle>
+                {isEditMode
+                  ? "Editar Liquidación"
+                  : "Calcular Nueva Liquidación"}
+              </DialogTitle>
               <DialogDescription>
-                Completa los datos para generar la liquidación del empleado
+                {isEditMode
+                  ? "Modifica los datos de la liquidación existente"
+                  : "Completa los datos para generar la liquidación del empleado"}
               </DialogDescription>
             </DialogHeader>
 
