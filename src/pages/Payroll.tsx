@@ -213,8 +213,13 @@ const Payroll = () => {
     setWorkDays(record.baseDays.toString());
     setHolidayDays(record.holidayDays.toString());
     setAdvances(record.advances.toString());
-    setDiscounts("0"); // We don't have discounts in the record, default to 0
+    setDiscounts(record.discounts ? record.discounts.toString() : "0");
     setWhiteWage(record.whiteAmount.toString());
+    setBonusAmount(record.bonusAmount ? record.bonusAmount.toString() : "0");
+    setOvertimeHours(
+      record.overtimeHours ? record.overtimeHours.toString() : "0",
+    );
+    setOvertimeEnabled(record.overtimeHours > 0);
 
     // Determine presentismo status based on record
     const has_presentismo = record.presentismoAmount > 0;
