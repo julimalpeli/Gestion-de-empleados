@@ -849,7 +849,48 @@ const Payroll = () => {
                             {record.employeeName}
                           </TableCell>
                           <TableCell>{record.baseDays} días</TableCell>
-                          <TableCell>{record.holidayDays} días</TableCell>
+                          <TableCell>
+                            {record.holidayDays > 0 ? (
+                              <div>
+                                <div>{record.holidayDays} días</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {formatCurrency(record.holidayBonus)}
+                                </div>
+                              </div>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {record.overtimeHours > 0 ? (
+                              <div>
+                                <div>{record.overtimeHours} hs</div>
+                                <div className="text-xs text-muted-foreground">
+                                  {formatCurrency(record.overtimeAmount)}
+                                </div>
+                              </div>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {record.bonusAmount > 0 ? (
+                              <span className="text-green-600 font-medium">
+                                {formatCurrency(record.bonusAmount)}
+                              </span>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {record.discounts > 0 ? (
+                              <span className="text-red-600">
+                                {formatCurrency(record.discounts)}
+                              </span>
+                            ) : (
+                              "-"
+                            )}
+                          </TableCell>
                           {isAguinaldoMonth && (
                             <TableCell className="font-medium text-green-600">
                               {record.aguinaldo > 0
