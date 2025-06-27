@@ -1418,7 +1418,5 @@ const Payroll = () => {
     </TooltipProvider>
   );
 };
-  );
-};
 
 export default Payroll;
