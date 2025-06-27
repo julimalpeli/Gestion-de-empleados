@@ -339,51 +339,6 @@ const Employees = () => {
                   />
                 </div>
 
-                {/* Presentismo Loss Section - Only in Edit */}
-                <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
-                  <h4 className="font-medium text-sm">
-                    Estado del Presentismo
-                  </h4>
-                  <div className="space-y-2">
-                    <Label htmlFor="editLosesPresentismo">
-                      ¿Pierde el presentismo?
-                    </Label>
-                    <Select
-                      value={losesPresentismo ? "si" : "no"}
-                      onValueChange={(value) =>
-                        setLosesPresentismo(value === "si")
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="no">
-                          No - Mantiene presentismo
-                        </SelectItem>
-                        <SelectItem value="si">
-                          Sí - Pierde presentismo
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {losesPresentismo && (
-                    <div className="space-y-2">
-                      <Label htmlFor="editPresentismoComment">
-                        Motivo de pérdida de presentismo
-                      </Label>
-                      <Input
-                        id="editPresentismoComment"
-                        placeholder="Ej: Ausencias sin justificar"
-                        defaultValue={editingEmployee.presentismoComment}
-                      />
-                      <p className="text-xs text-muted-foreground">
-                        Se registrará la fecha y motivo de la pérdida
-                      </p>
-                    </div>
-                  )}
-                </div>
-
                 <div className="space-y-2">
                   <Label htmlFor="editStartDate">Fecha de Ingreso</Label>
                   <Input
