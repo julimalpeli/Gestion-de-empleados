@@ -39,7 +39,7 @@ export interface Database {
 export interface Employee {
   id: string;
   name: string;
-  position: string;
+  job_position: string;
   white_wage: number;
   informal_wage: number;
   daily_wage: number;
