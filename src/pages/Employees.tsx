@@ -631,6 +631,12 @@ const Employees = () => {
           }}
         />
       )}
+
+      {/* Liquidations Report */}
+      <LiquidationsReport
+        isOpen={isLiquidationsReportOpen}
+        onClose={() => setIsLiquidationsReportOpen(false)}
+      />
     </div>
   );
 };
