@@ -47,6 +47,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
   async createEmployee(employee: CreateEmployeeRequest): Promise<Employee> {
     try {
+      console.log("Creating employee with input:", employee);
+
       const dailyWage = (employee.whiteWage + employee.informalWage) / 30;
       const vacationInfo = this.calculateVacationDays(employee.startDate);
 
@@ -64,11 +66,15 @@ export class SupabaseEmployeeService implements IEmployeeService {
         vacations_taken: 0,
       };
 
+      console.log("Sending to Supabase:", newEmployee);
+
       const { data, error } = await supabase
         .from("employees")
         .insert(newEmployee)
         .select()
         .single();
+
+      console.log("Supabase response:", { data, error });
 
       if (error) throw error;
 
