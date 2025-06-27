@@ -165,11 +165,12 @@ const employees = [
 const Payroll = () => {
   const [isNewPayrollOpen, setIsNewPayrollOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
-  const [workDays, setWorkDays] = useState("");
+  const [workDays, setWorkDays] = useState("30");
   const [holidayDays, setHolidayDays] = useState("");
   const [advances, setAdvances] = useState("");
   const [discounts, setDiscounts] = useState("");
   const [whiteWage, setWhiteWage] = useState("");
+  const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
 
