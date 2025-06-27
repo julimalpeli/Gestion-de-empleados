@@ -529,40 +529,30 @@ const Employees = () => {
                   <TableCell>{formatCurrency(employee.whiteWage)}</TableCell>
                   <TableCell>{formatCurrency(employee.informalWage)}</TableCell>
                   <TableCell>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
-                          {employee.vacationDays - employee.vacationsTaken}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          / {employee.vacationDays}
-                        </span>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="default" className="text-xs">
+                          {employee.vacationDays} anuales
+                        </Badge>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className="bg-blue-600 h-2 rounded-full"
-                          style={{
-                            width: `${Math.max(
-                              5,
-                              ((employee.vacationDays -
-                                employee.vacationsTaken) /
-                                employee.vacationDays) *
-                                100,
-                            )}%`,
-                          }}
-                        ></div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {employee.vacationsTaken} tomados
+                        </Badge>
+                        <Badge variant="outline" className="text-xs">
+                          {employee.vacationDays - employee.vacationsTaken}{" "}
+                          disponibles
+                        </Badge>
                       </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>Tomados: {employee.vacationsTaken}</span>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openVacationManager(employee)}
-                          className="h-6 px-2 text-xs hover:bg-blue-100"
-                        >
-                          <Plane className="h-3 w-3" />
-                        </Button>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openVacationManager(employee)}
+                        className="h-6 text-xs"
+                      >
+                        <Plane className="h-3 w-3 mr-1" />
+                        Gestionar
+                      </Button>
                     </div>
                   </TableCell>
                   <TableCell>
