@@ -157,18 +157,29 @@ const Employees = () => {
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
 
-  const handleAddEmployee = () => {
-    // Here would be the logic to save the employee
-    console.log("Adding employee:", newEmployee);
-    setIsAddDialogOpen(false);
-    setNewEmployee({
-      name: "",
-      position: "",
-      whiteWage: "",
-      informalWage: "",
-      presentismo: "",
-      startDate: "",
-    });
+  const handleAddEmployee = async () => {
+    try {
+      await createEmployee({
+        name: newEmployee.name,
+        position: newEmployee.position,
+        whiteWage: parseFloat(newEmployee.whiteWage) || 0,
+        informalWage: parseFloat(newEmployee.informalWage) || 0,
+        presentismo: parseFloat(newEmployee.presentismo) || 0,
+        startDate: newEmployee.startDate,
+      });
+      setIsAddDialogOpen(false);
+      setNewEmployee({
+        name: "",
+        position: "",
+        whiteWage: "",
+        informalWage: "",
+        presentismo: "",
+        startDate: "",
+      });
+    } catch (error) {
+      console.error("Error creating employee:", error);
+      alert("Error al crear empleado");
+    }
   };
 
   const handleEditEmployee = (employee) => {
@@ -176,16 +187,33 @@ const Employees = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleSaveEdit = () => {
-    // Here would be the logic to save the edited employee
-    console.log("Saving edited employee:", editingEmployee);
-    setIsEditDialogOpen(false);
-    setEditingEmployee(null);
+  const handleSaveEdit = async () => {
+    if (!editingEmployee) return;
+    try {
+      await updateEmployee(editingEmployee.id, {
+        name: editingEmployee.name,
+        position: editingEmployee.position,
+        whiteWage: editingEmployee.whiteWage,
+        informalWage: editingEmployee.informalWage,
+        presentismo: editingEmployee.presentismo,
+        startDate: editingEmployee.startDate,
+      });
+      setIsEditDialogOpen(false);
+      setEditingEmployee(null);
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      alert("Error al actualizar empleado");
+    }
   };
 
-  const handleToggleStatus = (employee) => {
-    // Here would be the logic to toggle employee status
-    console.log("Toggling status for:", employee.name);
+  const handleToggleStatus = async (employee) => {
+    try {
+      const newStatus = employee.status === "active" ? "inactive" : "active";
+      await updateEmployee(employee.id, { status: newStatus });
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      alert("Error al cambiar estado del empleado");
+    }
   };
 
   const openVacationManager = (employee) => {
