@@ -41,24 +41,16 @@ const Login = () => {
 
     // Simulate API call
     setTimeout(() => {
-      const user = DEMO_USERS[username as keyof typeof DEMO_USERS];
+      const userData = validateLogin(username, password);
 
-      if (user && user.password === password) {
-        // Use auth context login method
-        login({
-          username,
-          name: user.name,
-          role: user.role,
-          employeeId: user.employeeId || undefined,
-          permissions: user.permissions,
-          loginTime: new Date().toISOString(),
-        });
+      if (userData) {
+        login(userData);
 
         // Redirect based on role
-        if (user.role === "admin") {
-          navigate("/");
-        } else {
+        if (userData.role === "employee") {
           navigate("/portal-empleado");
+        } else {
+          navigate("/");
         }
       } else {
         setError("Usuario o contraseña incorrectos");
