@@ -197,9 +197,11 @@ const FileUpload = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Upload className="h-4 w-4 mr-2" />
-          {files.length > 0 ? `${files.length} archivos` : "Subir archivos"}
+        <Button variant="outline" size="sm" className="h-8 px-2">
+          <Upload className="h-3 w-3" />
+          {files.length > 0 && (
+            <span className="ml-1 text-xs">{files.length}</span>
+          )}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
