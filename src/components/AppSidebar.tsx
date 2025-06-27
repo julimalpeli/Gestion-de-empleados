@@ -44,6 +44,11 @@ const items = [
     url: "/reportes",
     icon: FileBarChart,
   },
+  {
+    title: "Roles y Permisos",
+    url: "/roles",
+    icon: Shield,
+  },
 ];
 
 export function AppSidebar() {
