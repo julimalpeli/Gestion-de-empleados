@@ -211,7 +211,7 @@ const Reports = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="aguinaldos" className="space-y-4">
+      <Tabs defaultValue="liquidaciones" className="space-y-4">
         <TabsList>
           <TabsTrigger value="liquidaciones">
             Reporte de Liquidaciones
