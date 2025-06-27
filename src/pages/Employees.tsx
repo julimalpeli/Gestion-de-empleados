@@ -556,6 +556,7 @@ const Employees = () => {
                 <TableHead>Presentismo</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Vacaciones</TableHead>
+                <TableHead>Documentos</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
