@@ -13,24 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { LogIn, User, Shield } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
-
-// Demo credentials
-const DEMO_USERS = {
-  admin: {
-    password: "admin123",
-    role: "admin",
-    name: "Administrador",
-    permissions: ["all"],
-  },
-  employee: {
-    password: "empleado123",
-    role: "employee",
-    name: "Juan Pérez",
-    employeeId: 1,
-    permissions: ["view-own-data", "view-payroll", "view-vacations"],
-  },
-};
+import { useAuth, validateLogin, DEMO_USERS } from "@/hooks/use-auth";
 
 const Login = () => {
   const [username, setUsername] = useState("");
