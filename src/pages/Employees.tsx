@@ -47,6 +47,12 @@ import {
 import { VacationManager } from "@/components/VacationManager";
 import FileUpload from "@/components/FileUpload";
 import LiquidationsReport from "@/components/LiquidationsReport";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Mock data with calculated vacation days
 const employees = [
