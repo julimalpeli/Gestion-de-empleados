@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
+import VacationManager from "@/components/VacationManager";
 
 // Mock data with calculated vacation days
 const employees = [
