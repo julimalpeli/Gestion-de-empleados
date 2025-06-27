@@ -132,9 +132,12 @@ const FileUpload = ({
         url: URL.createObjectURL(file), // In real app, this would be the server URL
         uploadDate: new Date().toISOString(),
         category: entityType === "payroll" ? "payroll" : "personal",
+        entityType,
+        entityId,
+        uploadedBy: user?.name || "Usuario",
       };
 
-      setFiles((prev) => [...prev, newFile]);
+      addFile(newFile);
       onFileUploaded?.(newFile);
 
       // Reset file input
