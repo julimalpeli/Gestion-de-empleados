@@ -433,32 +433,30 @@ const Employees = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-6 md:grid-cols-4">
-        <Card className="border-2 border-ceramic-terracotta/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-terracotta/10">
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
+            <CardTitle className="text-sm font-medium">
               Total Empleados
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-terracotta">
-              {employees.length}
-            </div>
-            <p className="text-xs text-ceramic-terracotta/70 font-medium">
+            <div className="text-2xl font-bold">{employees.length}</div>
+            <p className="text-xs text-muted-foreground">
               {employees.filter((e) => e.status === "active").length} activos
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-ceramic-gold/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-gold/10">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
+            <CardTitle className="text-sm font-medium">
               Gasto Mensual Total
             </CardTitle>
-            <DollarSign className="h-5 w-5 text-ceramic-gold" />
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-gold">
+            <div className="text-2xl font-bold">
               {formatCurrency(
                 employees
                   .filter((e) => e.status === "active")
@@ -472,21 +470,21 @@ const Employees = () => {
                   ),
               )}
             </div>
-            <p className="text-xs text-ceramic-terracotta/70 font-medium">
+            <p className="text-xs text-muted-foreground">
               Incluye presentismo vigente
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-ceramic-emerald/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-emerald/10">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
+            <CardTitle className="text-sm font-medium">
               Total Días de Vacaciones
             </CardTitle>
-            <Calendar className="h-5 w-5 text-ceramic-emerald" />
+            <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-emerald">
+            <div className="text-2xl font-bold">
               {employees
                 .filter((e) => e.status === "active")
                 .reduce(
@@ -494,20 +492,20 @@ const Employees = () => {
                   0,
                 )}
             </div>
-            <p className="text-xs text-ceramic-terracotta/70 font-medium">
+            <p className="text-xs text-muted-foreground">
               Días disponibles totales
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-ceramic-cream/40 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-cream/40">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
+            <CardTitle className="text-sm font-medium">
               Sueldo Promedio
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-terracotta">
+            <div className="text-2xl font-bold">
               {formatCurrency(
                 Math.round(
                   employees
@@ -517,7 +515,7 @@ const Employees = () => {
                 ),
               )}
             </div>
-            <p className="text-xs text-ceramic-terracotta/70 font-medium">
+            <p className="text-xs text-muted-foreground">
               Por día por empleado
             </p>
           </CardContent>
@@ -538,46 +536,26 @@ const Employees = () => {
       </div>
 
       {/* Employees Table */}
-      <Card className="border-2 border-ceramic-terracotta/20 shadow-xl bg-gradient-to-br from-white to-ceramic-cream/20">
-        <CardHeader className="bg-gradient-to-r from-ceramic-terracotta/5 to-ceramic-gold/5 border-b border-ceramic-terracotta/20">
-          <CardTitle className="text-ceramic-terracotta text-xl font-bold">
-            Lista de Empleados
-          </CardTitle>
-          <CardDescription className="text-ceramic-terracotta/70 font-medium">
+      <Card>
+        <CardHeader>
+          <CardTitle>Lista de Empleados</CardTitle>
+          <CardDescription>
             Gestiona la información de todos los empleados y sus vacaciones
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="bg-ceramic-terracotta/10 hover:bg-ceramic-terracotta/15">
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Nombre
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Puesto
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Sueldo Diario
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Mensual Blanco
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Mensual Informal
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Presentismo
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Estado
-                </TableHead>
-                <TableHead className="font-bold text-ceramic-terracotta">
-                  Vacaciones
-                </TableHead>
-                <TableHead className="text-right font-bold text-ceramic-terracotta">
-                  Acciones
-                </TableHead>
+              <TableRow>
+                <TableHead>Nombre</TableHead>
+                <TableHead>Puesto</TableHead>
+                <TableHead>Sueldo Diario</TableHead>
+                <TableHead>Mensual Blanco</TableHead>
+                <TableHead>Mensual Informal</TableHead>
+                <TableHead>Presentismo</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Vacaciones</TableHead>
+                <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -597,11 +575,11 @@ const Employees = () => {
                     <div className="space-y-1">
                       <div>{formatCurrency(employee.presentismo)}</div>
                       {employee.losesPresentismo ? (
-                        <Badge className="text-xs bg-ceramic-emerald text-ceramic-cream">
+                        <Badge variant="destructive" className="text-xs">
                           Perdido
                         </Badge>
                       ) : (
-                        <Badge className="text-xs bg-ceramic-gold text-ceramic-terracotta">
+                        <Badge variant="default" className="text-xs">
                           Vigente
                         </Badge>
                       )}
@@ -615,10 +593,8 @@ const Employees = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      className={
-                        employee.status === "active"
-                          ? "bg-ceramic-terracotta text-ceramic-cream border border-ceramic-gold/30"
-                          : "bg-ceramic-cream text-ceramic-terracotta border border-ceramic-terracotta/30"
+                      variant={
+                        employee.status === "active" ? "default" : "secondary"
                       }
                     >
                       {employee.status === "active" ? "Activo" : "Inactivo"}
@@ -627,15 +603,15 @@ const Employees = () => {
                   <TableCell>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge className="text-xs bg-ceramic-terracotta text-ceramic-cream">
+                        <Badge variant="default" className="text-xs">
                           {employee.vacationDays} anuales
                         </Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className="text-xs bg-ceramic-emerald text-ceramic-cream">
+                        <Badge variant="secondary" className="text-xs">
                           {employee.vacationsTaken} tomados
                         </Badge>
-                        <Badge className="text-xs bg-ceramic-gold text-ceramic-terracotta">
+                        <Badge variant="outline" className="text-xs">
                           {employee.vacationDays - employee.vacationsTaken}{" "}
                           disponibles
                         </Badge>
@@ -644,7 +620,7 @@ const Employees = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => openVacationManager(employee)}
-                        className="h-6 text-xs hover:bg-ceramic-gold/20 hover:text-ceramic-terracotta"
+                        className="h-6 text-xs"
                       >
                         <Plane className="h-3 w-3 mr-1" />
                         Gestionar
@@ -661,15 +637,10 @@ const Employees = () => {
                           setLosesPresentismo(employee.losesPresentismo);
                           setIsEditDialogOpen(true);
                         }}
-                        className="hover:bg-ceramic-gold/20 hover:text-ceramic-terracotta text-ceramic-terracotta/70"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="hover:bg-ceramic-emerald/20 hover:text-ceramic-emerald text-ceramic-terracotta/70"
-                      >
+                      <Button variant="ghost" size="sm">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
