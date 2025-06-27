@@ -667,6 +667,9 @@ const Employees = () => {
                 <TableRow key={employee.id}>
                   <TableCell className="font-medium">{employee.name}</TableCell>
                   <TableCell>{employee.position}</TableCell>
+                  <TableCell>
+                    {new Date(employee.startDate).toLocaleDateString("es-AR")}
+                  </TableCell>
                   <TableCell className="font-medium text-primary">
                     {formatCurrency(employee.dailyWage)}
                     <div className="text-xs text-muted-foreground">
