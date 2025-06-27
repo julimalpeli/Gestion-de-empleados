@@ -712,7 +712,7 @@ const Payroll = () => {
                 ),
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Febrero 2024</p>
+            <p className="text-xs text-muted-foreground">Diciembre 2024</p>
           </CardContent>
         </Card>
 
