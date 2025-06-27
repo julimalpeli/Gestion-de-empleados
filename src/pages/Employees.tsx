@@ -629,6 +629,14 @@ const Employees = () => {
                       </Button>
                     </div>
                   </TableCell>
+                  <TableCell>
+                    <FileUpload
+                      entityId={employee.id}
+                      entityType="employee"
+                      title={`Documentos de ${employee.name}`}
+                      description="Subir contratos, documentos personales y otros archivos del empleado"
+                    />
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
