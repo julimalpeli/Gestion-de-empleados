@@ -149,38 +149,18 @@ const VacationManager = ({
     setIsAddingVacation(true);
   };
 
-  const handleSaveEdit = () => {
-    if (
-      editingVacation &&
-      newVacation.startDate &&
-      newVacation.endDate &&
-      newVacation.reason
-    ) {
-      const days = calculateDays(newVacation.startDate, newVacation.endDate);
-
-      const updatedVacations = vacations.map((v) =>
-        v.id === editingVacation.id ? { ...v, ...newVacation, days } : v,
-      );
-
-      setVacations(updatedVacations);
-      setNewVacation({
-        startDate: "",
-        endDate: "",
-        reason: "",
-        status: "pending",
-      });
-      setEditingVacation(null);
-      setIsAddingVacation(false);
-    }
-  };
-
-  const handleDeleteVacation = (vacationId) => {
+  const handleDeleteVacation = async (vacationId) => {
     if (
       confirm(
         "¿Estás seguro de que quieres eliminar esta solicitud de vacaciones?",
       )
     ) {
-      setVacations(vacations.filter((v) => v.id !== vacationId));
+      try {
+        await deleteVacation(vacationId);
+      } catch (error) {
+        console.error("Error deleting vacation:", error);
+        alert("Error al eliminar vacación");
+      }
     }
   };
 
