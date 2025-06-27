@@ -729,7 +729,12 @@ const Employees = () => {
                           disponibles
                         </Badge>
                       </div>
-                      <Button variant="ghost" size="sm" className="h-6 text-xs">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs"
+                        onClick={() => openVacationManager(employee)}
+                      >
                         <Plane className="h-3 w-3 mr-1" />
                         Gestionar
                       </Button>
