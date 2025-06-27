@@ -34,6 +34,7 @@ import {
   DollarSign,
   Calendar,
   Plane,
+  FileText,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
