@@ -128,6 +128,9 @@ const Employees = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
+  const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
+    useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     position: "",
