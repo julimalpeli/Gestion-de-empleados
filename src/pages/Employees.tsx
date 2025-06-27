@@ -10,14 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
   Table,
   TableBody,
   TableCell,
@@ -36,25 +28,8 @@ import {
   Plane,
   FileText,
 } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { VacationManager } from "@/components/VacationManager";
-import FileUpload from "@/components/FileUpload";
-import LiquidationsReport from "@/components/LiquidationsReport";
 import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 // Mock data with calculated vacation days
 const employees = [
@@ -62,16 +37,15 @@ const employees = [
     id: 1,
     name: "Juan Pérez",
     position: "Cocinero",
-    whiteWage: 300000, // mensual
-    informalWage: 150000, // mensual
-    dailyWage: 15000, // calculado: (300000 + 150000) / 30
+    whiteWage: 300000,
+    informalWage: 150000,
+    dailyWage: 15000,
     presentismo: 25000,
     losesPresentismo: false,
-    presentismoComment: "",
     status: "active",
     startDate: "2023-01-15",
-    vacationDays: 14, // Calculado automáticamente según antigüedad
-    vacationsTaken: 12, // Días tomados este año
+    vacationDays: 14,
+    vacationsTaken: 12,
   },
   {
     id: 2,
@@ -79,10 +53,9 @@ const employees = [
     position: "Mesera",
     whiteWage: 240000,
     informalWage: 120000,
-    dailyWage: 12000, // calculado: (240000 + 120000) / 30
+    dailyWage: 12000,
     presentismo: 20000,
     losesPresentismo: true,
-    presentismoComment: "Ausencias sin justificar",
     status: "active",
     startDate: "2023-03-20",
     vacationDays: 14,
@@ -94,13 +67,12 @@ const employees = [
     position: "Cajero",
     whiteWage: 285000,
     informalWage: 120000,
-    dailyWage: 13500, // calculado: (285000 + 120000) / 30
+    dailyWage: 13500,
     presentismo: 22000,
     losesPresentismo: false,
-    presentismoComment: "",
     status: "active",
-    startDate: "2018-11-10", // Más antigüedad para mostrar más vacaciones
-    vacationDays: 21, // 5+ años de antigüedad
+    startDate: "2018-11-10",
+    vacationDays: 21,
     vacationsTaken: 0,
   },
   {
@@ -109,10 +81,9 @@ const employees = [
     position: "Ayudante de Cocina",
     whiteWage: 210000,
     informalWage: 120000,
-    dailyWage: 11000, // calculado: (210000 + 120000) / 30
+    dailyWage: 11000,
     presentismo: 18000,
     losesPresentismo: false,
-    presentismoComment: "",
     status: "inactive",
     startDate: "2023-06-01",
     vacationDays: 14,
@@ -122,52 +93,22 @@ const employees = [
     id: 5,
     name: "Luis Fernández",
     position: "Encargado",
-    whiteWage: 525000, // 70% de 750,000
-    informalWage: 225000, // 30% de 750,000
-    dailyWage: 25000, // calculado: (525000 + 225000) / 30
+    whiteWage: 525000,
+    informalWage: 225000,
+    dailyWage: 25000,
     presentismo: 35000,
     losesPresentismo: false,
-    presentismoComment: "",
     status: "active",
     startDate: "2025-05-22",
-    vacationDays: 14, // Nuevo empleado
+    vacationDays: 14,
     vacationsTaken: 0,
   },
 ];
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState(null);
-  const [losesPresentismo, setLosesPresentismo] = useState(false);
-  const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
-  const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
-    useState(null);
-  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
-    useState(false);
-
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
-
-  // Calculate vacation days based on seniority
-  const calculateVacationDays = (startDate: string) => {
-    const start = new Date(startDate);
-    const today = new Date();
-    const years = Math.floor(
-      (today.getTime() - start.getTime()) / (365.25 * 24 * 60 * 60 * 1000),
-    );
-
-    if (years < 5) return 14;
-    if (years < 10) return 21;
-    if (years < 20) return 28;
-    return 35;
-  };
-
-  const openVacationManager = (employee: any) => {
-    setSelectedEmployeeForVacations(employee);
-    setIsVacationManagerOpen(true);
-  };
 
   const filteredEmployees = employees.filter(
     (employee) =>
@@ -199,243 +140,19 @@ const Employees = () => {
 
         <div className="flex gap-2">
           <PermissionGate module="reports" action="view">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsLiquidationsReportOpen(true)}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  Reporte de Liquidaciones
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Generar reporte detallado de liquidaciones con efectivo, depósito y aguinaldos</p>
-              </TooltipContent>
-            </Tooltip>
+            <Button variant="outline">
+              <FileText className="h-4 w-4 mr-2" />
+              Reporte de Liquidaciones
+            </Button>
           </PermissionGate>
 
           <PermissionGate module="employees" action="create">
-            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Nuevo Empleado
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Agregar un nuevo empleado al sistema</p>
-                  </TooltipContent>
-                </Tooltip>
-              </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
-                <DialogDescription>
-                  Completa la información del nuevo empleado
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Nombre Completo</Label>
-                  <Input id="name" placeholder="Ej: Juan Pérez" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="position">Puesto</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar puesto" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cocinero">Cocinero</SelectItem>
-                      <SelectItem value="mesero">Mesero/a</SelectItem>
-                      <SelectItem value="cajero">Cajero/a</SelectItem>
-                      <SelectItem value="ayudante">
-                        Ayudante de Cocina
-                      </SelectItem>
-                      <SelectItem value="manager">Encargado/a</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="whiteWage">
-                      Sueldo en Blanco (mensual)
-                    </Label>
-                    <Input id="whiteWage" type="number" placeholder="300000" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="informalWage">
-                      Sueldo Informal (mensual)
-                    </Label>
-                    <Input
-                      id="informalWage"
-                      type="number"
-                      placeholder="150000"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="presentismo">
-                    Presentismo (no remunerativo)
-                  </Label>
-                  <Input id="presentismo" type="number" placeholder="25000" />
-                  <p className="text-xs text-muted-foreground">
-                    Este monto no se incluye en el cálculo del sueldo diario
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="startDate">Fecha de Ingreso</Label>
-                  <Input id="startDate" type="date" />
-                </div>
-
-                {/* Calculation Preview */}
-                <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-sm font-medium">
-                    Sueldo Diario Calculado
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
-                  </p>
-                  <div className="text-lg font-semibold mt-2">
-                    {/* This would be calculated dynamically in a real implementation */}
-                    $15,000 por día
-                  </div>
-                </div>
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    onClick={() => setIsAddDialogOpen(false)}
-                    className="w-full"
-                  >
-                    Guardar Empleado
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsAddDialogOpen(false)}
-                    className="w-full"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+            <Button>
+              <Plus className="h-4 w-4 mr-2" />
+              Nuevo Empleado
+            </Button>
+          </PermissionGate>
         </div>
-
-        {/* Edit Employee Dialog */}
-        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Editar Empleado</DialogTitle>
-              <DialogDescription>
-                Modifica la información de {editingEmployee?.name}
-              </DialogDescription>
-            </DialogHeader>
-            {editingEmployee && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="editName">Nombre Completo</Label>
-                  <Input id="editName" defaultValue={editingEmployee.name} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="editPosition">Puesto</Label>
-                  <Select defaultValue={editingEmployee.position.toLowerCase()}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="cocinero">Cocinero</SelectItem>
-                      <SelectItem value="mesero">Mesero/a</SelectItem>
-                      <SelectItem value="cajero">Cajero/a</SelectItem>
-                      <SelectItem value="ayudante">
-                        Ayudante de Cocina
-                      </SelectItem>
-                      <SelectItem value="manager">Encargado/a</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="editWhiteWage">
-                      Sueldo en Blanco (mensual)
-                    </Label>
-                    <Input
-                      id="editWhiteWage"
-                      type="number"
-                      defaultValue={editingEmployee.whiteWage}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="editInformalWage">
-                      Sueldo Informal (mensual)
-                    </Label>
-                    <Input
-                      id="editInformalWage"
-                      type="number"
-                      defaultValue={editingEmployee.informalWage}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="editPresentismo">
-                    Presentismo (no remunerativo)
-                  </Label>
-                  <Input
-                    id="editPresentismo"
-                    type="number"
-                    defaultValue={editingEmployee.presentismo}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="editStartDate">Fecha de Ingreso</Label>
-                  <Input
-                    id="editStartDate"
-                    type="date"
-                    defaultValue={editingEmployee.startDate}
-                  />
-                </div>
-
-                {/* Calculation Preview */}
-                <div className="p-3 bg-muted rounded-lg">
-                  <Label className="text-sm font-medium">
-                    Sueldo Diario Calculado
-                  </Label>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
-                  </p>
-                  <div className="text-lg font-semibold mt-2">
-                    {formatCurrency(editingEmployee.dailyWage)} por día
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    onClick={() => {
-                      setIsEditDialogOpen(false);
-                      setEditingEmployee(null);
-                    }}
-                    className="w-full"
-                  >
-                    Guardar Cambios
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsEditDialogOpen(false);
-                      setEditingEmployee(null);
-                    }}
-                    className="w-full"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
       </div>
 
       {/* Stats Cards */}
@@ -459,14 +176,7 @@ const Employees = () => {
             <CardTitle className="text-sm font-medium">
               Gasto Mensual Total
             </CardTitle>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DollarSign className="h-4 w-4 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Suma de todos los salarios mensuales incluye presentismo vigente</p>
-              </TooltipContent>
-            </Tooltip>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -494,14 +204,7 @@ const Employees = () => {
             <CardTitle className="text-sm font-medium">
               Total Días de Vacaciones
             </CardTitle>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Calendar className="h-4 w-4 text-muted-foreground cursor-help" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Suma de días de vacaciones disponibles de todos los empleados activos</p>
-              </TooltipContent>
-            </Tooltip>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -575,7 +278,6 @@ const Employees = () => {
                 <TableHead>Presentismo</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Vacaciones</TableHead>
-                <TableHead>Documentos</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -633,66 +335,24 @@ const Employees = () => {
                           disponibles
                         </Badge>
                       </div>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openVacationManager(employee)}
-                            className="h-6 text-xs"
-                          >
-                            <Plane className="h-3 w-3 mr-1" />
-                            Gestionar
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Gestionar vacaciones de {employee.name}</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <Button variant="ghost" size="sm" className="h-6 text-xs">
+                        <Plane className="h-3 w-3 mr-1" />
+                        Gestionar
+                      </Button>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <FileUpload
-                      entityId={employee.id}
-                      entityType="employee"
-                      title={`Documentos de ${employee.name}`}
-                      description="Subir contratos, documentos personales y otros archivos del empleado"
-                    />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
                       <PermissionGate module="employees" action="edit">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setEditingEmployee(employee);
-                                setLosesPresentismo(employee.losesPresentismo);
-                                setIsEditDialogOpen(true);
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Editar empleado</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <Button variant="ghost" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
                       </PermissionGate>
 
                       <PermissionGate module="employees" action="delete">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Eliminar empleado</p>
-                          </TooltipContent>
-                        </Tooltip>
+                        <Button variant="ghost" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </PermissionGate>
                     </div>
                   </TableCell>
@@ -702,24 +362,6 @@ const Employees = () => {
           </Table>
         </CardContent>
       </Card>
-
-      {/* Vacation Manager */}
-      {selectedEmployeeForVacations && (
-        <VacationManager
-          employee={selectedEmployeeForVacations}
-          isOpen={isVacationManagerOpen}
-          onClose={() => {
-            setIsVacationManagerOpen(false);
-            setSelectedEmployeeForVacations(null);
-          }}
-        />
-      )}
-
-      {/* Liquidations Report */}
-      <LiquidationsReport
-        isOpen={isLiquidationsReportOpen}
-        onClose={() => setIsLiquidationsReportOpen(false)}
-      />
     </div>
   );
 };
