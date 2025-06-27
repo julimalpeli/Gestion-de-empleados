@@ -123,7 +123,10 @@ const employees = [
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("active"); // Default to active
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     position: "",
@@ -148,6 +151,23 @@ const Employees = () => {
       presentismo: "",
       startDate: "",
     });
+  };
+
+  const handleEditEmployee = (employee) => {
+    setEditingEmployee(employee);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSaveEdit = () => {
+    // Here would be the logic to save the edited employee
+    console.log("Saving edited employee:", editingEmployee);
+    setIsEditDialogOpen(false);
+    setEditingEmployee(null);
+  };
+
+  const handleToggleStatus = (employee) => {
+    // Here would be the logic to toggle employee status
+    console.log("Toggling status for:", employee.name);
   };
 
   const filteredEmployees = employees.filter(
