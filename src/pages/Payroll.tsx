@@ -124,7 +124,7 @@ const employees = [
   },
   {
     id: 2,
-    name: "Mar��a González",
+    name: "María González",
     dailyWage: 12000,
     whiteWage: 240000,
     informalWage: 120000,
@@ -806,13 +806,21 @@ const Payroll = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    disabled={record.status === "processed"}
+                                    onClick={() => handleEditRecord(record)}
+                                    disabled={
+                                      record.status === "processed" &&
+                                      !isAdmin()
+                                    }
                                   >
                                     <Calculator className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Editar liquidación</p>
+                                  <p>
+                                    {record.status === "processed" && !isAdmin()
+                                      ? "Solo admin puede editar liquidaciones procesadas"
+                                      : "Editar liquidación"}
+                                  </p>
                                 </TooltipContent>
                               </Tooltip>
                               <Tooltip>
@@ -820,7 +828,7 @@ const Payroll = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    disabled={record.status === "processed"}
+                                    onClick={() => generatePayslip(record)}
                                   >
                                     <FileText className="h-4 w-4" />
                                   </Button>
