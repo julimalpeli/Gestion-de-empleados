@@ -662,35 +662,39 @@ const Employees = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEditingEmployee(employee);
-                              setLosesPresentismo(employee.losesPresentismo);
-                              setIsEditDialogOpen(true);
-                            }}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Editar empleado</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <PermissionGate module="employees" action="edit">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditingEmployee(employee);
+                                setLosesPresentismo(employee.losesPresentismo);
+                                setIsEditDialogOpen(true);
+                              }}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Editar empleado</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </PermissionGate>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Eliminar empleado</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <PermissionGate module="employees" action="delete">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button variant="ghost" size="sm">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Eliminar empleado</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </PermissionGate>
                     </div>
                   </TableCell>
                 </TableRow>
