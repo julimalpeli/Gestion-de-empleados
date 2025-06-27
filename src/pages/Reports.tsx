@@ -34,6 +34,7 @@ import {
   Users,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import LiquidationsReport from "@/components/LiquidationsReport";
 
 // Mock employees data - should match with Employees.tsx
 const employees = [
