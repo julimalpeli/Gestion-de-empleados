@@ -223,6 +223,36 @@ const Reports = () => {
           <TabsTrigger value="asistencia">Reportes de Asistencia</TabsTrigger>
         </TabsList>
 
+        <TabsContent value="liquidaciones" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileBarChart className="h-5 w-5" />
+                Reporte de Liquidaciones
+              </CardTitle>
+              <CardDescription>
+                Reporte detallado con montos de efectivo, depósito y aguinaldos
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => setIsLiquidationsReportOpen(true)}
+                  size="lg"
+                  className="text-lg px-8 py-4"
+                >
+                  <FileBarChart className="h-5 w-5 mr-2" />
+                  Generar Reporte de Liquidaciones
+                </Button>
+              </div>
+              <p className="text-center text-muted-foreground mt-4">
+                Genera un reporte completo con efectivo, depósitos y aguinaldos
+                de todas las liquidaciones
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="aguinaldos" className="space-y-6">
           {/* Period Selector */}
           <Card>
