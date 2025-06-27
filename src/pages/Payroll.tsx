@@ -173,6 +173,8 @@ const Payroll = () => {
   const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingRecord, setEditingRecord] = useState(null);
 
   // Current month for aguinaldo logic
   const currentMonth = new Date().getMonth() + 1; // 1-12
