@@ -70,15 +70,24 @@ const VacationManager = ({
   isOpen,
   onClose,
 }: VacationManagerProps) => {
-  const [vacations, setVacations] = useState(mockVacations);
   const [isAddingVacation, setIsAddingVacation] = useState(false);
   const [editingVacation, setEditingVacation] = useState(null);
   const [newVacation, setNewVacation] = useState({
     startDate: "",
     endDate: "",
     reason: "",
-    status: "pending",
   });
+
+  // Usar hook de Supabase para vacaciones
+  const {
+    vacations,
+    loading,
+    error,
+    createVacation,
+    updateVacation,
+    deleteVacation,
+    processVacation,
+  } = useVacations(employee?.id);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-AR");
