@@ -152,7 +152,7 @@ const FileUpload = ({
   };
 
   const handleDelete = (fileId: string) => {
-    setFiles((prev) => prev.filter((f) => f.id !== fileId));
+    removeFile(fileId);
     // In real app, also delete from server
   };
 
