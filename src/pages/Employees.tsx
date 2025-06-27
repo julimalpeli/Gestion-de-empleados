@@ -552,16 +552,34 @@ const Employees = () => {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead>Nombre</TableHead>
-                <TableHead>Puesto</TableHead>
-                <TableHead>Sueldo Diario</TableHead>
-                <TableHead>Mensual Blanco</TableHead>
-                <TableHead>Mensual Informal</TableHead>
-                <TableHead>Presentismo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Vacaciones</TableHead>
-                <TableHead className="text-right">Acciones</TableHead>
+              <TableRow className="bg-ceramic-emerald/10 hover:bg-ceramic-emerald/15">
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Nombre
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Puesto
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Sueldo Diario
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Mensual Blanco
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Mensual Informal
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Presentismo
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Estado
+                </TableHead>
+                <TableHead className="font-bold text-ceramic-emerald">
+                  Vacaciones
+                </TableHead>
+                <TableHead className="text-right font-bold text-ceramic-emerald">
+                  Acciones
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
