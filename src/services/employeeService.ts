@@ -12,12 +12,22 @@ export class SupabaseEmployeeService implements IEmployeeService {
   async getAllEmployees(): Promise<Employee[]> {
     try {
       console.log("🔄 Consultando empleados en Supabase...");
+      console.log("🔗 URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
+      console.log(
+        "🔑 Key configurada:",
+        !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+      );
+
       const { data, error } = await supabase
         .from("employees")
         .select("*")
         .order("created_at", { ascending: false });
 
-      console.log("📊 Respuesta de Supabase:", { data, error });
+      console.log("📊 Respuesta de Supabase:", {
+        data,
+        error,
+        dataLength: data?.length,
+      });
 
       if (error) {
         console.error("❌ Error de Supabase completo:", error);
