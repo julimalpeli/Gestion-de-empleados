@@ -680,7 +680,7 @@ const Payroll = () => {
       {/* Payroll Records */}
       <Tabs defaultValue="current" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="current">Período Actual</TabsTrigger>
+          <TabsTrigger value="current">Per��odo Actual</TabsTrigger>
           <TabsTrigger value="history">Historial</TabsTrigger>
           <TabsTrigger value="aguinaldo">Calculadora de Aguinaldos</TabsTrigger>
         </TabsList>
@@ -758,6 +758,14 @@ const Payroll = () => {
                                 ? "Pendiente"
                                 : "Borrador"}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <FileUpload
+                            entityId={record.id}
+                            entityType="payroll"
+                            title={`Documentos - ${record.employeeName} (${record.period})`}
+                            description="Subir recibos de sueldo, comprobantes y otros documentos de la liquidación"
+                          />
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
