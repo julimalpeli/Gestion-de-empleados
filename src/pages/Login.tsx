@@ -50,18 +50,15 @@ const Login = () => {
       const user = DEMO_USERS[username as keyof typeof DEMO_USERS];
 
       if (user && user.password === password) {
-        // Store user data in localStorage (in production, use secure storage)
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            username,
-            name: user.name,
-            role: user.role,
-            employeeId: user.employeeId || null,
-            permissions: user.permissions,
-            loginTime: new Date().toISOString(),
-          }),
-        );
+        // Use auth context login method
+        login({
+          username,
+          name: user.name,
+          role: user.role,
+          employeeId: user.employeeId || undefined,
+          permissions: user.permissions,
+          loginTime: new Date().toISOString(),
+        });
 
         // Redirect based on role
         if (user.role === "admin") {
