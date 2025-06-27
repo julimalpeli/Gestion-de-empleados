@@ -176,7 +176,7 @@ const Employees = () => {
           <div>
             <h1 className="text-2xl font-bold">Gestión de Empleados</h1>
             <p className="text-muted-foreground">
-              Administra el personal del restaurant
+              Administra el personal del bar de tapas
             </p>
           </div>
         </div>
