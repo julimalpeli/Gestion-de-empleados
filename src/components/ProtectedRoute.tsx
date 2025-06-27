@@ -1,35 +1,65 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import usePermissions from "@/hooks/use-permissions";
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  requiredRole?: "admin" | "employee";
-  requiredPermission?: string;
+  requiredRole?: "admin" | "manager" | "hr" | "employee" | "readonly";
+  requiredPermissions?: string[][]; // [module, action] pairs
+  requireAllPermissions?: boolean; // true = ALL permissions required, false = ANY permission required
+  allowedRoles?: string[]; // List of roles that can access this route
 }
 
 const ProtectedRoute = ({
   children,
   requiredRole,
-  requiredPermission,
+  requiredPermissions = [],
+  requireAllPermissions = false,
+  allowedRoles = [],
 }: ProtectedRouteProps) => {
-  const { isAuthenticated, user, hasPermission } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const {
+    hasPermission,
+    hasAllPermissions,
+    hasAnyPermission,
+    isAdmin,
+    isManager,
+    isEmployee,
+  } = usePermissions();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  // Check specific role requirement
   if (requiredRole && user?.role !== requiredRole) {
     // Redirect to appropriate dashboard based on role
-    if (user?.role === "admin") {
-      return <Navigate to="/" replace />;
-    } else {
+    if (isEmployee()) {
       return <Navigate to="/portal-empleado" replace />;
+    } else {
+      return <Navigate to="/" replace />;
     }
   }
 
-  if (requiredPermission && !hasPermission(requiredPermission)) {
-    return <Navigate to="/unauthorized" replace />;
+  // Check allowed roles
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role || "")) {
+    if (isEmployee()) {
+      return <Navigate to="/portal-empleado" replace />;
+    } else {
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
+  // Check permissions
+  if (requiredPermissions.length > 0) {
+    const hasRequiredPermissions = requireAllPermissions
+      ? hasAllPermissions(requiredPermissions)
+      : hasAnyPermission(requiredPermissions);
+
+    if (!hasRequiredPermissions && !isAdmin()) {
+      return <Navigate to="/unauthorized" replace />;
+    }
   }
 
   return <>{children}</>;
