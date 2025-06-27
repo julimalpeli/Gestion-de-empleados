@@ -177,6 +177,36 @@ const Payroll = () => {
   const [bonusAmount, setBonusAmount] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  const handleEditRecord = (record) => {
+    setIsEditMode(true);
+    setEditingRecord(record);
+
+    // Find employee
+    const employee = employees.find((e) => e.name === record.employeeName);
+    if (employee) {
+      setSelectedEmployee(employee.id.toString());
+    }
+
+    // Pre-fill form with record data
+    setWorkDays(record.baseDays.toString());
+    setHolidayDays(record.holidayDays.toString());
+    setAdvances(record.advances.toString());
+    setDiscounts("0"); // We don't have discounts in the record, default to 0
+    setWhiteWage(record.whiteAmount.toString());
+
+    // Determine presentismo status based on record
+    const has_presentismo = record.presentismoAmount > 0;
+    setPresentismoStatus(has_presentismo ? "mantiene" : "pierde");
+
+    setIsNewPayrollOpen(true);
+  };
+
+  const generatePayslip = (record) => {
+    // Generate payslip PDF logic here
+    console.log("Generating payslip for:", record.employeeName);
+    alert(`Generando recibo de sueldo para ${record.employeeName}`);
+  };
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
 
