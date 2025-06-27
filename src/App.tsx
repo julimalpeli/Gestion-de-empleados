@@ -99,6 +99,20 @@ const App = () => (
               }
             />
 
+            <Route
+              path="/roles"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <UserRoles />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Fallback routes */}
             <Route path="*" element={<NotFound />} />
           </Routes>
