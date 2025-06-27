@@ -771,7 +771,7 @@ const Payroll = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{payrollRecords.length}</div>
-              <p className="text-xs text-muted-foreground">Este período</p>
+              <p className="text-xs text-muted-foreground">Este per��odo</p>
             </CardContent>
           </Card>
 
@@ -828,6 +828,9 @@ const Payroll = () => {
                         <TableHead>Empleado</TableHead>
                         <TableHead>Días Base</TableHead>
                         <TableHead>Feriados</TableHead>
+                        <TableHead>Horas Extras</TableHead>
+                        <TableHead>Bono Libre</TableHead>
+                        <TableHead>Descuentos</TableHead>
                         {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
                         <TableHead>Adelantos</TableHead>
                         <TableHead>En Blanco</TableHead>
