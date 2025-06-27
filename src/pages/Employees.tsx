@@ -530,30 +530,28 @@ const Employees = () => {
                   <TableCell>{formatCurrency(employee.informalWage)}</TableCell>
                   <TableCell>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="default" className="text-xs">
-                          {employee.vacationDays} anuales
-                        </Badge>
+                      <div className="font-medium">
+                        {formatCurrency(employee.presentismo)}
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {employee.vacationsTaken} tomados
-                        </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {employee.vacationDays - employee.vacationsTaken}{" "}
-                          disponibles
-                        </Badge>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => openVacationManager(employee)}
-                        className="h-6 text-xs"
+                      <Badge
+                        variant={
+                          employee.losesPresentismo ? "destructive" : "default"
+                        }
+                        className="text-xs"
                       >
-                        <Plane className="h-3 w-3 mr-1" />
-                        Gestionar
-                      </Button>
+                        {employee.losesPresentismo ? "Perdido" : "Vigente"}
+                      </Badge>
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        employee.status === "active" ? "default" : "secondary"
+                      }
+                      className="text-xs"
+                    >
+                      {employee.status === "active" ? "Activo" : "Inactivo"}
+                    </Badge>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
