@@ -11,16 +11,24 @@ import type {
 export class SupabaseEmployeeService implements IEmployeeService {
   async getAllEmployees(): Promise<Employee[]> {
     try {
+      console.log("🔄 Consultando empleados en Supabase...");
       const { data, error } = await supabase
         .from("employees")
         .select("*")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      console.log("📊 Respuesta de Supabase:", { data, error });
 
-      return data.map(this.mapFromSupabase);
+      if (error) {
+        console.error("❌ Error de Supabase:", error);
+        throw error;
+      }
+
+      const mappedData = data.map(this.mapFromSupabase);
+      console.log("✅ Datos mapeados:", mappedData);
+      return mappedData;
     } catch (error) {
-      console.error("Error fetching employees:", error);
+      console.error("❌ Error fetching employees:", error);
       throw new Error("Failed to fetch employees");
     }
   }
