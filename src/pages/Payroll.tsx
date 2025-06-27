@@ -842,124 +842,125 @@ const Payroll = () => {
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Período</TableHead>
-                    <TableHead>Empleado</TableHead>
-                    <TableHead>Días Trabajados</TableHead>
-                    <TableHead>Sueldo Base</TableHead>
-                    <TableHead>Aguinaldo</TableHead>
-                    <TableHead>Presentismo</TableHead>
-                    <TableHead>Adelantos</TableHead>
-                    <TableHead>Total Neto</TableHead>
-                    <TableHead>Fecha Pago</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {/* Sample historical data */}
-                  <TableRow>
-                    <TableCell className="font-medium">Junio 2024</TableCell>
-                    <TableCell>Juan Pérez</TableCell>
-                    <TableCell>22 días</TableCell>
-                    <TableCell>{formatCurrency(450000)}</TableCell>
-                    <TableCell className="text-green-600 font-medium">
-                      {formatCurrency(225000)}
-                    </TableCell>
-                    <TableCell>{formatCurrency(25000)}</TableCell>
-                    <TableCell className="text-red-600">
-                      -{formatCurrency(50000)}
-                    </TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(650000)}
-                    </TableCell>
-                    <TableCell>30/06/2024</TableCell>
-                  </TableRow>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Período</TableHead>
+                      <TableHead>Empleado</TableHead>
+                      <TableHead>Días Trabajados</TableHead>
+                      <TableHead>Sueldo Base</TableHead>
+                      <TableHead>Aguinaldo</TableHead>
+                      <TableHead>Presentismo</TableHead>
+                      <TableHead>Adelantos</TableHead>
+                      <TableHead>Total Neto</TableHead>
+                      <TableHead>Fecha Pago</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {/* Sample historical data */}
+                    <TableRow>
+                      <TableCell className="font-medium">Junio 2024</TableCell>
+                      <TableCell>Juan Pérez</TableCell>
+                      <TableCell>22 días</TableCell>
+                      <TableCell>{formatCurrency(450000)}</TableCell>
+                      <TableCell className="text-green-600 font-medium">
+                        {formatCurrency(225000)}
+                      </TableCell>
+                      <TableCell>{formatCurrency(25000)}</TableCell>
+                      <TableCell className="text-red-600">
+                        -{formatCurrency(50000)}
+                      </TableCell>
+                      <TableCell className="font-bold">
+                        {formatCurrency(650000)}
+                      </TableCell>
+                      <TableCell>30/06/2024</TableCell>
+                    </TableRow>
 
-                  <TableRow>
-                    <TableCell className="font-medium">Mayo 2024</TableCell>
-                    <TableCell>Juan Pérez</TableCell>
-                    <TableCell>21 días</TableCell>
-                    <TableCell>{formatCurrency(420000)}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>{formatCurrency(25000)}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(445000)}
-                    </TableCell>
-                    <TableCell>31/05/2024</TableCell>
-                  </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Mayo 2024</TableCell>
+                      <TableCell>Juan Pérez</TableCell>
+                      <TableCell>21 días</TableCell>
+                      <TableCell>{formatCurrency(420000)}</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatCurrency(25000)}</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell className="font-bold">
+                        {formatCurrency(445000)}
+                      </TableCell>
+                      <TableCell>31/05/2024</TableCell>
+                    </TableRow>
 
-                  <TableRow>
-                    <TableCell className="font-medium">Abril 2024</TableCell>
-                    <TableCell>Juan Pérez</TableCell>
-                    <TableCell>22 días</TableCell>
-                    <TableCell>{formatCurrency(450000)}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell>{formatCurrency(25000)}</TableCell>
-                    <TableCell className="text-red-600">
-                      -{formatCurrency(30000)}
-                    </TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(445000)}
-                    </TableCell>
-                    <TableCell>30/04/2024</TableCell>
-                  </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Abril 2024</TableCell>
+                      <TableCell>Juan Pérez</TableCell>
+                      <TableCell>22 días</TableCell>
+                      <TableCell>{formatCurrency(450000)}</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell>{formatCurrency(25000)}</TableCell>
+                      <TableCell className="text-red-600">
+                        -{formatCurrency(30000)}
+                      </TableCell>
+                      <TableCell className="font-bold">
+                        {formatCurrency(445000)}
+                      </TableCell>
+                      <TableCell>30/04/2024</TableCell>
+                    </TableRow>
 
-                  <TableRow>
-                    <TableCell className="font-medium">Junio 2024</TableCell>
-                    <TableCell>María González</TableCell>
-                    <TableCell>20 días</TableCell>
-                    <TableCell>{formatCurrency(360000)}</TableCell>
-                    <TableCell className="text-green-600 font-medium">
-                      {formatCurrency(180000)}
-                    </TableCell>
-                    <TableCell className="text-red-600 line-through">
-                      {formatCurrency(20000)}
-                    </TableCell>
-                    <TableCell className="text-red-600">
-                      -{formatCurrency(25000)}
-                    </TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(515000)}
-                    </TableCell>
-                    <TableCell>30/06/2024</TableCell>
-                  </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Junio 2024</TableCell>
+                      <TableCell>María González</TableCell>
+                      <TableCell>20 días</TableCell>
+                      <TableCell>{formatCurrency(360000)}</TableCell>
+                      <TableCell className="text-green-600 font-medium">
+                        {formatCurrency(180000)}
+                      </TableCell>
+                      <TableCell className="text-red-600 line-through">
+                        {formatCurrency(20000)}
+                      </TableCell>
+                      <TableCell className="text-red-600">
+                        -{formatCurrency(25000)}
+                      </TableCell>
+                      <TableCell className="font-bold">
+                        {formatCurrency(515000)}
+                      </TableCell>
+                      <TableCell>30/06/2024</TableCell>
+                    </TableRow>
 
-                  <TableRow>
-                    <TableCell className="font-medium">Mayo 2024</TableCell>
-                    <TableCell>María González</TableCell>
-                    <TableCell>19 días</TableCell>
-                    <TableCell>{formatCurrency(342000)}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell className="text-red-600 line-through">
-                      {formatCurrency(20000)}
-                    </TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(342000)}
-                    </TableCell>
-                    <TableCell>31/05/2024</TableCell>
-                  </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Mayo 2024</TableCell>
+                      <TableCell>María González</TableCell>
+                      <TableCell>19 días</TableCell>
+                      <TableCell>{formatCurrency(342000)}</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell className="text-red-600 line-through">
+                        {formatCurrency(20000)}
+                      </TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell className="font-bold">
+                        {formatCurrency(342000)}
+                      </TableCell>
+                      <TableCell>31/05/2024</TableCell>
+                    </TableRow>
 
-                  <TableRow>
-                    <TableCell className="font-medium">
-                      Diciembre 2023
-                    </TableCell>
-                    <TableCell>Carlos López</TableCell>
-                    <TableCell>21 días</TableCell>
-                    <TableCell>{formatCurrency(400000)}</TableCell>
-                    <TableCell className="text-green-600 font-medium">
-                      {formatCurrency(202500)}
-                    </TableCell>
-                    <TableCell>{formatCurrency(22000)}</TableCell>
-                    <TableCell>-</TableCell>
-                    <TableCell className="font-bold">
-                      {formatCurrency(624500)}
-                    </TableCell>
-                    <TableCell>29/12/2023</TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+                    <TableRow>
+                      <TableCell className="font-medium">
+                        Diciembre 2023
+                      </TableCell>
+                      <TableCell>Carlos López</TableCell>
+                      <TableCell>21 días</TableCell>
+                      <TableCell>{formatCurrency(400000)}</TableCell>
+                      <TableCell className="text-green-600 font-medium">
+                        {formatCurrency(202500)}
+                      </TableCell>
+                      <TableCell>{formatCurrency(22000)}</TableCell>
+                      <TableCell>-</TableCell>
+                      <TableCell className="font-bold">
+                        {formatCurrency(624500)}
+                      </TableCell>
+                      <TableCell>29/12/2023</TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
