@@ -540,12 +540,12 @@ const Employees = () => {
       </div>
 
       {/* Employees Table */}
-      <Card className="border-2 border-ceramic-emerald/20 shadow-xl bg-gradient-to-br from-white to-ceramic-cream/20">
-        <CardHeader className="bg-gradient-to-r from-ceramic-emerald/5 to-ceramic-gold/5 border-b border-ceramic-emerald/20">
-          <CardTitle className="text-ceramic-emerald text-xl font-bold">
+      <Card className="border-2 border-ceramic-terracotta/20 shadow-xl bg-gradient-to-br from-white to-ceramic-cream/20">
+        <CardHeader className="bg-gradient-to-r from-ceramic-terracotta/5 to-ceramic-gold/5 border-b border-ceramic-terracotta/20">
+          <CardTitle className="text-ceramic-terracotta text-xl font-bold">
             Lista de Empleados
           </CardTitle>
-          <CardDescription className="text-ceramic-emerald/70 font-medium">
+          <CardDescription className="text-ceramic-terracotta/70 font-medium">
             Gestiona la información de todos los empleados y sus vacaciones
           </CardDescription>
         </CardHeader>
