@@ -295,6 +295,10 @@ const Payroll = () => {
       whiteAmount: manualWhiteWage,
       informalAmount,
       netTotal,
+      total: netTotal, // Agregar alias para compatibilidad
+      baseAmount: basePay,
+      aguinaldo: 0, // Por ahora 0, se puede calcular después
+      overtimeAmount: overtimePay,
     };
   };
 
