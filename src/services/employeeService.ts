@@ -182,7 +182,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const { data, error } = await supabase
         .from("employees")
         .select("*")
-        .or(`name.ilike.%${query}%, position.ilike.%${query}%`)
+        .or(`name.ilike.%${query}%, job_position.ilike.%${query}%`)
         .order("name");
 
       if (error) throw error;
