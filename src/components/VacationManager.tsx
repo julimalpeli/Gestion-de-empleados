@@ -196,6 +196,22 @@ const VacationManager = ({
 
   const availableDays = employee ? employee.vacationDays - totalDaysUsed : 0;
 
+  // Mostrar loading si está cargando
+  if (loading) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Cargando vacaciones...</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-center p-8">
+            <p>Cargando datos de vacaciones...</p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
