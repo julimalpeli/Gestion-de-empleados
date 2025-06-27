@@ -159,14 +159,33 @@ const Employees = () => {
 
   const handleAddEmployee = async () => {
     try {
-      await createEmployee({
-        name: newEmployee.name,
-        position: newEmployee.position,
+      // Validaciones básicas
+      if (!newEmployee.name.trim()) {
+        alert("El nombre es requerido");
+        return;
+      }
+      if (!newEmployee.position.trim()) {
+        alert("El puesto es requerido");
+        return;
+      }
+      if (!newEmployee.startDate) {
+        alert("La fecha de ingreso es requerida");
+        return;
+      }
+
+      const employeeData = {
+        name: newEmployee.name.trim(),
+        position: newEmployee.position.trim(),
         whiteWage: parseFloat(newEmployee.whiteWage) || 0,
         informalWage: parseFloat(newEmployee.informalWage) || 0,
         presentismo: parseFloat(newEmployee.presentismo) || 0,
         startDate: newEmployee.startDate,
-      });
+      };
+
+      console.log("Creating employee with data:", employeeData);
+
+      await createEmployee(employeeData);
+
       setIsAddDialogOpen(false);
       setNewEmployee({
         name: "",
@@ -178,7 +197,9 @@ const Employees = () => {
       });
     } catch (error) {
       console.error("Error creating employee:", error);
-      alert("Error al crear empleado");
+      alert(
+        `Error al crear empleado: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
     }
   };
 
