@@ -86,12 +86,12 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="border-t border-sidebar-border p-4">
+      <SidebarFooter className="border-t border-ceramic-gold/30 p-4 bg-gradient-to-t from-sidebar-accent to-transparent">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
+            <SidebarMenuButton className="hover:bg-ceramic-terracotta hover:text-ceramic-cream transition-all duration-200 rounded-xl py-3 px-4">
               <LogOut className="h-4 w-4" />
-              <span>Cerrar Sesión</span>
+              <span className="font-medium">Cerrar Sesión</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
