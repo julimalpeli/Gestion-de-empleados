@@ -57,8 +57,8 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Mock data
-const payrollRecords = [
+// Mock data - COMENTADO porque ahora usamos Supabase
+const mockPayrollRecords = [
   {
     id: 1,
     employeeName: "Juan Pérez",
