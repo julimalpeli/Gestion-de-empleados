@@ -124,7 +124,7 @@ const employees = [
   },
   {
     id: 2,
-    name: "María González",
+    name: "Mar��a González",
     dailyWage: 12000,
     whiteWage: 240000,
     informalWage: 120000,
@@ -178,6 +178,8 @@ const Payroll = () => {
   const [bonusAmount, setBonusAmount] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+
+  const { isAdmin, canEditModule } = usePermissions();
 
   const handleEditRecord = (record) => {
     setIsEditMode(true);
