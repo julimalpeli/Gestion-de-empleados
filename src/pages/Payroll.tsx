@@ -328,7 +328,7 @@ const Payroll = () => {
               Nueva Liquidación
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Calcular Nueva Liquidación</DialogTitle>
               <DialogDescription>
@@ -336,7 +336,7 @@ const Payroll = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-2">
               {/* Form */}
               <div className="space-y-4">
                 <div className="space-y-2">
