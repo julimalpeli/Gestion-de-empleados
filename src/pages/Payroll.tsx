@@ -358,8 +358,7 @@ const Payroll = () => {
   };
 
   return (
-    <TooltipProvider>
-      <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div className="flex items-center gap-4">
