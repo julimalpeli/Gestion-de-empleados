@@ -436,17 +436,17 @@ const Employees = () => {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-4">
-        <Card className="border-2 border-ceramic-emerald/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-cream/30">
+        <Card className="border-2 border-ceramic-terracotta/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-terracotta/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-emerald">
+            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
               Total Empleados
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-emerald">
+            <div className="text-3xl font-bold text-ceramic-terracotta">
               {employees.length}
             </div>
-            <p className="text-xs text-ceramic-emerald/70 font-medium">
+            <p className="text-xs text-ceramic-terracotta/70 font-medium">
               {employees.filter((e) => e.status === "active").length} activos
             </p>
           </CardContent>
@@ -454,7 +454,7 @@ const Employees = () => {
 
         <Card className="border-2 border-ceramic-gold/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-gold/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-emerald">
+            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
               Gasto Mensual Total
             </CardTitle>
             <DollarSign className="h-5 w-5 text-ceramic-gold" />
@@ -474,21 +474,21 @@ const Employees = () => {
                   ),
               )}
             </div>
-            <p className="text-xs text-ceramic-emerald/70 font-medium">
+            <p className="text-xs text-ceramic-terracotta/70 font-medium">
               Incluye presentismo vigente
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-2 border-ceramic-terracotta/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-terracotta/10">
+        <Card className="border-2 border-ceramic-emerald/20 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-emerald/10">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-emerald">
+            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
               Total Días de Vacaciones
             </CardTitle>
-            <Calendar className="h-5 w-5 text-ceramic-terracotta" />
+            <Calendar className="h-5 w-5 text-ceramic-emerald" />
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-terracotta">
+            <div className="text-3xl font-bold text-ceramic-emerald">
               {employees
                 .filter((e) => e.status === "active")
                 .reduce(
@@ -496,7 +496,7 @@ const Employees = () => {
                   0,
                 )}
             </div>
-            <p className="text-xs text-ceramic-emerald/70 font-medium">
+            <p className="text-xs text-ceramic-terracotta/70 font-medium">
               Días disponibles totales
             </p>
           </CardContent>
@@ -504,12 +504,12 @@ const Employees = () => {
 
         <Card className="border-2 border-ceramic-cream/40 shadow-lg hover:shadow-xl transition-all duration-200 bg-gradient-to-br from-white to-ceramic-cream/40">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold text-ceramic-emerald">
+            <CardTitle className="text-sm font-semibold text-ceramic-terracotta">
               Sueldo Promedio
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-ceramic-emerald">
+            <div className="text-3xl font-bold text-ceramic-terracotta">
               {formatCurrency(
                 Math.round(
                   employees
@@ -519,7 +519,7 @@ const Employees = () => {
                 ),
               )}
             </div>
-            <p className="text-xs text-ceramic-emerald/70 font-medium">
+            <p className="text-xs text-ceramic-terracotta/70 font-medium">
               Por día por empleado
             </p>
           </CardContent>
