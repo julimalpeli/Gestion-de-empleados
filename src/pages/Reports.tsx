@@ -535,21 +535,173 @@ const Reports = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="costos">
+        <TabsContent value="costos" className="space-y-6">
+          {/* Resumen de Costos */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Total Liquidaciones
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-primary">
+                  {formatCurrency(
+                    payrollRecords.reduce(
+                      (sum, record) => sum + record.netTotal,
+                      0,
+                    ),
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">Este mes</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Sueldos en Blanco
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-green-600">
+                  {formatCurrency(
+                    payrollRecords.reduce(
+                      (sum, record) => sum + record.whiteAmount,
+                      0,
+                    ),
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">Declarados</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Sueldos Informales
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-orange-600">
+                  {formatCurrency(
+                    payrollRecords.reduce(
+                      (sum, record) => sum + record.informalAmount,
+                      0,
+                    ),
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">En efectivo</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Costo por Empleado
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-bold text-blue-600">
+                  {formatCurrency(
+                    payrollRecords.length > 0
+                      ? Math.round(
+                          payrollRecords.reduce(
+                            (sum, record) => sum + record.netTotal,
+                            0,
+                          ) / payrollRecords.length,
+                        )
+                      : 0,
+                  )}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Promedio mensual
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Tabla de Costos por Empleado */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
-                Reportes de Costos
+                Costos por Empleado
               </CardTitle>
               <CardDescription>
-                Análisis de costos laborales por período
+                Desglose detallado de costos laborales
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-center text-muted-foreground py-8">
-                <TrendingUp className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Próximamente disponible</p>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Empleado</TableHead>
+                      <TableHead>Sueldo Base</TableHead>
+                      <TableHead>En Blanco</TableHead>
+                      <TableHead>Informal</TableHead>
+                      <TableHead>Presentismo</TableHead>
+                      <TableHead>Horas Extras</TableHead>
+                      <TableHead>Bonos</TableHead>
+                      <TableHead>Total</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {employees.map((employee) => {
+                      const employeePayrolls = payrollRecords.filter(
+                        (record) => record.employeeName === employee.name,
+                      );
+                      const totalPayroll = employeePayrolls.reduce(
+                        (sum, record) => sum + record.netTotal,
+                        0,
+                      );
+                      const whiteTotal = employeePayrolls.reduce(
+                        (sum, record) => sum + record.whiteAmount,
+                        0,
+                      );
+                      const informalTotal = employeePayrolls.reduce(
+                        (sum, record) => sum + record.informalAmount,
+                        0,
+                      );
+                      const presentismoTotal = employeePayrolls.reduce(
+                        (sum, record) => sum + record.presentismoAmount,
+                        0,
+                      );
+                      const overtimeTotal = employeePayrolls.reduce(
+                        (sum, record) => sum + record.overtimeAmount,
+                        0,
+                      );
+                      const bonusTotal = employeePayrolls.reduce(
+                        (sum, record) => sum + record.bonusAmount,
+                        0,
+                      );
+
+                      return (
+                        <TableRow key={employee.id}>
+                          <TableCell className="font-medium">
+                            {employee.name}
+                          </TableCell>
+                          <TableCell>
+                            {formatCurrency(
+                              employee.whiteWage + employee.informalWage,
+                            )}
+                          </TableCell>
+                          <TableCell>{formatCurrency(whiteTotal)}</TableCell>
+                          <TableCell>{formatCurrency(informalTotal)}</TableCell>
+                          <TableCell>
+                            {formatCurrency(presentismoTotal)}
+                          </TableCell>
+                          <TableCell>{formatCurrency(overtimeTotal)}</TableCell>
+                          <TableCell>{formatCurrency(bonusTotal)}</TableCell>
+                          <TableCell className="font-bold">
+                            {formatCurrency(totalPayroll)}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
