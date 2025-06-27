@@ -52,7 +52,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       const newEmployee = {
         name: employee.name,
-        position: employee.position,
+        job_position: employee.position,
         white_wage: employee.whiteWage,
         informal_wage: employee.informalWage,
         daily_wage: Math.round(dailyWage),
