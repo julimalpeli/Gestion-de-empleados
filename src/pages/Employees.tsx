@@ -599,11 +599,11 @@ const Employees = () => {
                     <div className="space-y-1">
                       <div>{formatCurrency(employee.presentismo)}</div>
                       {employee.losesPresentismo ? (
-                        <Badge className="text-xs bg-ceramic-terracotta text-ceramic-cream">
+                        <Badge className="text-xs bg-ceramic-emerald text-ceramic-cream">
                           Perdido
                         </Badge>
                       ) : (
-                        <Badge className="text-xs bg-ceramic-gold text-ceramic-emerald">
+                        <Badge className="text-xs bg-ceramic-gold text-ceramic-terracotta">
                           Vigente
                         </Badge>
                       )}
