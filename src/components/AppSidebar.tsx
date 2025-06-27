@@ -1,4 +1,11 @@
-import { Home, Users, Calculator, FileBarChart, LogOut } from "lucide-react";
+import {
+  Home,
+  Users,
+  Calculator,
+  FileBarChart,
+  Shield,
+  LogOut,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   Sidebar,
