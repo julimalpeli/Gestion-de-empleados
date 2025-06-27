@@ -304,7 +304,7 @@ INSERT INTO users (username, email, name, role, password_hash) VALUES
 ('auditor', 'auditor@cadizbartapas.com', 'Carlos Auditor', 'readonly', '$2b$10$dummy.hash.for.auditor123');
 
 -- Insertar empleados de ejemplo (datos reales para migrar desde mock)
-INSERT INTO employees (name, position, white_wage, informal_wage, presentismo, start_date, vacations_taken) VALUES
+INSERT INTO employees (name, job_position, white_wage, informal_wage, presentismo, start_date, vacations_taken) VALUES
 ('Juan Pérez', 'Cocinero', 300000, 150000, 25000, '2023-01-15', 5),
 ('María González', 'Mesera', 240000, 120000, 20000, '2019-03-20', 7),
 ('Carlos López', 'Cajero', 285000, 120000, 22000, '2012-11-10', 8),
