@@ -609,15 +609,22 @@ const Employees = () => {
                             disponibles
                           </Badge>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => openVacationManager(employee)}
-                          className="h-6 text-xs"
-                        >
-                          <Plane className="h-3 w-3 mr-1" />
-                          Gestionar
-                        </Button>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openVacationManager(employee)}
+                              className="h-6 text-xs"
+                            >
+                              <Plane className="h-3 w-3 mr-1" />
+                              Gestionar
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Gestionar vacaciones de {employee.name}</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </TableCell>
                     <TableCell>
