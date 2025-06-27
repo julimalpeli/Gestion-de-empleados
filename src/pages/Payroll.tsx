@@ -680,7 +680,7 @@ const Payroll = () => {
       {/* Payroll Records */}
       <Tabs defaultValue="current" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="current">Per��odo Actual</TabsTrigger>
+          <TabsTrigger value="current">Período Actual</TabsTrigger>
           <TabsTrigger value="history">Historial</TabsTrigger>
           <TabsTrigger value="aguinaldo">Calculadora de Aguinaldos</TabsTrigger>
         </TabsList>
@@ -706,6 +706,7 @@ const Payroll = () => {
                       <TableHead>Adelantos</TableHead>
                       <TableHead>En Blanco</TableHead>
                       <TableHead>Informal</TableHead>
+                      <TableHead>Presentismo</TableHead>
                       <TableHead>Total Neto</TableHead>
                       <TableHead>Estado</TableHead>
                       <TableHead>Documentos</TableHead>
