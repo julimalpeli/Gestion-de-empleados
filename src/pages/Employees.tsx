@@ -135,8 +135,7 @@ const Employees = () => {
   const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
   const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
     useState(null);
-  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
-    useState(false);
+  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] = useState(false);
 
   // Calculate vacation days based on seniority
   const calculateVacationDays = (startDate: string) => {
@@ -185,13 +184,21 @@ const Employees = () => {
           </div>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Empleado
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsLiquidationsReportOpen(true)}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Reporte de Liquidaciones
+          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Empleado
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
@@ -537,9 +544,7 @@ const Employees = () => {
                         {formatCurrency(employee.presentismo)}
                       </div>
                       <Badge
-                        variant={
-                          employee.losesPresentismo ? "destructive" : "default"
-                        }
+                        variant={employee.losesPresentismo ? "destructive" : "default"}
                         className="text-xs"
                       >
                         {employee.losesPresentismo ? "Perdido" : "Vigente"}
@@ -548,9 +553,7 @@ const Employees = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={
-                        employee.status === "active" ? "default" : "secondary"
-                      }
+                      variant={employee.status === "active" ? "default" : "secondary"}
                       className="text-xs"
                     >
                       {employee.status === "active" ? "Activo" : "Inactivo"}
