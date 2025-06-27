@@ -144,6 +144,16 @@ const Employees = () => {
     startDate: "",
   });
 
+  // Usar hook de Supabase para empleados
+  const {
+    employees,
+    loading,
+    error,
+    createEmployee,
+    updateEmployee,
+    deleteEmployee,
+  } = useEmployees();
+
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
 
