@@ -617,8 +617,10 @@ const Employees = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={
-                        employee.status === "active" ? "default" : "secondary"
+                      className={
+                        employee.status === "active"
+                          ? "bg-ceramic-emerald text-ceramic-cream border border-ceramic-gold/30"
+                          : "bg-ceramic-cream text-ceramic-emerald border border-ceramic-emerald/30"
                       }
                     >
                       {employee.status === "active" ? "Activo" : "Inactivo"}
