@@ -174,6 +174,11 @@ const Employees = () => {
     console.log("Toggling status for:", employee.name);
   };
 
+  const openVacationManager = (employee) => {
+    setSelectedEmployeeForVacations(employee);
+    setIsVacationManagerOpen(true);
+  };
+
   const filteredEmployees = employees.filter((employee) => {
     const matchesSearch =
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
