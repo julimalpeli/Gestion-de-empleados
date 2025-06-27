@@ -47,6 +47,8 @@ import {
 import { VacationManager } from "@/components/VacationManager";
 import FileUpload from "@/components/FileUpload";
 import LiquidationsReport from "@/components/LiquidationsReport";
+import PermissionGate from "@/components/PermissionGate";
+import usePermissions from "@/hooks/use-permissions";
 import {
   Tooltip,
   TooltipContent,
