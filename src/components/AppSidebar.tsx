@@ -64,10 +64,10 @@ export function AppSidebar() {
                       to={item.url}
                       className={({ isActive }) =>
                         cn(
-                          "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 group",
+                          "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
                           isActive
-                            ? "bg-ceramic-gold text-ceramic-emerald shadow-md scale-105 border border-ceramic-cream/30"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:scale-105 hover:shadow-sm border border-transparent",
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                         )
                       }
                     >
