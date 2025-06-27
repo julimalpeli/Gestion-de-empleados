@@ -367,10 +367,40 @@ const Payroll = () => {
                   <Input
                     id="workDays"
                     type="number"
-                    placeholder="22"
+                    placeholder="30"
                     value={workDays}
                     onChange={(e) => setWorkDays(e.target.value)}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="presentismo">Estado del Presentismo</Label>
+                  <Select
+                    value={presentismoStatus}
+                    onValueChange={setPresentismoStatus}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mantiene">
+                        Mantiene presentismo
+                      </SelectItem>
+                      <SelectItem value="pierde">
+                        Pierde presentismo este mes
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {selectedEmployee && (
+                    <p className="text-xs text-muted-foreground">
+                      Monto del presentismo:{" "}
+                      {formatCurrency(
+                        employees.find(
+                          (e) => e.id.toString() === selectedEmployee,
+                        )?.presentismo || 0,
+                      )}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
