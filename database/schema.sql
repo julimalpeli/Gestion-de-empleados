@@ -30,7 +30,7 @@ CREATE TABLE users (
 CREATE TABLE employees (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    position VARCHAR(100) NOT NULL,
+    job_position VARCHAR(100) NOT NULL,
     white_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo en blanco mensual
     informal_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo informal mensual
     daily_wage DECIMAL(10,2) NOT NULL DEFAULT 0, -- Calculado automáticamente
@@ -71,7 +71,7 @@ CREATE TABLE payroll_records (
     notes TEXT, -- Observaciones adicionales
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Evitar duplicados por empleado y período
     UNIQUE(employee_id, period)
 );
@@ -93,7 +93,7 @@ CREATE TABLE vacation_requests (
     rejection_reason TEXT, -- Motivo del rechazo
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    
+
     -- Validaciones
     CONSTRAINT valid_date_range CHECK (end_date >= start_date),
     CONSTRAINT positive_days CHECK (days > 0)
@@ -160,8 +160,8 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER trigger_calculate_daily_wage 
-    BEFORE INSERT OR UPDATE OF white_wage, informal_wage ON employees 
+CREATE TRIGGER trigger_calculate_daily_wage
+    BEFORE INSERT OR UPDATE OF white_wage, informal_wage ON employees
     FOR EACH ROW EXECUTE FUNCTION calculate_daily_wage();
 
 -- Calcular días de vacaciones por antigüedad
@@ -172,7 +172,7 @@ DECLARE
 BEGIN
     -- Calcular años de antigüedad
     years_worked = EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date));
-    
+
     -- Asignar días según antigüedad
     IF years_worked >= 20 THEN
         NEW.vacation_days = 35;
@@ -183,13 +183,13 @@ BEGIN
     ELSE
         NEW.vacation_days = 14;
     END IF;
-    
+
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER trigger_calculate_vacation_days 
-    BEFORE INSERT OR UPDATE OF start_date ON employees 
+CREATE TRIGGER trigger_calculate_vacation_days
+    BEFORE INSERT OR UPDATE OF start_date ON employees
     FOR EACH ROW EXECUTE FUNCTION calculate_vacation_days();
 
 -- Calcular días de solicitud de vacaciones
@@ -201,8 +201,8 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER trigger_calculate_vacation_request_days 
-    BEFORE INSERT OR UPDATE OF start_date, end_date ON vacation_requests 
+CREATE TRIGGER trigger_calculate_vacation_request_days
+    BEFORE INSERT OR UPDATE OF start_date, end_date ON vacation_requests
     FOR EACH ROW EXECUTE FUNCTION calculate_vacation_request_days();
 
 -- ===========================================
@@ -220,24 +220,24 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY employees_select_policy ON employees FOR SELECT USING (true);
 CREATE POLICY employees_insert_policy ON employees FOR INSERT WITH CHECK (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND users.role IN ('admin', 'manager', 'hr')
         AND users.is_active = true
     )
 );
 CREATE POLICY employees_update_policy ON employees FOR UPDATE USING (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND users.role IN ('admin', 'manager', 'hr')
         AND users.is_active = true
     )
 );
 CREATE POLICY employees_delete_policy ON employees FOR DELETE USING (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND users.role = 'admin'
         AND users.is_active = true
     )
@@ -246,10 +246,10 @@ CREATE POLICY employees_delete_policy ON employees FOR DELETE USING (
 -- Políticas para liquidaciones
 CREATE POLICY payroll_select_policy ON payroll_records FOR SELECT USING (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND (
-            users.role IN ('admin', 'manager', 'hr', 'readonly') 
+            users.role IN ('admin', 'manager', 'hr', 'readonly')
             OR (users.role = 'employee' AND users.employee_id = payroll_records.employee_id)
         )
         AND users.is_active = true
@@ -258,8 +258,8 @@ CREATE POLICY payroll_select_policy ON payroll_records FOR SELECT USING (
 
 CREATE POLICY payroll_insert_policy ON payroll_records FOR INSERT WITH CHECK (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND users.role IN ('admin', 'manager', 'hr')
         AND users.is_active = true
     )
@@ -267,8 +267,8 @@ CREATE POLICY payroll_insert_policy ON payroll_records FOR INSERT WITH CHECK (
 
 CREATE POLICY payroll_update_policy ON payroll_records FOR UPDATE USING (
     EXISTS (
-        SELECT 1 FROM users 
-        WHERE users.id = auth.uid() 
+        SELECT 1 FROM users
+        WHERE users.id = auth.uid()
         AND (
             users.role IN ('admin', 'manager', 'hr')
             OR (users.role = 'admin' AND status = 'processed') -- Solo admin puede editar procesadas
@@ -362,15 +362,15 @@ DECLARE
 BEGIN
     -- Obtener datos del empleado
     SELECT * INTO emp_record FROM employees WHERE id = emp_id;
-    
+
     IF emp_record.id IS NULL THEN
         RETURN;
     END IF;
-    
+
     -- Parsear período
     year_part := SPLIT_PART(calculation_period, '-', 1)::INTEGER;
     semester := SPLIT_PART(calculation_period, '-', 2)::INTEGER;
-    
+
     -- Determinar fechas del semestre
     IF semester = 1 THEN
         semester_start := MAKE_DATE(year_part, 1, 1);
@@ -379,7 +379,7 @@ BEGIN
         semester_start := MAKE_DATE(year_part, 7, 1);
         semester_end := MAKE_DATE(year_part, 12, 31);
     END IF;
-    
+
     -- Verificar si trabajó en el período
     IF emp_record.start_date > semester_end THEN
         corresponds_bool := false;
@@ -389,7 +389,7 @@ BEGIN
         corresponds_bool := true;
         best_salary := emp_record.white_wage + emp_record.informal_wage;
         full_aguinaldo := (best_salary / 12) * 6; -- 6 meses
-        
+
         -- Calcular proporcional si empezó durante el semestre
         IF emp_record.start_date > semester_start THEN
             months_worked := EXTRACT(MONTH FROM AGE(semester_end, emp_record.start_date)) + 1;
@@ -400,7 +400,7 @@ BEGIN
             reason_text := 'Aguinaldo completo';
         END IF;
     END IF;
-    
+
     RETURN QUERY SELECT emp_id, emp_record.name, corresponds_bool, final_amount, reason_text;
 END;
 $$ LANGUAGE plpgsql;
