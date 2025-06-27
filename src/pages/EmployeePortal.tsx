@@ -360,9 +360,10 @@ const EmployeePortal = () => {
                       <TableRow>
                         <TableHead>Período</TableHead>
                         <TableHead>Días Trabajados</TableHead>
-                        <TableHead>En Blanco</TableHead>
-                        <TableHead>Informal</TableHead>
+                        <TableHead>Sueldo Bruto</TableHead>
                         <TableHead>Presentismo</TableHead>
+                        <TableHead>Aguinaldo</TableHead>
+                        <TableHead>Adelanto</TableHead>
                         <TableHead>Total Neto</TableHead>
                         <TableHead>Estado</TableHead>
                         <TableHead className="text-right">Recibo</TableHead>
@@ -382,11 +383,8 @@ const EmployeePortal = () => {
                               </div>
                             )}
                           </TableCell>
-                          <TableCell>
-                            {formatCurrency(record.whiteAmount)}
-                          </TableCell>
-                          <TableCell>
-                            {formatCurrency(record.informalAmount)}
+                          <TableCell className="font-medium">
+                            {formatCurrency(record.grossSalary)}
                           </TableCell>
                           <TableCell>
                             {record.presentismo > 0 ? (
@@ -397,13 +395,26 @@ const EmployeePortal = () => {
                               <span className="text-red-600">Perdido</span>
                             )}
                           </TableCell>
-                          <TableCell className="font-bold">
-                            {formatCurrency(record.netTotal)}
-                            {record.advances > 0 && (
-                              <div className="text-xs text-orange-600">
-                                Adelanto: -{formatCurrency(record.advances)}
-                              </div>
+                          <TableCell>
+                            {record.aguinaldo > 0 ? (
+                              <span className="text-blue-600 font-medium">
+                                {formatCurrency(record.aguinaldo)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
                             )}
+                          </TableCell>
+                          <TableCell>
+                            {record.adelanto > 0 ? (
+                              <span className="text-orange-600">
+                                -{formatCurrency(record.adelanto)}
+                              </span>
+                            ) : (
+                              <span className="text-muted-foreground">-</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-bold text-primary">
+                            {formatCurrency(record.netTotal)}
                           </TableCell>
                           <TableCell>
                             <Badge variant="default">Pagado</Badge>
