@@ -660,6 +660,9 @@ const Payroll = () => {
                   setAdvances("");
                   setDiscounts("");
                   setWhiteWage("");
+                  setOvertimeEnabled(false);
+                  setOvertimeHours("");
+                  setBonusAmount("");
                   setPresentismoStatus("mantiene");
                   setIsEditMode(false);
                   setEditingRecord(null);
