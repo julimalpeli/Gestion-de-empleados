@@ -552,32 +552,32 @@ const Employees = () => {
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow className="bg-ceramic-emerald/10 hover:bg-ceramic-emerald/15">
-                <TableHead className="font-bold text-ceramic-emerald">
+              <TableRow className="bg-ceramic-terracotta/10 hover:bg-ceramic-terracotta/15">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Nombre
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Puesto
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Sueldo Diario
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Mensual Blanco
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Mensual Informal
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Presentismo
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Estado
                 </TableHead>
-                <TableHead className="font-bold text-ceramic-emerald">
+                <TableHead className="font-bold text-ceramic-terracotta">
                   Vacaciones
                 </TableHead>
-                <TableHead className="text-right font-bold text-ceramic-emerald">
+                <TableHead className="text-right font-bold text-ceramic-terracotta">
                   Acciones
                 </TableHead>
               </TableRow>
