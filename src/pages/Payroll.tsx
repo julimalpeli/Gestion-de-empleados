@@ -278,8 +278,8 @@ const Payroll = () => {
     // Sueldo informal = Total después de deducciones - Sueldo en blanco manual
     const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
 
-    // Total neto = sueldo en blanco + sueldo informal
-    const netTotal = manualWhiteWage + informalAmount;
+    // Total neto = total después de deducciones (incluye horas extras, presentismo, bonos, etc.)
+    const netTotal = totalAfterDeductions;
 
     return {
       basePay,
