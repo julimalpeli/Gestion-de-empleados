@@ -35,7 +35,10 @@ export class SupabaseEmployeeService implements IEmployeeService {
       return mappedData;
     } catch (error) {
       console.error("❌ Error fetching employees:", error);
-      throw new Error("Failed to fetch employees");
+      if (error instanceof Error) {
+        throw error; // Re-throw the original error with details
+      }
+      throw new Error("Failed to fetch employees: Unknown error");
     }
   }
 
