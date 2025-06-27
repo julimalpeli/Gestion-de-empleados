@@ -720,8 +720,7 @@ const Employees = () => {
         isOpen={isLiquidationsReportOpen}
         onClose={() => setIsLiquidationsReportOpen(false)}
       />
-      </div>
-    </TooltipProvider>
+    </div>
   );
 };
 
