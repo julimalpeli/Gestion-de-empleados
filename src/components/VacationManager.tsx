@@ -347,9 +347,7 @@ const VacationManager = ({
               )}
 
               <div className="flex gap-2 mt-4">
-                <Button
-                  onClick={editingVacation ? handleSaveEdit : handleAddVacation}
-                >
+                <Button onClick={handleAddVacation}>
                   {editingVacation ? "Guardar Cambios" : "Agregar Solicitud"}
                 </Button>
                 <Button
