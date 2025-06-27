@@ -735,6 +735,15 @@ const Payroll = () => {
                         <TableCell>
                           {formatCurrency(record.informalAmount)}
                         </TableCell>
+                        <TableCell>
+                          {record.presentismoAmount > 0 ? (
+                            <span className="text-green-600 font-medium">
+                              {formatCurrency(record.presentismoAmount)}
+                            </span>
+                          ) : (
+                            <span className="text-red-600">Perdido</span>
+                          )}
+                        </TableCell>
                         <TableCell className="font-medium">
                           {formatCurrency(record.netTotal)}
                           {record.aguinaldo > 0 && (
