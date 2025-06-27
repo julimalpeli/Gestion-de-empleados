@@ -1129,95 +1129,98 @@ const Payroll = () => {
             <CardContent>
               <div className="overflow-x-auto">
                 <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Empleado</TableHead>
-                    <TableHead>Fecha Ingreso</TableHead>
-                    <TableHead>Mejor Sueldo</TableHead>
-                    <TableHead>Días Trabajados</TableHead>
-                    <TableHead>Tipo</TableHead>
-                    <TableHead>Aguinaldo</TableHead>
-                    <TableHead>Estado</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {employees
-                    .filter((emp) => emp.status === "active")
-                    .map((emp) => {
-                      const aguinaldo = calculateAguinaldo(
-                        emp,
-                        selectedAguinaldoPeriod,
-                      );
-                      return (
-                        <TableRow key={emp.id}>
-                          <TableCell className="font-medium">
-                            <div>
-                              <p>{emp.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {emp.position}
-                              </p>
-                            </div>
-                          </TableCell>
-                          <TableCell>{formatDate(emp.startDate)}</TableCell>
-                          <TableCell>
-                            {formatCurrency(aguinaldo.bestSalary || 0)}
-                          </TableCell>
-                          <TableCell>
-                            {aguinaldo.corresponds ? (
-                              <div className="text-center">
-                                <div className="font-medium">
-                                  {aguinaldo.daysWorked}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  de {aguinaldo.totalDays} días
-                                </div>
-                              </div>
-                            ) : (
-                              <span className="text-muted-foreground">-</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {aguinaldo.corresponds ? (
-                              <Badge
-                                variant={
-                                  aguinaldo.proportional
-                                    ? "secondary"
-                                    : "default"
-                                }
-                              >
-                                {aguinaldo.proportional
-                                  ? "Proporcional"
-                                  : "Completo"}
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline">No corresponde</Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="font-bold">
-                            {aguinaldo.corresponds ? (
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Empleado</TableHead>
+                      <TableHead>Fecha Ingreso</TableHead>
+                      <TableHead>Mejor Sueldo</TableHead>
+                      <TableHead>Días Trabajados</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Aguinaldo</TableHead>
+                      <TableHead>Estado</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {employees
+                      .filter((emp) => emp.status === "active")
+                      .map((emp) => {
+                        const aguinaldo = calculateAguinaldo(
+                          emp,
+                          selectedAguinaldoPeriod,
+                        );
+                        return (
+                          <TableRow key={emp.id}>
+                            <TableCell className="font-medium">
                               <div>
-                                <div className="text-lg">
-                                  {formatCurrency(aguinaldo.amount)}
-                                </div>
-                                {aguinaldo.proportional && (
-                                  <div className="text-xs text-muted-foreground">
-                                    Completo:{" "}
-                                    {formatCurrency(aguinaldo.fullAguinaldo)}
-                                  </div>
-                                )}
+                                <p>{emp.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                  {emp.position}
+                                </p>
                               </div>
-                            ) : (
-                              <span className="text-muted-foreground">$0</span>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="text-xs">{aguinaldo.reason}</div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                </TableBody>
-              </Table>
+                            </TableCell>
+                            <TableCell>{formatDate(emp.startDate)}</TableCell>
+                            <TableCell>
+                              {formatCurrency(aguinaldo.bestSalary || 0)}
+                            </TableCell>
+                            <TableCell>
+                              {aguinaldo.corresponds ? (
+                                <div className="text-center">
+                                  <div className="font-medium">
+                                    {aguinaldo.daysWorked}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    de {aguinaldo.totalDays} días
+                                  </div>
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {aguinaldo.corresponds ? (
+                                <Badge
+                                  variant={
+                                    aguinaldo.proportional
+                                      ? "secondary"
+                                      : "default"
+                                  }
+                                >
+                                  {aguinaldo.proportional
+                                    ? "Proporcional"
+                                    : "Completo"}
+                                </Badge>
+                              ) : (
+                                <Badge variant="outline">No corresponde</Badge>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-bold">
+                              {aguinaldo.corresponds ? (
+                                <div>
+                                  <div className="text-lg">
+                                    {formatCurrency(aguinaldo.amount)}
+                                  </div>
+                                  {aguinaldo.proportional && (
+                                    <div className="text-xs text-muted-foreground">
+                                      Completo:{" "}
+                                      {formatCurrency(aguinaldo.fullAguinaldo)}
+                                    </div>
+                                  )}
+                                </div>
+                              ) : (
+                                <span className="text-muted-foreground">
+                                  $0
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="text-xs">{aguinaldo.reason}</div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
