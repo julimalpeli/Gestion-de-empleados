@@ -339,6 +339,8 @@ const Employees = () => {
                   />
                 </div>
 
+
+
                 <div className="space-y-2">
                   <Label htmlFor="editStartDate">Fecha de Ingreso</Label>
                   <Input
@@ -529,32 +531,41 @@ const Employees = () => {
                   <TableCell>{formatCurrency(employee.whiteWage)}</TableCell>
                   <TableCell>{formatCurrency(employee.informalWage)}</TableCell>
                   <TableCell>
-                    <div className="space-y-1">
-                      <div>{formatCurrency(employee.presentismo)}</div>
-                      {employee.losesPresentismo ? (
-                        <Badge variant="destructive" className="text-xs">
-                          Perdido
-                        </Badge>
-                      ) : (
-                        <Badge variant="default" className="text-xs">
-                          Vigente
-                        </Badge>
-                      )}
-                      {employee.losesPresentismo &&
-                        employee.presentismoComment && (
-                          <div className="text-xs text-muted-foreground max-w-32 truncate">
-                            {employee.presentismoComment}
-                          </div>
-                        )}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium">
+                          {employee.vacationDays - employee.vacationsTaken}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          / {employee.vacationDays}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full"
+                          style={{
+                            width: `${Math.max(
+                              5,
+                              ((employee.vacationDays - employee.vacationsTaken) /
+                                employee.vacationDays) *
+                                100,
+                            )}%`,
+                          }}
+                        ></div>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>Tomados: {employee.vacationsTaken}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => openVacationManager(employee)}
+                          className="h-6 px-2 text-xs hover:bg-blue-100"
+                        >
+                          <Plane className="h-3 w-3" />
+                        </Button>
+                      </div>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        employee.status === "active" ? "default" : "secondary"
-                      }
-                    >
-                      {employee.status === "active" ? "Activo" : "Inactivo"}
                     </Badge>
                   </TableCell>
                   <TableCell>
