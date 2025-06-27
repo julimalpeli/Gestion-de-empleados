@@ -168,14 +168,16 @@ const Employees = () => {
   };
 
   return (
-    <div className="flex flex-col gap-6 p-6">
+    <div className="flex flex-col gap-6 p-6 bg-gradient-to-br from-background to-ceramic-cream/20 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-border pb-4">
+      <div className="flex items-center justify-between border-b-2 border-ceramic-gold/30 pb-6">
         <div className="flex items-center gap-4">
-          <SidebarTrigger />
+          <SidebarTrigger className="bg-ceramic-emerald text-ceramic-cream hover:bg-ceramic-gold hover:text-ceramic-emerald transition-all duration-200" />
           <div>
-            <h1 className="text-2xl font-bold">Gestión de Empleados</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-3xl font-bold text-ceramic-emerald">
+              Gestión de Empleados
+            </h1>
+            <p className="text-ceramic-emerald/70 font-medium">
               Administra el personal del restaurant
             </p>
           </div>
