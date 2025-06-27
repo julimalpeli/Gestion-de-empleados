@@ -619,8 +619,8 @@ const Employees = () => {
                     <Badge
                       className={
                         employee.status === "active"
-                          ? "bg-ceramic-emerald text-ceramic-cream border border-ceramic-gold/30"
-                          : "bg-ceramic-cream text-ceramic-emerald border border-ceramic-emerald/30"
+                          ? "bg-ceramic-terracotta text-ceramic-cream border border-ceramic-gold/30"
+                          : "bg-ceramic-cream text-ceramic-terracotta border border-ceramic-terracotta/30"
                       }
                     >
                       {employee.status === "active" ? "Activo" : "Inactivo"}
