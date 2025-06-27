@@ -1407,16 +1407,17 @@ const Payroll = () => {
                       Math.round(total / Math.max(count, 1)),
                     );
                   })()}
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Por empleado con aguinaldo
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </TooltipProvider>
+  );
+};
   );
 };
 
