@@ -1127,7 +1127,8 @@ const Payroll = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Table>
+              <div className="overflow-x-auto">
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Empleado</TableHead>
