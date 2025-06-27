@@ -286,6 +286,27 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
     }).format(amount);
   };
 
+  // Manejo de loading y error
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p>Cargando empleados...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
