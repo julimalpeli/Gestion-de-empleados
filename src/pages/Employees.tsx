@@ -600,24 +600,23 @@ const Employees = () => {
                       title={`Documentos de ${employee.name}`}
                       description="Subir contratos, documentos personales y otros archivos del empleado"
                     />
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div>{formatCurrency(employee.presentismo)}</div>
-                      {employee.losesPresentismo ? (
-                        <Badge variant="destructive" className="text-xs">
-                          Perdido
-                        </Badge>
-                      ) : (
-                        <Badge variant="default" className="text-xs">
-                          Vigente
-                        </Badge>
-                      )}
-                      {employee.losesPresentismo &&
-                        employee.presentismoComment && (
-                          <div className="text-xs text-muted-foreground max-w-32 truncate">
-                            {employee.presentismoComment}
-                          </div>
-                        )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setEditingEmployee(employee);
+                          setLosesPresentismo(employee.losesPresentismo);
+                          setIsEditDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </TableCell>
               ))}
