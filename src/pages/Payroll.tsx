@@ -606,20 +606,76 @@ const Payroll = () => {
 
               <div className="flex gap-2 pt-4">
                 <Button
-                  onClick={() => {
-                    setIsNewPayrollOpen(false);
-                    setSelectedEmployee("");
-                    setWorkDays("30");
-                    setHolidayDays("");
-                    setAdvances("");
-                    setDiscounts("");
-                    setWhiteWage("");
-                    setOvertimeEnabled(false);
-                    setOvertimeHours("");
-                    setBonusAmount("");
-                    setPresentismoStatus("mantiene");
-                    setIsEditMode(false);
-                    setEditingRecord(null);
+                  onClick={async () => {
+                    if (!calculation) return;
+
+                    try {
+                      const currentDate = new Date();
+                      const period = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+
+                      if (isEditMode && editingRecord) {
+                        // Actualizar registro existente
+                        await updatePayrollRecord(editingRecord.id, {
+                          baseDays: parseInt(workDays),
+                          holidayDays: parseInt(holidayDays) || 0,
+                          baseAmount: calculation.baseAmount,
+                          holidayBonus: calculation.holidayBonus,
+                          aguinaldo: calculation.aguinaldo,
+                          discounts: parseFloat(discounts) || 0,
+                          advances: parseFloat(advances) || 0,
+                          whiteAmount: calculation.whiteAmount,
+                          informalAmount: calculation.informalAmount,
+                          presentismoAmount: calculation.presentismoAmount,
+                          overtimeHours: parseFloat(overtimeHours) || 0,
+                          overtimeAmount: calculation.overtimeAmount,
+                          bonusAmount: parseFloat(bonusAmount) || 0,
+                          netTotal: calculation.total,
+                          status: "processed",
+                        });
+                      } else {
+                        // Crear nuevo registro
+                        await createPayrollRecord({
+                          employeeId: selectedEmployee,
+                          period,
+                          baseDays: parseInt(workDays),
+                          holidayDays: parseInt(holidayDays) || 0,
+                          baseAmount: calculation.baseAmount,
+                          holidayBonus: calculation.holidayBonus,
+                          aguinaldo: calculation.aguinaldo,
+                          discounts: parseFloat(discounts) || 0,
+                          advances: parseFloat(advances) || 0,
+                          whiteAmount: calculation.whiteAmount,
+                          informalAmount: calculation.informalAmount,
+                          presentismoAmount: calculation.presentismoAmount,
+                          overtimeHours: parseFloat(overtimeHours) || 0,
+                          overtimeAmount: calculation.overtimeAmount,
+                          bonusAmount: parseFloat(bonusAmount) || 0,
+                          netTotal: calculation.total,
+                          status: "processed",
+                          processedDate: null,
+                          processedBy: null,
+                          notes: null,
+                        });
+                      }
+
+                      // Limpiar formulario
+                      setIsNewPayrollOpen(false);
+                      setSelectedEmployee("");
+                      setWorkDays("30");
+                      setHolidayDays("");
+                      setAdvances("");
+                      setDiscounts("");
+                      setWhiteWage("");
+                      setOvertimeEnabled(false);
+                      setOvertimeHours("");
+                      setBonusAmount("");
+                      setPresentismoStatus("mantiene");
+                      setIsEditMode(false);
+                      setEditingRecord(null);
+                    } catch (error) {
+                      console.error("Error saving payroll:", error);
+                      alert("Error al guardar liquidación");
+                    }
                   }}
                   className="w-full"
                   disabled={!calculation}
