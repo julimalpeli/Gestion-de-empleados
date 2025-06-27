@@ -182,6 +182,52 @@ const Employees = () => {
     setIsVacationManagerOpen(true);
   };
 
+  // Función correcta para calcular vacaciones
+  const calculateVacationDays = (startDate: string) => {
+    const start = new Date(startDate);
+    const today = new Date();
+
+    // Calcular años de antigüedad
+    const yearsDiff = today.getFullYear() - start.getFullYear();
+    const monthsDiff = today.getMonth() - start.getMonth();
+    const daysDiff = today.getDate() - start.getDate();
+
+    let years = yearsDiff;
+    if (monthsDiff < 0 || (monthsDiff === 0 && daysDiff < 0)) {
+      years--;
+    }
+
+    // Determinar días de vacaciones según antigüedad
+    let vacationDays = 14; // Por defecto hasta 5 años
+    if (years >= 20) {
+      vacationDays = 35;
+    } else if (years >= 10) {
+      vacationDays = 28;
+    } else if (years >= 5) {
+      vacationDays = 21;
+    }
+
+    return {
+      years,
+      vacationDays,
+      startDate: start.toLocaleDateString("es-AR"),
+    };
+  };
+
+  const showEmployeeInfo = (employee) => {
+    const vacationInfo = calculateVacationDays(employee.startDate);
+    alert(`Información de ${employee.name}:
+
+Fecha de Ingreso: ${vacationInfo.startDate}
+Antigüedad: ${vacationInfo.years} años
+Días de Vacaciones: ${vacationInfo.vacationDays} días (según antigüedad)
+Puesto: ${employee.position}
+Estado: ${employee.status === "active" ? "Activo" : "Inactivo"}
+Sueldo Mensual Total: ${formatCurrency(employee.whiteWage + employee.informalWage)}
+Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo ? "(Perdido)" : "(Vigente)"}
+`);
+  };
+
   const filteredEmployees = employees.filter((employee) => {
     const matchesSearch =
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
