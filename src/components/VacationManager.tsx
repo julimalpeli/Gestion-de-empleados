@@ -101,26 +101,41 @@ const VacationManager = ({
     return diffDays;
   };
 
-  const handleAddVacation = () => {
+  const handleAddVacation = async () => {
     if (newVacation.startDate && newVacation.endDate && newVacation.reason) {
-      const days = calculateDays(newVacation.startDate, newVacation.endDate);
-      const newId = Math.max(...vacations.map((v) => v.id)) + 1;
+      try {
+        const days = calculateDays(newVacation.startDate, newVacation.endDate);
 
-      const vacation = {
-        id: newId,
-        ...newVacation,
-        days,
-        requestDate: new Date().toISOString().split("T")[0],
-      };
+        if (editingVacation) {
+          // Actualizar vacación existente
+          await updateVacation(editingVacation.id, {
+            startDate: newVacation.startDate,
+            endDate: newVacation.endDate,
+            reason: newVacation.reason,
+            days,
+          });
+        } else {
+          // Crear nueva vacación
+          await createVacation({
+            employeeId: employee.id,
+            startDate: newVacation.startDate,
+            endDate: newVacation.endDate,
+            reason: newVacation.reason,
+            days,
+          });
+        }
 
-      setVacations([...vacations, vacation]);
-      setNewVacation({
-        startDate: "",
-        endDate: "",
-        reason: "",
-        status: "pending",
-      });
-      setIsAddingVacation(false);
+        setNewVacation({
+          startDate: "",
+          endDate: "",
+          reason: "",
+        });
+        setIsAddingVacation(false);
+        setEditingVacation(null);
+      } catch (error) {
+        console.error("Error saving vacation:", error);
+        alert("Error al guardar vacación");
+      }
     }
   };
 
