@@ -41,7 +41,7 @@ const Login = () => {
   const { login, isAuthenticated, user } = useAuth();
 
   // Redirect if already authenticated
-  useState(() => {
+  useEffect(() => {
     if (isAuthenticated && user) {
       if (user.role === "admin") {
         navigate("/");
@@ -49,7 +49,7 @@ const Login = () => {
         navigate("/portal-empleado");
       }
     }
-  });
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
