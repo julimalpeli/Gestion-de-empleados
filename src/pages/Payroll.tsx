@@ -275,16 +275,26 @@ const Payroll = () => {
     const basePay = employee.dailyWage * parseInt(workDays);
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
+    // Calcular horas extra si está habilitado
+    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario ÷ 8
+    const overtimePay = overtimeEnabled
+      ? hourlyRate * (parseInt(overtimeHours) || 0)
+      : 0;
+
     // Agregar presentismo según selección en liquidación
     const presentismoAmount =
       presentismoStatus === "mantiene" ? employee.presentismo : 0;
+
+    // Bono libre
+    const bonusPay = parseInt(bonusAmount) || 0;
 
     const totalAdvances = parseInt(advances) || 0;
     const totalDiscounts = parseInt(discounts) || 0;
     const manualWhiteWage = parseInt(whiteWage) || 0;
 
-    // Total bruto = sueldo base + feriados + presentismo
-    const grossTotal = basePay + holidayPay + presentismoAmount;
+    // Total bruto = sueldo base + feriados + horas extra + presentismo + bono
+    const grossTotal =
+      basePay + holidayPay + overtimePay + presentismoAmount + bonusPay;
 
     // Total después de descuentos y adelantos
     const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
@@ -298,7 +308,10 @@ const Payroll = () => {
     return {
       basePay,
       holidayPay,
+      overtimePay,
+      hourlyRate,
       presentismoAmount,
+      bonusPay,
       grossTotal,
       totalAdvances,
       totalDiscounts,
@@ -442,7 +455,7 @@ const Payroll = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="holidayDays">
-                    Días Feriados (doble pago)
+                    D��as Feriados (doble pago)
                   </Label>
                   <Input
                     id="holidayDays"
