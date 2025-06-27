@@ -169,21 +169,29 @@ export class SupabaseEmployeeService implements IEmployeeService {
     }
   }
 
-  async getActiveEmployees(): Promise<Employee[]> {
+  async getAllEmployees(): Promise<Employee[]> {
     try {
+      console.log("🔄 Consultando empleados en Supabase...");
       const { data, error } = await supabase
         .from("employees")
         .select("*")
-        .eq("status", "active")
         .order("name");
 
-      if (error) throw error;
+      console.log("📊 Respuesta de Supabase:", { data, error });
 
-      return data.map(this.mapFromSupabase);
+      if (error) {
+        console.error("❌ Error de Supabase:", error);
+        throw error;
+      }
+
+      const mappedData = data.map(this.mapFromSupabase);
+      console.log("✅ Datos mapeados:", mappedData);
+      return mappedData;
     } catch (error) {
-      console.error("Error fetching active employees:", error);
-      throw new Error("Failed to fetch active employees");
+      console.error("❌ Error fetching employees:", error);
+      throw new Error("Failed to fetch employees");
     }
+  }
   }
 
   async searchEmployees(query: string): Promise<Employee[]> {
