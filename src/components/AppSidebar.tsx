@@ -41,11 +41,18 @@ const items = [
 
 export function AppSidebar() {
   const { setOpenMobile, isMobile } = useSidebar();
+  const { logout, user } = useAuth();
+  const navigate = useNavigate();
 
   const handleLinkClick = () => {
     if (isMobile) {
       setOpenMobile(false);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
   };
 
   return (
