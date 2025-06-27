@@ -9,47 +9,51 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 28 25% 95%; /* Warm cream background */
-    --foreground: 4 82% 25%; /* Deep terracotta for text */
+    --background: 0 0% 100%;
+    --foreground: 224 71.4% 4.1%;
 
     --card: 0 0% 100%;
-    --card-foreground: 4 82% 25%;
+    --card-foreground: 224 71.4% 4.1%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 4 82% 25%;
+    --popover-foreground: 224 71.4% 4.1%;
 
-    --primary: 4 82% 40%; /* Terracotta primary */
-    --primary-foreground: 28 25% 95%;
+    --primary: 220.9 39.3% 11%;
+    --primary-foreground: 210 20% 98%;
 
-    --secondary: 28 25% 90%; /* Light cream */
-    --secondary-foreground: 4 82% 25%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
 
-    --muted: 28 25% 88%;
-    --muted-foreground: 4 60% 45%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
 
-    --accent: 43 79% 47%; /* Golden accent */
-    --accent-foreground: 4 82% 25%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
 
-    --destructive: 4 82% 40%; /* Terracotta red */
-    --destructive-foreground: 28 25% 95%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 4 30% 85%;
-    --input: 28 25% 90%;
-    --ring: 4 82% 40%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 220.9 39.3% 11%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 4 82% 40%; /* Terracotta sidebar */
-    --sidebar-foreground: 28 25% 95%; /* Light cream text */
+    --sidebar-background: 0 0% 98%;
 
-    --sidebar-primary: 43 79% 47%; /* Gold for active items */
-    --sidebar-primary-foreground: 4 82% 25%; /* Dark terracotta text on gold */
+    --sidebar-foreground: 240 5.3% 26.1%;
 
-    --sidebar-accent: 4 82% 50%; /* Lighter terracotta for hover */
-    --sidebar-accent-foreground: 28 25% 95%; /* Light cream text */
+    --sidebar-primary: 240 5.9% 10%;
 
-    --sidebar-border: 4 82% 50%;
-    --sidebar-ring: 43 79% 47%;
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
