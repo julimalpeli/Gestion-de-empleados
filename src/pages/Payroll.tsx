@@ -26,6 +26,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { usePayroll } from "@/hooks/use-payroll";
+import { useEmployees } from "@/hooks/use-employees";
 import {
   Plus,
   Calculator,
