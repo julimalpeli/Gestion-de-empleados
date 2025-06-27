@@ -112,8 +112,8 @@ const mockPayrollRecords = [
   },
 ];
 
-// Mock employees data
-const employees = [
+// Mock employees data - COMENTADO porque ahora usamos Supabase
+const mockEmployees = [
   {
     id: 1,
     name: "Juan Pérez",
