@@ -309,6 +309,33 @@ const Payroll = () => {
 
   const calculation = calculatePayroll();
 
+  const handleEditRecord = (record) => {
+    setIsEditMode(true);
+    setEditingRecord(record);
+
+    // Find employee
+    const employee = employees.find((e) => e.name === record.employeeName);
+    if (employee) {
+      setSelectedEmployee(employee.id.toString());
+    }
+
+    // Pre-fill form with record data
+    setWorkDays(record.baseDays.toString());
+    setHolidayDays(record.holidayDays.toString());
+    setAdvances(record.advances.toString());
+    setDiscounts(record.discounts.toString());
+    setWhiteWage(record.whiteAmount.toString());
+
+    // Determine presentismo status based on record
+    // This is a simple heuristic - in real app you'd store this info
+    const employee_presentismo = employee?.presentismo || 0;
+    const has_presentismo =
+      record.netTotal > record.whiteAmount + record.informalAmount;
+    setPresentismoStatus(has_presentismo ? "mantiene" : "pierde");
+
+    setIsNewPayrollOpen(true);
+  };
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
