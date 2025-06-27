@@ -40,14 +40,18 @@ const items = [
 export function AppSidebar() {
   return (
     <Sidebar>
-      <SidebarHeader className="border-b border-sidebar-border p-6">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
+      <SidebarHeader className="border-b border-sidebar-border p-6 bg-gradient-to-br from-sidebar-background to-sidebar-accent">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ceramic-gold text-ceramic-emerald font-bold text-lg shadow-lg border-2 border-ceramic-cream/20">
             RH
           </div>
           <div>
-            <h1 className="text-lg font-semibold">RestauranteHR</h1>
-            <p className="text-xs text-muted-foreground">Gestión de Personal</p>
+            <h1 className="text-xl font-bold text-sidebar-foreground">
+              RestauranteHR
+            </h1>
+            <p className="text-sm text-ceramic-gold font-medium">
+              Gestión de Personal
+            </p>
           </div>
         </div>
       </SidebarHeader>
