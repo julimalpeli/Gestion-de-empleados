@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/components/FileUpload";
+import usePermissions from "@/hooks/use-permissions";
 import {
   Tooltip,
   TooltipContent,
