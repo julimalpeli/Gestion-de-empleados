@@ -9,8 +9,9 @@ import {
 interface User {
   username: string;
   name: string;
-  role: "admin" | "employee";
+  role: "admin" | "manager" | "hr" | "employee" | "readonly";
   employeeId?: number;
+  email: string;
   permissions: string[];
   loginTime: string;
 }
@@ -22,6 +23,66 @@ interface AuthContextType {
   isAuthenticated: boolean;
   hasPermission: (permission: string) => boolean;
 }
+
+// Demo users with different roles
+const DEMO_USERS = {
+  admin: {
+    username: "admin",
+    password: "admin123",
+    name: "Administrador",
+    role: "admin" as const,
+    email: "admin@cadizbartapas.com",
+    permissions: ["all"],
+  },
+  manager: {
+    username: "manager",
+    password: "gerente123",
+    name: "María López",
+    role: "manager" as const,
+    email: "maria.lopez@cadizbartapas.com",
+    permissions: [
+      "employees:view",
+      "employees:create",
+      "employees:edit",
+      "payroll:view",
+      "payroll:create",
+      "payroll:edit",
+      "reports:view",
+    ],
+  },
+  hr: {
+    username: "rrhh",
+    password: "rrhh123",
+    name: "Ana García",
+    role: "hr" as const,
+    email: "ana.garcia@cadizbartapas.com",
+    permissions: [
+      "employees:view",
+      "employees:create",
+      "employees:edit",
+      "payroll:view",
+      "payroll:create",
+      "vacations:manage",
+    ],
+  },
+  employee: {
+    username: "employee",
+    password: "empleado123",
+    name: "Juan Pérez",
+    role: "employee" as const,
+    employeeId: 1,
+    email: "juan.perez@cadizbartapas.com",
+    permissions: ["profile:view", "payroll:view:own", "vacations:view:own"],
+  },
+  readonly: {
+    username: "auditor",
+    password: "auditor123",
+    name: "Carlos Auditor",
+    role: "readonly" as const,
+    email: "auditor@cadizbartapas.com",
+    permissions: ["employees:view", "payroll:view", "reports:view"],
+  },
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -86,3 +147,26 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Helper function for login validation
+export const validateLogin = (username: string, password: string) => {
+  const user = Object.values(DEMO_USERS).find(
+    (u) => u.username === username && u.password === password,
+  );
+
+  if (user) {
+    return {
+      username: user.username,
+      name: user.name,
+      role: user.role,
+      employeeId: user.employeeId,
+      email: user.email,
+      permissions: user.permissions,
+      loginTime: new Date().toISOString(),
+    };
+  }
+
+  return null;
+};
+
+export { DEMO_USERS };
