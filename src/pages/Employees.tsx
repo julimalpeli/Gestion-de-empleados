@@ -461,7 +461,17 @@ const Employees = () => {
               <CardTitle className="text-sm font-medium">
                 Gasto Mensual Total
               </CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <DollarSign className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    Suma de todos los salarios mensuales incluye presentismo
+                    vigente
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
