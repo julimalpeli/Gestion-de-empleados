@@ -543,11 +543,12 @@ const Payroll = () => {
                   setIsNewPayrollOpen(false);
                   // Limpiar campos
                   setSelectedEmployee("");
-                  setWorkDays("");
+                  setWorkDays("30");
                   setHolidayDays("");
                   setAdvances("");
                   setDiscounts("");
                   setWhiteWage("");
+                  setPresentismoStatus("mantiene");
                 }}
                 className="w-full"
                 disabled={!calculation}
