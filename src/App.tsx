@@ -42,11 +42,13 @@ const App = () => (
               }
             />
 
-            {/* Admin dashboard with sidebar */}
+            {/* Dashboard with sidebar - Allow admin, manager, hr */}
             <Route
               path="/"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute
+                  allowedRoles={["admin", "manager", "hr", "readonly"]}
+                >
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
@@ -60,7 +62,7 @@ const App = () => (
             <Route
               path="/empleados"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
@@ -74,7 +76,7 @@ const App = () => (
             <Route
               path="/liquidaciones"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
@@ -88,7 +90,9 @@ const App = () => (
             <Route
               path="/reportes"
               element={
-                <ProtectedRoute requiredRole="admin">
+                <ProtectedRoute
+                  allowedRoles={["admin", "manager", "hr", "readonly"]}
+                >
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
