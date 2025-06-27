@@ -15,6 +15,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { AuthProvider } from "@/hooks/use-auth";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import AuthRedirect from "@/components/AuthRedirect";
 
 const queryClient = new QueryClient();
 
@@ -26,8 +27,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
+
+            {/* Employee portal */}
             <Route
               path="/portal-empleado"
               element={
@@ -36,25 +40,66 @@ const App = () => (
                 </ProtectedRoute>
               }
             />
+
+            {/* Admin dashboard with sidebar */}
             <Route
-              path="/*"
+              path="/"
               element={
                 <ProtectedRoute requiredRole="admin">
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
-                      <Routes>
-                        <Route path="/" element={<Index />} />
-                        <Route path="/empleados" element={<Employees />} />
-                        <Route path="/liquidaciones" element={<Payroll />} />
-                        <Route path="/reportes" element={<Reports />} />
-                        <Route path="*" element={<NotFound />} />
-                      </Routes>
+                      <Index />
                     </main>
                   </SidebarProvider>
                 </ProtectedRoute>
               }
             />
+
+            <Route
+              path="/empleados"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Employees />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/liquidaciones"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Payroll />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reportes"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Reports />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Fallback routes */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
