@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
+import useFiles from "@/hooks/use-files";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
