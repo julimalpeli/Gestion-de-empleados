@@ -271,10 +271,9 @@ const Payroll = () => {
     const basePay = employee.dailyWage * parseInt(workDays);
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
-    // Agregar presentismo si no lo perdió
-    const presentismoAmount = employee.losesPresentismo
-      ? 0
-      : employee.presentismo;
+    // Agregar presentismo según selección en liquidación
+    const presentismoAmount =
+      presentismoStatus === "mantiene" ? employee.presentismo : 0;
 
     const totalAdvances = parseInt(advances) || 0;
     const totalDiscounts = parseInt(discounts) || 0;
