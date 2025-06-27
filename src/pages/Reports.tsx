@@ -537,6 +537,12 @@ const Reports = () => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Liquidations Report Modal */}
+      <LiquidationsReport
+        isOpen={isLiquidationsReportOpen}
+        onClose={() => setIsLiquidationsReportOpen(false)}
+      />
     </div>
   );
 };
