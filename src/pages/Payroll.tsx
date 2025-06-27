@@ -604,6 +604,8 @@ const Payroll = () => {
                   setDiscounts("");
                   setWhiteWage("");
                   setPresentismoStatus("mantiene");
+                  setIsEditMode(false);
+                  setEditingRecord(null);
                 }}
                 className="w-full"
               >
