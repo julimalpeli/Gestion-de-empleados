@@ -179,13 +179,6 @@ const Employees = () => {
         </div>
 
         <div className="flex gap-2">
-          <PermissionGate module="reports" action="view">
-            <Button variant="outline">
-              <FileText className="h-4 w-4 mr-2" />
-              Reporte de Liquidaciones
-            </Button>
-          </PermissionGate>
-
           <PermissionGate module="employees" action="create">
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
