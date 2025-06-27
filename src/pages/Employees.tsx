@@ -183,7 +183,7 @@ const Employees = () => {
 
         <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-ceramic-terracotta hover:bg-ceramic-terracotta/90 text-ceramic-cream font-semibold shadow-lg border border-ceramic-gold/50 hover:scale-105 transition-all duration-200">
+            <Button>
               <Plus className="h-4 w-4 mr-2" />
               Nuevo Empleado
             </Button>
