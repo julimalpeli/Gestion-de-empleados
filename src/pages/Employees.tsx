@@ -339,8 +339,6 @@ const Employees = () => {
                   />
                 </div>
 
-
-
                 <div className="space-y-2">
                   <Label htmlFor="editStartDate">Fecha de Ingreso</Label>
                   <Input
@@ -546,7 +544,8 @@ const Employees = () => {
                           style={{
                             width: `${Math.max(
                               5,
-                              ((employee.vacationDays - employee.vacationsTaken) /
+                              ((employee.vacationDays -
+                                employee.vacationsTaken) /
                                 employee.vacationDays) *
                                 100,
                             )}%`,
@@ -619,6 +618,7 @@ const Employees = () => {
                       </Button>
                     </div>
                   </TableCell>
+                </TableRow>
               ))}
             </TableBody>
           </Table>
