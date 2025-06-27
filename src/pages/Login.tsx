@@ -59,7 +59,7 @@ const Login = () => {
     }, 1000);
   };
 
-  const fillDemoCredentials = (userType: "admin" | "employee") => {
+  const fillDemoCredentials = (userType: keyof typeof DEMO_USERS) => {
     setUsername(userType);
     setPassword(DEMO_USERS[userType].password);
     setError("");
