@@ -50,9 +50,10 @@ import {
 import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
+import { useEmployees } from "@/hooks/use-employees";
 
-// Mock data with calculated vacation days (calculated correctly based on seniority)
-const employees = [
+// Ya no usamos mock data - ahora viene de Supabase
+const mockEmployees = [
   {
     id: 1,
     name: "Juan Pérez",
