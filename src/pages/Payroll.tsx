@@ -181,6 +181,22 @@ const Payroll = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
+  // Usar hooks de Supabase
+  const {
+    payrollRecords,
+    loading: payrollLoading,
+    error: payrollError,
+    createPayrollRecord,
+    updatePayrollRecord,
+    deletePayrollRecord,
+  } = usePayroll();
+
+  const {
+    employees,
+    loading: employeesLoading,
+    error: employeesError,
+  } = useEmployees();
+
   const { isAdmin, canEditModule } = usePermissions();
 
   const handleEditRecord = (record) => {
