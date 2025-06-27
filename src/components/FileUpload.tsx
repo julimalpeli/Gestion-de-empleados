@@ -55,10 +55,15 @@ const FileUpload = ({
 }: FileUploadProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [files, setFiles] = useState<FileDocument[]>(existingFiles);
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { addFile, removeFile, getFilesByEntity } = useFiles();
+  const { user } = useAuth();
+
+  // Get files for this entity
+  const files = getFilesByEntity(entityType, entityId);
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
