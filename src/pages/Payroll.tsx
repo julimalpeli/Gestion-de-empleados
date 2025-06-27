@@ -255,552 +255,562 @@ const Payroll = () => {
   return (
     <TooltipProvider>
       <div className="flex flex-col gap-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border pb-4">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger />
-          <div>
-            <h1 className="text-2xl font-bold">Liquidaciones</h1>
-            <p className="text-muted-foreground">
-              Gestión de sueldos y liquidaciones
-            </p>
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <div>
+              <h1 className="text-2xl font-bold">Liquidaciones</h1>
+              <p className="text-muted-foreground">
+                Gestión de sueldos y liquidaciones
+              </p>
+            </div>
           </div>
+
+          <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Liquidación
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {isEditMode
+                    ? "Editar Liquidación"
+                    : "Calcular Nueva Liquidación"}
+                </DialogTitle>
+                <DialogDescription>
+                  {isEditMode
+                    ? "Modifica los datos de la liquidación existente"
+                    : "Completa los datos para generar la liquidación del empleado"}
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Form */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="employee">Empleado</Label>
+                    <Select
+                      value={selectedEmployee}
+                      onValueChange={setSelectedEmployee}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar empleado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees.map((employee) => (
+                          <SelectItem
+                            key={employee.id}
+                            value={employee.id.toString()}
+                          >
+                            {employee.name} -{" "}
+                            {formatCurrency(employee.dailyWage)}
+                            /día
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="workDays">Días Trabajados</Label>
+                    <Input
+                      id="workDays"
+                      type="number"
+                      placeholder="30"
+                      value={workDays}
+                      onChange={(e) => setWorkDays(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="presentismo">Estado del Presentismo</Label>
+                    <Select
+                      value={presentismoStatus}
+                      onValueChange={setPresentismoStatus}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mantiene">
+                          Mantiene presentismo
+                        </SelectItem>
+                        <SelectItem value="pierde">
+                          Pierde presentismo este mes
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {selectedEmployee && (
+                      <p className="text-xs text-muted-foreground">
+                        Monto del presentismo:{" "}
+                        {formatCurrency(
+                          employees.find(
+                            (e) => e.id.toString() === selectedEmployee,
+                          )?.presentismo || 0,
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="holidayDays">
+                      Días Feriados (doble pago)
+                    </Label>
+                    <Input
+                      id="holidayDays"
+                      type="number"
+                      placeholder="0"
+                      value={holidayDays}
+                      onChange={(e) => setHolidayDays(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="overtimeToggle"
+                        checked={overtimeEnabled}
+                        onChange={(e) => setOvertimeEnabled(e.target.checked)}
+                        className="rounded border-gray-300"
+                      />
+                      <Label htmlFor="overtimeToggle">Horas Extra</Label>
+                    </div>
+                    {overtimeEnabled && (
+                      <div className="space-y-2">
+                        <Input
+                          id="overtimeHours"
+                          type="number"
+                          placeholder="0"
+                          value={overtimeHours}
+                          onChange={(e) => setOvertimeHours(e.target.value)}
+                        />
+                        {selectedEmployee && (
+                          <p className="text-xs text-muted-foreground">
+                            Tarifa por hora:{" "}
+                            {formatCurrency(
+                              (employees.find(
+                                (e) => e.id.toString() === selectedEmployee,
+                              )?.dailyWage || 0) / 8,
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bonusAmount">Bono Libre</Label>
+                    <Input
+                      id="bonusAmount"
+                      type="number"
+                      placeholder="0"
+                      value={bonusAmount}
+                      onChange={(e) => setBonusAmount(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Monto adicional que se suma al salario final
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="advances">Adelantos de Sueldo</Label>
+                    <Input
+                      id="advances"
+                      type="number"
+                      placeholder="0"
+                      value={advances}
+                      onChange={(e) => setAdvances(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="discounts">Otros Descuentos</Label>
+                    <Input
+                      id="discounts"
+                      type="number"
+                      placeholder="0"
+                      value={discounts}
+                      onChange={(e) => setDiscounts(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="whiteWage">Sueldo en Blanco (manual)</Label>
+                    <Input
+                      id="whiteWage"
+                      type="number"
+                      placeholder="350000"
+                      value={whiteWage}
+                      onChange={(e) => setWhiteWage(e.target.value)}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      El sueldo informal se calculará automáticamente
+                    </p>
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">Vista Previa</h3>
+                  {calculation ? (
+                    <Card>
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex justify-between">
+                          <span>Sueldo base:</span>
+                          <span>{formatCurrency(calculation.basePay)}</span>
+                        </div>
+                        {calculation.holidayPay > 0 && (
+                          <div className="flex justify-between">
+                            <span>Feriados (doble):</span>
+                            <span>
+                              {formatCurrency(calculation.holidayPay)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.overtimePay > 0 && (
+                          <div className="flex justify-between text-blue-600">
+                            <span>Horas extra ({overtimeHours}h):</span>
+                            <span>
+                              +{formatCurrency(calculation.overtimePay)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.presentismoAmount > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>Presentismo:</span>
+                            <span>
+                              +{formatCurrency(calculation.presentismoAmount)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.bonusPay > 0 && (
+                          <div className="flex justify-between text-purple-600">
+                            <span>Bono:</span>
+                            <span>+{formatCurrency(calculation.bonusPay)}</span>
+                          </div>
+                        )}
+                        <div className="flex justify-between font-medium">
+                          <span>Subtotal bruto:</span>
+                          <span>{formatCurrency(calculation.grossTotal)}</span>
+                        </div>
+                        {calculation.totalAdvances > 0 && (
+                          <div className="flex justify-between text-red-600">
+                            <span>Adelantos:</span>
+                            <span>
+                              -{formatCurrency(calculation.totalAdvances)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.totalDiscounts > 0 && (
+                          <div className="flex justify-between text-red-600">
+                            <span>Descuentos:</span>
+                            <span>
+                              -{formatCurrency(calculation.totalDiscounts)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex justify-between font-medium">
+                          <span>Total después de deducciones:</span>
+                          <span>
+                            {formatCurrency(calculation.totalAfterDeductions)}
+                          </span>
+                        </div>
+                        <hr />
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>En blanco (manual):</span>
+                            <span className="font-medium">
+                              {formatCurrency(calculation.whiteAmount)}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>Informal (calculado):</span>
+                            <span className="font-medium">
+                              {formatCurrency(calculation.informalAmount)}
+                            </span>
+                          </div>
+                        </div>
+                        <hr />
+                        <div className="flex justify-between font-bold text-lg">
+                          <span>Total Neto:</span>
+                          <span>{formatCurrency(calculation.netTotal)}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <Card>
+                      <CardContent className="p-4 text-center text-muted-foreground">
+                        Selecciona un empleado y completa los días trabajados
+                        para ver la vista previa
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={() => {
+                    setIsNewPayrollOpen(false);
+                    setSelectedEmployee("");
+                    setWorkDays("30");
+                    setHolidayDays("");
+                    setAdvances("");
+                    setDiscounts("");
+                    setWhiteWage("");
+                    setOvertimeEnabled(false);
+                    setOvertimeHours("");
+                    setBonusAmount("");
+                    setPresentismoStatus("mantiene");
+                    setIsEditMode(false);
+                    setEditingRecord(null);
+                  }}
+                  className="w-full"
+                  disabled={!calculation}
+                >
+                  {isEditMode ? "Guardar Cambios" : "Generar Liquidación"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsNewPayrollOpen(false);
+                    setSelectedEmployee("");
+                    setWorkDays("30");
+                    setHolidayDays("");
+                    setAdvances("");
+                    setDiscounts("");
+                    setWhiteWage("");
+                    setOvertimeEnabled(false);
+                    setOvertimeHours("");
+                    setBonusAmount("");
+                    setPresentismoStatus("mantiene");
+                    setIsEditMode(false);
+                    setEditingRecord(null);
+                  }}
+                  className="w-full"
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
 
-        <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nueva Liquidación
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {isEditMode
-                  ? "Editar Liquidación"
-                  : "Calcular Nueva Liquidación"}
-              </DialogTitle>
-              <DialogDescription>
-                {isEditMode
-                  ? "Modifica los datos de la liquidación existente"
-                  : "Completa los datos para generar la liquidación del empleado"}
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-              {/* Form */}
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="employee">Empleado</Label>
-                  <Select
-                    value={selectedEmployee}
-                    onValueChange={setSelectedEmployee}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar empleado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees.map((employee) => (
-                        <SelectItem
-                          key={employee.id}
-                          value={employee.id.toString()}
-                        >
-                          {employee.name} - {formatCurrency(employee.dailyWage)}
-                          /día
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="workDays">Días Trabajados</Label>
-                  <Input
-                    id="workDays"
-                    type="number"
-                    placeholder="30"
-                    value={workDays}
-                    onChange={(e) => setWorkDays(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="presentismo">Estado del Presentismo</Label>
-                  <Select
-                    value={presentismoStatus}
-                    onValueChange={setPresentismoStatus}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="mantiene">
-                        Mantiene presentismo
-                      </SelectItem>
-                      <SelectItem value="pierde">
-                        Pierde presentismo este mes
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {selectedEmployee && (
-                    <p className="text-xs text-muted-foreground">
-                      Monto del presentismo:{" "}
-                      {formatCurrency(
-                        employees.find(
-                          (e) => e.id.toString() === selectedEmployee,
-                        )?.presentismo || 0,
-                      )}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="holidayDays">
-                    Días Feriados (doble pago)
-                  </Label>
-                  <Input
-                    id="holidayDays"
-                    type="number"
-                    placeholder="0"
-                    value={holidayDays}
-                    onChange={(e) => setHolidayDays(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="overtimeToggle"
-                      checked={overtimeEnabled}
-                      onChange={(e) => setOvertimeEnabled(e.target.checked)}
-                      className="rounded border-gray-300"
-                    />
-                    <Label htmlFor="overtimeToggle">Horas Extra</Label>
-                  </div>
-                  {overtimeEnabled && (
-                    <div className="space-y-2">
-                      <Input
-                        id="overtimeHours"
-                        type="number"
-                        placeholder="0"
-                        value={overtimeHours}
-                        onChange={(e) => setOvertimeHours(e.target.value)}
-                      />
-                      {selectedEmployee && (
-                        <p className="text-xs text-muted-foreground">
-                          Tarifa por hora:{" "}
-                          {formatCurrency(
-                            (employees.find(
-                              (e) => e.id.toString() === selectedEmployee,
-                            )?.dailyWage || 0) / 8,
-                          )}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="bonusAmount">Bono Libre</Label>
-                  <Input
-                    id="bonusAmount"
-                    type="number"
-                    placeholder="0"
-                    value={bonusAmount}
-                    onChange={(e) => setBonusAmount(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Monto adicional que se suma al salario final
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="advances">Adelantos de Sueldo</Label>
-                  <Input
-                    id="advances"
-                    type="number"
-                    placeholder="0"
-                    value={advances}
-                    onChange={(e) => setAdvances(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="discounts">Otros Descuentos</Label>
-                  <Input
-                    id="discounts"
-                    type="number"
-                    placeholder="0"
-                    value={discounts}
-                    onChange={(e) => setDiscounts(e.target.value)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="whiteWage">Sueldo en Blanco (manual)</Label>
-                  <Input
-                    id="whiteWage"
-                    type="number"
-                    placeholder="350000"
-                    value={whiteWage}
-                    onChange={(e) => setWhiteWage(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    El sueldo informal se calculará automáticamente
-                  </p>
-                </div>
-              </div>
-
-              {/* Preview */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Vista Previa</h3>
-                {calculation ? (
-                  <Card>
-                    <CardContent className="p-4 space-y-3">
-                      <div className="flex justify-between">
-                        <span>Sueldo base:</span>
-                        <span>{formatCurrency(calculation.basePay)}</span>
-                      </div>
-                      {calculation.holidayPay > 0 && (
-                        <div className="flex justify-between">
-                          <span>Feriados (doble):</span>
-                          <span>{formatCurrency(calculation.holidayPay)}</span>
-                        </div>
-                      )}
-                      {calculation.overtimePay > 0 && (
-                        <div className="flex justify-between text-blue-600">
-                          <span>Horas extra ({overtimeHours}h):</span>
-                          <span>
-                            +{formatCurrency(calculation.overtimePay)}
-                          </span>
-                        </div>
-                      )}
-                      {calculation.presentismoAmount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Presentismo:</span>
-                          <span>
-                            +{formatCurrency(calculation.presentismoAmount)}
-                          </span>
-                        </div>
-                      )}
-                      {calculation.bonusPay > 0 && (
-                        <div className="flex justify-between text-purple-600">
-                          <span>Bono:</span>
-                          <span>+{formatCurrency(calculation.bonusPay)}</span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-medium">
-                        <span>Subtotal bruto:</span>
-                        <span>{formatCurrency(calculation.grossTotal)}</span>
-                      </div>
-                      {calculation.totalAdvances > 0 && (
-                        <div className="flex justify-between text-red-600">
-                          <span>Adelantos:</span>
-                          <span>
-                            -{formatCurrency(calculation.totalAdvances)}
-                          </span>
-                        </div>
-                      )}
-                      {calculation.totalDiscounts > 0 && (
-                        <div className="flex justify-between text-red-600">
-                          <span>Descuentos:</span>
-                          <span>
-                            -{formatCurrency(calculation.totalDiscounts)}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex justify-between font-medium">
-                        <span>Total después de deducciones:</span>
-                        <span>
-                          {formatCurrency(calculation.totalAfterDeductions)}
-                        </span>
-                      </div>
-                      <hr />
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span>En blanco (manual):</span>
-                          <span className="font-medium">
-                            {formatCurrency(calculation.whiteAmount)}
-                          </span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span>Informal (calculado):</span>
-                          <span className="font-medium">
-                            {formatCurrency(calculation.informalAmount)}
-                          </span>
-                        </div>
-                      </div>
-                      <hr />
-                      <div className="flex justify-between font-bold text-lg">
-                        <span>Total Neto:</span>
-                        <span>{formatCurrency(calculation.netTotal)}</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <Card>
-                    <CardContent className="p-4 text-center text-muted-foreground">
-                      Selecciona un empleado y completa los días trabajados para
-                      ver la vista previa
-                    </CardContent>
-                  </Card>
+        {/* Stats */}
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total a Pagar
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {formatCurrency(
+                  payrollRecords.reduce(
+                    (sum, record) => sum + record.netTotal,
+                    0,
+                  ),
                 )}
               </div>
-            </div>
+              <p className="text-xs text-muted-foreground">Diciembre 2024</p>
+            </CardContent>
+          </Card>
 
-            <div className="flex gap-2 pt-4">
-              <Button
-                onClick={() => {
-                  setIsNewPayrollOpen(false);
-                  setSelectedEmployee("");
-                  setWorkDays("30");
-                  setHolidayDays("");
-                  setAdvances("");
-                  setDiscounts("");
-                  setWhiteWage("");
-                  setOvertimeEnabled(false);
-                  setOvertimeHours("");
-                  setBonusAmount("");
-                  setPresentismoStatus("mantiene");
-                  setIsEditMode(false);
-                  setEditingRecord(null);
-                }}
-                className="w-full"
-                disabled={!calculation}
-              >
-                {isEditMode ? "Guardar Cambios" : "Generar Liquidación"}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsNewPayrollOpen(false);
-                  setSelectedEmployee("");
-                  setWorkDays("30");
-                  setHolidayDays("");
-                  setAdvances("");
-                  setDiscounts("");
-                  setWhiteWage("");
-                  setOvertimeEnabled(false);
-                  setOvertimeHours("");
-                  setBonusAmount("");
-                  setPresentismoStatus("mantiene");
-                  setIsEditMode(false);
-                  setEditingRecord(null);
-                }}
-                className="w-full"
-              >
-                Cancelar
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      {/* Stats */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total a Pagar</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatCurrency(
-                payrollRecords.reduce(
-                  (sum, record) => sum + record.netTotal,
-                  0,
-                ),
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground">Diciembre 2024</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Liquidaciones</CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{payrollRecords.length}</div>
-            <p className="text-xs text-muted-foreground">Este período</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Procesadas</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {payrollRecords.filter((r) => r.status === "processed").length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              De {payrollRecords.length} total
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Próximo Aguinaldo
-            </CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">Jun 2025</div>
-            <p className="text-xs text-muted-foreground">Primer semestre</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Payroll Records */}
-      <Tabs defaultValue="current" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="current">Período Actual</TabsTrigger>
-          <TabsTrigger value="history">Historial</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="current">
           <Card>
-            <CardHeader>
-              <CardTitle>Liquidaciones - Diciembre 2024</CardTitle>
-              <CardDescription>
-                Estado actual de las liquidaciones del período (incluye
-                aguinaldo)
-              </CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Liquidaciones
+              </CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Empleado</TableHead>
-                      <TableHead>Días Base</TableHead>
-                      <TableHead>Feriados</TableHead>
-                      {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
-                      <TableHead>Adelantos</TableHead>
-                      <TableHead>En Blanco</TableHead>
-                      <TableHead>Informal</TableHead>
-                      <TableHead>Presentismo</TableHead>
-                      <TableHead>Total Neto</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Documentos</TableHead>
-                      <TableHead className="text-right">Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {payrollRecords.map((record) => (
-                      <TableRow key={record.id}>
-                        <TableCell className="font-medium">
-                          {record.employeeName}
-                        </TableCell>
-                        <TableCell>{record.baseDays} días</TableCell>
-                        <TableCell>{record.holidayDays} días</TableCell>
-                        {isAguinaldoMonth && (
-                          <TableCell className="font-medium text-green-600">
-                            {record.aguinaldo > 0
-                              ? formatCurrency(record.aguinaldo)
-                              : "-"}
-                          </TableCell>
-                        )}
-                        <TableCell>{formatCurrency(record.advances)}</TableCell>
-                        <TableCell>
-                          {formatCurrency(record.whiteAmount)}
-                        </TableCell>
-                        <TableCell>
-                          {formatCurrency(record.informalAmount)}
-                        </TableCell>
-                        <TableCell>
-                          {record.presentismoAmount > 0 ? (
-                            <span className="text-green-600 font-medium">
-                              {formatCurrency(record.presentismoAmount)}
-                            </span>
-                          ) : (
-                            <span className="text-red-600">Perdido</span>
-                          )}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(record.netTotal)}
-                          {record.aguinaldo > 0 && (
-                            <div className="text-xs text-green-600">
-                              Incluye aguinaldo
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={
-                              record.status === "processed"
-                                ? "default"
-                                : record.status === "pending"
-                                  ? "secondary"
-                                  : "outline"
-                            }
-                          >
-                            {record.status === "processed"
-                              ? "Procesada"
-                              : record.status === "pending"
-                                ? "Pendiente"
-                                : "Borrador"}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <FileUpload
-                            entityId={record.id}
-                            entityType="payroll"
-                            title={`Documentos - ${record.employeeName} (${record.period})`}
-                            description="Subir recibos de sueldo, comprobantes y otros documentos de la liquidación"
-                          />
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={record.status === "processed"}
-                            >
-                              <Calculator className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={record.status === "processed"}
-                            >
-                              <FileText className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
+              <div className="text-2xl font-bold">{payrollRecords.length}</div>
+              <p className="text-xs text-muted-foreground">Este período</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Procesadas</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {payrollRecords.filter((r) => r.status === "processed").length}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                De {payrollRecords.length} total
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Próximo Aguinaldo
+              </CardTitle>
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">Jun 2025</div>
+              <p className="text-xs text-muted-foreground">Primer semestre</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Payroll Records */}
+        <Tabs defaultValue="current" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="current">Período Actual</TabsTrigger>
+            <TabsTrigger value="history">Historial</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="current">
+            <Card>
+              <CardHeader>
+                <CardTitle>Liquidaciones - Diciembre 2024</CardTitle>
+                <CardDescription>
+                  Estado actual de las liquidaciones del período (incluye
+                  aguinaldo)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Empleado</TableHead>
+                        <TableHead>Días Base</TableHead>
+                        <TableHead>Feriados</TableHead>
+                        {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
+                        <TableHead>Adelantos</TableHead>
+                        <TableHead>En Blanco</TableHead>
+                        <TableHead>Informal</TableHead>
+                        <TableHead>Presentismo</TableHead>
+                        <TableHead>Total Neto</TableHead>
+                        <TableHead>Estado</TableHead>
+                        <TableHead>Documentos</TableHead>
+                        <TableHead className="text-right">Acciones</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    </TableHeader>
+                    <TableBody>
+                      {payrollRecords.map((record) => (
+                        <TableRow key={record.id}>
+                          <TableCell className="font-medium">
+                            {record.employeeName}
+                          </TableCell>
+                          <TableCell>{record.baseDays} días</TableCell>
+                          <TableCell>{record.holidayDays} días</TableCell>
+                          {isAguinaldoMonth && (
+                            <TableCell className="font-medium text-green-600">
+                              {record.aguinaldo > 0
+                                ? formatCurrency(record.aguinaldo)
+                                : "-"}
+                            </TableCell>
+                          )}
+                          <TableCell>
+                            {formatCurrency(record.advances)}
+                          </TableCell>
+                          <TableCell>
+                            {formatCurrency(record.whiteAmount)}
+                          </TableCell>
+                          <TableCell>
+                            {formatCurrency(record.informalAmount)}
+                          </TableCell>
+                          <TableCell>
+                            {record.presentismoAmount > 0 ? (
+                              <span className="text-green-600 font-medium">
+                                {formatCurrency(record.presentismoAmount)}
+                              </span>
+                            ) : (
+                              <span className="text-red-600">Perdido</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {formatCurrency(record.netTotal)}
+                            {record.aguinaldo > 0 && (
+                              <div className="text-xs text-green-600">
+                                Incluye aguinaldo
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                record.status === "processed"
+                                  ? "default"
+                                  : record.status === "pending"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                            >
+                              {record.status === "processed"
+                                ? "Procesada"
+                                : record.status === "pending"
+                                  ? "Pendiente"
+                                  : "Borrador"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <FileUpload
+                              entityId={record.id}
+                              entityType="payroll"
+                              title={`Documentos - ${record.employeeName} (${record.period})`}
+                              description="Subir recibos de sueldo, comprobantes y otros documentos de la liquidación"
+                            />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={record.status === "processed"}
+                              >
+                                <Calculator className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                disabled={record.status === "processed"}
+                              >
+                                <FileText className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-        <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historial de Liquidaciones</CardTitle>
-              <CardDescription>
-                Consulta liquidaciones de períodos anteriores
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Funcionalidad de historial disponible próximamente
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+          <TabsContent value="history">
+            <Card>
+              <CardHeader>
+                <CardTitle>Historial de Liquidaciones</CardTitle>
+                <CardDescription>
+                  Consulta liquidaciones de períodos anteriores
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-muted-foreground">
+                  Funcionalidad de historial disponible próximamente
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </TooltipProvider>
   );
 };
 
