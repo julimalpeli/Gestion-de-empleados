@@ -172,8 +172,9 @@ const Payroll = () => {
   const [discounts, setDiscounts] = useState("");
   const [whiteWage, setWhiteWage] = useState("");
   const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
-  const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
-    useState("2024-2");
+  const [overtimeEnabled, setOvertimeEnabled] = useState(false);
+  const [overtimeHours, setOvertimeHours] = useState("");
+  const [bonusAmount, setBonusAmount] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
 
