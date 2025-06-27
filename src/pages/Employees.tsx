@@ -35,6 +35,9 @@ import {
   Calendar,
   Plane,
   FileText,
+  Info,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
