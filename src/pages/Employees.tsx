@@ -51,7 +51,7 @@ import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
 
-// Mock data with calculated vacation days
+// Mock data with calculated vacation days (calculated correctly based on seniority)
 const employees = [
   {
     id: 1,
@@ -63,9 +63,9 @@ const employees = [
     presentismo: 25000,
     losesPresentismo: false,
     status: "active",
-    startDate: "2023-01-15",
+    startDate: "2023-01-15", // ~2 años -> 14 días
     vacationDays: 14,
-    vacationsTaken: 12,
+    vacationsTaken: 5,
   },
   {
     id: 2,
@@ -77,8 +77,8 @@ const employees = [
     presentismo: 20000,
     losesPresentismo: true,
     status: "active",
-    startDate: "2023-03-20",
-    vacationDays: 14,
+    startDate: "2019-03-20", // ~5.7 años -> 21 días
+    vacationDays: 21,
     vacationsTaken: 7,
   },
   {
@@ -91,9 +91,9 @@ const employees = [
     presentismo: 22000,
     losesPresentismo: false,
     status: "active",
-    startDate: "2018-11-10",
-    vacationDays: 21,
-    vacationsTaken: 0,
+    startDate: "2012-11-10", // ~12 años -> 28 días
+    vacationDays: 28,
+    vacationsTaken: 8,
   },
   {
     id: 4,
@@ -105,7 +105,7 @@ const employees = [
     presentismo: 18000,
     losesPresentismo: false,
     status: "inactive",
-    startDate: "2023-06-01",
+    startDate: "2023-06-01", // ~1.5 años -> 14 días
     vacationDays: 14,
     vacationsTaken: 0,
   },
@@ -119,9 +119,9 @@ const employees = [
     presentismo: 35000,
     losesPresentismo: false,
     status: "active",
-    startDate: "2025-05-22",
-    vacationDays: 14,
-    vacationsTaken: 0,
+    startDate: "2000-05-22", // ~24 años -> 35 días
+    vacationDays: 35,
+    vacationsTaken: 10,
   },
 ];
 
