@@ -41,12 +41,16 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="border-b border-sidebar-border p-6">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold">
-            RH
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white p-1 border border-gray-200">
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Fba484c5e9b3d409b8f430aad946b1b02%2F12f46da7c0a34ce3b09600a8825776cc?format=webp&width=800"
+              alt="Cádiz Bar de Tapas"
+              className="h-full w-full object-contain"
+            />
           </div>
           <div>
-            <h1 className="text-lg font-semibold">RestauranteHR</h1>
+            <h1 className="text-lg font-semibold">Cádiz Bar de Tapas</h1>
             <p className="text-xs text-muted-foreground">Gestión de Personal</p>
           </div>
         </div>
