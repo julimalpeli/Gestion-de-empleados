@@ -104,6 +104,19 @@ const mockEmployees = [
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("2024-2");
+
+  // Usar hooks de Supabase
+  const {
+    employees,
+    loading: employeesLoading,
+    error: employeesError,
+  } = useEmployees();
+
+  const {
+    payrollRecords,
+    loading: payrollLoading,
+    error: payrollError,
+  } = usePayroll();
   const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
     useState(false);
 
