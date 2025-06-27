@@ -200,7 +200,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
       throw new Error("Failed to fetch employees");
     }
   }
-  }
 
   async searchEmployees(query: string): Promise<Employee[]> {
     try {
