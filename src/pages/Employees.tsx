@@ -136,7 +136,8 @@ const Employees = () => {
   const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
   const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
     useState(null);
-  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] = useState(false);
+  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
+    useState(false);
 
   // Calculate vacation days based on seniority
   const calculateVacationDays = (startDate: string) => {
@@ -200,90 +201,99 @@ const Employees = () => {
                 Nuevo Empleado
               </Button>
             </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
-              <DialogDescription>
-                Completa la información del nuevo empleado
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Nombre Completo</Label>
-                <Input id="name" placeholder="Ej: Juan Pérez" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="position">Puesto</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar puesto" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cocinero">Cocinero</SelectItem>
-                    <SelectItem value="mesero">Mesero/a</SelectItem>
-                    <SelectItem value="cajero">Cajero/a</SelectItem>
-                    <SelectItem value="ayudante">Ayudante de Cocina</SelectItem>
-                    <SelectItem value="manager">Encargado/a</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
+                <DialogDescription>
+                  Completa la información del nuevo empleado
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="whiteWage">Sueldo en Blanco (mensual)</Label>
-                  <Input id="whiteWage" type="number" placeholder="300000" />
+                  <Label htmlFor="name">Nombre Completo</Label>
+                  <Input id="name" placeholder="Ej: Juan Pérez" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="informalWage">
-                    Sueldo Informal (mensual)
+                  <Label htmlFor="position">Puesto</Label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar puesto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cocinero">Cocinero</SelectItem>
+                      <SelectItem value="mesero">Mesero/a</SelectItem>
+                      <SelectItem value="cajero">Cajero/a</SelectItem>
+                      <SelectItem value="ayudante">
+                        Ayudante de Cocina
+                      </SelectItem>
+                      <SelectItem value="manager">Encargado/a</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="whiteWage">
+                      Sueldo en Blanco (mensual)
+                    </Label>
+                    <Input id="whiteWage" type="number" placeholder="300000" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="informalWage">
+                      Sueldo Informal (mensual)
+                    </Label>
+                    <Input
+                      id="informalWage"
+                      type="number"
+                      placeholder="150000"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="presentismo">
+                    Presentismo (no remunerativo)
                   </Label>
-                  <Input id="informalWage" type="number" placeholder="150000" />
+                  <Input id="presentismo" type="number" placeholder="25000" />
+                  <p className="text-xs text-muted-foreground">
+                    Este monto no se incluye en el cálculo del sueldo diario
+                  </p>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="presentismo">
-                  Presentismo (no remunerativo)
-                </Label>
-                <Input id="presentismo" type="number" placeholder="25000" />
-                <p className="text-xs text-muted-foreground">
-                  Este monto no se incluye en el cálculo del sueldo diario
-                </p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="startDate">Fecha de Ingreso</Label>
-                <Input id="startDate" type="date" />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="startDate">Fecha de Ingreso</Label>
+                  <Input id="startDate" type="date" />
+                </div>
 
-              {/* Calculation Preview */}
-              <div className="p-3 bg-muted rounded-lg">
-                <Label className="text-sm font-medium">
-                  Sueldo Diario Calculado
-                </Label>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
-                </p>
-                <div className="text-lg font-semibold mt-2">
-                  {/* This would be calculated dynamically in a real implementation */}
-                  $15,000 por día
+                {/* Calculation Preview */}
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-sm font-medium">
+                    Sueldo Diario Calculado
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
+                  </p>
+                  <div className="text-lg font-semibold mt-2">
+                    {/* This would be calculated dynamically in a real implementation */}
+                    $15,000 por día
+                  </div>
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={() => setIsAddDialogOpen(false)}
+                    className="w-full"
+                  >
+                    Guardar Empleado
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsAddDialogOpen(false)}
+                    className="w-full"
+                  >
+                    Cancelar
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={() => setIsAddDialogOpen(false)}
-                  className="w-full"
-                >
-                  Guardar Empleado
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsAddDialogOpen(false)}
-                  className="w-full"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </div>
 
         {/* Edit Employee Dialog */}
         <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -545,7 +555,9 @@ const Employees = () => {
                         {formatCurrency(employee.presentismo)}
                       </div>
                       <Badge
-                        variant={employee.losesPresentismo ? "destructive" : "default"}
+                        variant={
+                          employee.losesPresentismo ? "destructive" : "default"
+                        }
                         className="text-xs"
                       >
                         {employee.losesPresentismo ? "Perdido" : "Vigente"}
@@ -554,7 +566,9 @@ const Employees = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={employee.status === "active" ? "default" : "secondary"}
+                      variant={
+                        employee.status === "active" ? "default" : "secondary"
+                      }
                       className="text-xs"
                     >
                       {employee.status === "active" ? "Activo" : "Inactivo"}
