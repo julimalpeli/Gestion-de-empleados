@@ -14,11 +14,14 @@ export const useEmployees = () => {
   // Cargar empleados
   const fetchEmployees = async () => {
     try {
+      console.log("🔄 Iniciando carga de empleados...");
       setLoading(true);
       setError(null);
       const data = await employeeService.getAllEmployees();
+      console.log("✅ Empleados cargados desde Supabase:", data);
       setEmployees(data);
     } catch (err) {
+      console.error("❌ Error cargando empleados:", err);
       setError(err instanceof Error ? err.message : "Error loading employees");
     } finally {
       setLoading(false);
