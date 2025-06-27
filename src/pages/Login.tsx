@@ -149,49 +149,49 @@ const Login = () => {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="default"
-                    className="bg-blue-100 text-blue-800"
+              {Object.entries(DEMO_USERS).map(([key, user]) => (
+                <div key={key} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      variant={user.role === "admin" ? "default" : "secondary"}
+                      className={
+                        user.role === "admin"
+                          ? "bg-blue-100 text-blue-800"
+                          : user.role === "manager"
+                            ? "bg-purple-100 text-purple-800"
+                            : user.role === "hr"
+                              ? "bg-orange-100 text-orange-800"
+                              : user.role === "employee"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-gray-100 text-gray-800"
+                      }
+                    >
+                      <Shield className="h-3 w-3 mr-1" />
+                      {user.role === "admin"
+                        ? "Admin"
+                        : user.role === "manager"
+                          ? "Gerente"
+                          : user.role === "hr"
+                            ? "RRHH"
+                            : user.role === "employee"
+                              ? "Empleado"
+                              : "Auditor"}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {key} / {user.password}
+                    </span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() =>
+                      fillDemoCredentials(key as keyof typeof DEMO_USERS)
+                    }
                   >
-                    <Shield className="h-3 w-3 mr-1" />
-                    Administrador
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    admin / admin123
-                  </span>
+                    Usar
+                  </Button>
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fillDemoCredentials("admin")}
-                >
-                  Usar
-                </Button>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-green-100 text-green-800"
-                  >
-                    <User className="h-3 w-3 mr-1" />
-                    Empleado
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">
-                    employee / empleado123
-                  </span>
-                </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => fillDemoCredentials("employee")}
-                >
-                  Usar
-                </Button>
-              </div>
+              ))}
             </div>
 
             <p className="text-xs text-amber-700 mt-2">
