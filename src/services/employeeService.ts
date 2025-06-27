@@ -138,10 +138,14 @@ export class SupabaseEmployeeService implements IEmployeeService {
         }
       }
 
-      // Recalcular vacaciones si cambió la fecha de inicio
+      // Recalcular automáticamente vacaciones si cambió la fecha de inicio
       if (employee.startDate) {
         const vacationInfo = this.calculateVacationDays(employee.startDate);
         updateData.vacation_days = vacationInfo.vacationDays;
+        updateData.start_date = employee.startDate;
+        console.log(
+          `🔄 Recalculando vacaciones para nueva fecha: ${employee.startDate} → ${vacationInfo.vacationDays} días`,
+        );
       }
 
       updateData.updated_at = new Date().toISOString();
