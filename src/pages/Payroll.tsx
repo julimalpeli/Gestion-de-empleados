@@ -567,12 +567,26 @@ const Payroll = () => {
                           <span>{formatCurrency(calculation.holidayPay)}</span>
                         </div>
                       )}
+                      {calculation.overtimePay > 0 && (
+                        <div className="flex justify-between text-blue-600">
+                          <span>Horas extra ({overtimeHours}h):</span>
+                          <span>
+                            +{formatCurrency(calculation.overtimePay)}
+                          </span>
+                        </div>
+                      )}
                       {calculation.presentismoAmount > 0 && (
                         <div className="flex justify-between text-green-600">
                           <span>Presentismo:</span>
                           <span>
                             +{formatCurrency(calculation.presentismoAmount)}
                           </span>
+                        </div>
+                      )}
+                      {calculation.bonusPay > 0 && (
+                        <div className="flex justify-between text-purple-600">
+                          <span>Bono:</span>
+                          <span>+{formatCurrency(calculation.bonusPay)}</span>
                         </div>
                       )}
                       <div className="flex justify-between font-medium">
