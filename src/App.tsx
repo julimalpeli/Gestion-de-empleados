@@ -9,6 +9,7 @@ import Payroll from "./pages/Payroll";
 import Reports from "./pages/Reports";
 import EmployeePortal from "./pages/EmployeePortal";
 import Login from "./pages/Login";
+import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
