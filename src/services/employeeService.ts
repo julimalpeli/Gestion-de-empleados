@@ -75,7 +75,10 @@ export class SupabaseEmployeeService implements IEmployeeService {
       return this.mapFromSupabase(data);
     } catch (error) {
       console.error("Error creating employee:", error);
-      throw new Error("Failed to create employee");
+      if (error && typeof error === "object" && "message" in error) {
+        throw new Error(`Failed to create employee: ${error.message}`);
+      }
+      throw new Error("Failed to create employee: Unknown error");
     }
   }
 
