@@ -62,13 +62,6 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        // Ceramic-inspired palette
-        ceramic: {
-          gold: "#BF9B32",
-          emerald: "#2D5036",
-          terracotta: "#B81910",
-          cream: "#EBDED4",
-        },
       },
       borderRadius: {
         lg: "var(--radius)",
