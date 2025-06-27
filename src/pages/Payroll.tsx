@@ -767,7 +767,7 @@ const Payroll = () => {
         <TabsContent value="current">
           <Card>
             <CardHeader>
-              <CardTitle>Liquidaciones - Junio 2024</CardTitle>
+              <CardTitle>Liquidaciones - Diciembre 2024</CardTitle>
               <CardDescription>
                 Estado actual de las liquidaciones del período (incluye
                 aguinaldo)
