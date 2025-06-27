@@ -35,9 +35,11 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LiquidationsReport from "@/components/LiquidationsReport";
+import { useEmployees } from "@/hooks/use-employees";
+import { usePayroll } from "@/hooks/use-payroll";
 
-// Mock employees data - should match with Employees.tsx
-const employees = [
+// Mock employees data - COMENTADO porque ahora usamos Supabase
+const mockEmployees = [
   {
     id: 1,
     name: "Juan Pérez",
