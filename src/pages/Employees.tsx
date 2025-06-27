@@ -532,14 +532,28 @@ const Employees = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        employee.status === "active" ? "default" : "secondary"
-                      }
-                      className="text-xs"
-                    >
-                      {employee.status === "active" ? "Activo" : "Inactivo"}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          employee.status === "active" ? "default" : "secondary"
+                        }
+                        className="text-xs"
+                      >
+                        {employee.status === "active" ? "Activo" : "Inactivo"}
+                      </Badge>
+                      <PermissionGate module="employees" action="edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleToggleStatus(employee)}
+                          className="h-6 px-2 text-xs"
+                        >
+                          {employee.status === "active"
+                            ? "Desactivar"
+                            : "Activar"}
+                        </Button>
+                      </PermissionGate>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="space-y-1">
