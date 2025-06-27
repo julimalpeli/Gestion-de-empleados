@@ -213,6 +213,29 @@ const Reports = () => {
     0,
   );
 
+  // Manejo de loading y error
+  if (employeesLoading || payrollLoading) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p>Cargando datos para reportes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (employeesError || payrollError) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p className="text-red-500">
+            Error: {employeesError || payrollError}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
