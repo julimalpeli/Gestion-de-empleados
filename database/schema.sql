@@ -323,12 +323,12 @@ CREATE OR REPLACE FUNCTION get_active_employees()
 RETURNS TABLE (
     id UUID,
     name VARCHAR,
-    position VARCHAR,
+    job_position VARCHAR,
     daily_wage DECIMAL
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT e.id, e.name, e.position, e.daily_wage
+    SELECT e.id, e.name, e.job_position, e.daily_wage
     FROM employees e
     WHERE e.status = 'active'
     ORDER BY e.name;
