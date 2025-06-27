@@ -1413,8 +1413,7 @@ const Payroll = () => {
           </Card>
         </TabsContent>
       </Tabs>
-      </div>
-    </TooltipProvider>
+    </div>
   );
 };
 
