@@ -123,8 +123,32 @@ const employees = [
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [newEmployee, setNewEmployee] = useState({
+    name: "",
+    position: "",
+    whiteWage: "",
+    informalWage: "",
+    presentismo: "",
+    startDate: "",
+  });
+
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
+
+  const handleAddEmployee = () => {
+    // Here would be the logic to save the employee
+    console.log("Adding employee:", newEmployee);
+    setIsAddDialogOpen(false);
+    setNewEmployee({
+      name: "",
+      position: "",
+      whiteWage: "",
+      informalWage: "",
+      presentismo: "",
+      startDate: "",
+    });
+  };
 
   const filteredEmployees = employees.filter(
     (employee) =>
