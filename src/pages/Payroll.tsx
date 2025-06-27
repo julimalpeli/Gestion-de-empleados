@@ -584,11 +584,13 @@ const Payroll = () => {
                   setDiscounts("");
                   setWhiteWage("");
                   setPresentismoStatus("mantiene");
+                  setIsEditMode(false);
+                  setEditingRecord(null);
                 }}
                 className="w-full"
                 disabled={!calculation}
               >
-                Generar Liquidación
+                {isEditMode ? "Guardar Cambios" : "Generar Liquidación"}
               </Button>
               <Button
                 variant="outline"
