@@ -102,6 +102,8 @@ const employees = [
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("2024-2");
+  const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
+    useState(false);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
