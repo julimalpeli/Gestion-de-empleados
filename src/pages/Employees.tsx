@@ -499,7 +499,17 @@ const Employees = () => {
               <CardTitle className="text-sm font-medium">
                 Total Días de Vacaciones
               </CardTitle>
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Calendar className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>
+                    Suma de días de vacaciones disponibles de todos los
+                    empleados activos
+                  </p>
+                </TooltipContent>
+              </Tooltip>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
