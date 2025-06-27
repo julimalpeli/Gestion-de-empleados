@@ -629,15 +629,15 @@ const Employees = () => {
                   <TableCell>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge className="text-xs bg-ceramic-emerald text-ceramic-cream">
+                        <Badge className="text-xs bg-ceramic-terracotta text-ceramic-cream">
                           {employee.vacationDays} anuales
                         </Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge className="text-xs bg-ceramic-terracotta text-ceramic-cream">
+                        <Badge className="text-xs bg-ceramic-emerald text-ceramic-cream">
                           {employee.vacationsTaken} tomados
                         </Badge>
-                        <Badge className="text-xs bg-ceramic-gold text-ceramic-emerald">
+                        <Badge className="text-xs bg-ceramic-gold text-ceramic-terracotta">
                           {employee.vacationDays - employee.vacationsTaken}{" "}
                           disponibles
                         </Badge>
@@ -646,7 +646,7 @@ const Employees = () => {
                         variant="ghost"
                         size="sm"
                         onClick={() => openVacationManager(employee)}
-                        className="h-6 text-xs hover:bg-ceramic-gold/20 hover:text-ceramic-emerald"
+                        className="h-6 text-xs hover:bg-ceramic-gold/20 hover:text-ceramic-terracotta"
                       >
                         <Plane className="h-3 w-3 mr-1" />
                         Gestionar
