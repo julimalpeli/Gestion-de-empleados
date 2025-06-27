@@ -107,12 +107,17 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton>
+            <SidebarMenuButton onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
               <span>Cerrar Sesión</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+        {user && (
+          <div className="px-2 py-1 text-xs text-muted-foreground">
+            {user.name}
+          </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
