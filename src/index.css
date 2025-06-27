@@ -10,45 +10,45 @@
   */
   :root {
     --background: 28 25% 95%; /* Warm cream background */
-    --foreground: 120 31% 15%; /* Deep emerald for text */
+    --foreground: 4 82% 25%; /* Deep terracotta for text */
 
     --card: 0 0% 100%;
-    --card-foreground: 120 31% 15%;
+    --card-foreground: 4 82% 25%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 120 31% 15%;
+    --popover-foreground: 4 82% 25%;
 
-    --primary: 120 31% 15%; /* Emerald green */
+    --primary: 4 82% 40%; /* Terracotta primary */
     --primary-foreground: 28 25% 95%;
 
     --secondary: 28 25% 90%; /* Light cream */
-    --secondary-foreground: 120 31% 15%;
+    --secondary-foreground: 4 82% 25%;
 
     --muted: 28 25% 88%;
-    --muted-foreground: 120 20% 35%;
+    --muted-foreground: 4 60% 45%;
 
     --accent: 43 79% 47%; /* Golden accent */
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 4 82% 25%;
 
     --destructive: 4 82% 40%; /* Terracotta red */
     --destructive-foreground: 28 25% 95%;
 
-    --border: 28 25% 85%;
+    --border: 4 30% 85%;
     --input: 28 25% 90%;
-    --ring: 43 79% 47%;
+    --ring: 4 82% 40%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 120 31% 15%; /* Deep emerald sidebar */
-    --sidebar-foreground: 28 25% 95%;
+    --sidebar-background: 4 82% 40%; /* Terracotta sidebar */
+    --sidebar-foreground: 28 25% 95%; /* Light cream text */
 
     --sidebar-primary: 43 79% 47%; /* Gold for active items */
-    --sidebar-primary-foreground: 120 31% 15%;
+    --sidebar-primary-foreground: 4 82% 25%; /* Dark terracotta text on gold */
 
-    --sidebar-accent: 120 31% 20%; /* Slightly lighter emerald */
-    --sidebar-accent-foreground: 28 25% 95%;
+    --sidebar-accent: 4 82% 50%; /* Lighter terracotta for hover */
+    --sidebar-accent-foreground: 28 25% 95%; /* Light cream text */
 
-    --sidebar-border: 120 31% 25%;
+    --sidebar-border: 4 82% 50%;
     --sidebar-ring: 43 79% 47%;
   }
 
