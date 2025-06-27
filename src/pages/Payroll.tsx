@@ -303,6 +303,29 @@ const Payroll = () => {
     }).format(amount);
   };
 
+  // Manejo de loading y error
+  if (payrollLoading || employeesLoading) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p>Cargando datos...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (payrollError || employeesError) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p className="text-red-500">
+            Error: {payrollError || employeesError}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <TooltipProvider>
       <div className="flex flex-col gap-6 p-6">
