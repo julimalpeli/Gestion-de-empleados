@@ -147,6 +147,9 @@ const Employees = () => {
   const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
     useState(false);
 
+  const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
+    usePermissions();
+
   // Calculate vacation days based on seniority
   const calculateVacationDays = (startDate: string) => {
     const start = new Date(startDate);
