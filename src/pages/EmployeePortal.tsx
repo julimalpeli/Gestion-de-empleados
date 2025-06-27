@@ -19,11 +19,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { User, Eye, Calendar, DollarSign, FileText, LogIn } from "lucide-react";
+import {
+  User,
+  Eye,
+  Calendar,
+  DollarSign,
+  FileText,
+  LogOut,
+} from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "react-router-dom";
 
 const EmployeePortal = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [employeeCode, setEmployeeCode] = useState("");
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Mock employee data
   const employeeData = {
