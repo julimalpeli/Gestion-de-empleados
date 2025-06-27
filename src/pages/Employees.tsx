@@ -194,19 +194,37 @@ const Employees = () => {
           </div>
 
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsLiquidationsReportOpen(true)}
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Reporte de Liquidaciones
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsLiquidationsReportOpen(true)}
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  Reporte de Liquidaciones
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>
+                  Generar reporte detallado de liquidaciones con efectivo,
+                  depósito y aguinaldos
+                </p>
+              </TooltipContent>
+            </Tooltip>
+
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Nuevo Empleado
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Nuevo Empleado
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Agregar un nuevo empleado al sistema</p>
+                  </TooltipContent>
+                </Tooltip>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
