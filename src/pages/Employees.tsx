@@ -465,6 +465,19 @@ const Employees = () => {
             className="pl-10"
           />
         </div>
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium">Estado:</label>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="active">Activos</SelectItem>
+              <SelectItem value="inactive">Inactivos</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Employees Table */}
