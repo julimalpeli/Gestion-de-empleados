@@ -362,6 +362,155 @@ const Employees = () => {
             </Dialog>
           </PermissionGate>
         </div>
+
+        {/* Edit Employee Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Empleado</DialogTitle>
+              <DialogDescription>
+                Modifica la información de {editingEmployee?.name}
+              </DialogDescription>
+            </DialogHeader>
+            {editingEmployee && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="editName">Nombre Completo</Label>
+                  <Input
+                    id="editName"
+                    defaultValue={editingEmployee.name}
+                    onChange={(e) =>
+                      setEditingEmployee({
+                        ...editingEmployee,
+                        name: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editPosition">Puesto</Label>
+                  <Select
+                    defaultValue={editingEmployee.position.toLowerCase()}
+                    onValueChange={(value) =>
+                      setEditingEmployee({
+                        ...editingEmployee,
+                        position: value,
+                      })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cocinero">Cocinero</SelectItem>
+                      <SelectItem value="mesero">Mesero/a</SelectItem>
+                      <SelectItem value="cajero">Cajero/a</SelectItem>
+                      <SelectItem value="ayudante">
+                        Ayudante de Cocina
+                      </SelectItem>
+                      <SelectItem value="manager">Encargado/a</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="editWhiteWage">
+                      Sueldo en Blanco (mensual)
+                    </Label>
+                    <Input
+                      id="editWhiteWage"
+                      type="number"
+                      defaultValue={editingEmployee.whiteWage}
+                      onChange={(e) =>
+                        setEditingEmployee({
+                          ...editingEmployee,
+                          whiteWage: parseInt(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="editInformalWage">
+                      Sueldo Informal (mensual)
+                    </Label>
+                    <Input
+                      id="editInformalWage"
+                      type="number"
+                      defaultValue={editingEmployee.informalWage}
+                      onChange={(e) =>
+                        setEditingEmployee({
+                          ...editingEmployee,
+                          informalWage: parseInt(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editPresentismo">
+                    Presentismo (no remunerativo)
+                  </Label>
+                  <Input
+                    id="editPresentismo"
+                    type="number"
+                    defaultValue={editingEmployee.presentismo}
+                    onChange={(e) =>
+                      setEditingEmployee({
+                        ...editingEmployee,
+                        presentismo: parseInt(e.target.value),
+                      })
+                    }
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="editStartDate">Fecha de Ingreso</Label>
+                  <Input
+                    id="editStartDate"
+                    type="date"
+                    defaultValue={editingEmployee.startDate}
+                    onChange={(e) =>
+                      setEditingEmployee({
+                        ...editingEmployee,
+                        startDate: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                {/* Calculation Preview */}
+                <div className="p-3 bg-muted rounded-lg">
+                  <Label className="text-sm font-medium">
+                    Sueldo Diario Calculado
+                  </Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷ 30
+                  </p>
+                  <div className="text-lg font-semibold mt-2">
+                    {formatCurrency(
+                      (editingEmployee.whiteWage +
+                        editingEmployee.informalWage) /
+                        30,
+                    )}{" "}
+                    por día
+                  </div>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button onClick={handleSaveEdit} className="w-full">
+                    Guardar Cambios
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsEditDialogOpen(false)}
+                    className="w-full"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Stats Cards */}
