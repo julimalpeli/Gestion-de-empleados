@@ -187,10 +187,161 @@ const Employees = () => {
           </PermissionGate>
 
           <PermissionGate module="employees" action="create">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Empleado
-            </Button>
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nuevo Empleado
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
+                  <DialogDescription>
+                    Completa la información del nuevo empleado
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nombre Completo</Label>
+                    <Input
+                      id="name"
+                      placeholder="Ej: Juan Pérez"
+                      value={newEmployee.name}
+                      onChange={(e) =>
+                        setNewEmployee({ ...newEmployee, name: e.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="position">Puesto</Label>
+                    <Select
+                      value={newEmployee.position}
+                      onValueChange={(value) =>
+                        setNewEmployee({ ...newEmployee, position: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar puesto" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="cocinero">Cocinero</SelectItem>
+                        <SelectItem value="mesero">Mesero/a</SelectItem>
+                        <SelectItem value="cajero">Cajero/a</SelectItem>
+                        <SelectItem value="ayudante">
+                          Ayudante de Cocina
+                        </SelectItem>
+                        <SelectItem value="manager">Encargado/a</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="whiteWage">
+                        Sueldo en Blanco (mensual)
+                      </Label>
+                      <Input
+                        id="whiteWage"
+                        type="number"
+                        placeholder="300000"
+                        value={newEmployee.whiteWage}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            whiteWage: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="informalWage">
+                        Sueldo Informal (mensual)
+                      </Label>
+                      <Input
+                        id="informalWage"
+                        type="number"
+                        placeholder="150000"
+                        value={newEmployee.informalWage}
+                        onChange={(e) =>
+                          setNewEmployee({
+                            ...newEmployee,
+                            informalWage: e.target.value,
+                          })
+                        }
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="presentismo">
+                      Presentismo (no remunerativo)
+                    </Label>
+                    <Input
+                      id="presentismo"
+                      type="number"
+                      placeholder="25000"
+                      value={newEmployee.presentismo}
+                      onChange={(e) =>
+                        setNewEmployee({
+                          ...newEmployee,
+                          presentismo: e.target.value,
+                        })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Este monto no se incluye en el cálculo del sueldo diario
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="startDate">Fecha de Ingreso</Label>
+                    <Input
+                      id="startDate"
+                      type="date"
+                      value={newEmployee.startDate}
+                      onChange={(e) =>
+                        setNewEmployee({
+                          ...newEmployee,
+                          startDate: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+
+                  {/* Calculation Preview */}
+                  {newEmployee.whiteWage && newEmployee.informalWage && (
+                    <div className="p-3 bg-muted rounded-lg">
+                      <Label className="text-sm font-medium">
+                        Sueldo Diario Calculado
+                      </Label>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Se calcula como: (Sueldo en Blanco + Sueldo Informal) ÷
+                        30
+                      </p>
+                      <div className="text-lg font-semibold mt-2">
+                        {formatCurrency(
+                          (parseInt(newEmployee.whiteWage) +
+                            parseInt(newEmployee.informalWage)) /
+                            30,
+                        )}{" "}
+                        por día
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-2 pt-4">
+                    <Button onClick={handleAddEmployee} className="w-full">
+                      Guardar Empleado
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsAddDialogOpen(false)}
+                      className="w-full"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </PermissionGate>
         </div>
       </div>
