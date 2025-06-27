@@ -170,11 +170,16 @@ const Employees = () => {
     console.log("Toggling status for:", employee.name);
   };
 
-  const filteredEmployees = employees.filter(
-    (employee) =>
+  const filteredEmployees = employees.filter((employee) => {
+    const matchesSearch =
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.position.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      employee.position.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || employee.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
