@@ -145,7 +145,6 @@ const VacationManager = ({
       startDate: vacation.startDate,
       endDate: vacation.endDate,
       reason: vacation.reason,
-      status: vacation.status,
     });
     setIsAddingVacation(true);
   };
