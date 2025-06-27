@@ -866,9 +866,11 @@ const Payroll = () => {
                           <TableCell>
                             {record.overtimeHours > 0 ? (
                               <div>
-                                <div>{record.overtimeHours} hs</div>
-                                <div className="text-xs text-muted-foreground">
+                                <div className="font-medium">
                                   {formatCurrency(record.overtimeAmount)}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  {record.overtimeHours} hs
                                 </div>
                               </div>
                             ) : (
