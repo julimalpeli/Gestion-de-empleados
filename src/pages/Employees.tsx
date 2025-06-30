@@ -796,6 +796,15 @@ const Employees = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleViewEmployee(employee)}
+                          title="Ver información del empleado"
+                        >
+                          <Info className="h-4 w-4" />
+                        </Button>
+
                         <PermissionGate module="vacations" action="view">
                           <Button
                             variant="ghost"
