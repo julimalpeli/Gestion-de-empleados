@@ -1507,6 +1507,41 @@ const Payroll = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Filtros */}
+                <div className="mb-4 flex gap-4">
+                  <Select
+                    value={employeeFilter}
+                    onValueChange={setEmployeeFilter}
+                  >
+                    <SelectTrigger className="w-64">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">
+                        Solo empleados activos
+                      </SelectItem>
+                      <SelectItem value="all">Todos los empleados</SelectItem>
+                      <SelectItem value="inactive">
+                        Solo empleados inactivos
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Filtrar por estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los estados</SelectItem>
+                      <SelectItem value="draft">Borrador</SelectItem>
+                      <SelectItem value="pending">Pendientes</SelectItem>
+                      <SelectItem value="approved">Aprobadas</SelectItem>
+                      <SelectItem value="processed">Procesadas</SelectItem>
+                      <SelectItem value="paid">Pagadas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {historyRecords.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     No hay liquidaciones de períodos anteriores
