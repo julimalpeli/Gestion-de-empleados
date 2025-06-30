@@ -58,6 +58,7 @@ import { Switch } from "@/components/ui/switch";
 import { useUsers } from "@/hooks/use-users";
 import { useEmployees } from "@/hooks/use-employees";
 import usePermissions from "@/hooks/use-permissions";
+import { useAuth } from "@/hooks/use-auth";
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -703,7 +704,7 @@ const UserManagement = () => {
           <div className="space-y-4">
             <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
               <p className="text-sm text-orange-800">
-                El usuario deberá cambiar esta contraseña en su próximo login.
+                El usuario deber�� cambiar esta contraseña en su próximo login.
               </p>
             </div>
 
