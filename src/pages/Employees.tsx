@@ -889,9 +889,18 @@ const Employees = () => {
                                     <UserX className="h-4 w-4 text-red-600" />
                                   ) : (
                                     <UserCheck className="h-4 w-4 text-green-600" />
-                            )}
-                          </Button>
-                        </PermissionGate>
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  {employee.status === "active"
+                                    ? "Desactivar empleado"
+                                    : "Activar empleado"}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </PermissionGate>
 
                         {/* Delete button temporarily hidden */}
                         {false && (
