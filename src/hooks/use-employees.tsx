@@ -11,6 +11,7 @@ export const useEmployees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { updateUser, users } = useUsers();
 
   // Cargar empleados
   const fetchEmployees = async () => {
