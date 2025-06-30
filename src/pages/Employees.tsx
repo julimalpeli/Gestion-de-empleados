@@ -198,7 +198,23 @@ const Employees = () => {
 
       console.log("Creating employee with data:", employeeData);
 
-      await createEmployee(employeeData);
+      const newEmployeeRecord = await createEmployee(employeeData);
+
+      // Crear usuario automáticamente para acceso al portal
+      try {
+        await createEmployeeUser({
+          id: newEmployeeRecord.id,
+          name: newEmployeeRecord.name,
+          dni: newEmployeeRecord.dni,
+        });
+        console.log("✅ Usuario creado automáticamente para empleado");
+      } catch (userError) {
+        console.error("❌ Error creando usuario:", userError);
+        // No fallar la creación del empleado por error de usuario
+        alert(
+          "Empleado creado, pero hubo un error al crear el usuario. Contacte al administrador.",
+        );
+      }
 
       setIsAddDialogOpen(false);
       setNewEmployee({
