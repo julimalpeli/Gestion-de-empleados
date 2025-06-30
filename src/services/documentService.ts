@@ -233,6 +233,56 @@ class DocumentService {
     return categoryNames[category] || category;
   }
 
+  async verifySetup(): Promise<{
+    table: boolean;
+    bucket: boolean;
+    errors: string[];
+  }> {
+    const errors: string[] = [];
+    let tableExists = false;
+    let bucketExists = false;
+
+    try {
+      // Test table access
+      const { error: tableError } = await supabase
+        .from("employee_documents")
+        .select("id")
+        .limit(1);
+
+      if (tableError) {
+        if (tableError.code === "42P01") {
+          errors.push("Tabla employee_documents no existe");
+        } else {
+          errors.push(`Error de tabla: ${tableError.message}`);
+        }
+      } else {
+        tableExists = true;
+      }
+    } catch (error) {
+      errors.push(`Error verificando tabla: ${error}`);
+    }
+
+    try {
+      // Test bucket access
+      const { data: buckets, error: bucketError } =
+        await supabase.storage.listBuckets();
+
+      if (bucketError) {
+        errors.push(`Error accediendo storage: ${bucketError.message}`);
+      } else {
+        bucketExists =
+          buckets?.some((bucket) => bucket.id === this.BUCKET_NAME) || false;
+        if (!bucketExists) {
+          errors.push(`Bucket '${this.BUCKET_NAME}' no existe`);
+        }
+      }
+    } catch (error) {
+      errors.push(`Error verificando bucket: ${error}`);
+    }
+
+    return { table: tableExists, bucket: bucketExists, errors };
+  }
+
   private mapFromSupabase(data: any): EmployeeDocument {
     return {
       id: data.id,
