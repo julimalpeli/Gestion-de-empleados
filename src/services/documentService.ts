@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 export interface EmployeeDocument {
   id: string;
   employeeId: string;
+  payrollId?: string; // Optional, for payroll-specific documents
   fileName: string;
   originalFileName: string;
   fileType: string;
@@ -16,6 +17,7 @@ export interface EmployeeDocument {
 
 export interface CreateDocumentRequest {
   employeeId: string;
+  payrollId?: string; // Optional, for payroll-specific documents
   file: File;
   category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "otros";
   description?: string;
