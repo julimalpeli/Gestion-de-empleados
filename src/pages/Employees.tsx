@@ -1036,38 +1036,28 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                         </div>
                       );
                     })()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      {/* Info Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => showEmployeeInfo(employee)}
-                        title="Ver información completa del empleado"
-                      >
-                        <Info className="h-4 w-4" />
-                      </Button>
-
-                      {/* Edit Button */}
-                      <PermissionGate module="employees" action="edit">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditEmployee(employee)}
-                          title="Editar datos del empleado"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </PermissionGate>
-
-                      {/* Toggle Status Button */}
-                      <PermissionGate module="employees" action="edit">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleToggleStatus(employee)}
-                          title={
+                  <TableCell>
+                    {(() => {
+                      const vacInfo = calculateVacationDays(employee.startDate);
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="default" className="text-xs">
+                              {vacInfo.vacationDays} anuales
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              ({vacInfo.years} años)
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {employee.vacationsTaken} tomados
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {vacInfo.vacationDays - employee.vacationsTaken}{" "}
+                              disponibles
+                            </Badge>
+                          </div>
                             employee.status === "active"
                               ? "Desactivar empleado"
                               : "Activar empleado"
