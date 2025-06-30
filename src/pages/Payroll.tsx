@@ -395,6 +395,52 @@ const Payroll = () => {
     return month === "06" || month === "12"; // Junio o Diciembre
   };
 
+  const calculateAguinaldo = (employee, period) => {
+    if (!isAguinaldoPeriod(period)) return 0;
+
+    const [year, month] = period.split("-");
+    const startDate = new Date(employee.startDate);
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    // Determinar fecha límite según el período
+    let endDate;
+    if (month === "06") {
+      // Primer semestre - hasta 30 de junio
+      endDate = new Date(parseInt(year), 5, 30); // Mes 5 = junio (0-indexed)
+    } else {
+      // Segundo semestre - hasta 31 de diciembre
+      endDate = new Date(parseInt(year), 11, 31); // Mes 11 = diciembre (0-indexed)
+    }
+
+    // Sueldo total más alto (sin presentismo)
+    const totalSalary = employee.whiteWage + employee.informalWage;
+
+    // Si tiene más de 6 meses de antigüedad al momento de liquidar
+    const liquidationDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const hasMoreThanSixMonths =
+      (liquidationDate - startDate) / (1000 * 60 * 60 * 24) >= 180;
+
+    if (hasMoreThanSixMonths) {
+      // Aguinaldo completo
+      return totalSalary / 2;
+    } else {
+      // Aguinaldo proporcional
+      // Calcular días trabajados desde fecha de ingreso hasta fecha límite
+      const workStartDate =
+        startDate > new Date(parseInt(year), 0, 1)
+          ? startDate
+          : new Date(parseInt(year), 0, 1);
+      const daysWorked = Math.max(
+        0,
+        Math.ceil((endDate - workStartDate) / (1000 * 60 * 60 * 24)) + 1,
+      );
+
+      // Fórmula: (Sueldo total / 2) / 180 * días trabajados
+      return Math.max(0, (totalSalary / 2 / 180) * daysWorked);
+    }
+  };
+
   // Manejo de loading y error
   if (payrollLoading || employeesLoading) {
     return (
