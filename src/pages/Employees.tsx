@@ -1303,7 +1303,18 @@ const Employees = () => {
               <div className="space-y-2">
                 <Label>Días de Vacaciones</Label>
                 <p className="text-lg">
-                  {viewingEmployee.vacationDays || 0} días anuales
+                  {viewingEmployee.startDate
+                    ? (() => {
+                        const vacationInfo = calculateVacationDays(
+                          viewingEmployee.startDate,
+                        );
+                        if (vacationInfo.eligibleForVacations) {
+                          return `${vacationInfo.vacationDays} días anuales`;
+                        } else {
+                          return `0 días (requiere 6 meses de antigüedad)`;
+                        }
+                      })()
+                    : "No calculado"}
                 </p>
               </div>
             </div>
