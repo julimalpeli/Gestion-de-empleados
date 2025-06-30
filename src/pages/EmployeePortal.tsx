@@ -448,6 +448,7 @@ const EmployeePortal = () => {
                                 size="sm"
                                 disabled={!record.hasDocument}
                                 title="Descargar recibo"
+                                onClick={() => handleDownloadReceipt(record)}
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
