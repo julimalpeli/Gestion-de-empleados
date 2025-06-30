@@ -125,6 +125,11 @@ const Employees = () => {
     }
   };
 
+  const handleViewEmployee = (employee) => {
+    setViewingEmployee(employee);
+    setIsViewDialogOpen(true);
+  };
+
   const handleAddEmployee = async () => {
     try {
       if (!newEmployee.name.trim()) {
