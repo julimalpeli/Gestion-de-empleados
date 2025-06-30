@@ -163,6 +163,16 @@ const Employees = () => {
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
 
+  // Auto-dismiss mensaje de éxito después de 5 segundos
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
   const handleAddEmployee = async () => {
     try {
       // Validaciones básicas
