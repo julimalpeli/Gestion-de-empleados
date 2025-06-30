@@ -33,20 +33,8 @@ import {
 } from "@/components/ui/select";
 import { FileText, Download, Calendar, DollarSign } from "lucide-react";
 
-// Mock report data
-const reportData = [
-  {
-    id: 1,
-    employeeName: "Juan Pérez",
-    period: "Diciembre 2024",
-    efectivo: 120000, // informal amount called "Efectivo"
-    deposito: 330000, // white amount called "Depósito"
-    aguinaldo: 225000,
-    totalNeto: 675000,
-    hasAguinaldo: true,
-  },
-  {
-    id: 2,
+// Real report data - will be populated from database
+const reportData = [];
     employeeName: "María González",
     period: "Diciembre 2024",
     efectivo: 100000,
