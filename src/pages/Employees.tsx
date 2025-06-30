@@ -307,7 +307,7 @@ const Employees = () => {
     return (
       <div className="flex flex-col gap-6 p-6">
         <div className="flex items-center justify-center h-32">
-          <p>No tienes permisos para acceder a este m��dulo.</p>
+          <p>No tienes permisos para acceder a este módulo.</p>
         </div>
       </div>
     );
@@ -817,7 +817,7 @@ const Employees = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-informalWage">Sueldo en Negro</Label>
+                <Label htmlFor="edit-informalWage">Sueldo Informal</Label>
                 <Input
                   id="edit-informalWage"
                   type="number"
