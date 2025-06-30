@@ -55,6 +55,19 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
   );
   const [selectedType, setSelectedType] = useState("all");
 
+  // Filter records by selected period - real data from database
+  const reportData = payrollRecords
+    .filter((record) => record.period === selectedPeriod)
+    .map((record) => ({
+      employeeName: record.employeeName,
+      period: record.period,
+      efectivo: record.informalAmount || 0,
+      deposito: record.whiteAmount || 0,
+      aguinaldo: record.aguinaldo || 0,
+      totalNeto: record.netTotal || 0,
+      hasAguinaldo: (record.aguinaldo || 0) > 0,
+    }));
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
