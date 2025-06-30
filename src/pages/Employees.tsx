@@ -199,6 +199,7 @@ const Employees = () => {
       setIsAddDialogOpen(false);
       setNewEmployee({
         name: "",
+        dni: "",
         position: "",
         whiteWage: "",
         informalWage: "",
