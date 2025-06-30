@@ -24,9 +24,9 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider delayDuration={200}>
+      <Toaster />
+      <Sonner />
       <AuthProvider>
-        <Toaster />
-        <Sonner />
         <BrowserRouter>
           <Routes>
             {/* Public routes */}
