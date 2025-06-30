@@ -59,6 +59,7 @@ import { useUsers } from "@/hooks/use-users";
 import { useEmployees } from "@/hooks/use-employees";
 import usePermissions from "@/hooks/use-permissions";
 import { useAuth } from "@/hooks/use-auth";
+import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
