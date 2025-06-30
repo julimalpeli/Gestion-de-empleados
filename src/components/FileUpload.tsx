@@ -330,6 +330,7 @@ const FileUpload = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDownload(file)}
+                              title="Descargar archivo"
                             >
                               <Download className="h-4 w-4" />
                             </Button>
