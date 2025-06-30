@@ -178,6 +178,57 @@ class DocumentService {
     }
   }
 
+  async getPayrollDocuments(payrollId: string): Promise<EmployeeDocument[]> {
+    try {
+      console.log("Fetching documents for payroll:", payrollId);
+
+      const { data, error } = await supabase
+        .from("employee_documents")
+        .select("*")
+        .eq("payroll_id", payrollId)
+        .order("uploaded_at", { ascending: false });
+
+      console.log("Supabase payroll documents response:", { data, error });
+
+      if (error) {
+        console.error(
+          "Supabase error details:",
+          JSON.stringify(error, null, 2),
+        );
+
+        if (
+          error.code === "42P01" ||
+          error.message?.includes("does not exist")
+        ) {
+          console.log(
+            "employee_documents table does not exist yet, returning empty array",
+          );
+          return [];
+        }
+
+        throw new Error(
+          `Database error: ${error.message || error.details || error.hint || "Unknown error"}`,
+        );
+      }
+
+      if (!data) {
+        return [];
+      }
+
+      return data.map(this.mapFromSupabase);
+    } catch (error) {
+      console.error("Error fetching payroll documents:", error);
+
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      throw new Error(
+        `Failed to fetch payroll documents: ${error && typeof error === "object" ? JSON.stringify(error) : String(error)}`,
+      );
+    }
+  }
+
   async deleteDocument(id: string): Promise<void> {
     try {
       // Get document info first
