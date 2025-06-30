@@ -245,8 +245,8 @@ const Payroll = () => {
         period: record.period,
         company: {
           name: "Cádiz Bar de Tapas",
-          address: "Av. Corrientes 1234, CABA",
-          phone: "+54 11 4567-8900",
+          address: "Calle 57 Nro1099 esq. 17",
+          phone: "", // Removed phone number
         },
       };
 
