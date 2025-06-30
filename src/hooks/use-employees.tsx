@@ -103,10 +103,8 @@ export const useEmployees = () => {
         prev.map((emp) => (emp.id === id ? updatedEmployee : emp)),
       );
 
-      // Sync user status if employee status changed to inactive
-      if (employee.status) {
-        await syncUserStatusWithEmployee(id, employee.status);
-      }
+      // Sync user data with employee changes
+      await syncUserDataWithEmployee(id, employee);
 
       return updatedEmployee;
     } catch (err) {
