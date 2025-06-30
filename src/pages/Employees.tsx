@@ -527,7 +527,9 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="startDate">Fecha de Ingreso</Label>
+                    <Label htmlFor="startDate">
+                      Fecha de Ingreso <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="startDate"
                       type="date"
@@ -538,6 +540,7 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                           startDate: e.target.value,
                         })
                       }
+                      required
                     />
                   </div>
 
