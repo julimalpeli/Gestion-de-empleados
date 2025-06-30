@@ -305,13 +305,71 @@ const UserManagement = () => {
           </div>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Usuario
-            </Button>
-          </DialogTrigger>
+        <div className="flex gap-2">
+          <Dialog open={isChangeMyPasswordOpen} onOpenChange={setIsChangeMyPasswordOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Lock className="h-4 w-4 mr-2" />
+                Cambiar Mi Contraseña
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Cambiar Mi Contraseña</DialogTitle>
+                <DialogDescription>
+                  Ingresa tu nueva contraseña. Debe tener al menos 6 caracteres.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="newPassword">Nueva Contraseña</Label>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    placeholder="Mínimo 6 caracteres"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Repite la contraseña"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsChangeMyPasswordOpen(false);
+                      setNewPassword("");
+                      setConfirmPassword("");
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                  <Button onClick={handleChangeMyPassword}>
+                    Cambiar Contraseña
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Usuario
+              </Button>
+            </DialogTrigger>
+        </div>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Crear Nuevo Usuario</DialogTitle>
