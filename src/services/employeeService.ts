@@ -124,6 +124,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const updateData: any = {};
 
       if (employee.name) updateData.name = employee.name;
+      if (employee.dni) updateData.dni = employee.dni;
       if (employee.position) updateData.job_position = employee.position;
       if (employee.whiteWage !== undefined)
         updateData.white_wage = employee.whiteWage;
