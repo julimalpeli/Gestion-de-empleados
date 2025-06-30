@@ -1196,7 +1196,7 @@ const Payroll = () => {
                                 </div>
                               )}
                             </TableCell>
-                            <TableCell>{record.baseDays} d��as</TableCell>
+                            <TableCell>{record.baseDays} días</TableCell>
                             <TableCell>
                               {record.holidayDays > 0 ? (
                                 <div>
