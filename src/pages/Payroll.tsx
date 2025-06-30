@@ -789,6 +789,9 @@ const Payroll = () => {
                       // Limpiar formulario
                       setIsNewPayrollOpen(false);
                       setSelectedEmployee("");
+                      const currentDate = new Date();
+                      const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+                      setSelectedPeriod(currentPeriod);
                       setWorkDays("30");
                       setHolidayDays("");
                       setAdvances("");
