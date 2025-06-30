@@ -438,9 +438,9 @@ const Payroll = () => {
     const hourlyRate = employee.dailyWage / 8;
     const overtimePay = overtimeHoursNum * hourlyRate * 1.5; // 50% extra
 
-    // Presentismo: 8.33% del sueldo base si mantiene
+    // Presentismo: valor fijo del empleado si mantiene
     const presentismoAmount =
-      presentismoStatus === "mantiene" ? basePay * 0.0833 : 0;
+      presentismoStatus === "mantiene" ? employee?.presentismo || 0 : 0;
 
     const bonusPay = bonusNum;
 
@@ -573,8 +573,8 @@ const Payroll = () => {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid gap-6 py-4">
-                <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-6 py-4 lg:grid-cols-2">
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="employee">
                       Empleado <span className="text-red-500">*</span>
@@ -712,7 +712,18 @@ const Payroll = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="mantiene">
-                          Mantiene (8.33%)
+                          Mantiene{" "}
+                          {selectedEmployee && (
+                            <span>
+                              (
+                              {formatCurrency(
+                                employees.find(
+                                  (e) => e.id.toString() === selectedEmployee,
+                                )?.presentismo || 0,
+                              )}
+                              )
+                            </span>
+                          )}
                         </SelectItem>
                         <SelectItem value="perdido">Perdido</SelectItem>
                       </SelectContent>
