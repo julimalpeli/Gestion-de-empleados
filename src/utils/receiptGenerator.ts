@@ -208,7 +208,6 @@ export const generatePayrollReceiptExcel = async (data: ReceiptData) => {
       [""],
       ["Empresa:", data.company.name],
       ["Dirección:", data.company.address],
-      ["Teléfono:", data.company.phone],
       [""],
       ["DATOS DEL EMPLEADO"],
       ["Nombre:", data.employee.name],
