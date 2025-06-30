@@ -31,7 +31,7 @@ CREATE INDEX IF NOT EXISTS idx_payroll_records_period ON payroll_records(period)
 CREATE INDEX IF NOT EXISTS idx_payroll_records_status ON payroll_records(status);
 
 -- Create unique constraint to prevent duplicate payroll records for same employee and period
-CREATE UNIQUE INDEX IF NOT EXISTS idx_payroll_records_employee_period 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_payroll_records_employee_period
 ON payroll_records(employee_id, period);
 
 -- Create trigger to update updated_at column
@@ -43,6 +43,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Drop trigger if exists and recreate
+DROP TRIGGER IF EXISTS trigger_update_payroll_records_updated_at ON payroll_records;
 CREATE TRIGGER trigger_update_payroll_records_updated_at
     BEFORE UPDATE ON payroll_records
     FOR EACH ROW
