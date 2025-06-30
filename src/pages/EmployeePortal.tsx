@@ -262,7 +262,7 @@ const EmployeePortal = () => {
             ¡Bienvenido, {employeeData.name}!
           </h2>
           <p className="text-muted-foreground">
-            Aqu�� puedes consultar tu información personal, liquidaciones y
+            Aquí puedes consultar tu información personal, liquidaciones y
             vacaciones.
           </p>
         </div>
