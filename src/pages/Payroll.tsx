@@ -228,7 +228,7 @@ const Payroll = () => {
       const updateData = {
         status: newStatus,
         processedDate: new Date().toISOString(),
-        processedBy: "admin", // TODO: Get current user
+        processedBy: user?.id || null,
       };
 
       await updatePayrollRecord(record.id, updateData);
