@@ -1160,7 +1160,7 @@ const Payroll = () => {
                                 </div>
                               )}
                             </TableCell>
-                            <TableCell>{record.baseDays} días</TableCell>
+                            <TableCell>{record.baseDays} d��as</TableCell>
                             <TableCell>
                               {record.holidayDays > 0 ? (
                                 <div>
@@ -1585,6 +1585,16 @@ const Payroll = () => {
             </div>
           </div>
         )}
+
+        {/* Document Manager */}
+        <DocumentManager
+          isOpen={isDocumentManagerOpen}
+          onClose={() => {
+            setIsDocumentManagerOpen(false);
+            setSelectedEmployeeForDocs(null);
+          }}
+          employee={selectedEmployeeForDocs}
+        />
       </div>
     </TooltipProvider>
   );
