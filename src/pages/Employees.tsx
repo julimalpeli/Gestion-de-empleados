@@ -54,6 +54,7 @@ import {
   Info,
   UserCheck,
   UserX,
+  FolderOpen,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
@@ -841,6 +842,26 @@ const Employees = () => {
                             </TooltipTrigger>
                             <TooltipContent>
                               <p>Gestionar vacaciones</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </PermissionGate>
+
+                        <PermissionGate module="employees" action="view">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedEmployeeForDocuments(employee);
+                                  setIsDocumentManagerOpen(true);
+                                }}
+                              >
+                                <FolderOpen className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Gestionar documentos</p>
                             </TooltipContent>
                           </Tooltip>
                         </PermissionGate>
