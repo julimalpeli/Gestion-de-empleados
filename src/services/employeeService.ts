@@ -194,9 +194,19 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
         // Handle specific database errors
         if (error.code === "23503") {
-          throw new Error(
-            "No se puede eliminar el empleado porque tiene registros de liquidaciones o usuario asociado. Primero desactívalo.",
-          );
+          if (error.details?.includes('table "users"')) {
+            throw new Error(
+              "No se puede eliminar el empleado porque tiene una cuenta de usuario asociada. Elimina primero el usuario en la sección 'Gestión de Usuarios' o desactiva el empleado.",
+            );
+          } else if (error.details?.includes("payroll")) {
+            throw new Error(
+              "No se puede eliminar el empleado porque tiene registros de liquidaciones. Primero desactívalo.",
+            );
+          } else {
+            throw new Error(
+              "No se puede eliminar el empleado porque tiene registros relacionados. Primero desactívalo.",
+            );
+          }
         }
 
         if (error.code === "23505") {
