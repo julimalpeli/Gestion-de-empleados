@@ -1128,12 +1128,19 @@ const Payroll = () => {
                               )}
                             </TableCell>
                             <TableCell className="font-medium">
-                              {formatCurrency(record.netTotal)}
-                              {record.aguinaldo > 0 && (
-                                <div className="text-xs text-green-600">
-                                  Incluye aguinaldo
-                                </div>
+                              {formatCurrency(
+                                record.netTotal +
+                                  (isAguinaldoPeriod(record.period)
+                                    ? record.aguinaldo || 0
+                                    : 0),
                               )}
+                              {isAguinaldoPeriod(record.period) &&
+                                record.aguinaldo > 0 && (
+                                  <div className="text-xs text-green-600">
+                                    Incluye aguinaldo:{" "}
+                                    {formatCurrency(record.aguinaldo)}
+                                  </div>
+                                )}
                             </TableCell>
                             <TableCell>
                               <div className="flex flex-col gap-1">
