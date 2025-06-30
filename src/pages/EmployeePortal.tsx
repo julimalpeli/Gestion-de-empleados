@@ -319,10 +319,11 @@ const EmployeePortal = () => {
 
         {/* Main Content */}
         <Tabs defaultValue="personal" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="personal">Datos Personales</TabsTrigger>
             <TabsTrigger value="payroll">Liquidaciones</TabsTrigger>
             <TabsTrigger value="vacations">Vacaciones</TabsTrigger>
+            <TabsTrigger value="documents">Documentos</TabsTrigger>
           </TabsList>
 
           <TabsContent value="personal">
