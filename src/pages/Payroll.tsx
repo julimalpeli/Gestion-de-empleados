@@ -930,11 +930,19 @@ const Payroll = () => {
                           );
                           if (!employee) return false;
 
+                          // Filter by employee status
+                          let employeeMatch = true;
                           if (employeeFilter === "active")
-                            return employee.status === "active";
-                          if (employeeFilter === "inactive")
-                            return employee.status === "inactive";
-                          return true; // "all"
+                            employeeMatch = employee.status === "active";
+                          else if (employeeFilter === "inactive")
+                            employeeMatch = employee.status === "inactive";
+
+                          // Filter by liquidation status
+                          let statusMatch = true;
+                          if (statusFilter !== "all")
+                            statusMatch = record.status === statusFilter;
+
+                          return employeeMatch && statusMatch;
                         })
                         .map((record) => (
                           <TableRow key={record.id}>
