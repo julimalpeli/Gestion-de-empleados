@@ -136,10 +136,35 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2024-12">Diciembre 2024</SelectItem>
-                  <SelectItem value="2024-11">Noviembre 2024</SelectItem>
-                  <SelectItem value="2024-10">Octubre 2024</SelectItem>
-                  <SelectItem value="2024-06">Junio 2024</SelectItem>
+                  {availablePeriods.length > 0 ? (
+                    availablePeriods.map((period) => {
+                      const [year, month] = period.split("-");
+                      const monthNames = [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre",
+                      ];
+                      const monthName = monthNames[parseInt(month) - 1];
+                      return (
+                        <SelectItem key={period} value={period}>
+                          {monthName} {year}
+                        </SelectItem>
+                      );
+                    })
+                  ) : (
+                    <SelectItem value="no-data" disabled>
+                      No hay períodos disponibles
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
