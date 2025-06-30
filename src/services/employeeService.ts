@@ -299,29 +299,42 @@ export class SupabaseEmployeeService implements IEmployeeService {
     const start = new Date(startDate);
     const today = new Date();
 
-    // Calcular años de antigüedad
+    // Calcular años y meses de antigüedad
     const yearsDiff = today.getFullYear() - start.getFullYear();
     const monthsDiff = today.getMonth() - start.getMonth();
     const daysDiff = today.getDate() - start.getDate();
 
     let years = yearsDiff;
+    let totalMonths = years * 12 + monthsDiff;
+
+    if (daysDiff < 0) {
+      totalMonths--;
+    }
+
     if (monthsDiff < 0 || (monthsDiff === 0 && daysDiff < 0)) {
       years--;
     }
 
-    // Determinar días de vacaciones según antigüedad
-    let vacationDays = 14; // Por defecto hasta 5 años
-    if (years >= 20) {
-      vacationDays = 35;
-    } else if (years >= 10) {
-      vacationDays = 28;
-    } else if (years >= 5) {
-      vacationDays = 21;
+    // Solo otorgar vacaciones después de 6 meses de antigüedad
+    let vacationDays = 0;
+
+    if (totalMonths >= 6) {
+      // Determinar días de vacaciones según antigüedad (después de 6 meses)
+      vacationDays = 14; // Por defecto hasta 5 años
+      if (years >= 20) {
+        vacationDays = 35;
+      } else if (years >= 10) {
+        vacationDays = 28;
+      } else if (years >= 5) {
+        vacationDays = 21;
+      }
     }
 
     return {
       years,
       vacationDays,
+      totalMonths,
+      eligibleForVacations: totalMonths >= 6,
       startDate: start.toLocaleDateString("es-AR"),
     };
   }
