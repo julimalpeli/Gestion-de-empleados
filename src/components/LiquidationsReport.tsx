@@ -35,45 +35,6 @@ import { FileText, Download, Calendar, DollarSign } from "lucide-react";
 
 // Real report data - will be populated from database
 const reportData = [];
-    employeeName: "María González",
-    period: "Diciembre 2024",
-    efectivo: 100000,
-    deposito: 240000,
-    aguinaldo: 170000,
-    totalNeto: 510000,
-    hasAguinaldo: true,
-  },
-  {
-    id: 3,
-    employeeName: "Carlos López",
-    period: "Diciembre 2024",
-    efectivo: 120000,
-    deposito: 285000,
-    aguinaldo: 202500,
-    totalNeto: 607500,
-    hasAguinaldo: true,
-  },
-  {
-    id: 4,
-    employeeName: "Ana Martínez",
-    period: "Noviembre 2024",
-    efectivo: 120000,
-    deposito: 210000,
-    aguinaldo: 0,
-    totalNeto: 330000,
-    hasAguinaldo: false,
-  },
-  {
-    id: 5,
-    employeeName: "Luis Fernández",
-    period: "Diciembre 2024",
-    efectivo: 225000,
-    deposito: 525000,
-    aguinaldo: 375000,
-    totalNeto: 1125000,
-    hasAguinaldo: true,
-  },
-];
 
 interface LiquidationsReportProps {
   isOpen: boolean;
