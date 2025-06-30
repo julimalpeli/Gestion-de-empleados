@@ -185,6 +185,7 @@ const Employees = () => {
       setNewEmployee({
         name: "",
         dni: "",
+        documentType: "dni",
         position: "",
         whiteWage: "",
         informalWage: "",
