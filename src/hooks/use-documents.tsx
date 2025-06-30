@@ -119,9 +119,9 @@ export const useDocuments = (employeeId?: string, payrollId?: string) => {
 
   useEffect(() => {
     if (employeeId) {
-      fetchDocuments(employeeId);
+      fetchDocuments(employeeId, payrollId);
     }
-  }, [employeeId]);
+  }, [employeeId, payrollId]);
 
   return {
     documents,
