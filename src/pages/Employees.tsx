@@ -244,6 +244,7 @@ const Employees = () => {
     try {
       await updateEmployee(editingEmployee.id, {
         name: editingEmployee.name,
+        dni: editingEmployee.dni,
         position: editingEmployee.position,
         whiteWage: editingEmployee.whiteWage,
         informalWage: editingEmployee.informalWage,
