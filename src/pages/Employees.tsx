@@ -261,6 +261,8 @@ const Employees = () => {
         informalWage: parseFloat(editingEmployee.informalWage) || 0,
         presentismo: parseFloat(editingEmployee.presentismo) || 0,
         startDate: editingEmployee.startDate,
+        address: editingEmployee.address.trim(),
+        email: editingEmployee.email.trim(),
       };
 
       await updateEmployee(editingEmployee.id, employeeData);
