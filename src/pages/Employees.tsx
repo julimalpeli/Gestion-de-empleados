@@ -66,6 +66,7 @@ import {
 import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
+import DocumentManager from "@/components/DocumentManager";
 import { useEmployees } from "@/hooks/use-employees";
 import { useUsers } from "@/hooks/use-users";
 import { employeeService } from "@/services/employeeService";
@@ -78,6 +79,9 @@ const Employees = () => {
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
   const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
+    useState(null);
+  const [isDocumentManagerOpen, setIsDocumentManagerOpen] = useState(false);
+  const [selectedEmployeeForDocuments, setSelectedEmployeeForDocuments] =
     useState(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
