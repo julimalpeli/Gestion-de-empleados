@@ -265,6 +265,42 @@ const Payroll = () => {
       alert(`Error al generar el recibo: ${error.message}`);
     }
   };
+
+  // Helper functions for status display
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "default";
+      case "processed":
+        return "secondary";
+      case "approved":
+        return "outline";
+      case "pending":
+        return "secondary";
+      case "draft":
+        return "outline";
+      default:
+        return "outline";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "Pagado";
+      case "processed":
+        return "Procesado";
+      case "approved":
+        return "Aprobado";
+      case "pending":
+        return "Pendiente";
+      case "draft":
+        return "Borrador";
+      default:
+        return status;
+    }
+  };
+
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
 
