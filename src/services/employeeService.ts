@@ -81,6 +81,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       const newEmployee = {
         name: employee.name,
+        dni: employee.dni,
         job_position: employee.position,
         white_wage: employee.whiteWage,
         informal_wage: employee.informalWage,
