@@ -80,6 +80,25 @@ const Login = () => {
     setError("");
   };
 
+  const handlePasswordChanged = () => {
+    if (pendingUser) {
+      // Actualizar el usuario para indicar que ya no necesita cambiar contraseña
+      const updatedUser = { ...pendingUser, needsPasswordChange: false };
+      login(updatedUser);
+
+      // Redirigir según rol
+      if (updatedUser.role === "employee") {
+        navigate("/portal-empleado");
+      } else {
+        navigate("/");
+      }
+
+      // Limpiar estados
+      setShowPasswordChange(false);
+      setPendingUser(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
