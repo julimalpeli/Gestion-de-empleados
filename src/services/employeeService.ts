@@ -190,7 +190,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const { error } = await supabase.from("employees").delete().eq("id", id);
 
       if (error) {
-        console.error("Supabase delete error:", error);
+        console.error("Supabase delete error:", JSON.stringify(error, null, 2));
 
         // Handle specific database errors
         if (error.code === "23503") {
