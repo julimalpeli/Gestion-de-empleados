@@ -278,6 +278,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
     return {
       id: data.id,
       name: data.name,
+      dni: data.dni,
       position: data.job_position,
       whiteWage: data.white_wage,
       informalWage: data.informal_wage,
