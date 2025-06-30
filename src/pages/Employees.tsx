@@ -84,6 +84,8 @@ const Employees = () => {
     informalWage: "",
     presentismo: "",
     startDate: "",
+    address: "",
+    email: "",
   });
 
   const {
