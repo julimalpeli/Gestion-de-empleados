@@ -66,13 +66,54 @@ const EmployeePortal = () => {
     navigate("/login");
   };
 
-  const handleDownloadReceipt = (record) => {
-    // Generate and download receipt PDF
-    console.log("Downloading receipt for:", record.period);
-    alert(
-      `Generando recibo para ${formatPeriod(record.period)}. La descarga comenzará en breve.`,
-    );
-    // TODO: Implement actual PDF generation and download
+  const handleDownloadReceipt = async (record) => {
+    try {
+      const employee = currentEmployee;
+      if (!employee) {
+        alert("No se encontró la información del empleado");
+        return;
+      }
+
+      // Find the actual payroll record with all data
+      const fullPayrollRecord = (payrollRecords || []).find(
+        (pr) => pr.id === record.id,
+      );
+
+      if (!fullPayrollRecord) {
+        alert("No se encontró el registro de liquidación completo");
+        return;
+      }
+
+      const receiptData = {
+        employee: {
+          name: employee.name,
+          dni: employee.dni,
+          position: employee.position,
+          startDate: employee.startDate,
+        },
+        payroll: fullPayrollRecord,
+        period: fullPayrollRecord.period,
+        company: {
+          name: "Cádiz Bar de Tapas",
+          address: "Calle 57 Nro1099 esq. 17",
+          phone: "", // Removed phone number
+        },
+      };
+
+      // Show options to user
+      const format = confirm(
+        "¿Generar como PDF? \n\nOK = PDF\nCancelar = Excel/CSV",
+      );
+
+      if (format) {
+        await generatePayrollReceiptPDF(receiptData);
+      } else {
+        await generatePayrollReceiptExcel(receiptData);
+      }
+    } catch (error) {
+      console.error("Error generating payslip:", error);
+      alert(`Error al generar el recibo: ${error.message}`);
+    }
   };
 
   // Get current employee data
