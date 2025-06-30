@@ -123,8 +123,18 @@ const Employees = () => {
         alert("El DNI es requerido");
         return;
       }
-      if (!/^\d{1,8}$/.test(newEmployee.dni.trim())) {
+      if (
+        newEmployee.documentType === "dni" &&
+        !/^\d{1,8}$/.test(newEmployee.dni.trim())
+      ) {
         alert("El DNI debe ser un número de máximo 8 dígitos");
+        return;
+      }
+      if (
+        newEmployee.documentType !== "dni" &&
+        newEmployee.dni.trim().length < 3
+      ) {
+        alert("El número de documento debe tener al menos 3 caracteres");
         return;
       }
       if (!newEmployee.position.trim()) {
