@@ -439,11 +439,6 @@ const Payroll = () => {
     return `${monthNames[parseInt(month) - 1]} ${year}`;
   };
 
-  const isAguinaldoPeriod = (period: string) => {
-    const [year, month] = period.split("-");
-    return month === "06" || month === "12"; // Junio o Diciembre
-  };
-
   // Manejo de loading y error
   if (payrollLoading || employeesLoading) {
     return (
