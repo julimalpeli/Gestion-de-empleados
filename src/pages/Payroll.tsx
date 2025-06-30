@@ -269,7 +269,7 @@ const Payroll = () => {
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
     // Calcular horas extra si está habilitado
-    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario �� 8
+    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario ÷ 8
     const overtimePay = overtimeEnabled
       ? hourlyRate * (parseInt(overtimeHours) || 0)
       : 0;
@@ -1340,6 +1340,27 @@ const Payroll = () => {
                                     <p>Descargar recibo</p>
                                   </TooltipContent>
                                 </Tooltip>
+
+                                {(isAdmin() || canEditModule("payroll")) && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setRecordToDelete(record);
+                                          setDeleteConfirmOpen(true);
+                                        }}
+                                        title="Eliminar liquidación"
+                                      >
+                                        <Trash2 className="h-4 w-4 text-red-600" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Eliminar liquidación</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
                               </div>
                             </TableCell>
                           </TableRow>
