@@ -5,13 +5,14 @@ import {
   type CreateDocumentRequest,
 } from "@/services/documentService";
 
-export const useDocuments = (employeeId?: string) => {
+export const useDocuments = (employeeId?: string, payrollId?: string) => {
   const [documents, setDocuments] = useState<EmployeeDocument[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDocuments = async (empId?: string) => {
+  const fetchDocuments = async (empId?: string, prId?: string) => {
     const targetEmployeeId = empId || employeeId;
+    const targetPayrollId = prId || payrollId;
 
     if (!targetEmployeeId) {
       console.log("No employee ID provided, skipping fetch");
@@ -21,10 +22,21 @@ export const useDocuments = (employeeId?: string) => {
     try {
       setLoading(true);
       setError(null);
-      console.log("Fetching documents for employee ID:", targetEmployeeId);
+      console.log(
+        "Fetching documents for employee ID:",
+        targetEmployeeId,
+        "payrollId:",
+        targetPayrollId,
+      );
 
-      const data = await documentService.getEmployeeDocuments(targetEmployeeId);
-      console.log("Documents fetched successfully:", data.length);
+      let data;
+      if (targetPayrollId) {
+        data = await documentService.getPayrollDocuments(targetPayrollId);
+        console.log("Payroll documents fetched successfully:", data.length);
+      } else {
+        data = await documentService.getEmployeeDocuments(targetEmployeeId);
+        console.log("Employee documents fetched successfully:", data.length);
+      }
       setDocuments(data);
     } catch (err) {
       console.error("Error in fetchDocuments hook:", err);
