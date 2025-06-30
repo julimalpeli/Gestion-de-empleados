@@ -133,6 +133,7 @@ export default function DocumentManager({
 
       await uploadDocument({
         employeeId: employee.id,
+        payrollId,
         file: uploadForm.file,
         category: uploadForm.category as any,
         description: uploadForm.description,
