@@ -1231,9 +1231,10 @@ const Employees = () => {
                 <p className="text-lg">
                   {viewingEmployee.startDate
                     ? (() => {
-                        const vacationInfo = calculateVacationDays(
-                          viewingEmployee.startDate,
-                        );
+                        const vacationInfo =
+                          employeeService.calculateVacationDays(
+                            viewingEmployee.startDate,
+                          );
                         const years = vacationInfo.years;
                         const months = vacationInfo.totalMonths % 12;
                         if (years > 0) {
@@ -1306,9 +1307,10 @@ const Employees = () => {
                 <p className="text-lg">
                   {viewingEmployee.startDate
                     ? (() => {
-                        const vacationInfo = calculateVacationDays(
-                          viewingEmployee.startDate,
-                        );
+                        const vacationInfo =
+                          employeeService.calculateVacationDays(
+                            viewingEmployee.startDate,
+                          );
                         if (vacationInfo.eligibleForVacations) {
                           return `${vacationInfo.vacationDays} días anuales`;
                         } else {
