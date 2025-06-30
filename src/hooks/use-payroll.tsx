@@ -96,14 +96,24 @@ export const usePayroll = () => {
         .single();
 
       if (error) {
-        console.error("Supabase error:", error);
-        throw error;
+        console.error("Supabase error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          full: error,
+        });
+        throw new Error(error.message || "Database error");
       }
 
       await fetchPayrollRecords();
       return data;
     } catch (err) {
-      console.error("Full error:", err);
+      console.error("Full error details:", {
+        message: err.message,
+        stack: err.stack,
+        full: err,
+      });
       throw new Error(
         err instanceof Error ? err.message : "Error creating payroll record",
       );
