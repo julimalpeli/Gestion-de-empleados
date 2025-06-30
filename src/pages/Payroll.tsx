@@ -293,11 +293,6 @@ const Payroll = () => {
   const currentMonth = new Date().getMonth() + 1;
   const isAguinaldoMonth = currentMonth === 6 || currentMonth === 12;
 
-  const isAguinaldoPeriod = (period: string) => {
-    const [year, month] = period.split("-");
-    return month === "06" || month === "12"; // Junio o Diciembre
-  };
-
   const calculateAguinaldo = (employee, period) => {
     if (!isAguinaldoPeriod(period)) return 0;
 
