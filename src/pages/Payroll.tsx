@@ -1205,9 +1205,43 @@ const Payroll = () => {
                             </TableCell>
                             <TableCell className="font-medium text-green-600">
                               {isAguinaldoPeriod(record.period) &&
-                              record.aguinaldo > 0
-                                ? formatCurrency(record.aguinaldo)
-                                : "-"}
+                              record.aguinaldo > 0 ? (
+                                <div>
+                                  <div>{formatCurrency(record.aguinaldo)}</div>
+                                  {(() => {
+                                    const employee = employees.find(
+                                      (e) => e.name === record.employeeName,
+                                    );
+                                    if (!employee) return null;
+
+                                    const startDate = new Date(
+                                      employee.startDate,
+                                    );
+                                    const [year, month] =
+                                      record.period.split("-");
+                                    const liquidationDate = new Date(
+                                      parseInt(year),
+                                      parseInt(month) - 1,
+                                      1,
+                                    );
+                                    const hasMoreThanSixMonths =
+                                      (liquidationDate - startDate) /
+                                        (1000 * 60 * 60 * 24) >=
+                                      180;
+
+                                    if (!hasMoreThanSixMonths) {
+                                      return (
+                                        <div className="text-xs text-green-700">
+                                          Proporcional
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
+                                </div>
+                              ) : (
+                                "-"
+                              )}
                             </TableCell>
                             <TableCell>
                               {formatCurrency(record.advances)}
