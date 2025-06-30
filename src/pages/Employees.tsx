@@ -238,6 +238,7 @@ const Employees = () => {
       presentismo: employee.presentismo?.toString() || "",
       address: employee.address || "",
       email: employee.email || "",
+      originalEmail: employee.email || "", // Store original email for comparison
     });
     setIsEditDialogOpen(true);
   };
@@ -298,7 +299,10 @@ const Employees = () => {
       await updateEmployee(editingEmployee.id, employeeData);
 
       // Sync email with user account if email was changed
-      if (employeeData.email && employeeData.email !== editingEmployee.email) {
+      if (
+        employeeData.email &&
+        employeeData.email !== editingEmployee.originalEmail
+      ) {
         try {
           await syncEmployeeUserEmail(editingEmployee.id, employeeData.email);
         } catch (error) {
