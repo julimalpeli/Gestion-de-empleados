@@ -78,6 +78,14 @@ export default function DocumentManager({
     getCategoryDisplayName,
   } = useDocuments(employee?.id);
 
+  // Debug logging
+  console.log("DocumentManager state:", {
+    employeeId: employee?.id,
+    documentsCount: documents?.length,
+    loading,
+    error,
+  });
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadForm, setUploadForm] = useState({
     file: null as File | null,
