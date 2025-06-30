@@ -46,7 +46,9 @@ const EmployeePortal = () => {
   };
 
   // Get current employee data
-  const currentEmployee = employees.find((emp) => emp.id === user?.employeeId);
+  const currentEmployee = (employees || []).find(
+    (emp) => emp.id === user?.employeeId,
+  );
 
   const employeeData = currentEmployee
     ? {
