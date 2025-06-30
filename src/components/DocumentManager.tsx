@@ -42,6 +42,8 @@ interface DocumentManagerProps {
   isOpen: boolean;
   onClose: () => void;
   employee: Employee | null;
+  payrollId?: string; // Optional payroll ID for payroll-specific documents
+  title?: string; // Optional custom title
 }
 
 const DOCUMENT_CATEGORIES = [
@@ -68,6 +70,8 @@ export default function DocumentManager({
   isOpen,
   onClose,
   employee,
+  payrollId,
+  title,
 }: DocumentManagerProps) {
   const {
     documents,
@@ -77,11 +81,12 @@ export default function DocumentManager({
     deleteDocument,
     downloadDocument,
     getCategoryDisplayName,
-  } = useDocuments(employee?.id);
+  } = useDocuments(employee?.id, payrollId);
 
   // Debug logging
   console.log("DocumentManager state:", {
     employeeId: employee?.id,
+    payrollId,
     documentsCount: documents?.length,
     loading,
     error,
