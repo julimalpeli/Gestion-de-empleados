@@ -304,6 +304,11 @@ const EmployeePortal = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <label className="text-sm font-medium">DNI</label>
+                    <p className="text-lg font-mono">{employeeData.dni}</p>
+                  </div>
+
+                  <div className="space-y-2">
                     <label className="text-sm font-medium">Puesto</label>
                     <p className="text-lg">{employeeData.position}</p>
                   </div>
