@@ -59,6 +59,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
   const reportData = payrollRecords
     .filter((record) => record.period === selectedPeriod)
     .map((record) => ({
+      id: record.id, // Add unique identifier for React key
       employeeName: record.employeeName,
       period: record.period,
       efectivo: record.informalAmount || 0,
