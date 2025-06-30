@@ -140,8 +140,10 @@ export interface PayrollRecord {
   overtimeAmount?: number;
   bonusAmount?: number;
   netTotal: number;
-  status: "draft" | "pending" | "processed";
+  status: "draft" | "pending" | "approved" | "processed" | "paid";
   processedDate?: string;
+  processedBy?: string;
+  notes?: string;
   createdAt: string;
   updatedAt: string;
 }
