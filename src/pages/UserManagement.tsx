@@ -65,6 +65,7 @@ const UserManagement = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+  const [isChangeMyPasswordOpen, setIsChangeMyPasswordOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newUser, setNewUser] = useState({
     username: "",
@@ -76,6 +77,8 @@ const UserManagement = () => {
     isActive: true,
   });
   const [newPassword, setNewPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const {
     users,
