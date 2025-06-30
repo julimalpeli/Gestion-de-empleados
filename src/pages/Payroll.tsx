@@ -424,6 +424,22 @@ const Payroll = () => {
                 {/* Form */}
                 <div className="space-y-4">
                   <div className="space-y-2">
+                    <Label htmlFor="period">
+                      Período a Liquidar <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="period"
+                      type="month"
+                      value={selectedPeriod}
+                      onChange={(e) => setSelectedPeriod(e.target.value)}
+                      required
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Selecciona el mes y año del período a liquidar
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="employee">Empleado</Label>
                     <Select
                       value={selectedEmployee}
