@@ -586,6 +586,24 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                     }
                   />
                 </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="editDni">DNI (sin puntos)</Label>
+                  <Input
+                    id="editDni"
+                    type="text"
+                    maxLength={8}
+                    defaultValue={editingEmployee.dni}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, ""); // Solo números
+                      setEditingEmployee({
+                        ...editingEmployee,
+                        dni: value,
+                      });
+                    }}
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="editPosition">Puesto</Label>
                   <Select
