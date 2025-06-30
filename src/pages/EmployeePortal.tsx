@@ -327,13 +327,6 @@ const EmployeePortal = () => {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">
-                      ID de Empleado
-                    </label>
-                    <p className="text-lg">#{employeeData.employeeId}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
                       Fecha de Ingreso
                     </label>
                     <p className="text-lg">
