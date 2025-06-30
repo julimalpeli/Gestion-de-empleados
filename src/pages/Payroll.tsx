@@ -227,11 +227,11 @@ const Payroll = () => {
         pending: "pendiente",
         approved: "aprobada",
         paid: "pagada",
-        processed: "procesada"
+        processed: "procesada",
       };
 
       setSuccessMessage(
-        `Liquidación de ${record.employeeName} marcada como ${statusLabels[newStatus]}`
+        `Liquidación de ${record.employeeName} marcada como ${statusLabels[newStatus]}`,
       );
     } catch (error) {
       console.error("Error updating payroll status:", error);
@@ -707,11 +707,14 @@ const Payroll = () => {
                         });
                       } else {
                         // Check if record already exists
-                        const existingRecord = await getExistingPayrollRecord(selectedEmployee, period);
+                        const existingRecord = await getExistingPayrollRecord(
+                          selectedEmployee,
+                          period,
+                        );
 
                         if (existingRecord) {
                           const confirmUpdate = confirm(
-                            `Ya existe una liquidación para este empleado en ${period}. ¿Deseas actualizarla?`
+                            `Ya existe una liquidación para este empleado en ${period}. ¿Deseas actualizarla?`,
                           );
 
                           if (confirmUpdate) {
@@ -739,24 +742,25 @@ const Payroll = () => {
                         } else {
                           // Crear nuevo registro
                           await createPayrollRecord({
-                          employeeId: selectedEmployee,
-                          period,
-                          baseDays: parseInt(workDays),
-                          holidayDays: parseInt(holidayDays) || 0,
-                          baseAmount: calculation.baseAmount,
-                          holidayBonus: calculation.holidayBonus,
-                          aguinaldo: calculation.aguinaldo,
-                          discounts: parseFloat(discounts) || 0,
-                          advances: parseFloat(advances) || 0,
-                          whiteAmount: calculation.whiteAmount,
-                          informalAmount: calculation.informalAmount,
-                          presentismoAmount: calculation.presentismoAmount,
-                          overtimeHours: parseFloat(overtimeHours) || 0,
-                          overtimeAmount: calculation.overtimeAmount,
-                          bonusAmount: parseFloat(bonusAmount) || 0,
-                          netTotal: calculation.total,
-                          status: "processed",
-                        });
+                            employeeId: selectedEmployee,
+                            period,
+                            baseDays: parseInt(workDays),
+                            holidayDays: parseInt(holidayDays) || 0,
+                            baseAmount: calculation.baseAmount,
+                            holidayBonus: calculation.holidayBonus,
+                            aguinaldo: calculation.aguinaldo,
+                            discounts: parseFloat(discounts) || 0,
+                            advances: parseFloat(advances) || 0,
+                            whiteAmount: calculation.whiteAmount,
+                            informalAmount: calculation.informalAmount,
+                            presentismoAmount: calculation.presentismoAmount,
+                            overtimeHours: parseFloat(overtimeHours) || 0,
+                            overtimeAmount: calculation.overtimeAmount,
+                            bonusAmount: parseFloat(bonusAmount) || 0,
+                            netTotal: calculation.total,
+                            status: "processed",
+                          });
+                        }
                       }
 
                       // Limpiar formulario
@@ -854,7 +858,12 @@ const Payroll = () => {
                 {payrollRecords.filter((r) => r.status === "paid").length}
               </div>
               <p className="text-xs text-muted-foreground">
-                {payrollRecords.filter((r) => r.status === "pending" || r.status === "approved").length} pendientes
+                {
+                  payrollRecords.filter(
+                    (r) => r.status === "pending" || r.status === "approved",
+                  ).length
+                }{" "}
+                pendientes
               </p>
             </CardContent>
           </Card>
@@ -910,10 +919,7 @@ const Payroll = () => {
                     </SelectContent>
                   </Select>
 
-                  <Select
-                    value={statusFilter}
-                    onValueChange={setStatusFilter}
-                  >
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger className="w-48">
                       <SelectValue placeholder="Filtrar por estado" />
                     </SelectTrigger>
@@ -1090,7 +1096,9 @@ const Payroll = () => {
                                 </Badge>
                                 {record.processedDate && (
                                   <span className="text-xs text-muted-foreground">
-                                    {new Date(record.processedDate).toLocaleDateString("es-AR")}
+                                    {new Date(
+                                      record.processedDate,
+                                    ).toLocaleDateString("es-AR")}
                                   </span>
                                 )}
                               </div>
@@ -1113,7 +1121,8 @@ const Payroll = () => {
                                       onClick={() => handleEditRecord(record)}
                                       disabled={
                                         record.status === "paid" ||
-                                        (record.status === "processed" && !isAdmin())
+                                        (record.status === "processed" &&
+                                          !isAdmin())
                                       }
                                     >
                                       <Calculator className="h-4 w-4" />
@@ -1123,7 +1132,8 @@ const Payroll = () => {
                                     <p>
                                       {record.status === "paid"
                                         ? "No se puede editar liquidación pagada"
-                                        : record.status === "processed" && !isAdmin()
+                                        : record.status === "processed" &&
+                                            !isAdmin()
                                           ? "Solo admin puede editar liquidaciones procesadas"
                                           : "Editar liquidación"}
                                     </p>
@@ -1137,7 +1147,9 @@ const Payroll = () => {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleStateChange(record, "pending")}
+                                        onClick={() =>
+                                          handleStateChange(record, "pending")
+                                        }
                                       >
                                         <UserCheck className="h-4 w-4 text-orange-600" />
                                       </Button>
@@ -1154,7 +1166,9 @@ const Payroll = () => {
                                       <Button
                                         variant="ghost"
                                         size="sm"
-                                        onClick={() => handleStateChange(record, "approved")}
+                                        onClick={() =>
+                                          handleStateChange(record, "approved")
+                                        }
                                       >
                                         <CheckCircle className="h-4 w-4 text-blue-600" />
                                       </Button>
@@ -1165,22 +1179,26 @@ const Payroll = () => {
                                   </Tooltip>
                                 )}
 
-                                {(record.status === "approved" || record.status === "processed") && isAdmin() && (
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleStateChange(record, "paid")}
-                                      >
-                                        <DollarSign className="h-4 w-4 text-green-600" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Marcar como pagada</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
+                                {(record.status === "approved" ||
+                                  record.status === "processed") &&
+                                  isAdmin() && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() =>
+                                            handleStateChange(record, "paid")
+                                          }
+                                        >
+                                          <DollarSign className="h-4 w-4 text-green-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Marcar como pagada</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
 
                                 <Tooltip>
                                   <TooltipTrigger asChild>
