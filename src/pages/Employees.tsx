@@ -136,6 +136,7 @@ const Employees = () => {
   const [isVacationManagerOpen, setIsVacationManagerOpen] = useState(false);
   const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
     useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     dni: "",
