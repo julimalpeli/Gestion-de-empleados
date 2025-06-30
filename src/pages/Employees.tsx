@@ -75,6 +75,8 @@ const Employees = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+  const [viewingEmployee, setViewingEmployee] = useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     dni: "",
