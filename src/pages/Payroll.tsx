@@ -182,6 +182,7 @@ const Payroll = () => {
   const [editingRecord, setEditingRecord] = useState(null);
   const [employeeFilter, setEmployeeFilter] = useState("active"); // Por defecto solo activos
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedPeriod, setSelectedPeriod] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   // Usar hooks de Supabase
