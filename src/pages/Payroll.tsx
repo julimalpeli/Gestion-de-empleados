@@ -965,21 +965,45 @@ const Payroll = () => {
                               )}
                             </TableCell>
                             <TableCell>
-                              <Badge
-                                variant={
-                                  record.status === "processed"
-                                    ? "default"
+                              <div className="flex flex-col gap-1">
+                                <Badge
+                                  variant={
+                                    record.status === "processed"
+                                      ? "default"
+                                      : record.status === "pending"
+                                        ? "secondary"
+                                        : record.status === "approved"
+                                          ? "default"
+                                          : record.status === "paid"
+                                            ? "default"
+                                            : "outline"
+                                  }
+                                  className={
+                                    record.status === "paid"
+                                      ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                      : record.status === "approved"
+                                        ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                        : ""
+                                  }
+                                >
+                                  {record.status === "processed"
+                                    ? "Procesada"
                                     : record.status === "pending"
-                                      ? "secondary"
-                                      : "outline"
-                                }
-                              >
-                                {record.status === "processed"
-                                  ? "Procesada"
-                                  : record.status === "pending"
-                                    ? "Pendiente"
-                                    : "Borrador"}
-                              </Badge>
+                                      ? "Pendiente"
+                                      : record.status === "approved"
+                                        ? "Aprobada"
+                                        : record.status === "paid"
+                                          ? "Pagada"
+                                          : "Borrador"}
+                                </Badge>
+                                {record.processedDate && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(
+                                      record.processedDate,
+                                    ).toLocaleDateString("es-AR")}
+                                  </span>
+                                )}
+                              </div>
                             </TableCell>
                             <TableCell>
                               <FileUpload
