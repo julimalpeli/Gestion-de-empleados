@@ -1009,7 +1009,7 @@ const Payroll = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{payrollRecords.length}</div>
-              <p className="text-xs text-muted-foreground">Este per��odo</p>
+              <p className="text-xs text-muted-foreground">Este período</p>
             </CardContent>
           </Card>
 
