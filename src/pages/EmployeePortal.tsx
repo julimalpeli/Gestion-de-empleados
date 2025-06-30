@@ -34,6 +34,10 @@ import { usePayroll } from "@/hooks/use-payroll";
 import { useVacations } from "@/hooks/use-vacations";
 import { useDocuments } from "@/hooks/use-documents";
 import { employeeService } from "@/services/employeeService";
+import {
+  generatePayrollReceiptPDF,
+  generatePayrollReceiptExcel,
+} from "@/utils/receiptGenerator";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
