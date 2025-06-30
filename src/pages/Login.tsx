@@ -54,8 +54,12 @@ const Login = () => {
       } else {
         setError("Usuario o contraseña incorrectos");
       }
+    } catch (error) {
+      console.error("Login error:", error);
+      setError("Error al intentar iniciar sesión");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const fillDemoCredentials = (userType: keyof typeof DEMO_USERS) => {
