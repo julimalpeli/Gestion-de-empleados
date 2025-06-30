@@ -542,7 +542,7 @@ const EmployeePortal = () => {
                                 variant="ghost"
                                 size="sm"
                                 disabled={!record.hasDocument}
-                                title="Descargar recibo"
+                                title="Generar recibo"
                                 onClick={() => handleDownloadReceipt(record)}
                               >
                                 <Download className="h-4 w-4" />
