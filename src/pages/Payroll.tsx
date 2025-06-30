@@ -289,7 +289,7 @@ const Payroll = () => {
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
 
-  // Check if current month is aguinaldo month (June or December)
+  // Check if current month is aguinaldo month (June or December) - kept for backward compatibility
   const currentMonth = new Date().getMonth() + 1;
   const isAguinaldoMonth = currentMonth === 6 || currentMonth === 12;
 
