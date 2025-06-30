@@ -195,6 +195,8 @@ const Employees = () => {
         informalWage: "",
         presentismo: "",
         startDate: "",
+        address: "",
+        email: "",
       });
     } catch (error) {
       console.error("Error creating employee:", error);
