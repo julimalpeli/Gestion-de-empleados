@@ -70,6 +70,7 @@ class DocumentService {
       // Save document metadata to database
       const documentData = {
         employee_id: request.employeeId,
+        payroll_id: request.payrollId || null,
         file_name: fileName,
         original_file_name: request.file.name,
         file_type: request.file.type,
