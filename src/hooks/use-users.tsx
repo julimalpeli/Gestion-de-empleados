@@ -195,6 +195,23 @@ export const useUsers = () => {
     }
   };
 
+  // Update user email specifically
+  const updateUserEmail = async (employeeId: string, email: string) => {
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ email })
+        .eq("employee_id", employeeId);
+
+      if (error) throw error;
+      await fetchUsers();
+    } catch (err) {
+      throw new Error(
+        err instanceof Error ? err.message : "Error updating user email",
+      );
+    }
+  };
+
   // Cargar datos al montar el componente
   useEffect(() => {
     fetchUsers();
@@ -208,6 +225,7 @@ export const useUsers = () => {
     createUser,
     createEmployeeUser,
     updateUser,
+    updateUserEmail,
     resetPassword,
     deleteUser,
   };
