@@ -215,10 +215,23 @@ export const validateLogin = async (username: string, password: string) => {
       return null;
     }
 
-    // Verificar contraseña (simple base64 decode para demo)
-    const storedPassword = atob(user.password_hash);
-    if (storedPassword !== password) {
-      console.log("❌ Invalid password");
+    // Verificar contraseña usando Supabase Auth
+    try {
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email: user.email,
+          password: password,
+        });
+
+      if (authError || !authData.user) {
+        console.log("❌ Invalid password:", authError?.message);
+        return null;
+      }
+
+      // Sign out immediately after validation (we're using session-based auth)
+      await supabase.auth.signOut();
+    } catch (authValidationError) {
+      console.log("❌ Password validation error:", authValidationError);
       return null;
     }
 
