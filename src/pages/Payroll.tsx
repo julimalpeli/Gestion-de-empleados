@@ -1360,12 +1360,31 @@ const Payroll = () => {
                               </div>
                             </TableCell>
                             <TableCell>
-                              <FileUpload
-                                entityId={record.id}
-                                entityType="payroll"
-                                title={`Documentos - ${record.employeeName} (${record.period})`}
-                                description="Subir recibos de sueldo, comprobantes y otros documentos de la liquidación"
-                              />
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      const employee = employees.find(
+                                        (e) => e.name === record.employeeName,
+                                      );
+                                      if (employee) {
+                                        setSelectedPayrollRecord(record);
+                                        setSelectedEmployeeForDocs(employee);
+                                        setIsPayrollDocManagerOpen(true);
+                                      }
+                                    }}
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>
+                                    Gestionar documentos de esta liquidación
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end gap-1">
