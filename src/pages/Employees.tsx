@@ -983,11 +983,7 @@ const Employees = () => {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  {editingEmployee.documentType === "dni"
-                    ? "Solo números, sin puntos ni espacios"
-                    : editingEmployee.documentType === "passport"
-                      ? "Letras y números según formato del pasaporte"
-                      : "Según formato del documento"}
+                  El número de documento no se puede modificar por seguridad
                 </p>
               </div>
 
