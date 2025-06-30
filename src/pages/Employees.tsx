@@ -335,9 +335,20 @@ const Employees = () => {
       setEmployeeToDelete(null);
     } catch (error) {
       console.error("Error deleting employee:", error);
-      alert(
-        `Error al eliminar empleado: ${error instanceof Error ? error.message : "Error desconocido"}`,
-      );
+
+      // Get the actual error message
+      let errorMessage = "Error desconocido";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error && typeof error === "object" && "message" in error) {
+        errorMessage = String(error.message);
+      }
+
+      alert(`Error al eliminar empleado: ${errorMessage}`);
+      setDeleteConfirmOpen(false);
+      setEmployeeToDelete(null);
     }
   };
 
