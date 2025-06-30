@@ -115,6 +115,14 @@ const Employees = () => {
     setSuccessMessage(message);
   };
 
+  const syncEmployeeUserEmail = async (employeeId, email) => {
+    try {
+      await updateUserEmail(employeeId, email);
+    } catch (error) {
+      console.error("Failed to sync user email:", error);
+    }
+  };
+
   const handleAddEmployee = async () => {
     try {
       if (!newEmployee.name.trim()) {
