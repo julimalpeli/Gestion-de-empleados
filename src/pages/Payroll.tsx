@@ -48,6 +48,7 @@ import {
   Users,
   Info,
   TrendingUp,
+  Trash2,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
