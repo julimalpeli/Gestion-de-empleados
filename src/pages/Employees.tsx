@@ -1058,10 +1058,57 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                               disponibles
                             </Badge>
                           </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-xs"
+                            onClick={() => openVacationManager(employee)}
+                          >
+                            <Plane className="h-3 w-3 mr-1" />
+                            Gestionar
+                          </Button>
+                        </div>
+                      );
+                    })()}
+                  </TableCell>
+
+                  {/* Acciones */}
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      {/* Info Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Ver información completa del empleado"
+                        onClick={() => showEmployeeInfo(employee)}
+                      >
+                        <Info className="h-4 w-4" />
+                      </Button>
+
+                      {/* Edit Button */}
+                      <PermissionGate module="employees" action="edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Editar datos del empleado"
+                          onClick={() => handleEditEmployee(employee)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </PermissionGate>
+
+                      {/* Toggle Status Button */}
+                      <PermissionGate module="employees" action="edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title={
                             employee.status === "active"
                               ? "Desactivar empleado"
                               : "Activar empleado"
                           }
+                          onClick={() => handleToggleStatus(employee)}
+                        >
                         >
                           {employee.status === "active" ? (
                             <UserX className="h-4 w-4 text-red-500" />
