@@ -540,35 +540,46 @@ const EmployeePortal = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {vacationHistory.map((vacation) => (
-                          <TableRow key={vacation.id}>
-                            <TableCell>
-                              {formatDate(vacation.startDate)}
-                            </TableCell>
-                            <TableCell>
-                              {formatDate(vacation.endDate)}
-                            </TableCell>
-                            <TableCell>{vacation.days} días</TableCell>
-                            <TableCell>{vacation.reason}</TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  vacation.status === "approved"
-                                    ? "default"
+                        {vacationHistory.length > 0 ? (
+                          vacationHistory.map((vacation) => (
+                            <TableRow key={vacation.id}>
+                              <TableCell>
+                                {formatDate(vacation.startDate)}
+                              </TableCell>
+                              <TableCell>
+                                {formatDate(vacation.endDate)}
+                              </TableCell>
+                              <TableCell>{vacation.days} días</TableCell>
+                              <TableCell>{vacation.reason}</TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    vacation.status === "approved"
+                                      ? "default"
+                                      : vacation.status === "pending"
+                                        ? "secondary"
+                                        : "destructive"
+                                  }
+                                >
+                                  {vacation.status === "approved"
+                                    ? "Aprobado"
                                     : vacation.status === "pending"
-                                      ? "secondary"
-                                      : "destructive"
-                                }
-                              >
-                                {vacation.status === "approved"
-                                  ? "Aprobado"
-                                  : vacation.status === "pending"
-                                    ? "Pendiente"
-                                    : "Rechazado"}
-                              </Badge>
+                                      ? "Pendiente"
+                                      : "Rechazado"}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell
+                              colSpan={5}
+                              className="text-center text-muted-foreground py-8"
+                            >
+                              No hay solicitudes de vacaciones registradas
                             </TableCell>
                           </TableRow>
-                        ))}
+                        )}
                       </TableBody>
                     </Table>
                   </div>
