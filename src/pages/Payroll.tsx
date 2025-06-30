@@ -201,6 +201,42 @@ const Payroll = () => {
 
   const { isAdmin, canEditModule } = usePermissions();
 
+  // Success message effect
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  const handleStateChange = async (record, newStatus) => {
+    try {
+      const updateData = {
+        status: newStatus,
+        processedDate: new Date().toISOString(),
+        processedBy: "admin", // TODO: Get current user
+      };
+
+      await updatePayrollRecord(record.id, updateData);
+
+      const statusLabels = {
+        pending: "pendiente",
+        approved: "aprobada",
+        paid: "pagada",
+        processed: "procesada",
+      };
+
+      setSuccessMessage(
+        `Liquidación de ${record.employeeName} marcada como ${statusLabels[newStatus]}`,
+      );
+    } catch (error) {
+      console.error("Error updating payroll status:", error);
+      alert("Error al actualizar el estado de la liquidación");
+    }
+  };
+
   const handleEditRecord = (record) => {
     setIsEditMode(true);
     setEditingRecord(record);
