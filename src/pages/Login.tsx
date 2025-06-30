@@ -47,6 +47,14 @@ const Login = () => {
       const userData = await validateLogin(username, password);
 
       if (userData) {
+        // Verificar si necesita cambiar contraseña
+        if (userData.needsPasswordChange) {
+          setPendingUser(userData);
+          setShowPasswordChange(true);
+          setIsLoading(false);
+          return;
+        }
+
         login(userData);
 
         // Redirect based on role
