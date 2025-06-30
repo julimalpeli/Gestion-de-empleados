@@ -118,6 +118,21 @@ const App = () => (
               }
             />
 
+            {/* User Management - Solo Admin */}
+            <Route
+              path="/usuarios"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <UserManagement />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
             {/* Fallback routes */}
             <Route path="*" element={<NotFound />} />
           </Routes>
