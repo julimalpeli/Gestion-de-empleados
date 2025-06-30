@@ -231,6 +231,7 @@ export const usePayroll = () => {
     loading,
     error,
     fetchPayrollRecords,
+    getExistingPayrollRecord,
     createPayrollRecord,
     updatePayrollRecord,
     deletePayrollRecord,
