@@ -96,10 +96,9 @@ const Payroll = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [recordToDelete, setRecordToDelete] = useState(null);
-  const [isDocumentManagerOpen, setIsDocumentManagerOpen] = useState(false);
-  const [selectedEmployeeForDocs, setSelectedEmployeeForDocs] = useState(null);
   const [isPayrollDocManagerOpen, setIsPayrollDocManagerOpen] = useState(false);
   const [selectedPayrollRecord, setSelectedPayrollRecord] = useState(null);
+  const [selectedEmployeeForDocs, setSelectedEmployeeForDocs] = useState(null);
 
   // Usar hooks de Supabase
   const {
@@ -375,7 +374,7 @@ const Payroll = () => {
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
     // Calcular horas extra si está habilitado
-    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario ÷ 8
+    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario �� 8
     const overtimePay = overtimeEnabled
       ? hourlyRate * (parseInt(overtimeHours) || 0)
       : 0;
@@ -1076,33 +1075,11 @@ const Payroll = () => {
           <TabsContent value="current">
             <Card>
               <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle>Liquidaciones del Período</CardTitle>
-                    <CardDescription>
-                      Estado actual de las liquidaciones registradas
-                    </CardDescription>
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      // Use the first employee as default, or let user select
-                      const firstEmployee = employees.find(
-                        (emp) => emp.status === "active",
-                      );
-                      if (firstEmployee) {
-                        setSelectedEmployeeForDocs(firstEmployee);
-                        setIsDocumentManagerOpen(true);
-                      } else {
-                        alert(
-                          "No hay empleados activos para gestionar documentos",
-                        );
-                      }
-                    }}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Gestionar Documentos
-                  </Button>
+                <div>
+                  <CardTitle>Liquidaciones del Período</CardTitle>
+                  <CardDescription>
+                    Estado actual de las liquidaciones registradas
+                  </CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
@@ -1642,16 +1619,6 @@ const Payroll = () => {
             </div>
           </div>
         )}
-
-        {/* Document Manager */}
-        <DocumentManager
-          isOpen={isDocumentManagerOpen}
-          onClose={() => {
-            setIsDocumentManagerOpen(false);
-            setSelectedEmployeeForDocs(null);
-          }}
-          employee={selectedEmployeeForDocs}
-        />
 
         {/* Payroll-specific Document Manager */}
         <DocumentManager
