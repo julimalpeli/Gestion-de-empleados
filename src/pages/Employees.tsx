@@ -203,6 +203,7 @@ const Employees = () => {
   const handleEditEmployee = (employee) => {
     setEditingEmployee({
       ...employee,
+      documentType: employee.documentType || "dni",
       whiteWage: employee.whiteWage?.toString() || "",
       informalWage: employee.informalWage?.toString() || "",
       presentismo: employee.presentismo?.toString() || "",
