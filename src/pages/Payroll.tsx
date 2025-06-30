@@ -722,14 +722,46 @@ const Payroll = () => {
                             <span>+{formatCurrency(calculation.bonusPay)}</span>
                           </div>
                         )}
-                        {calculation.aguinaldo > 0 && (
-                          <div className="flex justify-between text-green-600">
-                            <span>
-                              Aguinaldo ({formatPeriod(selectedPeriod)}):
-                            </span>
-                            <span>
-                              +{formatCurrency(calculation.aguinaldo)}
-                            </span>
+                        {calculation.aguinaldo > 0 && selectedEmployee && (
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-green-600">
+                              <span>
+                                Aguinaldo ({formatPeriod(selectedPeriod)}):
+                              </span>
+                              <span>
+                                +{formatCurrency(calculation.aguinaldo)}
+                              </span>
+                            </div>
+                            {(() => {
+                              const employee = employees.find(
+                                (e) => e.id.toString() === selectedEmployee,
+                              );
+                              if (!employee) return null;
+
+                              const startDate = new Date(employee.startDate);
+                              const [year, month] = selectedPeriod.split("-");
+                              const liquidationDate = new Date(
+                                parseInt(year),
+                                parseInt(month) - 1,
+                                1,
+                              );
+                              const hasMoreThanSixMonths =
+                                (liquidationDate - startDate) /
+                                  (1000 * 60 * 60 * 24) >=
+                                180;
+
+                              if (!hasMoreThanSixMonths) {
+                                return (
+                                  <div className="text-xs text-green-700">
+                                    Proporcional - Ingreso:{" "}
+                                    {new Date(
+                                      employee.startDate,
+                                    ).toLocaleDateString("es-AR")}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                         )}
                         <div className="flex justify-between font-medium">
