@@ -977,22 +977,9 @@ const Employees = () => {
                 <Input
                   id="edit-dni"
                   type="text"
-                  placeholder={
-                    editingEmployee.documentType === "dni"
-                      ? "Ej: 12345678"
-                      : editingEmployee.documentType === "passport"
-                        ? "Ej: ABC123456"
-                        : "Número de documento"
-                  }
-                  maxLength={editingEmployee.documentType === "dni" ? 8 : 20}
                   value={editingEmployee.dni}
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    if (editingEmployee.documentType === "dni") {
-                      value = value.replace(/\D/g, "");
-                    }
-                    setEditingEmployee({ ...editingEmployee, dni: value });
-                  }}
+                  disabled
+                  className="bg-muted text-muted-foreground"
                   required
                 />
                 <p className="text-xs text-muted-foreground">
