@@ -800,21 +800,62 @@ const Employees = () => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="edit-documentType">
+                  Tipo de Documento <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={editingEmployee.documentType}
+                  onValueChange={(value) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      documentType: value,
+                    })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dni">DNI</SelectItem>
+                    <SelectItem value="passport">Pasaporte</SelectItem>
+                    <SelectItem value="ce">Cédula de Extranjería</SelectItem>
+                    <SelectItem value="ci">Cédula de Identidad</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="edit-dni">
-                  DNI (sin puntos) <span className="text-red-500">*</span>
+                  Número de Documento <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="edit-dni"
                   type="text"
-                  placeholder="Ej: 12345678"
-                  maxLength={8}
+                  placeholder={
+                    editingEmployee.documentType === "dni"
+                      ? "Ej: 12345678"
+                      : editingEmployee.documentType === "passport"
+                        ? "Ej: ABC123456"
+                        : "Número de documento"
+                  }
+                  maxLength={editingEmployee.documentType === "dni" ? 8 : 20}
                   value={editingEmployee.dni}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
+                    let value = e.target.value;
+                    if (editingEmployee.documentType === "dni") {
+                      value = value.replace(/\D/g, "");
+                    }
                     setEditingEmployee({ ...editingEmployee, dni: value });
                   }}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  {editingEmployee.documentType === "dni"
+                    ? "Solo números, sin puntos ni espacios"
+                    : editingEmployee.documentType === "passport"
+                      ? "Letras y números según formato del pasaporte"
+                      : "Según formato del documento"}
+                </p>
               </div>
 
               <div className="space-y-2">
