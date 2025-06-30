@@ -823,6 +823,27 @@ const Payroll = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Filtro de empleados */}
+                <div className="mb-4">
+                  <Select
+                    value={employeeFilter}
+                    onValueChange={setEmployeeFilter}
+                  >
+                    <SelectTrigger className="w-64">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">
+                        Solo empleados activos
+                      </SelectItem>
+                      <SelectItem value="all">Todos los empleados</SelectItem>
+                      <SelectItem value="inactive">
+                        Solo empleados inactivos
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
