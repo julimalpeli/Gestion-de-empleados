@@ -1519,13 +1519,43 @@ const Payroll = () => {
                           <TableHead>Empleado</TableHead>
                           <TableHead>Período Liquidado</TableHead>
                           <TableHead>Días Base</TableHead>
+                          <TableHead>Feriados</TableHead>
+                          <TableHead>Horas Extras</TableHead>
+                          <TableHead>Bono Libre</TableHead>
+                          <TableHead>Descuentos</TableHead>
+                          <TableHead>Aguinaldo</TableHead>
+                          <TableHead>Adelantos</TableHead>
+                          <TableHead>En Blanco</TableHead>
+                          <TableHead>Informal</TableHead>
+                          <TableHead>Presentismo</TableHead>
                           <TableHead>Total Neto</TableHead>
                           <TableHead>Estado</TableHead>
+                          <TableHead>Documentos</TableHead>
                           <TableHead className="text-right">Acciones</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {historyRecords
+                          .filter((record) => {
+                            const employee = employees.find(
+                              (e) => e.name === record.employeeName,
+                            );
+                            if (!employee) return false;
+
+                            // Filter by employee status
+                            let employeeMatch = true;
+                            if (employeeFilter === "active")
+                              employeeMatch = employee.status === "active";
+                            else if (employeeFilter === "inactive")
+                              employeeMatch = employee.status === "inactive";
+
+                            // Filter by liquidation status
+                            let statusMatch = true;
+                            if (statusFilter !== "all")
+                              statusMatch = record.status === statusFilter;
+
+                            return employeeMatch && statusMatch;
+                          })
                           .sort((a, b) => b.period.localeCompare(a.period)) // Sort by period descending
                           .map((record) => (
                             <TableRow key={record.id}>
@@ -1541,18 +1571,224 @@ const Payroll = () => {
                                 )}
                               </TableCell>
                               <TableCell>{record.baseDays} días</TableCell>
-                              <TableCell className="font-medium text-green-600">
-                                {formatCurrency(record.netTotal)}
+                              <TableCell>
+                                {record.holidayDays > 0 ? (
+                                  <div>
+                                    <div className="font-medium">
+                                      {formatCurrency(record.holidayBonus)}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {record.holidayDays} días
+                                    </div>
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
                               </TableCell>
                               <TableCell>
-                                <Badge
-                                  variant={getStatusVariant(record.status)}
-                                >
-                                  {getStatusText(record.status)}
-                                </Badge>
+                                {record.overtimeHours > 0 ? (
+                                  <div>
+                                    <div className="font-medium">
+                                      {formatCurrency(record.overtimeAmount)}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {record.overtimeHours} hs
+                                    </div>
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {record.bonusAmount > 0 ? (
+                                  <span className="text-green-600 font-medium">
+                                    {formatCurrency(record.bonusAmount)}
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {record.discounts > 0 ? (
+                                  <span className="text-red-600">
+                                    {formatCurrency(record.discounts)}
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium text-green-600">
+                                {isAguinaldoPeriod(record.period) &&
+                                record.aguinaldo > 0 ? (
+                                  <div>
+                                    <div>
+                                      {formatCurrency(record.aguinaldo)}
+                                    </div>
+                                    {(() => {
+                                      const employee = employees.find(
+                                        (e) => e.name === record.employeeName,
+                                      );
+                                      if (!employee) return null;
+
+                                      const startDate = new Date(
+                                        employee.startDate,
+                                      );
+                                      const [year, month] =
+                                        record.period.split("-");
+                                      const liquidationDate = new Date(
+                                        parseInt(year),
+                                        parseInt(month) - 1,
+                                        1,
+                                      );
+                                      const hasMoreThanSixMonths =
+                                        (liquidationDate - startDate) /
+                                          (1000 * 60 * 60 * 24) >=
+                                        180;
+
+                                      if (!hasMoreThanSixMonths) {
+                                        return (
+                                          <div className="text-xs text-green-700">
+                                            Proporcional
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {formatCurrency(record.advances)}
+                              </TableCell>
+                              <TableCell>
+                                {formatCurrency(record.whiteAmount)}
+                              </TableCell>
+                              <TableCell>
+                                {formatCurrency(record.informalAmount)}
+                              </TableCell>
+                              <TableCell>
+                                {record.presentismoAmount > 0 ? (
+                                  <span className="text-green-600 font-medium">
+                                    {formatCurrency(record.presentismoAmount)}
+                                  </span>
+                                ) : (
+                                  <span className="text-red-600">Perdido</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {formatCurrency(
+                                  record.netTotal +
+                                    (isAguinaldoPeriod(record.period)
+                                      ? record.aguinaldo || 0
+                                      : 0),
+                                )}
+                                {isAguinaldoPeriod(record.period) &&
+                                  record.aguinaldo > 0 && (
+                                    <div className="text-xs text-green-600">
+                                      Incluye aguinaldo:{" "}
+                                      {formatCurrency(record.aguinaldo)}
+                                    </div>
+                                  )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-col gap-1">
+                                  <Badge
+                                    variant={
+                                      record.status === "processed"
+                                        ? "default"
+                                        : record.status === "pending"
+                                          ? "secondary"
+                                          : record.status === "approved"
+                                            ? "default"
+                                            : record.status === "paid"
+                                              ? "default"
+                                              : "outline"
+                                    }
+                                    className={
+                                      record.status === "paid"
+                                        ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                        : record.status === "approved"
+                                          ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                          : ""
+                                    }
+                                  >
+                                    {record.status === "processed"
+                                      ? "Procesada"
+                                      : record.status === "pending"
+                                        ? "Pendiente"
+                                        : record.status === "approved"
+                                          ? "Aprobada"
+                                          : record.status === "paid"
+                                            ? "Pagada"
+                                            : "Borrador"}
+                                  </Badge>
+                                  {record.processedDate && (
+                                    <span className="text-xs text-muted-foreground">
+                                      {new Date(
+                                        record.processedDate,
+                                      ).toLocaleDateString("es-AR")}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const employee = employees.find(
+                                          (e) => e.name === record.employeeName,
+                                        );
+                                        if (employee) {
+                                          setSelectedPayrollRecord(record);
+                                          setSelectedEmployeeForDocs(employee);
+                                          setIsPayrollDocManagerOpen(true);
+                                        }
+                                      }}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      Gestionar documentos de esta liquidación
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
                               </TableCell>
                               <TableCell className="text-right">
-                                <div className="flex justify-end gap-1">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditRecord(record)}
+                                        disabled={
+                                          record.status === "paid" ||
+                                          (record.status === "processed" &&
+                                            !isAdmin())
+                                        }
+                                      >
+                                        <Calculator className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>
+                                        {record.status === "paid"
+                                          ? "No se puede editar liquidación pagada"
+                                          : record.status === "processed" &&
+                                              !isAdmin()
+                                            ? "Solo admin puede editar liquidaciones procesadas"
+                                            : "Editar liquidación"}
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
+
                                   <Tooltip>
                                     <TooltipTrigger asChild>
                                       <Button
@@ -1567,6 +1803,27 @@ const Payroll = () => {
                                       <p>Generar recibo</p>
                                     </TooltipContent>
                                   </Tooltip>
+
+                                  {isAdmin() && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            setRecordToDelete(record);
+                                            setDeleteConfirmOpen(true);
+                                          }}
+                                          className="text-red-600 hover:text-red-700"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Eliminar liquidación</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
                                 </div>
                               </TableCell>
                             </TableRow>
