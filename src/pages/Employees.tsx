@@ -1352,6 +1352,16 @@ const Employees = () => {
         employee={selectedEmployeeForVacations}
       />
 
+      {/* Document Manager */}
+      <DocumentManager
+        isOpen={isDocumentManagerOpen}
+        onClose={() => {
+          setIsDocumentManagerOpen(false);
+          setSelectedEmployeeForDocuments(null);
+        }}
+        employee={selectedEmployeeForDocuments}
+      />
+
       {/* Success Message */}
       {successMessage && (
         <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
