@@ -815,7 +815,7 @@ const Employees = () => {
                             }
                           >
                             {employee.status === "active" ? (
-                              <UserX className="h-4 w-4" />
+                              <UserX className="h-4 w-4 text-red-600" />
                             ) : (
                               <UserCheck className="h-4 w-4" />
                             )}
