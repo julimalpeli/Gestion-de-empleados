@@ -665,6 +665,77 @@ const EmployeePortal = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="documents">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="h-5 w-5" />
+                  Mis Documentos
+                </CardTitle>
+                <CardDescription>
+                  Consulta y descarga tus documentos laborales
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {documentsLoading ? (
+                  <div className="text-center py-8">
+                    <p>Cargando documentos...</p>
+                  </div>
+                ) : documents.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                    <p>No tienes documentos disponibles</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Documento</TableHead>
+                          <TableHead>Categoría</TableHead>
+                          <TableHead>Fecha</TableHead>
+                          <TableHead className="text-right">
+                            Descargar
+                          </TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {documents.map((doc) => (
+                          <TableRow key={doc.id}>
+                            <TableCell className="font-medium">
+                              {doc.originalFileName}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="outline">
+                                {getCategoryDisplayName(doc.category)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {new Date(doc.uploadedAt).toLocaleDateString(
+                                "es-AR",
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  downloadDocument(doc.id, doc.originalFileName)
+                                }
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
