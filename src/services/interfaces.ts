@@ -161,7 +161,10 @@ export interface CreatePayrollRequest {
 }
 
 export interface UpdatePayrollRequest extends Partial<CreatePayrollRequest> {
-  status?: "draft" | "pending" | "processed";
+  status?: "draft" | "pending" | "approved" | "processed" | "paid";
+  processedDate?: string;
+  processedBy?: string;
+  notes?: string;
 }
 
 export interface VacationRequest {
