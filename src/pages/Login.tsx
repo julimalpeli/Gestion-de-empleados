@@ -235,6 +235,13 @@ const Login = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Modal de cambio de contraseña obligatorio */}
+      <ForcePasswordChange
+        isOpen={showPasswordChange}
+        username={username}
+        onPasswordChanged={handlePasswordChanged}
+      />
     </div>
   );
 };
