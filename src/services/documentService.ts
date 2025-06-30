@@ -28,44 +28,94 @@ class DocumentService {
     request: CreateDocumentRequest,
   ): Promise<EmployeeDocument> {
     try {
+      console.log("Starting document upload:", {
+        employeeId: request.employeeId,
+        fileName: request.file.name,
+        fileSize: request.file.size,
+        fileType: request.file.type,
+        category: request.category,
+      });
+
       const fileExt = request.file.name.split(".").pop();
       const fileName = `${request.employeeId}/${Date.now()}_${request.category}.${fileExt}`;
+
+      console.log("Generated file path:", fileName);
 
       // Upload file to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from(this.BUCKET_NAME)
         .upload(fileName, request.file);
 
-      if (uploadError) throw uploadError;
+      console.log("Storage upload result:", { uploadData, uploadError });
+
+      if (uploadError) {
+        console.error(
+          "Storage upload error:",
+          JSON.stringify(uploadError, null, 2),
+        );
+        throw new Error(
+          `Storage upload failed: ${uploadError.message || uploadError.error || "Unknown storage error"}`,
+        );
+      }
 
       // Get public URL
       const {
         data: { publicUrl },
       } = supabase.storage.from(this.BUCKET_NAME).getPublicUrl(fileName);
 
+      console.log("Generated public URL:", publicUrl);
+
       // Save document metadata to database
+      const documentData = {
+        employee_id: request.employeeId,
+        file_name: fileName,
+        original_file_name: request.file.name,
+        file_type: request.file.type,
+        file_size: request.file.size,
+        category: request.category,
+        description: request.description,
+        file_url: publicUrl,
+        uploaded_by: "system", // TODO: Get from auth context
+      };
+
+      console.log("Inserting document metadata:", documentData);
+
       const { data, error } = await supabase
         .from("employee_documents")
-        .insert({
-          employee_id: request.employeeId,
-          file_name: fileName,
-          original_file_name: request.file.name,
-          file_type: request.file.type,
-          file_size: request.file.size,
-          category: request.category,
-          description: request.description,
-          file_url: publicUrl,
-          uploaded_by: "system", // TODO: Get from auth context
-        })
+        .insert(documentData)
         .select()
         .single();
 
-      if (error) throw error;
+      console.log("Database insert result:", { data, error });
 
-      return this.mapFromSupabase(data);
+      if (error) {
+        console.error("Database insert error:", JSON.stringify(error, null, 2));
+
+        // Handle specific database errors
+        if (error.code === "42P01") {
+          throw new Error(
+            "La tabla de documentos no existe. Contacta al administrador para configurar el sistema.",
+          );
+        }
+
+        throw new Error(
+          `Database error: ${error.message || error.details || error.hint || "Unknown database error"}`,
+        );
+      }
+
+      const result = this.mapFromSupabase(data);
+      console.log("Document uploaded successfully:", result);
+      return result;
     } catch (error) {
       console.error("Error uploading document:", error);
-      throw new Error("Failed to upload document");
+
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      throw new Error(
+        `Failed to upload document: ${error && typeof error === "object" ? JSON.stringify(error) : String(error)}`,
+      );
     }
   }
 
