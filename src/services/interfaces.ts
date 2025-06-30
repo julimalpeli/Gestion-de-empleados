@@ -112,11 +112,14 @@ export interface Employee {
 export interface CreateEmployeeRequest {
   name: string;
   dni: string;
+  documentType?: string;
   position: string;
   whiteWage: number;
   informalWage: number;
   presentismo: number;
   startDate: string;
+  address?: string;
+  email?: string;
 }
 
 export interface UpdateEmployeeRequest extends Partial<CreateEmployeeRequest> {
