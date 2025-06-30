@@ -816,37 +816,51 @@ const Employees = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewEmployee(employee)}
-                          title="Ver información del empleado"
-                        >
-                          <Info className="h-4 w-4" />
-                        </Button>
+                      <TooltipProvider>
+                        <div className="flex justify-end gap-1">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleViewEmployee(employee)}
+                              >
+                                <Info className="h-4 w-4" />
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Ver información del empleado</p>
+                            </TooltipContent>
+                          </Tooltip>
 
-                        <PermissionGate module="vacations" action="view">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setSelectedEmployeeForVacations(employee);
-                              setIsVacationManagerOpen(true);
-                            }}
-                            title="Gestionar vacaciones"
-                          >
-                            <Plane className="h-4 w-4" />
-                          </Button>
-                        </PermissionGate>
+                          <PermissionGate module="vacations" action="view">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedEmployeeForVacations(employee);
+                                    setIsVacationManagerOpen(true);
+                                  }}
+                                >
+                                  <Plane className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Gestionar vacaciones</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </PermissionGate>
 
-                        <PermissionGate module="employees" action="edit">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditEmployee(employee)}
-                            title="Editar empleado"
-                          >
+                          <PermissionGate module="employees" action="edit">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleEditEmployee(employee)}
+                                >
                             <Edit className="h-4 w-4" />
                           </Button>
                         </PermissionGate>
