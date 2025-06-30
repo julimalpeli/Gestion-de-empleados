@@ -24,6 +24,7 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   hasPermission: (permission: string) => boolean;
+  changePassword: (newPassword: string) => Promise<void>;
 }
 
 // Demo users with different roles
@@ -131,12 +132,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     );
   };
 
+  const changePassword = async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      // Update user data to remove password change requirement
+      if (user?.needsPasswordChange) {
+        const updatedUser = { ...user, needsPasswordChange: false };
+        setUser(updatedUser);
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+    } catch (error) {
+      console.error("Error changing password:", error);
+      throw error;
+    }
+  };
+
   const value = {
     user,
     login,
     logout,
     isAuthenticated: !!user,
     hasPermission,
+    changePassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
