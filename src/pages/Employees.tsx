@@ -258,6 +258,9 @@ const Employees = () => {
         presentismo: editingEmployee.presentismo,
         startDate: editingEmployee.startDate,
       });
+      setSuccessMessage(
+        `Empleado ${editingEmployee.name} actualizado exitosamente`,
+      );
       setIsEditDialogOpen(false);
       setEditingEmployee(null);
     } catch (error) {
@@ -270,6 +273,9 @@ const Employees = () => {
     try {
       const newStatus = employee.status === "active" ? "inactive" : "active";
       await updateEmployee(employee.id, { status: newStatus });
+      setSuccessMessage(
+        `Estado de ${employee.name} cambiado a ${newStatus === "active" ? "Activo" : "Inactivo"}`,
+      );
     } catch (error) {
       console.error("Error toggling status:", error);
       alert("Error al cambiar estado del empleado");
