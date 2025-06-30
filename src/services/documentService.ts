@@ -71,18 +71,44 @@ class DocumentService {
 
   async getEmployeeDocuments(employeeId: string): Promise<EmployeeDocument[]> {
     try {
+      console.log("Fetching documents for employee:", employeeId);
+
       const { data, error } = await supabase
         .from("employee_documents")
         .select("*")
         .eq("employee_id", employeeId)
         .order("uploaded_at", { ascending: false });
 
-      if (error) throw error;
+      console.log("Supabase response:", { data, error });
 
-      return data.map(this.mapFromSupabase);
+      if (error) {
+        console.error(
+          "Supabase error details:",
+          JSON.stringify(error, null, 2),
+        );
+        throw new Error(
+          `Database error: ${error.message || error.details || "Unknown error"}`,
+        );
+      }
+
+      if (!data) {
+        console.log("No data returned, returning empty array");
+        return [];
+      }
+
+      const mappedData = data.map(this.mapFromSupabase);
+      console.log("Mapped documents:", mappedData);
+      return mappedData;
     } catch (error) {
       console.error("Error fetching documents:", error);
-      throw new Error("Failed to fetch documents");
+
+      if (error instanceof Error) {
+        throw error;
+      }
+
+      throw new Error(
+        `Failed to fetch documents: ${error && typeof error === "object" ? JSON.stringify(error) : String(error)}`,
+      );
     }
   }
 
