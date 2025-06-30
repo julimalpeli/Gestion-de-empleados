@@ -998,6 +998,37 @@ const Employees = () => {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="edit-email">Email</Label>
+                <Input
+                  id="edit-email"
+                  type="email"
+                  placeholder="juan.perez@ejemplo.com"
+                  value={editingEmployee.email}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      email: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="edit-address">Domicilio</Label>
+                <Input
+                  id="edit-address"
+                  placeholder="Av. Corrientes 1234, CABA"
+                  value={editingEmployee.address}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      address: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2 col-span-2">
                 <Label>Sueldo Diario Calculado</Label>
                 <div className="p-3 bg-muted rounded-md">
                   <span className="text-lg font-semibold">
