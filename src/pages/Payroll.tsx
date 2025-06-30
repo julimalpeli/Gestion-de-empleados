@@ -189,6 +189,7 @@ const Payroll = () => {
     payrollRecords,
     loading: payrollLoading,
     error: payrollError,
+    getExistingPayrollRecord,
     createPayrollRecord,
     updatePayrollRecord,
     deletePayrollRecord,
