@@ -78,6 +78,8 @@ const Payroll = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [recordToDelete, setRecordToDelete] = useState(null);
 
   // Usar hooks de Supabase
   const {
