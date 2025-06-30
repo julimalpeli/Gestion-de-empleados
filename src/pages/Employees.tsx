@@ -857,6 +857,9 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
               {filteredEmployees.map((employee) => (
                 <TableRow key={employee.id}>
                   <TableCell className="font-medium">{employee.name}</TableCell>
+                  <TableCell className="font-mono text-sm">
+                    {employee.dni || "No registrado"}
+                  </TableCell>
                   <TableCell>{employee.position}</TableCell>
                   <TableCell>
                     {new Date(employee.startDate).toLocaleDateString("es-AR")}
