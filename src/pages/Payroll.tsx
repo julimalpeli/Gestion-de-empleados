@@ -1103,13 +1103,12 @@ const Payroll = () => {
                                 "-"
                               )}
                             </TableCell>
-                            {isAguinaldoMonth && (
-                              <TableCell className="font-medium text-green-600">
-                                {record.aguinaldo > 0
-                                  ? formatCurrency(record.aguinaldo)
-                                  : "-"}
-                              </TableCell>
-                            )}
+                            <TableCell className="font-medium text-green-600">
+                              {isAguinaldoPeriod(record.period) &&
+                              record.aguinaldo > 0
+                                ? formatCurrency(record.aguinaldo)
+                                : "-"}
+                            </TableCell>
                             <TableCell>
                               {formatCurrency(record.advances)}
                             </TableCell>
