@@ -292,6 +292,22 @@ const Employees = () => {
     }
   };
 
+  const handleDeleteEmployee = async (employee) => {
+    if (
+      confirm(
+        `¿Estás seguro de que quieres eliminar al empleado ${employee.name}? Esta acción no se puede deshacer.`,
+      )
+    ) {
+      try {
+        await deleteEmployee(employee.id);
+        setSuccessMessage(`Empleado ${employee.name} eliminado exitosamente`);
+      } catch (error) {
+        console.error("Error deleting employee:", error);
+        alert("Error al eliminar empleado");
+      }
+    }
+  };
+
   const openVacationManager = (employee) => {
     setSelectedEmployeeForVacations(employee);
     setIsVacationManagerOpen(true);
