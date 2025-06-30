@@ -523,6 +523,22 @@ const EmployeePortal = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {!employeeData.isEligibleForVacations && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <Clock className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">Vacaciones no disponibles</p>
+                        <p className="text-sm">
+                          Necesitas 6 meses de antigüedad para acceder a
+                          vacaciones. Tiempo actual:{" "}
+                          {employeeData.monthsOfService} meses.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Vacation Balance */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                   <div className="flex items-center justify-between">
