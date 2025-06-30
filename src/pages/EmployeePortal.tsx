@@ -32,6 +32,7 @@ import useFiles from "@/hooks/use-files";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useVacations } from "@/hooks/use-vacations";
+import { employeeService } from "@/services/employeeService";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
