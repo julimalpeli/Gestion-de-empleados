@@ -163,8 +163,12 @@ const Reports = () => {
     }
 
     // Fecha efectiva de inicio (la mayor entre inicio de semestre e inicio de trabajo)
+    // Importante: se cuenta desde el día POSTERIOR a la fecha de ingreso
+    const effectiveStartDate = new Date(startDate);
+    effectiveStartDate.setDate(effectiveStartDate.getDate() + 1);
+
     const effectiveStart =
-      startDate > semesterStart ? startDate : semesterStart;
+      effectiveStartDate > semesterStart ? effectiveStartDate : semesterStart;
 
     // Calcular días trabajados
     const totalSemesterDays =
