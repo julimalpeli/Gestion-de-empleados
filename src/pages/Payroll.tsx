@@ -1102,7 +1102,7 @@ const Payroll = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {payrollRecords
+                      {currentPeriodRecords
                         .filter((record) => {
                           const employee = employees.find(
                             (e) => e.name === record.employeeName,
