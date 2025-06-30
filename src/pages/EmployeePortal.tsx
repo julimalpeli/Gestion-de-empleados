@@ -45,6 +45,15 @@ const EmployeePortal = () => {
     navigate("/login");
   };
 
+  const handleDownloadReceipt = (record) => {
+    // Generate and download receipt PDF
+    console.log("Downloading receipt for:", record.period);
+    alert(
+      `Generando recibo para ${formatPeriod(record.period)}. La descarga comenzará en breve.`,
+    );
+    // TODO: Implement actual PDF generation and download
+  };
+
   // Get current employee data
   const currentEmployee = (employees || []).find(
     (emp) => emp.id === user?.employeeId,
