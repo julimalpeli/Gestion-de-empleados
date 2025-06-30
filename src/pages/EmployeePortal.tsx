@@ -318,7 +318,9 @@ const EmployeePortal = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">DNI</label>
+                    <label className="text-sm font-medium">
+                      {employeeData.documentType?.toUpperCase() || "DNI"}
+                    </label>
                     <p className="text-lg font-mono">{employeeData.dni}</p>
                   </div>
 
