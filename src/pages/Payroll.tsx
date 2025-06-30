@@ -135,27 +135,64 @@ const Payroll = () => {
     return month === "06" || month === "12";
   };
 
-  // Función para calcular aguinaldo
+  // Función para calcular aguinaldo (tomada de Reports.tsx)
   const calculateAguinaldo = (employee, period) => {
     if (!isAguinaldoPeriod(period)) return 0;
 
-    const startDate = new Date(employee.startDate);
     const [year, month] = period.split("-");
-    const liquidationDate = new Date(parseInt(year), parseInt(month) - 1, 1);
+    const currentYear = parseInt(year);
+    const currentMonth = parseInt(month);
 
-    const monthsWorked =
-      (liquidationDate.getFullYear() - startDate.getFullYear()) * 12 +
-      liquidationDate.getMonth() -
-      startDate.getMonth();
+    // Determinar fechas del semestre según el mes
+    const semesterStart =
+      currentMonth === 6
+        ? new Date(currentYear, 0, 1) // 1 enero (primer semestre)
+        : new Date(currentYear, 6, 1); // 1 julio (segundo semestre)
 
-    if (monthsWorked < 6) {
-      // Proporcional para menos de 6 meses
-      const proportional = (monthsWorked / 6) * (employee.dailyWage * 30);
-      return Math.round(proportional);
-    } else {
-      // Aguinaldo completo (medio sueldo)
-      return employee.dailyWage * 30;
+    const semesterEnd =
+      currentMonth === 6
+        ? new Date(currentYear, 5, 30) // 30 junio
+        : new Date(currentYear, 11, 31); // 31 diciembre
+
+    const startDate = new Date(employee.startDate);
+
+    // Si empezó después del semestre, no corresponde aguinaldo
+    if (startDate > semesterEnd) {
+      return 0;
     }
+
+    // Fecha efectiva de inicio (la mayor entre inicio de semestre e inicio de trabajo)
+    // Importante: se cuenta desde el día POSTERIOR a la fecha de ingreso
+    const effectiveStartDate = new Date(startDate);
+    effectiveStartDate.setDate(effectiveStartDate.getDate() + 1);
+
+    const effectiveStart =
+      effectiveStartDate > semesterStart ? effectiveStartDate : semesterStart;
+
+    // Calcular días trabajados
+    const totalSemesterDays =
+      Math.ceil(
+        (semesterEnd.getTime() - semesterStart.getTime()) /
+          (1000 * 60 * 60 * 24),
+      ) + 1;
+
+    const daysWorked =
+      Math.ceil(
+        (semesterEnd.getTime() - effectiveStart.getTime()) /
+          (1000 * 60 * 60 * 24),
+      ) + 1;
+
+    // Mejor remuneración del semestre (sueldo blanco + informal, sin presentismo)
+    const bestSalary = employee.whiteWage + employee.informalWage;
+
+    // Calcular aguinaldo
+    const fullAguinaldo = (bestSalary / 12) * 6; // 6 meses
+    const proportionalAguinaldo = (bestSalary / 12) * (daysWorked / 30); // Proporcional por días
+
+    const isProportional = daysWorked < totalSemesterDays;
+    const finalAmount = isProportional ? proportionalAguinaldo : fullAguinaldo;
+
+    return Math.round(finalAmount);
   };
 
   // Manejo de nuevo payroll
@@ -383,7 +420,7 @@ const Payroll = () => {
     }
   };
 
-  // Función para eliminar liquidación
+  // Función para eliminar liquidaci��n
   const handleDeletePayroll = async () => {
     if (!recordToDelete) return;
 
