@@ -1065,6 +1065,21 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
           }}
         />
       )}
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-medium">{successMessage}</div>
+            <button
+              onClick={() => setSuccessMessage("")}
+              className="ml-2 text-white hover:text-green-200"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
