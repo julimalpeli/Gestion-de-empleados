@@ -212,8 +212,14 @@ const Employees = () => {
       } catch (userError) {
         console.error("❌ Error creando usuario:", userError);
         // No fallar la creación del empleado por error de usuario
-        alert(
-          "Empleado creado, pero hubo un error al crear el usuario. Contacte al administrador.",
+        setSuccessMessage(
+          "Empleado creado exitosamente, pero hubo un error al crear el usuario. Contacte al administrador.",
+        );
+      }
+
+      if (!userError) {
+        setSuccessMessage(
+          `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}`,
         );
       }
 
