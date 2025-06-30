@@ -53,6 +53,12 @@ CREATE TRIGGER trigger_update_payroll_records_updated_at
 -- Enable RLS (Row Level Security)
 ALTER TABLE payroll_records ENABLE ROW LEVEL SECURITY;
 
+-- Drop existing policies if they exist and recreate
+DROP POLICY IF EXISTS "Users can view all payroll records" ON payroll_records;
+DROP POLICY IF EXISTS "Users can insert payroll records" ON payroll_records;
+DROP POLICY IF EXISTS "Users can update payroll records" ON payroll_records;
+DROP POLICY IF EXISTS "Users can delete payroll records" ON payroll_records;
+
 -- Create RLS policies
 CREATE POLICY "Users can view all payroll records" ON payroll_records FOR SELECT USING (true);
 CREATE POLICY "Users can insert payroll records" ON payroll_records FOR INSERT WITH CHECK (true);
