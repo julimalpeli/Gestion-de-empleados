@@ -636,7 +636,16 @@ const Employees = () => {
                       {employee.name}
                     </TableCell>
                     <TableCell className="font-mono text-sm">
-                      {employee.dni || "No registrado"}
+                      <div className="flex flex-col">
+                        <span className="font-medium">
+                          {employee.dni || "No registrado"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {employee.documentType
+                            ? employee.documentType.toUpperCase()
+                            : "DNI"}
+                        </span>
+                      </div>
                     </TableCell>
                     <TableCell>{formatPosition(employee.position)}</TableCell>
                     <TableCell>
