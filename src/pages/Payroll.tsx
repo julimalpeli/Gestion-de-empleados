@@ -120,113 +120,198 @@ const Payroll = () => {
   const { isAdmin, canEditModule } = usePermissions();
   const { user } = useAuth();
 
-  // Initialize period with current month
+  // Configurar período actual automáticamente
   useEffect(() => {
-    const currentDate = new Date();
-    const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
-    setSelectedPeriod(currentPeriod);
-  }, []);
+    if (!selectedPeriod) {
+      const now = new Date();
+      const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      setSelectedPeriod(currentPeriod);
+    }
+  }, [selectedPeriod]);
 
-  // Get current period for filtering
-  const getCurrentPeriod = () => {
-    const currentDate = new Date();
-    return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+  // Función para verificar si un período es de aguinaldo (junio o diciembre)
+  const isAguinaldoPeriod = (period: string) => {
+    const [year, month] = period.split("-");
+    return month === "06" || month === "12";
   };
 
-  const currentPeriod = getCurrentPeriod();
+  // Función para calcular aguinaldo
+  const calculateAguinaldo = (employee, period) => {
+    if (!isAguinaldoPeriod(period)) return 0;
 
-  // Filter records by period for current vs history tabs
-  const currentPeriodRecords = payrollRecords.filter(
-    (record) => record.period === currentPeriod,
-  );
-  const historyRecords = payrollRecords.filter(
-    (record) => record.period !== currentPeriod,
-  );
+    const startDate = new Date(employee.startDate);
+    const [year, month] = period.split("-");
+    const liquidationDate = new Date(parseInt(year), parseInt(month) - 1, 1);
 
-  // Success message effect
-  useEffect(() => {
-    if (successMessage) {
-      const timer = setTimeout(() => {
-        setSuccessMessage("");
-      }, 5000);
-      return () => clearTimeout(timer);
+    const monthsWorked =
+      (liquidationDate.getFullYear() - startDate.getFullYear()) * 12 +
+      liquidationDate.getMonth() -
+      startDate.getMonth();
+
+    if (monthsWorked < 6) {
+      // Proporcional para menos de 6 meses
+      const proportional = (monthsWorked / 6) * (employee.dailyWage * 30);
+      return Math.round(proportional);
+    } else {
+      // Aguinaldo completo (medio sueldo)
+      return employee.dailyWage * 30;
     }
-  }, [successMessage]);
+  };
 
-  const handleStateChange = async (record, newStatus) => {
+  // Manejo de nuevo payroll
+  const handleCreatePayroll = async () => {
+    if (!selectedEmployee || !selectedPeriod) {
+      alert("Selecciona empleado y período");
+      return;
+    }
+
+    const employee = employees.find(
+      (e) => e.id.toString() === selectedEmployee,
+    );
+    if (!employee) {
+      alert("Empleado no encontrado");
+      return;
+    }
+
+    // Verificar si ya existe liquidación para este período
+    const existingRecord = await getExistingPayrollRecord(
+      parseInt(selectedEmployee),
+      selectedPeriod,
+    );
+
+    if (existingRecord) {
+      alert(
+        `Ya existe una liquidación para ${employee.name} en ${formatPeriod(selectedPeriod)}`,
+      );
+      return;
+    }
+
+    const calculation = calculatePayroll();
+
     try {
-      console.log("Updating status to:", newStatus);
-
-      const updateData = {
-        status: newStatus,
-        processedDate: new Date().toISOString(),
-        processedBy: user?.id || null,
+      const payrollData = {
+        employeeId: parseInt(selectedEmployee),
+        employeeName: employee.name,
+        period: selectedPeriod,
+        baseDays: parseInt(workDays),
+        holidayDays: parseInt(holidayDays) || 0,
+        overtimeHours: overtimeEnabled ? parseFloat(overtimeHours) || 0 : 0,
+        advances: parseFloat(advances) || 0,
+        discounts: parseFloat(discounts) || 0,
+        whiteAmount: parseFloat(whiteWage) || 0,
+        informalAmount: calculation.informalAmount || 0,
+        bonusAmount: parseFloat(bonusAmount) || 0,
+        presentismoAmount: calculation.presentismoAmount || 0,
+        aguinaldo: calculation.aguinaldo || 0,
+        netTotal: calculation.netTotal,
+        status: "draft",
+        // Campos calculados adicionales
+        holidayBonus: calculation.holidayPay || 0,
+        overtimeAmount: calculation.overtimePay || 0,
       };
 
-      await updatePayrollRecord(record.id, updateData);
+      console.log("Creating payroll with data:", payrollData);
+      await createPayrollRecord(payrollData);
 
-      const statusLabels = {
-        pending: "pendiente",
-        approved: "aprobada",
-        paid: "pagada",
-        processed: "procesada",
-      };
+      // Reset form
+      setSelectedEmployee("");
+      setWorkDays("30");
+      setHolidayDays("");
+      setAdvances("");
+      setDiscounts("");
+      setWhiteWage("");
+      setPresentismoStatus("mantiene");
+      setOvertimeEnabled(false);
+      setOvertimeHours("");
+      setBonusAmount("");
+      setIsNewPayrollOpen(false);
 
       setSuccessMessage(
-        `Liquidación de ${record.employeeName} marcada como ${statusLabels[newStatus]}`,
+        `Liquidación creada exitosamente para ${employee.name}`,
       );
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
-      console.error("Error updating payroll status:", error);
-      alert("Error al actualizar el estado de la liquidación");
+      console.error("Error creating payroll:", error);
+      alert("Error al crear liquidación: " + error.message);
     }
   };
 
-  const handleDeletePayroll = async () => {
-    if (!recordToDelete) return;
-
-    try {
-      await deletePayrollRecord(recordToDelete.id);
-      setSuccessMessage(
-        `Liquidación de ${recordToDelete.employeeName} eliminada exitosamente`,
-      );
-      setDeleteConfirmOpen(false);
-      setRecordToDelete(null);
-    } catch (error) {
-      console.error("Error deleting payroll:", error);
-      alert("Error al eliminar liquidación");
-    }
-  };
-
+  // Función para editar registro existente
   const handleEditRecord = (record) => {
-    setIsEditMode(true);
     setEditingRecord(record);
-
-    // Find employee
-    const employee = employees.find((e) => e.name === record.employeeName);
-    if (employee) {
-      setSelectedEmployee(employee.id.toString());
-    }
-
-    // Pre-fill form with record data
+    setSelectedEmployee(record.employeeId.toString());
     setSelectedPeriod(record.period);
     setWorkDays(record.baseDays.toString());
-    setHolidayDays(record.holidayDays.toString());
-    setAdvances(record.advances.toString());
-    setDiscounts(record.discounts ? record.discounts.toString() : "0");
-    setWhiteWage(record.whiteAmount.toString());
-    setBonusAmount(record.bonusAmount ? record.bonusAmount.toString() : "0");
-    setOvertimeHours(
-      record.overtimeHours ? record.overtimeHours.toString() : "0",
-    );
+    setHolidayDays(record.holidayDays?.toString() || "");
+    setAdvances(record.advances?.toString() || "");
+    setDiscounts(record.discounts?.toString() || "");
+    setWhiteWage(record.whiteAmount?.toString() || "");
+    setBonusAmount(record.bonusAmount?.toString() || "");
+    setOvertimeHours(record.overtimeHours?.toString() || "");
     setOvertimeEnabled(record.overtimeHours > 0);
-
-    // Determine presentismo status based on record
-    const has_presentismo = record.presentismoAmount > 0;
-    setPresentismoStatus(has_presentismo ? "mantiene" : "pierde");
-
+    setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
+    setIsEditMode(true);
     setIsNewPayrollOpen(true);
   };
 
+  // Función para actualizar registro
+  const handleUpdatePayroll = async () => {
+    if (!editingRecord) return;
+
+    const employee = employees.find(
+      (e) => e.id.toString() === selectedEmployee,
+    );
+    if (!employee) {
+      alert("Empleado no encontrado");
+      return;
+    }
+
+    const calculation = calculatePayroll();
+
+    try {
+      const updatedData = {
+        baseDays: parseInt(workDays),
+        holidayDays: parseInt(holidayDays) || 0,
+        overtimeHours: overtimeEnabled ? parseFloat(overtimeHours) || 0 : 0,
+        advances: parseFloat(advances) || 0,
+        discounts: parseFloat(discounts) || 0,
+        whiteAmount: parseFloat(whiteWage) || 0,
+        informalAmount: calculation.informalAmount || 0,
+        bonusAmount: parseFloat(bonusAmount) || 0,
+        presentismoAmount: calculation.presentismoAmount || 0,
+        aguinaldo: calculation.aguinaldo || 0,
+        netTotal: calculation.netTotal,
+        // Campos calculados adicionales
+        holidayBonus: calculation.holidayPay || 0,
+        overtimeAmount: calculation.overtimePay || 0,
+      };
+
+      await updatePayrollRecord(editingRecord.id, updatedData);
+
+      // Reset form
+      setEditingRecord(null);
+      setIsEditMode(false);
+      setSelectedEmployee("");
+      setWorkDays("30");
+      setHolidayDays("");
+      setAdvances("");
+      setDiscounts("");
+      setWhiteWage("");
+      setPresentismoStatus("mantiene");
+      setOvertimeEnabled(false);
+      setOvertimeHours("");
+      setBonusAmount("");
+      setIsNewPayrollOpen(false);
+
+      setSuccessMessage("Liquidación actualizada exitosamente");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error updating payroll:", error);
+      alert("Error al actualizar liquidación: " + error.message);
+    }
+  };
+
+  // Función para generar recibo
   const generatePayslip = async (record) => {
     try {
       const employee = employees.find((emp) => emp.id === record.employeeId);
@@ -278,8 +363,6 @@ const Payroll = () => {
         return "outline";
       case "pending":
         return "secondary";
-      case "draft":
-        return "outline";
       default:
         return "outline";
     }
@@ -288,116 +371,92 @@ const Payroll = () => {
   const getStatusText = (status: string) => {
     switch (status) {
       case "paid":
-        return "Pagado";
+        return "Pagada";
       case "processed":
-        return "Procesado";
+        return "Procesada";
       case "approved":
-        return "Aprobado";
+        return "Aprobada";
       case "pending":
         return "Pendiente";
-      case "draft":
-        return "Borrador";
       default:
-        return status;
+        return "Borrador";
     }
   };
 
-  const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
-    useState("2024-2");
+  // Función para eliminar liquidación
+  const handleDeletePayroll = async () => {
+    if (!recordToDelete) return;
 
-  // Check if current month is aguinaldo month (June or December) - kept for backward compatibility
-  const currentMonth = new Date().getMonth() + 1;
-  const isAguinaldoMonth = currentMonth === 6 || currentMonth === 12;
-
-  const isAguinaldoPeriod = (period: string) => {
-    const [year, month] = period.split("-");
-    return month === "06" || month === "12"; // Junio o Diciembre
-  };
-
-  const calculateAguinaldo = (employee, period) => {
-    if (!isAguinaldoPeriod(period)) return 0;
-
-    const [year, month] = period.split("-");
-    const startDate = new Date(employee.startDate);
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
-    // Determinar fecha límite según el período
-    let endDate;
-    if (month === "06") {
-      // Primer semestre - hasta 30 de junio
-      endDate = new Date(parseInt(year), 5, 30); // Mes 5 = junio (0-indexed)
-    } else {
-      // Segundo semestre - hasta 31 de diciembre
-      endDate = new Date(parseInt(year), 11, 31); // Mes 11 = diciembre (0-indexed)
-    }
-
-    // Sueldo total más alto (sin presentismo)
-    const totalSalary = employee.whiteWage + employee.informalWage;
-
-    // Si tiene más de 6 meses de antigüedad al momento de liquidar
-    const liquidationDate = new Date(parseInt(year), parseInt(month) - 1, 1);
-    const hasMoreThanSixMonths =
-      (liquidationDate - startDate) / (1000 * 60 * 60 * 24) >= 180;
-
-    if (hasMoreThanSixMonths) {
-      // Aguinaldo completo
-      return totalSalary / 2;
-    } else {
-      // Aguinaldo proporcional
-      // Calcular días trabajados desde el día posterior a la fecha de ingreso hasta fecha límite
-      const dayAfterStart = new Date(startDate);
-      dayAfterStart.setDate(dayAfterStart.getDate() + 1);
-      const workStartDate =
-        dayAfterStart > new Date(parseInt(year), 0, 1)
-          ? dayAfterStart
-          : new Date(parseInt(year), 0, 1);
-      const daysWorked = Math.max(
-        0,
-        Math.ceil((endDate - workStartDate) / (1000 * 60 * 60 * 24)) + 1,
-      );
-
-      // Fórmula: (Sueldo total / 2) / 180 * días trabajados
-      return Math.max(0, (totalSalary / 2 / 180) * daysWorked);
+    try {
+      await deletePayrollRecord(recordToDelete.id);
+      setDeleteConfirmOpen(false);
+      setRecordToDelete(null);
+      setSuccessMessage("Liquidación eliminada exitosamente");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error deleting payroll:", error);
+      alert("Error al eliminar liquidación: " + error.message);
     }
   };
 
+  // Función para obtener período actual
+  const getCurrentPeriod = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  };
+
+  // Filtrar registros por período actual vs historial
+  const currentPeriodRecords = payrollRecords.filter(
+    (record) => record.period === getCurrentPeriod(),
+  );
+
+  const historyRecords = payrollRecords.filter(
+    (record) => record.period !== getCurrentPeriod(),
+  );
+
+  // Cálculo de payroll
   const calculatePayroll = () => {
-    if (!selectedEmployee || !workDays) return null;
+    if (!selectedEmployee) return null;
 
     const employee = employees.find(
       (e) => e.id.toString() === selectedEmployee,
     );
     if (!employee) return null;
 
-    const basePay = employee.dailyWage * parseInt(workDays);
-    const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
-
-    // Calcular horas extra si está habilitado
-    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario �� 8
-    const overtimePay = overtimeEnabled
-      ? hourlyRate * (parseInt(overtimeHours) || 0)
+    const workDaysNum = parseInt(workDays) || 0;
+    const holidayDaysNum = parseInt(holidayDays) || 0;
+    const overtimeHoursNum = overtimeEnabled
+      ? parseFloat(overtimeHours) || 0
       : 0;
+    const advancesNum = parseFloat(advances) || 0;
+    const discountsNum = parseFloat(discounts) || 0;
+    const bonusNum = parseFloat(bonusAmount) || 0;
 
-    // Agregar presentismo según selección en liquidación
+    // Cálculos base
+    const basePay = employee.dailyWage * workDaysNum;
+    const holidayPay = employee.dailyWage * holidayDaysNum * 2; // Doble pago
+    const hourlyRate = employee.dailyWage / 8;
+    const overtimePay = overtimeHoursNum * hourlyRate * 1.5; // 50% extra
+
+    // Presentismo: 8.33% del sueldo base si mantiene
     const presentismoAmount =
-      presentismoStatus === "mantiene" ? employee.presentismo : 0;
+      presentismoStatus === "mantiene" ? basePay * 0.0833 : 0;
 
-    // Bono libre
-    const bonusPay = parseInt(bonusAmount) || 0;
+    const bonusPay = bonusNum;
 
-    const totalAdvances = parseInt(advances) || 0;
-    const totalDiscounts = parseInt(discounts) || 0;
-    const manualWhiteWage = parseInt(whiteWage) || 0;
-
-    // Total bruto = sueldo base + feriados + horas extra + presentismo + bono
+    // Total bruto
     const grossTotal =
       basePay + holidayPay + overtimePay + presentismoAmount + bonusPay;
 
-    // Total después de descuentos y adelantos
+    // Deducciones
+    const totalAdvances = advancesNum;
+    const totalDiscounts = discountsNum;
+
+    // Total después de deducciones
     const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
 
-    // Sueldo informal = Total después de deducciones - Sueldo en blanco manual
+    // División entre blanco e informal
+    const manualWhiteWage = parseFloat(whiteWage) || 0;
     const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
 
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
@@ -502,101 +561,94 @@ const Payroll = () => {
                 Nueva Liquidación
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>
-                  {isEditMode
-                    ? "Editar Liquidación"
-                    : "Calcular Nueva Liquidación"}
+                  {isEditMode ? "Editar Liquidación" : "Nueva Liquidación"}
                 </DialogTitle>
                 <DialogDescription>
                   {isEditMode
                     ? "Modifica los datos de la liquidación existente"
-                    : "Completa los datos para generar la liquidación del empleado"}
+                    : "Completa los datos para crear una nueva liquidación"}
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid gap-6 lg:grid-cols-2">
-                {/* Form */}
-                <div className="space-y-4">
+              <div className="grid gap-6 py-4">
+                <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="period">
-                      Período a Liquidar <span className="text-red-500">*</span>
+                    <Label htmlFor="employee">
+                      Empleado <span className="text-red-500">*</span>
                     </Label>
-                    <Input
-                      id="period"
-                      type="month"
-                      value={selectedPeriod}
-                      onChange={(e) => setSelectedPeriod(e.target.value)}
-                      required
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Selecciona el mes y año del período a liquidar
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="employee">Empleado</Label>
                     <Select
                       value={selectedEmployee}
                       onValueChange={setSelectedEmployee}
+                      disabled={isEditMode}
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Seleccionar empleado" />
                       </SelectTrigger>
                       <SelectContent>
                         {employees
-                          .filter((employee) => employee.status === "active")
+                          .filter((emp) => emp.status === "active")
                           .map((employee) => (
                             <SelectItem
                               key={employee.id}
                               value={employee.id.toString()}
                             >
-                              {employee.name} -{" "}
-                              {formatCurrency(employee.dailyWage)}
-                              /día
+                              {employee.name} - {employee.position}
                             </SelectItem>
                           ))}
                       </SelectContent>
                     </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="workDays">Días Trabajados</Label>
-                    <Input
-                      id="workDays"
-                      type="number"
-                      placeholder="30"
-                      value={workDays}
-                      onChange={(e) => setWorkDays(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="presentismo">Estado del Presentismo</Label>
-                    <Select
-                      value={presentismoStatus}
-                      onValueChange={setPresentismoStatus}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="mantiene">
-                          Mantiene presentismo
-                        </SelectItem>
-                        <SelectItem value="pierde">
-                          Pierde presentismo este mes
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
                     {selectedEmployee && (
                       <p className="text-xs text-muted-foreground">
-                        Monto del presentismo:{" "}
+                        Sueldo diario:{" "}
                         {formatCurrency(
                           employees.find(
                             (e) => e.id.toString() === selectedEmployee,
-                          )?.presentismo || 0,
+                          )?.dailyWage || 0,
+                        )}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="period">
+                      Período <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="period"
+                      type="month"
+                      value={selectedPeriod}
+                      onChange={(e) => setSelectedPeriod(e.target.value)}
+                      disabled={isEditMode}
+                    />
+                    {selectedPeriod && isAguinaldoPeriod(selectedPeriod) && (
+                      <p className="text-xs text-green-600">
+                        ✨ Período con aguinaldo (SAC)
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="workDays">
+                      Días Trabajados <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="workDays"
+                      type="number"
+                      min="1"
+                      max="31"
+                      value={workDays}
+                      onChange={(e) => setWorkDays(e.target.value)}
+                    />
+                    {selectedEmployee && (
+                      <p className="text-xs text-muted-foreground">
+                        Sueldo base:{" "}
+                        {formatCurrency(
+                          (employees.find(
+                            (e) => e.id.toString() === selectedEmployee,
+                          )?.dailyWage || 0) * parseInt(workDays),
                         )}
                       </p>
                     )}
@@ -650,6 +702,24 @@ const Payroll = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="presentismo">Presentismo</Label>
+                    <Select
+                      value={presentismoStatus}
+                      onValueChange={setPresentismoStatus}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="mantiene">
+                          Mantiene (8.33%)
+                        </SelectItem>
+                        <SelectItem value="perdido">Perdido</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="bonusAmount">Bono Libre</Label>
                     <Input
                       id="bonusAmount"
@@ -658,13 +728,10 @@ const Payroll = () => {
                       value={bonusAmount}
                       onChange={(e) => setBonusAmount(e.target.value)}
                     />
-                    <p className="text-xs text-muted-foreground">
-                      Monto adicional que se suma al salario final
-                    </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="advances">Adelantos de Sueldo</Label>
+                    <Label htmlFor="advances">Adelantos</Label>
                     <Input
                       id="advances"
                       type="number"
@@ -675,7 +742,7 @@ const Payroll = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="discounts">Otros Descuentos</Label>
+                    <Label htmlFor="discounts">Descuentos</Label>
                     <Input
                       id="discounts"
                       type="number"
@@ -686,16 +753,16 @@ const Payroll = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="whiteWage">Sueldo en Blanco (manual)</Label>
+                    <Label htmlFor="whiteWage">Sueldo Depósito</Label>
                     <Input
                       id="whiteWage"
                       type="number"
-                      placeholder="350000"
+                      placeholder="0"
                       value={whiteWage}
                       onChange={(e) => setWhiteWage(e.target.value)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      El sueldo informal se calculará automáticamente
+                      El resto se calculará como sueldo en efectivo
                     </p>
                   </div>
                 </div>
@@ -802,202 +869,66 @@ const Payroll = () => {
                             </span>
                           </div>
                         )}
-                        <div className="flex justify-between font-medium">
-                          <span>Total después de deducciones:</span>
-                          <span>
-                            {formatCurrency(calculation.totalAfterDeductions)}
-                          </span>
-                        </div>
-                        <hr />
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span>En blanco (manual):</span>
-                            <span className="font-medium">
-                              {formatCurrency(calculation.whiteAmount)}
-                            </span>
+                        <div className="border-t pt-2">
+                          <div className="flex justify-between text-lg font-bold">
+                            <span>Total Neto:</span>
+                            <span>{formatCurrency(calculation.netTotal)}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span>Informal (calculado):</span>
-                            <span className="font-medium">
-                              {formatCurrency(calculation.informalAmount)}
-                            </span>
+                          <div className="text-sm space-y-1 mt-2">
+                            <div className="flex justify-between">
+                              <span>Depósito:</span>
+                              <span>
+                                {formatCurrency(calculation.whiteAmount)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Efectivo:</span>
+                              <span>
+                                {formatCurrency(calculation.informalAmount)}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        <hr />
-                        <div className="flex justify-between font-bold text-lg">
-                          <span>Total Neto:</span>
-                          <span>
-                            {formatCurrency(
-                              calculation.netTotal + calculation.aguinaldo,
-                            )}
-                          </span>
-                        </div>
-                        {calculation.aguinaldo > 0 && (
-                          <div className="text-xs text-green-600 text-center">
-                            Incluye aguinaldo de {formatPeriod(selectedPeriod)}
-                          </div>
-                        )}
                       </CardContent>
                     </Card>
                   ) : (
-                    <Card>
-                      <CardContent className="p-4 text-center text-muted-foreground">
-                        Selecciona un empleado y completa los días trabajados
-                        para ver la vista previa
-                      </CardContent>
-                    </Card>
+                    <p className="text-muted-foreground">
+                      Selecciona un empleado para ver la vista previa
+                    </p>
                   )}
                 </div>
-              </div>
 
-              <div className="flex gap-2 pt-4">
-                <Button
-                  onClick={async () => {
-                    if (!calculation) return;
-
-                    try {
-                      if (!selectedPeriod) {
-                        alert("Debes seleccionar un período para liquidar");
-                        return;
-                      }
-
-                      const period = selectedPeriod;
-
-                      if (isEditMode && editingRecord) {
-                        // Actualizar registro existente
-                        await updatePayrollRecord(editingRecord.id, {
-                          baseDays: parseInt(workDays),
-                          holidayDays: parseInt(holidayDays) || 0,
-                          baseAmount: calculation.baseAmount,
-                          holidayBonus: calculation.holidayBonus,
-                          aguinaldo: calculation.aguinaldo,
-                          discounts: parseFloat(discounts) || 0,
-                          advances: parseFloat(advances) || 0,
-                          whiteAmount: calculation.whiteAmount,
-                          informalAmount: calculation.informalAmount,
-                          presentismoAmount: calculation.presentismoAmount,
-                          overtimeHours: parseFloat(overtimeHours) || 0,
-                          overtimeAmount: calculation.overtimeAmount,
-                          bonusAmount: parseFloat(bonusAmount) || 0,
-                          netTotal: calculation.total,
-                          status: "processed",
-                        });
-                      } else {
-                        // Check if record already exists
-                        const existingRecord = await getExistingPayrollRecord(
-                          selectedEmployee,
-                          period,
-                        );
-
-                        if (existingRecord) {
-                          const confirmUpdate = confirm(
-                            `Ya existe una liquidación para este empleado en ${period}. ¿Deseas actualizarla?`,
-                          );
-
-                          if (confirmUpdate) {
-                            // Update existing record
-                            await updatePayrollRecord(existingRecord.id, {
-                              baseDays: parseInt(workDays),
-                              holidayDays: parseInt(holidayDays) || 0,
-                              baseAmount: calculation.baseAmount,
-                              holidayBonus: calculation.holidayBonus,
-                              aguinaldo: calculation.aguinaldo,
-                              discounts: parseFloat(discounts) || 0,
-                              advances: parseFloat(advances) || 0,
-                              whiteAmount: calculation.whiteAmount,
-                              informalAmount: calculation.informalAmount,
-                              presentismoAmount: calculation.presentismoAmount,
-                              overtimeHours: parseFloat(overtimeHours) || 0,
-                              overtimeAmount: calculation.overtimeAmount,
-                              bonusAmount: parseFloat(bonusAmount) || 0,
-                              netTotal: calculation.total,
-                              status: "processed",
-                            });
-                          } else {
-                            return; // User cancelled
-                          }
-                        } else {
-                          // Crear nuevo registro
-                          await createPayrollRecord({
-                            employeeId: selectedEmployee,
-                            period,
-                            baseDays: parseInt(workDays),
-                            holidayDays: parseInt(holidayDays) || 0,
-                            baseAmount: calculation.baseAmount,
-                            holidayBonus: calculation.holidayBonus,
-                            aguinaldo: calculation.aguinaldo,
-                            discounts: parseFloat(discounts) || 0,
-                            advances: parseFloat(advances) || 0,
-                            whiteAmount: calculation.whiteAmount,
-                            informalAmount: calculation.informalAmount,
-                            presentismoAmount: calculation.presentismoAmount,
-                            overtimeHours: parseFloat(overtimeHours) || 0,
-                            overtimeAmount: calculation.overtimeAmount,
-                            bonusAmount: parseFloat(bonusAmount) || 0,
-                            netTotal: calculation.total,
-                            status: "processed",
-                          });
-                        }
-                      }
-
-                      // Limpiar formulario
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    onClick={
+                      isEditMode ? handleUpdatePayroll : handleCreatePayroll
+                    }
+                    disabled={!selectedEmployee || !selectedPeriod}
+                    className="flex-1"
+                  >
+                    {isEditMode
+                      ? "Actualizar Liquidación"
+                      : "Crear Liquidación"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
                       setIsNewPayrollOpen(false);
-                      setSelectedEmployee("");
-                      const currentDate = new Date();
-                      const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
-                      setSelectedPeriod(currentPeriod);
-                      setWorkDays("30");
-                      setHolidayDays("");
-                      setAdvances("");
-                      setDiscounts("");
-                      setWhiteWage("");
-                      setOvertimeEnabled(false);
-                      setOvertimeHours("");
-                      setBonusAmount("");
-                      setPresentismoStatus("mantiene");
                       setIsEditMode(false);
                       setEditingRecord(null);
-                    } catch (error) {
-                      console.error("Error saving payroll:", error);
-                      alert("Error al guardar liquidación");
-                    }
-                  }}
-                  className="w-full"
-                  disabled={!calculation}
-                >
-                  {isEditMode ? "Guardar Cambios" : "Generar Liquidación"}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setIsNewPayrollOpen(false);
-                    setSelectedEmployee("");
-                    const currentDate = new Date();
-                    const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
-                    setSelectedPeriod(currentPeriod);
-                    setWorkDays("30");
-                    setHolidayDays("");
-                    setAdvances("");
-                    setDiscounts("");
-                    setWhiteWage("");
-                    setOvertimeEnabled(false);
-                    setOvertimeHours("");
-                    setBonusAmount("");
-                    setPresentismoStatus("mantiene");
-                    setIsEditMode(false);
-                    setEditingRecord(null);
-                  }}
-                  className="w-full"
-                >
-                  Cancelar
-                </Button>
+                    }}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                </div>
               </div>
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Stats */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Statistics Cards */}
+        <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -1169,7 +1100,694 @@ const Payroll = () => {
                             </TableCell>
                             <TableCell className="font-medium">
                               {formatPeriod(record.period)}
-              )
+                              {isAguinaldoPeriod(record.period) && (
+                                <div className="text-xs text-green-600">
+                                  Período con aguinaldo
+                                </div>
                               )}
-              )
+                            </TableCell>
+                            <TableCell>{record.baseDays} días</TableCell>
+                            <TableCell>
+                              {record.holidayDays > 0 ? (
+                                <div>
+                                  <div className="font-medium">
+                                    {formatCurrency(record.holidayBonus)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {record.holidayDays} días
+                                  </div>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.overtimeHours > 0 ? (
+                                <div>
+                                  <div className="font-medium">
+                                    {formatCurrency(record.overtimeAmount)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {record.overtimeHours} hs
+                                  </div>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.bonusAmount > 0 ? (
+                                <span className="text-green-600 font-medium">
+                                  {formatCurrency(record.bonusAmount)}
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.discounts > 0 ? (
+                                <span className="text-red-600">
+                                  {formatCurrency(record.discounts)}
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium text-green-600">
+                              {isAguinaldoPeriod(record.period) &&
+                              record.aguinaldo > 0 ? (
+                                <div>
+                                  <div>{formatCurrency(record.aguinaldo)}</div>
+                                  {(() => {
+                                    const employee = employees.find(
+                                      (e) => e.name === record.employeeName,
+                                    );
+                                    if (!employee) return null;
+
+                                    const startDate = new Date(
+                                      employee.startDate,
+                                    );
+                                    const [year, month] =
+                                      record.period.split("-");
+                                    const liquidationDate = new Date(
+                                      parseInt(year),
+                                      parseInt(month) - 1,
+                                      1,
+                                    );
+                                    const hasMoreThanSixMonths =
+                                      (liquidationDate - startDate) /
+                                        (1000 * 60 * 60 * 24) >=
+                                      180;
+
+                                    if (!hasMoreThanSixMonths) {
+                                      return (
+                                        <div className="text-xs text-green-700">
+                                          Proporcional
+                                        </div>
+                                      );
+                                    }
+                                    return null;
+                                  })()}
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(record.advances)}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(record.whiteAmount)}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(record.informalAmount)}
+                            </TableCell>
+                            <TableCell>
+                              {record.presentismoAmount > 0 ? (
+                                <span className="text-green-600 font-medium">
+                                  {formatCurrency(record.presentismoAmount)}
+                                </span>
+                              ) : (
+                                <span className="text-red-600">Perdido</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {formatCurrency(record.netTotal)}
+                              {isAguinaldoPeriod(record.period) &&
+                                record.aguinaldo > 0 && (
+                                  <div className="text-xs text-green-600">
+                                    Incluye aguinaldo:{" "}
+                                    {formatCurrency(record.aguinaldo)}
+                                  </div>
                                 )}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col gap-1">
+                                <Badge
+                                  variant={
+                                    record.status === "processed"
+                                      ? "default"
+                                      : record.status === "pending"
+                                        ? "secondary"
+                                        : record.status === "approved"
+                                          ? "default"
+                                          : record.status === "paid"
+                                            ? "default"
+                                            : "outline"
+                                  }
+                                  className={
+                                    record.status === "paid"
+                                      ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                      : record.status === "approved"
+                                        ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                        : ""
+                                  }
+                                >
+                                  {record.status === "processed"
+                                    ? "Procesada"
+                                    : record.status === "pending"
+                                      ? "Pendiente"
+                                      : record.status === "approved"
+                                        ? "Aprobada"
+                                        : record.status === "paid"
+                                          ? "Pagada"
+                                          : "Borrador"}
+                                </Badge>
+                                {record.processedDate && (
+                                  <span className="text-xs text-muted-foreground">
+                                    {new Date(
+                                      record.processedDate,
+                                    ).toLocaleDateString("es-AR")}
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      const employee = employees.find(
+                                        (e) => e.name === record.employeeName,
+                                      );
+                                      if (employee) {
+                                        setSelectedPayrollRecord(record);
+                                        setSelectedEmployeeForDocs(employee);
+                                        setIsPayrollDocManagerOpen(true);
+                                      }
+                                    }}
+                                  >
+                                    <FileText className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>
+                                    Gestionar documentos de esta liquidación
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-1">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEditRecord(record)}
+                                      disabled={
+                                        record.status === "paid" ||
+                                        (record.status === "processed" &&
+                                          !isAdmin())
+                                      }
+                                    >
+                                      <Calculator className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      {record.status === "paid"
+                                        ? "No se puede editar liquidación pagada"
+                                        : record.status === "processed" &&
+                                            !isAdmin()
+                                          ? "Solo admin puede editar liquidaciones procesadas"
+                                          : "Editar liquidación"}
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => generatePayslip(record)}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Generar recibo</p>
+                                  </TooltipContent>
+                                </Tooltip>
+
+                                {isAdmin() && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setRecordToDelete(record);
+                                          setDeleteConfirmOpen(true);
+                                        }}
+                                        className="text-red-600 hover:text-red-700"
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Eliminar liquidación</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history">
+            <Card>
+              <CardHeader>
+                <CardTitle>Historial de Liquidaciones</CardTitle>
+                <CardDescription>
+                  Consulta liquidaciones de períodos anteriores
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {/* Filtros */}
+                <div className="mb-4 flex gap-4">
+                  <Select
+                    value={employeeFilter}
+                    onValueChange={setEmployeeFilter}
+                  >
+                    <SelectTrigger className="w-64">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="active">
+                        Solo empleados activos
+                      </SelectItem>
+                      <SelectItem value="all">Todos los empleados</SelectItem>
+                      <SelectItem value="inactive">
+                        Solo empleados inactivos
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Filtrar por estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los estados</SelectItem>
+                      <SelectItem value="draft">Borrador</SelectItem>
+                      <SelectItem value="pending">Pendientes</SelectItem>
+                      <SelectItem value="approved">Aprobadas</SelectItem>
+                      <SelectItem value="processed">Procesadas</SelectItem>
+                      <SelectItem value="paid">Pagadas</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {historyRecords.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No hay liquidaciones de períodos anteriores
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Empleado</TableHead>
+                          <TableHead>Período Liquidado</TableHead>
+                          <TableHead>Días Base</TableHead>
+                          <TableHead>Feriados</TableHead>
+                          <TableHead>Horas Extras</TableHead>
+                          <TableHead>Bono Libre</TableHead>
+                          <TableHead>Descuentos</TableHead>
+                          <TableHead>Aguinaldo</TableHead>
+                          <TableHead>Adelantos</TableHead>
+                          <TableHead>En Blanco</TableHead>
+                          <TableHead>Informal</TableHead>
+                          <TableHead>Presentismo</TableHead>
+                          <TableHead>Total Neto</TableHead>
+                          <TableHead>Estado</TableHead>
+                          <TableHead>Documentos</TableHead>
+                          <TableHead className="text-right">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {historyRecords
+                          .filter((record) => {
+                            const employee = employees.find(
+                              (e) => e.name === record.employeeName,
+                            );
+                            if (!employee) return false;
+
+                            // Filter by employee status
+                            let employeeMatch = true;
+                            if (employeeFilter === "active")
+                              employeeMatch = employee.status === "active";
+                            else if (employeeFilter === "inactive")
+                              employeeMatch = employee.status === "inactive";
+
+                            // Filter by liquidation status
+                            let statusMatch = true;
+                            if (statusFilter !== "all")
+                              statusMatch = record.status === statusFilter;
+
+                            return employeeMatch && statusMatch;
+                          })
+                          .sort((a, b) => b.period.localeCompare(a.period)) // Sort by period descending
+                          .map((record) => (
+                            <TableRow key={record.id}>
+                              <TableCell className="font-medium">
+                                {record.employeeName}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {formatPeriod(record.period)}
+                                {isAguinaldoPeriod(record.period) && (
+                                  <div className="text-xs text-green-600">
+                                    Período con aguinaldo
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>{record.baseDays} días</TableCell>
+                              <TableCell>
+                                {record.holidayDays > 0 ? (
+                                  <div>
+                                    <div className="font-medium">
+                                      {formatCurrency(record.holidayBonus)}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {record.holidayDays} días
+                                    </div>
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {record.overtimeHours > 0 ? (
+                                  <div>
+                                    <div className="font-medium">
+                                      {formatCurrency(record.overtimeAmount)}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {record.overtimeHours} hs
+                                    </div>
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {record.bonusAmount > 0 ? (
+                                  <span className="text-green-600 font-medium">
+                                    {formatCurrency(record.bonusAmount)}
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {record.discounts > 0 ? (
+                                  <span className="text-red-600">
+                                    {formatCurrency(record.discounts)}
+                                  </span>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium text-green-600">
+                                {isAguinaldoPeriod(record.period) &&
+                                record.aguinaldo > 0 ? (
+                                  <div>
+                                    <div>
+                                      {formatCurrency(record.aguinaldo)}
+                                    </div>
+                                    {(() => {
+                                      const employee = employees.find(
+                                        (e) => e.name === record.employeeName,
+                                      );
+                                      if (!employee) return null;
+
+                                      const startDate = new Date(
+                                        employee.startDate,
+                                      );
+                                      const [year, month] =
+                                        record.period.split("-");
+                                      const liquidationDate = new Date(
+                                        parseInt(year),
+                                        parseInt(month) - 1,
+                                        1,
+                                      );
+                                      const hasMoreThanSixMonths =
+                                        (liquidationDate - startDate) /
+                                          (1000 * 60 * 60 * 24) >=
+                                        180;
+
+                                      if (!hasMoreThanSixMonths) {
+                                        return (
+                                          <div className="text-xs text-green-700">
+                                            Proporcional
+                                          </div>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
+                                  </div>
+                                ) : (
+                                  "-"
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {formatCurrency(record.advances)}
+                              </TableCell>
+                              <TableCell>
+                                {formatCurrency(record.whiteAmount)}
+                              </TableCell>
+                              <TableCell>
+                                {formatCurrency(record.informalAmount)}
+                              </TableCell>
+                              <TableCell>
+                                {record.presentismoAmount > 0 ? (
+                                  <span className="text-green-600 font-medium">
+                                    {formatCurrency(record.presentismoAmount)}
+                                  </span>
+                                ) : (
+                                  <span className="text-red-600">Perdido</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {formatCurrency(record.netTotal)}
+                                {isAguinaldoPeriod(record.period) &&
+                                  record.aguinaldo > 0 && (
+                                    <div className="text-xs text-green-600">
+                                      Incluye aguinaldo:{" "}
+                                      {formatCurrency(record.aguinaldo)}
+                                    </div>
+                                  )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-col gap-1">
+                                  <Badge
+                                    variant={
+                                      record.status === "processed"
+                                        ? "default"
+                                        : record.status === "pending"
+                                          ? "secondary"
+                                          : record.status === "approved"
+                                            ? "default"
+                                            : record.status === "paid"
+                                              ? "default"
+                                              : "outline"
+                                    }
+                                    className={
+                                      record.status === "paid"
+                                        ? "bg-green-100 text-green-800 hover:bg-green-100"
+                                        : record.status === "approved"
+                                          ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
+                                          : ""
+                                    }
+                                  >
+                                    {record.status === "processed"
+                                      ? "Procesada"
+                                      : record.status === "pending"
+                                        ? "Pendiente"
+                                        : record.status === "approved"
+                                          ? "Aprobada"
+                                          : record.status === "paid"
+                                            ? "Pagada"
+                                            : "Borrador"}
+                                  </Badge>
+                                  {record.processedDate && (
+                                    <span className="text-xs text-muted-foreground">
+                                      {new Date(
+                                        record.processedDate,
+                                      ).toLocaleDateString("es-AR")}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const employee = employees.find(
+                                          (e) => e.name === record.employeeName,
+                                        );
+                                        if (employee) {
+                                          setSelectedPayrollRecord(record);
+                                          setSelectedEmployeeForDocs(employee);
+                                          setIsPayrollDocManagerOpen(true);
+                                        }
+                                      }}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      Gestionar documentos de esta liquidación
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex items-center justify-end gap-1">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditRecord(record)}
+                                        disabled={
+                                          record.status === "paid" ||
+                                          (record.status === "processed" &&
+                                            !isAdmin())
+                                        }
+                                      >
+                                        <Calculator className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>
+                                        {record.status === "paid"
+                                          ? "No se puede editar liquidación pagada"
+                                          : record.status === "processed" &&
+                                              !isAdmin()
+                                            ? "Solo admin puede editar liquidaciones procesadas"
+                                            : "Editar liquidación"}
+                                      </p>
+                                    </TooltipContent>
+                                  </Tooltip>
+
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => generatePayslip(record)}
+                                      >
+                                        <FileText className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Generar recibo</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+
+                                  {isAdmin() && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => {
+                                            setRecordToDelete(record);
+                                            setDeleteConfirmOpen(true);
+                                          }}
+                                          className="text-red-600 hover:text-red-700"
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Eliminar liquidación</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog
+          open={deleteConfirmOpen}
+          onOpenChange={setDeleteConfirmOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+              <AlertDialogDescription>
+                Esta acción no se puede deshacer. Esto eliminará permanentemente
+                la liquidación de{" "}
+                <strong>{recordToDelete?.employeeName}</strong> del período{" "}
+                <strong>{recordToDelete?.period}</strong> y todos sus datos
+                asociados.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeletePayroll}>
+                Eliminar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
+        {/* Success Message */}
+        {successMessage && (
+          <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+            <div className="flex items-center gap-2">
+              <div className="text-sm font-medium">{successMessage}</div>
+              <button
+                onClick={() => setSuccessMessage("")}
+                className="ml-2 text-white hover:text-green-200"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Payroll-specific Document Manager */}
+        <DocumentManager
+          isOpen={isPayrollDocManagerOpen}
+          onClose={() => {
+            setIsPayrollDocManagerOpen(false);
+            setSelectedPayrollRecord(null);
+            setSelectedEmployeeForDocs(null);
+          }}
+          employee={selectedEmployeeForDocs}
+          payrollId={selectedPayrollRecord?.id}
+          title={`Documentos - ${selectedPayrollRecord?.employeeName} (${selectedPayrollRecord?.period ? formatPeriod(selectedPayrollRecord.period) : ""})`}
+        />
+      </div>
+    </TooltipProvider>
+  );
+};
+
+export default Payroll;
