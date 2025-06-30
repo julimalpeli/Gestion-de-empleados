@@ -45,26 +45,45 @@ export const useEmployees = () => {
     }
   };
 
-  // Función auxiliar para sincronizar estado del usuario cuando se desactiva un empleado
-  const syncUserStatusWithEmployee = async (
+  // Función auxiliar para sincronizar datos del usuario cuando se actualiza un empleado
+  const syncUserDataWithEmployee = async (
     employeeId: string,
-    employeeStatus: string,
+    employeeData: any,
   ) => {
     try {
-      // Solo desactivar usuario si el empleado se desactiva, no activar automáticamente
-      if (employeeStatus === "inactive") {
-        const associatedUser = users.find(
-          (user) => user.employeeId === employeeId,
-        );
-        if (associatedUser && associatedUser.isActive) {
-          await updateUser(associatedUser.id, { isActive: false });
+      const associatedUser = users.find(
+        (user) => user.employeeId === employeeId,
+      );
+
+      if (associatedUser) {
+        const updates: any = {};
+
+        // Sincronizar nombre si cambió
+        if (employeeData.name && employeeData.name !== associatedUser.name) {
+          updates.name = employeeData.name;
+        }
+
+        // Sincronizar email si cambió (ya existía esta lógica)
+        if (employeeData.email && employeeData.email !== associatedUser.email) {
+          updates.email = employeeData.email;
+        }
+
+        // Desactivar usuario si empleado se desactiva
+        if (employeeData.status === "inactive" && associatedUser.isActive) {
+          updates.isActive = false;
+        }
+
+        // Aplicar actualizaciones si hay cambios
+        if (Object.keys(updates).length > 0) {
+          await updateUser(associatedUser.id, updates);
           console.log(
-            `Usuario ${associatedUser.username} desactivado al desactivar empleado`,
+            `Usuario ${associatedUser.username} sincronizado:`,
+            updates,
           );
         }
       }
     } catch (error) {
-      console.error("Error syncing user status:", error);
+      console.error("Error syncing user data:", error);
       // No throw error here, just log it to avoid breaking the employee update
     }
   };
