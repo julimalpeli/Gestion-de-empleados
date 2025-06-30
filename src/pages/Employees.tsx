@@ -989,9 +989,38 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                   <TableCell>
                     {(() => {
                       const vacInfo = calculateVacationDays(employee.startDate);
-                      const vacationDays = employee.vacationDays || 0; // Usar datos de la BD
-                      const available = Math.max(
-                        0,
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="default" className="text-xs">
+                              {vacInfo.vacationDays} anuales
+                            </Badge>
+                            <span className="text-xs text-muted-foreground">
+                              ({vacInfo.years} años)
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant="secondary" className="text-xs">
+                              {employee.vacationsTaken} tomados
+                            </Badge>
+                            <Badge variant="outline" className="text-xs">
+                              {vacInfo.vacationDays - employee.vacationsTaken}{" "}
+                              disponibles
+                            </Badge>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 text-xs"
+                            onClick={() => openVacationManager(employee)}
+                          >
+                            <Plane className="h-3 w-3 mr-1" />
+                            Gestionar
+                          </Button>
+                        </div>
+                      );
+                    })()}
+                  </TableCell>
                         vacationDays - (employee.vacationsTaken || 0),
                       );
 
