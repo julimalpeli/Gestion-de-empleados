@@ -189,10 +189,45 @@ export class SupabaseEmployeeService implements IEmployeeService {
     try {
       const { error } = await supabase.from("employees").delete().eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase delete error:", error);
+
+        // Handle specific database errors
+        if (error.code === "23503") {
+          throw new Error(
+            "No se puede eliminar el empleado porque tiene registros de liquidaciones o usuario asociado. Primero desactívalo.",
+          );
+        }
+
+        if (error.code === "23505") {
+          throw new Error("Error de integridad de datos al eliminar empleado");
+        }
+
+        // Handle policy violations (RLS)
+        if (error.code === "42501" || error.message?.includes("permission")) {
+          throw new Error("No tienes permisos para eliminar este empleado");
+        }
+
+        // Generic database error with specific message
+        throw new Error(
+          `Error de base de datos: ${error.message || error.details || "Error desconocido"}`,
+        );
+      }
     } catch (error) {
       console.error("Error deleting employee:", error);
-      throw new Error("Failed to delete employee");
+
+      // If it's already our custom error, re-throw it
+      if (
+        error instanceof Error &&
+        error.message !== "Failed to delete employee"
+      ) {
+        throw error;
+      }
+
+      // Generic fallback
+      throw new Error(
+        `No se pudo eliminar el empleado: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
     }
   }
 
