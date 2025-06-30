@@ -153,11 +153,22 @@ export interface CreatePayrollRequest {
   period: string;
   baseDays: number;
   holidayDays: number;
+  baseAmount: number;
+  holidayBonus: number;
+  aguinaldo: number;
+  discounts: number;
   advances: number;
   whiteAmount: number;
-  presentismoStatus: "mantiene" | "pierde";
+  informalAmount: number;
+  presentismoAmount: number;
   overtimeHours?: number;
+  overtimeAmount?: number;
   bonusAmount?: number;
+  netTotal: number;
+  status: "draft" | "pending" | "approved" | "processed" | "paid";
+  processedDate?: string;
+  processedBy?: string;
+  notes?: string;
 }
 
 export interface UpdatePayrollRequest extends Partial<CreatePayrollRequest> {
