@@ -204,6 +204,13 @@ const Payroll = () => {
 
   const { isAdmin, canEditModule } = usePermissions();
 
+  // Initialize period with current month
+  useEffect(() => {
+    const currentDate = new Date();
+    const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+    setSelectedPeriod(currentPeriod);
+  }, []);
+
   // Success message effect
   useEffect(() => {
     if (successMessage) {
