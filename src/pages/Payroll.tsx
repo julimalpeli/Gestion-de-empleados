@@ -865,8 +865,8 @@ const Payroll = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {/* Filtro de empleados */}
-                <div className="mb-4">
+                {/* Filtros */}
+                <div className="mb-4 flex gap-4">
                   <Select
                     value={employeeFilter}
                     onValueChange={setEmployeeFilter}
@@ -882,6 +882,20 @@ const Payroll = () => {
                       <SelectItem value="inactive">
                         Solo empleados inactivos
                       </SelectItem>
+                    </SelectContent>
+                  </Select>
+
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Filtrar por estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los estados</SelectItem>
+                      <SelectItem value="draft">Borrador</SelectItem>
+                      <SelectItem value="pending">Pendientes</SelectItem>
+                      <SelectItem value="approved">Aprobadas</SelectItem>
+                      <SelectItem value="processed">Procesadas</SelectItem>
+                      <SelectItem value="paid">Pagadas</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
