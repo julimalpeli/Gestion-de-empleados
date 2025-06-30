@@ -32,6 +32,7 @@ import useFiles from "@/hooks/use-files";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useVacations } from "@/hooks/use-vacations";
+import { useDocuments } from "@/hooks/use-documents";
 import { employeeService } from "@/services/employeeService";
 
 const EmployeePortal = () => {
@@ -40,6 +41,12 @@ const EmployeePortal = () => {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const { vacationRequests, loading: vacationsLoading } = useVacations();
+  const {
+    documents,
+    loading: documentsLoading,
+    downloadDocument,
+    getCategoryDisplayName,
+  } = useDocuments(user?.employeeId);
 
   const handleLogout = () => {
     logout();
@@ -246,7 +253,7 @@ const EmployeePortal = () => {
             ¡Bienvenido, {employeeData.name}!
           </h2>
           <p className="text-muted-foreground">
-            Aquí puedes consultar tu información personal, liquidaciones y
+            Aqu�� puedes consultar tu información personal, liquidaciones y
             vacaciones.
           </p>
         </div>
