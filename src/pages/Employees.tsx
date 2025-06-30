@@ -176,6 +176,7 @@ const Employees = () => {
           id: newEmployeeRecord.id,
           name: newEmployeeRecord.name,
           dni: newEmployeeRecord.dni,
+          email: newEmployeeRecord.email,
         });
         userCreated = true;
       } catch (userError) {
