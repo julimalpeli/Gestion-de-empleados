@@ -11,17 +11,28 @@ export const useDocuments = (employeeId?: string) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchDocuments = async (empId?: string) => {
-    if (!empId && !employeeId) return;
+    const targetEmployeeId = empId || employeeId;
+
+    if (!targetEmployeeId) {
+      console.log("No employee ID provided, skipping fetch");
+      return;
+    }
 
     try {
       setLoading(true);
       setError(null);
-      const data = await documentService.getEmployeeDocuments(
-        empId || employeeId!,
-      );
+      console.log("Fetching documents for employee ID:", targetEmployeeId);
+
+      const data = await documentService.getEmployeeDocuments(targetEmployeeId);
+      console.log("Documents fetched successfully:", data.length);
       setDocuments(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error loading documents");
+      console.error("Error in fetchDocuments hook:", err);
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : `Error loading documents: ${String(err)}`;
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
