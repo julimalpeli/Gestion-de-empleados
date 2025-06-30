@@ -86,8 +86,20 @@ class DocumentService {
           "Supabase error details:",
           JSON.stringify(error, null, 2),
         );
+
+        // Handle table not exists error
+        if (
+          error.code === "42P01" ||
+          error.message?.includes("does not exist")
+        ) {
+          console.log(
+            "employee_documents table does not exist yet, returning empty array",
+          );
+          return [];
+        }
+
         throw new Error(
-          `Database error: ${error.message || error.details || "Unknown error"}`,
+          `Database error: ${error.message || error.details || error.hint || "Unknown error"}`,
         );
       }
 
