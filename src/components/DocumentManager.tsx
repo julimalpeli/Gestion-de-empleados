@@ -123,12 +123,16 @@ export default function DocumentManager({
 
     try {
       setIsUploading(true);
+      console.log("DocumentManager: Starting upload process");
+
       await uploadDocument({
         employeeId: employee.id,
         file: uploadForm.file,
         category: uploadForm.category as any,
         description: uploadForm.description,
       });
+
+      console.log("DocumentManager: Upload successful, resetting form");
 
       // Reset form
       setUploadForm({ file: null, category: "", description: "" });
@@ -139,9 +143,22 @@ export default function DocumentManager({
         "file-upload",
       ) as HTMLInputElement;
       if (fileInput) fileInput.value = "";
+
+      // Show success message
+      alert("Documento subido exitosamente");
     } catch (error) {
-      console.error("Error uploading document:", error);
-      alert("Error al subir el documento");
+      console.error("DocumentManager: Error uploading document:", error);
+
+      let errorMessage = "Error al subir el documento";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      } else if (error && typeof error === "object") {
+        errorMessage = `Error: ${JSON.stringify(error)}`;
+      }
+
+      alert(`Error al subir el documento: ${errorMessage}`);
     } finally {
       setIsUploading(false);
     }
