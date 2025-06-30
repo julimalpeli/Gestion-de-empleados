@@ -125,6 +125,49 @@ const EmployeePortal = () => {
     return new Date(dateString).toLocaleDateString("es-AR");
   };
 
+  const formatPeriod = (period: string) => {
+    const [year, month] = period.split("-");
+    const monthNames = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    return `${monthNames[parseInt(month) - 1]} ${year}`;
+  };
+
+  if (employeesLoading || payrollLoading || vacationsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Cargando información del empleado...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentEmployee) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">
+            Error: No se encontró información del empleado
+          </p>
+          <Button onClick={handleLogout}>Volver al Login</Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       {/* Header */}
