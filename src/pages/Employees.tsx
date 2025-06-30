@@ -832,7 +832,7 @@ const Employees = () => {
                 />
               </div>
 
-              <div className="space-y-2 col-span-2">
+              <div className="space-y-2">
                 <Label htmlFor="edit-presentismo">Presentismo</Label>
                 <Input
                   id="edit-presentismo"
@@ -846,6 +846,23 @@ const Employees = () => {
                     })
                   }
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label>Sueldo Diario Calculado</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  <span className="text-lg font-semibold">
+                    {formatCurrency(
+                      calculateDailySalary(
+                        parseFloat(editingEmployee.whiteWage) || 0,
+                        parseFloat(editingEmployee.informalWage) || 0,
+                      ),
+                    )}
+                  </span>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    (Sueldo Blanco + Sueldo Informal) ÷ 30
+                  </p>
+                </div>
               </div>
             </div>
           )}
