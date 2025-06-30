@@ -1067,6 +1067,7 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                           variant="ghost"
                           size="sm"
                           title="Eliminar empleado"
+                          onClick={() => handleDeleteEmployee(employee)}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
