@@ -97,27 +97,29 @@ export function AppSidebar() {
           <SidebarGroupLabel>Principal</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      onClick={handleLinkClick}
-                      className={({ isActive }) =>
-                        cn(
-                          "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                          isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                            : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        )
-                      }
-                    >
-                      <item.icon className="h-4 w-4" />
-                      {item.title}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items
+                .filter((item) => !item.adminOnly || user?.role === "admin")
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink
+                        to={item.url}
+                        onClick={handleLinkClick}
+                        className={({ isActive }) =>
+                          cn(
+                            "flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                            isActive
+                              ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                              : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                          )
+                        }
+                      >
+                        <item.icon className="h-4 w-4" />
+                        {item.title}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
