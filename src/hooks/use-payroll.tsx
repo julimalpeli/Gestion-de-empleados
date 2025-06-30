@@ -143,6 +143,10 @@ export const usePayroll = () => {
       if (updates.netTotal !== undefined)
         updateData.net_total = updates.netTotal;
       if (updates.status !== undefined) updateData.status = updates.status;
+      if (updates.processedDate !== undefined)
+        updateData.processed_date = updates.processedDate;
+      if (updates.processedBy !== undefined)
+        updateData.processed_by = updates.processedBy;
       if (updates.notes !== undefined) updateData.notes = updates.notes;
 
       const { error } = await supabase
