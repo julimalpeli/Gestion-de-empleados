@@ -343,12 +343,24 @@ const EmployeePortal = () => {
 
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Email</label>
-                    <p className="text-lg">{employeeData.email}</p>
+                    <p className="text-lg">
+                      {employeeData.email || (
+                        <span className="text-muted-foreground italic">
+                          No registrado
+                        </span>
+                      )}
+                    </p>
                   </div>
 
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">Dirección</label>
-                    <p className="text-lg">{employeeData.address}</p>
+                    <p className="text-lg">
+                      {employeeData.address || (
+                        <span className="text-muted-foreground italic">
+                          No registrada
+                        </span>
+                      )}
+                    </p>
                   </div>
                 </div>
               </CardContent>
