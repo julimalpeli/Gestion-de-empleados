@@ -218,7 +218,8 @@ const VacationManager = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Gestión de Vacaciones - {employee?.name}
+            Gestión de Vacaciones - {employee?.name} (DNI:{" "}
+            {employee?.dni || "N/A"})
           </DialogTitle>
           <DialogDescription>
             Administra las solicitudes de vacaciones del empleado
