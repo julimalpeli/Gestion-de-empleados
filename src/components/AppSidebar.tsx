@@ -24,7 +24,14 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 
-const items = [
+interface MenuItem {
+  title: string;
+  url: string;
+  icon: any;
+  adminOnly?: boolean;
+}
+
+const items: MenuItem[] = [
   {
     title: "Dashboard",
     url: "/",
