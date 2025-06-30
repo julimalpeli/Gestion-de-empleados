@@ -65,6 +65,31 @@ export const usePayroll = () => {
     }
   };
 
+  // Check if payroll record exists for employee and period
+  const getExistingPayrollRecord = async (
+    employeeId: string,
+    period: string,
+  ) => {
+    try {
+      const { data, error } = await supabase
+        .from("payroll_records")
+        .select("*")
+        .eq("employee_id", employeeId)
+        .eq("period", period)
+        .single();
+
+      if (error && error.code !== "PGRST116") {
+        // PGRST116 = no rows found
+        throw error;
+      }
+
+      return data;
+    } catch (err) {
+      console.error("Error checking existing payroll:", err);
+      return null;
+    }
+  };
+
   // Crear registro de liquidación
   const createPayrollRecord = async (payroll: CreatePayrollRequest) => {
     try {
