@@ -1652,6 +1652,19 @@ const Payroll = () => {
           }}
           employee={selectedEmployeeForDocs}
         />
+
+        {/* Payroll-specific Document Manager */}
+        <DocumentManager
+          isOpen={isPayrollDocManagerOpen}
+          onClose={() => {
+            setIsPayrollDocManagerOpen(false);
+            setSelectedPayrollRecord(null);
+            setSelectedEmployeeForDocs(null);
+          }}
+          employee={selectedEmployeeForDocs}
+          payrollId={selectedPayrollRecord?.id}
+          title={`Documentos - ${selectedPayrollRecord?.employeeName} (${selectedPayrollRecord?.period ? formatPeriod(selectedPayrollRecord.period) : ""})`}
+        />
       </div>
     </TooltipProvider>
   );
