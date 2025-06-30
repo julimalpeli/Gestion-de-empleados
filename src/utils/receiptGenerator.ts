@@ -46,7 +46,6 @@ export const generatePayrollReceiptPDF = async (data: ReceiptData) => {
         <div class="header">
           <div class="company-name">${data.company.name}</div>
           <div>${data.company.address}</div>
-          <div>Tel: ${data.company.phone}</div>
           <div class="receipt-title">RECIBO DE SUELDO</div>
         </div>
 
@@ -76,12 +75,12 @@ export const generatePayrollReceiptPDF = async (data: ReceiptData) => {
             </thead>
             <tbody>
               <tr>
-                <td>Sueldo en Blanco</td>
+                <td>Sueldo Depósito</td>
                 <td>${data.payroll.baseDays} días</td>
                 <td>$${formatAmount(data.payroll.whiteAmount)}</td>
               </tr>
               <tr>
-                <td>Sueldo Informal</td>
+                <td>Sueldo Efectivo</td>
                 <td>${data.payroll.baseDays} días</td>
                 <td>$${formatAmount(data.payroll.informalAmount)}</td>
               </tr>
