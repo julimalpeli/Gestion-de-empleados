@@ -15,6 +15,7 @@ interface User {
   email: string;
   permissions: string[];
   loginTime: string;
+  needsPasswordChange?: boolean;
 }
 
 interface AuthContextType {
