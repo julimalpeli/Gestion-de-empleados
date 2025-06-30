@@ -29,6 +29,9 @@ import {
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
 import useFiles from "@/hooks/use-files";
+import { useEmployees } from "@/hooks/use-employees";
+import { usePayroll } from "@/hooks/use-payroll";
+import { useVacations } from "@/hooks/use-vacations";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
