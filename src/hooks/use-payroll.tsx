@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import type { PayrollRecord } from "@/services/interfaces";
+import type {
+  PayrollRecord,
+  CreatePayrollRequest,
+} from "@/services/interfaces";
 
 export const usePayroll = () => {
   const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>([]);
