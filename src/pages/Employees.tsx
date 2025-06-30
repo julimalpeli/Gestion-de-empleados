@@ -871,19 +871,22 @@ const Employees = () => {
                           </Button>
                         </PermissionGate>
 
-                        <PermissionGate module="employees" action="delete">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setEmployeeToDelete(employee);
-                              setDeleteConfirmOpen(true);
-                            }}
-                            title="Eliminar empleado"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </Button>
-                        </PermissionGate>
+                        {/* Delete button temporarily hidden */}
+                        {false && (
+                          <PermissionGate module="employees" action="delete">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEmployeeToDelete(employee);
+                                setDeleteConfirmOpen(true);
+                              }}
+                              title="Eliminar empleado"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </PermissionGate>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>
