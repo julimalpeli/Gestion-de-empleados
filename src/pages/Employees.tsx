@@ -1065,13 +1065,104 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                         </div>
                       );
                     })()}
-                  <TableCell>
-                    {(() => {
-                      const vacInfo = calculateVacationDays(employee.startDate);
-                      return (
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <Badge variant="default" className="text-xs">
+                  </TableCell>
+
+                  {/* Acciones */}
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-1">
+                      {/* Info Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        title="Ver información completa del empleado"
+                        onClick={() => showEmployeeInfo(employee)}
+                      >
+                        <Info className="h-4 w-4" />
+                      </Button>
+
+                      {/* Edit Button */}
+                      <PermissionGate module="employees" action="edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Editar datos del empleado"
+                          onClick={() => handleEditEmployee(employee)}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                      </PermissionGate>
+
+                      {/* Toggle Status Button */}
+                      <PermissionGate module="employees" action="edit">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title={
+                            employee.status === "active"
+                              ? "Desactivar empleado"
+                              : "Activar empleado"
+                          }
+                          onClick={() => handleToggleStatus(employee)}
+                        >
+                          {employee.status === "active" ? (
+                            <UserX className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <UserCheck className="h-4 w-4 text-green-500" />
+                          )}
+                        </Button>
+                      </PermissionGate>
+
+                      {/* Delete Button */}
+                      <PermissionGate module="employees" action="delete">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          title="Eliminar empleado"
+                          onClick={() => handleDeleteEmployee(employee)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </PermissionGate>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Vacation Manager */}
+      {selectedEmployeeForVacations && (
+        <VacationManager
+          employee={selectedEmployeeForVacations}
+          isOpen={isVacationManagerOpen}
+          onClose={() => {
+            setIsVacationManagerOpen(false);
+            setSelectedEmployeeForVacations(null);
+          }}
+        />
+      )}
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-medium">{successMessage}</div>
+            <button
+              onClick={() => setSuccessMessage("")}
+              className="ml-2 text-white hover:text-green-200"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Employees;
                               {vacInfo.vacationDays} anuales
                             </Badge>
                             <span className="text-xs text-muted-foreground">
