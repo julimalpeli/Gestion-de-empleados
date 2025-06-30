@@ -93,6 +93,7 @@ const UserManagement = () => {
 
   const { employees } = useEmployees();
   const { isAdmin } = usePermissions();
+  const { changePassword } = useAuth();
 
   // Filtrar usuarios
   const filteredUsers = users.filter((user) => {
