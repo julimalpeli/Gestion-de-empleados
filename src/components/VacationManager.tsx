@@ -194,7 +194,17 @@ const VacationManager = ({
     .filter((v) => v.status === "approved")
     .reduce((sum, v) => sum + v.days, 0);
 
-  const availableDays = employee ? employee.vacationDays - totalDaysUsed : 0;
+  // Calcular elegibilidad para vacaciones (6 meses de antigüedad)
+  const vacationInfo = employee
+    ? employeeService.calculateVacationDays(employee.startDate)
+    : null;
+  const isEligibleForVacations = vacationInfo?.eligibleForVacations || false;
+  const monthsOfService = vacationInfo?.totalMonths || 0;
+
+  const availableDays =
+    employee && isEligibleForVacations
+      ? employee.vacationDays - totalDaysUsed
+      : 0;
 
   // Mostrar loading si está cargando
   if (loading) {
