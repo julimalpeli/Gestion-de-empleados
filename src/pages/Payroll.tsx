@@ -724,9 +724,6 @@ const Payroll = () => {
                           bonusAmount: parseFloat(bonusAmount) || 0,
                           netTotal: calculation.total,
                           status: "processed",
-                          processedDate: null,
-                          processedBy: null,
-                          notes: null,
                         });
                       }
 
