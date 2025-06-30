@@ -1425,7 +1425,7 @@ const Payroll = () => {
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Generar recibo de sueldo</p>
+                                    <p>Descargar recibo</p>
                                   </TooltipContent>
                                 </Tooltip>
                               </div>
