@@ -128,6 +128,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       if (employee.name) updateData.name = employee.name;
       if (employee.dni) updateData.dni = employee.dni;
+      if (employee.documentType)
+        updateData.document_type = employee.documentType;
       if (employee.position) updateData.job_position = employee.position;
       if (employee.whiteWage !== undefined)
         updateData.white_wage = employee.whiteWage;
@@ -139,6 +141,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
         updateData.loses_presentismo = employee.losesPresentismo;
       if (employee.status) updateData.status = employee.status;
       if (employee.startDate) updateData.start_date = employee.startDate;
+      if (employee.address !== undefined) updateData.address = employee.address;
+      if (employee.email !== undefined) updateData.email = employee.email;
 
       // Recalcular sueldo diario si cambiaron los sueldos
       if (
