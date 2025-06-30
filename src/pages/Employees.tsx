@@ -165,6 +165,14 @@ const Employees = () => {
         alert("El nombre es requerido");
         return;
       }
+      if (!newEmployee.dni.trim()) {
+        alert("El DNI es requerido");
+        return;
+      }
+      if (!/^\d{1,8}$/.test(newEmployee.dni.trim())) {
+        alert("El DNI debe ser un número de máximo 8 dígitos");
+        return;
+      }
       if (!newEmployee.position.trim()) {
         alert("El puesto es requerido");
         return;
@@ -176,6 +184,7 @@ const Employees = () => {
 
       const employeeData = {
         name: newEmployee.name.trim(),
+        dni: newEmployee.dni.trim(),
         position: newEmployee.position.trim(),
         whiteWage: parseFloat(newEmployee.whiteWage) || 0,
         informalWage: parseFloat(newEmployee.informalWage) || 0,
