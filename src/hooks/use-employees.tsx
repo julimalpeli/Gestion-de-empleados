@@ -73,10 +73,11 @@ export const useEmployees = () => {
       await employeeService.deleteEmployee(id);
       setEmployees((prev) => prev.filter((emp) => emp.id !== id));
     } catch (err) {
+      console.error("Delete employee error:", err);
       const errorMsg =
-        err instanceof Error ? err.message : "Error deleting employee";
+        err instanceof Error ? err.message : "Error eliminando empleado";
       setError(errorMsg);
-      throw new Error(errorMsg);
+      throw err; // Re-throw the original error to preserve the message
     }
   };
 
