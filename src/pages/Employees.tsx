@@ -572,6 +572,34 @@ const Employees = () => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="juan.perez@ejemplo.com"
+                    value={newEmployee.email}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, email: e.target.value })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="address">Domicilio</Label>
+                  <Input
+                    id="address"
+                    placeholder="Av. Corrientes 1234, CABA"
+                    value={newEmployee.address}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        address: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
                   <Label>Sueldo Diario Calculado</Label>
                   <div className="p-3 bg-muted rounded-md">
                     <span className="text-lg font-semibold">
