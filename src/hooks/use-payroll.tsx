@@ -63,12 +63,7 @@ export const usePayroll = () => {
   };
 
   // Crear registro de liquidación
-  const createPayrollRecord = async (
-    payroll: Omit<
-      PayrollRecord,
-      "id" | "createdAt" | "updatedAt" | "employeeName"
-    >,
-  ) => {
+  const createPayrollRecord = async (payroll: CreatePayrollRequest) => {
     try {
       const { data, error } = await supabase
         .from("payroll_records")
@@ -76,20 +71,22 @@ export const usePayroll = () => {
           employee_id: payroll.employeeId,
           period: payroll.period,
           base_days: payroll.baseDays,
-          holiday_days: payroll.holidayDays,
+          holiday_days: payroll.holidayDays || 0,
           base_amount: payroll.baseAmount,
-          holiday_bonus: payroll.holidayBonus,
-          aguinaldo: payroll.aguinaldo,
-          discounts: payroll.discounts,
-          advances: payroll.advances,
+          holiday_bonus: payroll.holidayBonus || 0,
+          aguinaldo: payroll.aguinaldo || 0,
+          discounts: payroll.discounts || 0,
+          advances: payroll.advances || 0,
           white_amount: payroll.whiteAmount,
           informal_amount: payroll.informalAmount,
-          presentismo_amount: payroll.presentismoAmount,
-          overtime_hours: payroll.overtimeHours,
-          overtime_amount: payroll.overtimeAmount,
-          bonus_amount: payroll.bonusAmount,
+          presentismo_amount: payroll.presentismoAmount || 0,
+          overtime_hours: payroll.overtimeHours || 0,
+          overtime_amount: payroll.overtimeAmount || 0,
+          bonus_amount: payroll.bonusAmount || 0,
           net_total: payroll.netTotal,
           status: payroll.status,
+          processed_date: payroll.processedDate,
+          processed_by: payroll.processedBy,
           notes: payroll.notes,
         })
         .select()
