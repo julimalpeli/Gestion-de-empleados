@@ -41,14 +41,30 @@ export const useDocuments = (employeeId?: string) => {
   const uploadDocument = async (request: CreateDocumentRequest) => {
     try {
       setError(null);
+      console.log(
+        "Hook: Starting document upload for employee:",
+        request.employeeId,
+      );
+
       const newDocument = await documentService.uploadDocument(request);
+      console.log("Hook: Document uploaded successfully, updating state");
+
       setDocuments((prev) => [newDocument, ...prev]);
       return newDocument;
     } catch (err) {
-      const errorMsg =
-        err instanceof Error ? err.message : "Error uploading document";
+      console.error("Hook: Error uploading document:", err);
+
+      let errorMsg = "Error uploading document";
+      if (err instanceof Error) {
+        errorMsg = err.message;
+      } else if (typeof err === "string") {
+        errorMsg = err;
+      } else if (err && typeof err === "object") {
+        errorMsg = `Upload error: ${JSON.stringify(err)}`;
+      }
+
       setError(errorMsg);
-      throw new Error(errorMsg);
+      throw err; // Re-throw original error to preserve the message
     }
   };
 
