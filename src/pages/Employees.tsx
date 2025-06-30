@@ -582,7 +582,10 @@ const Employees = () => {
                   <TableHead>DNI</TableHead>
                   <TableHead>Puesto</TableHead>
                   <TableHead>Fecha Ingreso</TableHead>
-                  <TableHead>Sueldo Total</TableHead>
+                  <TableHead>Sueldo Diario</TableHead>
+                  <TableHead>Mensual Blanco</TableHead>
+                  <TableHead>Mensual Informal</TableHead>
+                  <TableHead>Presentismo</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
