@@ -104,6 +104,8 @@ const EmployeePortal = () => {
         phone: "",
         email: "",
         address: "",
+        isEligibleForVacations: false,
+        monthsOfService: 0,
       };
 
   // Get real payroll history for current employee
