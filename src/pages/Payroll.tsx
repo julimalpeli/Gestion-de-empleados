@@ -310,7 +310,7 @@ const Payroll = () => {
       ? hourlyRate * (parseInt(overtimeHours) || 0)
       : 0;
 
-    // Agregar presentismo según selección en liquidaci��n
+    // Agregar presentismo según selección en liquidación
     const presentismoAmount =
       presentismoStatus === "mantiene" ? employee.presentismo : 0;
 
@@ -980,12 +980,13 @@ const Payroll = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Empleado</TableHead>
+                        <TableHead>Período Liquidado</TableHead>
                         <TableHead>Días Base</TableHead>
                         <TableHead>Feriados</TableHead>
                         <TableHead>Horas Extras</TableHead>
                         <TableHead>Bono Libre</TableHead>
                         <TableHead>Descuentos</TableHead>
-                        {isAguinaldoMonth && <TableHead>Aguinaldo</TableHead>}
+                        <TableHead>Aguinaldo</TableHead>
                         <TableHead>Adelantos</TableHead>
                         <TableHead>En Blanco</TableHead>
                         <TableHead>Informal</TableHead>
