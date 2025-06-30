@@ -258,6 +258,7 @@ const Payroll = () => {
     }
 
     // Pre-fill form with record data
+    setSelectedPeriod(record.period);
     setWorkDays(record.baseDays.toString());
     setHolidayDays(record.holidayDays.toString());
     setAdvances(record.advances.toString());
