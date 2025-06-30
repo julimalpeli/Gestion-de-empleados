@@ -126,6 +126,22 @@ const Payroll = () => {
     setSelectedPeriod(currentPeriod);
   }, []);
 
+  // Get current period for filtering
+  const getCurrentPeriod = () => {
+    const currentDate = new Date();
+    return `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+  };
+
+  const currentPeriod = getCurrentPeriod();
+
+  // Filter records by period for current vs history tabs
+  const currentPeriodRecords = payrollRecords.filter(
+    (record) => record.period === currentPeriod,
+  );
+  const historyRecords = payrollRecords.filter(
+    (record) => record.period !== currentPeriod,
+  );
+
   // Success message effect
   useEffect(() => {
     if (successMessage) {
