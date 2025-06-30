@@ -841,6 +841,7 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
             <TableHeader>
               <TableRow>
                 <TableHead>Nombre</TableHead>
+                <TableHead>DNI</TableHead>
                 <TableHead>Puesto</TableHead>
                 <TableHead>Fecha de Ingreso</TableHead>
                 <TableHead>Sueldo Diario</TableHead>
