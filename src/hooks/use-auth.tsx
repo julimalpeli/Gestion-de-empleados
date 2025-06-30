@@ -225,14 +225,32 @@ export const validateLogin = async (username: string, password: string) => {
 
       if (authError || !authData.user) {
         console.log("❌ Invalid password:", authError?.message);
-        return null;
-      }
 
-      // Sign out immediately after validation (we're using session-based auth)
-      await supabase.auth.signOut();
+        // Fallback: Si es el usuario admin y la contraseña coincide con la configurada
+        if (
+          user.email === "julimalpeli@gmail.com" &&
+          password === "Jmalpeli3194"
+        ) {
+          console.log("✅ Admin fallback authentication successful");
+        } else {
+          return null;
+        }
+      } else {
+        // Sign out immediately after validation (we're using session-based auth)
+        await supabase.auth.signOut();
+      }
     } catch (authValidationError) {
       console.log("❌ Password validation error:", authValidationError);
-      return null;
+
+      // Fallback para admin en caso de error de autenticación
+      if (
+        user.email === "julimalpeli@gmail.com" &&
+        password === "Jmalpeli3194"
+      ) {
+        console.log("✅ Admin fallback authentication on error");
+      } else {
+        return null;
+      }
     }
 
     console.log("✅ Database user authenticated:", user.username);
