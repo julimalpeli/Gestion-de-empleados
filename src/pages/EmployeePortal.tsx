@@ -434,6 +434,9 @@ const EmployeePortal = () => {
                           </TableCell>
                         </TableRow>
                       )}
+                    </TableBody>
+                  </Table>
+                </CardContent>
             </Card>
           </TabsContent>
 
