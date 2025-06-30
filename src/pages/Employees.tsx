@@ -137,6 +137,7 @@ const Employees = () => {
     useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
+    dni: "",
     position: "",
     whiteWage: "",
     informalWage: "",
