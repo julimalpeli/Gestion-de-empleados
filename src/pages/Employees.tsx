@@ -78,6 +78,7 @@ const Employees = () => {
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     dni: "",
+    documentType: "dni",
     position: "",
     whiteWage: "",
     informalWage: "",
