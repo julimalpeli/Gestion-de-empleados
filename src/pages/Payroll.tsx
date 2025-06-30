@@ -225,6 +225,8 @@ const Payroll = () => {
 
   const handleStateChange = async (record, newStatus) => {
     try {
+      console.log("Updating status to:", newStatus);
+
       const updateData = {
         status: newStatus,
         processedDate: new Date().toISOString(),
