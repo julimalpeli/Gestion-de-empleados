@@ -369,7 +369,6 @@ const UserManagement = () => {
                 Nuevo Usuario
               </Button>
             </DialogTrigger>
-        </div>
           <DialogContent className="max-w-md">
             <DialogHeader>
               <DialogTitle>Crear Nuevo Usuario</DialogTitle>
