@@ -284,6 +284,11 @@ const Employees = () => {
     }).format(amount);
   };
 
+  const calculateDailySalary = (whiteWage, informalWage) => {
+    const totalSalary = (whiteWage || 0) + (informalWage || 0);
+    return totalSalary / 30;
+  };
+
   const formatPosition = (position) => {
     const positions = {
       cocinero: "Cocinero",
