@@ -63,18 +63,20 @@ const EmployeePortal = () => {
     ? {
         name: currentEmployee.name,
         dni: currentEmployee.dni,
+        documentType: currentEmployee.documentType || "DNI",
         position: currentEmployee.position,
         employeeId: currentEmployee.id,
         startDate: currentEmployee.startDate,
         vacationDays: currentEmployee.vacationDays || 14,
         vacationsTaken: currentEmployee.vacationsTaken || 0,
         phone: "+54 11 1234-5678", // TODO: Add to employee model
-        email: `${currentEmployee.name.toLowerCase().replace(/\s+/g, ".")}@cadizbartapas.com`,
-        address: "Av. Corrientes 1234, CABA", // TODO: Add to employee model
+        email: currentEmployee.email || "",
+        address: currentEmployee.address || "",
       }
     : {
         name: user?.name || "Empleado",
         dni: user?.username || "--------",
+        documentType: "DNI",
         position: "Empleado",
         employeeId: user?.employeeId || "",
         startDate: new Date().toISOString().split("T")[0],
