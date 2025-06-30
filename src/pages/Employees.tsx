@@ -226,7 +226,7 @@ const Employees = () => {
         // No fallar la creación del empleado por error de usuario
       }
 
-      // Mensaje de éxito según el resultado
+      // Mensaje de éxito seg��n el resultado
       if (userCreated) {
         setSuccessMessage(
           `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}`,
@@ -1108,7 +1108,6 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                               : "Activar empleado"
                           }
                           onClick={() => handleToggleStatus(employee)}
-                        >
                         >
                           {employee.status === "active" ? (
                             <UserX className="h-4 w-4 text-red-500" />
