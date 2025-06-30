@@ -816,15 +816,20 @@ const Payroll = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Procesadas</CardTitle>
+              <CardTitle className="text-sm font-medium">Pagadas</CardTitle>
               <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {payrollRecords.filter((r) => r.status === "processed").length}
+                {payrollRecords.filter((r) => r.status === "paid").length}
               </div>
               <p className="text-xs text-muted-foreground">
-                De {payrollRecords.length} total
+                {
+                  payrollRecords.filter(
+                    (r) => r.status === "pending" || r.status === "approved",
+                  ).length
+                }{" "}
+                pendientes
               </p>
             </CardContent>
           </Card>
