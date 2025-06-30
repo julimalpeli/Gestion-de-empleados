@@ -39,8 +39,8 @@ INSERT INTO auth.users (
 ) VALUES (
   gen_random_uuid(), -- id único
   '00000000-0000-0000-0000-000000000000', -- instance_id estándar
-  'admin@cadizbartapas.com', -- CAMBIA ESTE EMAIL
-  crypt('admin123456', gen_salt('bf')), -- CAMBIA ESTA CONTRASEÑA
+  'julian@cadizbartapas.com', -- Email del administrador
+  crypt('CadizBar2024!', gen_salt('bf')), -- Contraseña segura
   NOW(), -- email confirmado
   NOW(), -- created_at
   NOW(), -- updated_at
@@ -84,10 +84,10 @@ INSERT INTO public.users (
   created_at,
   updated_at
 ) VALUES (
-  (SELECT id FROM auth.users WHERE email = 'admin@cadizbartapas.com'),
-  'admin@cadizbartapas.com',
+  (SELECT id FROM auth.users WHERE email = 'julian@cadizbartapas.com'),
+  'julian@cadizbartapas.com',
   'admin',
-  'Administrador Principal',
+  'Julian Malpeli',
   'admin',
   NULL, -- Sin empleado asociado
   false, -- No forzar cambio de contraseña
@@ -100,7 +100,7 @@ ON CONFLICT (id) DO UPDATE SET
   updated_at = NOW();
 
 -- 3. Verificar que se creó correctamente
-SELECT 
+SELECT
   au.id,
   au.email,
   au.created_at as auth_created_at,
@@ -111,7 +111,7 @@ SELECT
   pu.created_at as profile_created_at
 FROM auth.users au
 LEFT JOIN public.users pu ON au.id = pu.id
-WHERE au.email = 'admin@cadizbartapas.com';
+WHERE au.email = 'julian@cadizbartapas.com';
 
 -- 4. (OPCIONAL) Si quieres crear un segundo admin de respaldo
 -- Descomenta las siguientes líneas y cambia los datos:
@@ -179,8 +179,8 @@ ON CONFLICT (id) DO NOTHING;
 */
 
 -- 5. Mostrar resumen de usuarios creados
-SELECT 
+SELECT
   'Usuario creado exitosamente' as status,
   COUNT(*) as admin_users_count
-FROM public.users 
+FROM public.users
 WHERE role = 'admin';
