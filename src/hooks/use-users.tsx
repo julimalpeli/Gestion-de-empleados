@@ -109,11 +109,12 @@ export const useUsers = () => {
     id: string;
     name: string;
     dni: string;
+    email?: string;
   }) => {
     try {
       await createUser({
         username: employee.dni,
-        email: `${employee.dni}@cadizbar.com`,
+        email: employee.email || `${employee.dni}@cadizbar.com`,
         name: employee.name,
         role: "employee",
         employeeId: employee.id,
