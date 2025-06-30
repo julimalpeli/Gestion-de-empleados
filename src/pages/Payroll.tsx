@@ -866,158 +866,172 @@ const Payroll = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {payrollRecords.map((record) => (
-                        <TableRow key={record.id}>
-                          <TableCell className="font-medium">
-                            {record.employeeName}
-                          </TableCell>
-                          <TableCell>{record.baseDays} días</TableCell>
-                          <TableCell>
-                            {record.holidayDays > 0 ? (
-                              <div>
-                                <div className="font-medium">
-                                  {formatCurrency(record.holidayBonus)}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {record.holidayDays} días
-                                </div>
-                              </div>
-                            ) : (
-                              "-"
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {record.overtimeHours > 0 ? (
-                              <div>
-                                <div className="font-medium">
-                                  {formatCurrency(record.overtimeAmount)}
-                                </div>
-                                <div className="text-xs text-muted-foreground">
-                                  {record.overtimeHours} hs
-                                </div>
-                              </div>
-                            ) : (
-                              "-"
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {record.bonusAmount > 0 ? (
-                              <span className="text-green-600 font-medium">
-                                {formatCurrency(record.bonusAmount)}
-                              </span>
-                            ) : (
-                              "-"
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {record.discounts > 0 ? (
-                              <span className="text-red-600">
-                                {formatCurrency(record.discounts)}
-                              </span>
-                            ) : (
-                              "-"
-                            )}
-                          </TableCell>
-                          {isAguinaldoMonth && (
-                            <TableCell className="font-medium text-green-600">
-                              {record.aguinaldo > 0
-                                ? formatCurrency(record.aguinaldo)
-                                : "-"}
+                      {payrollRecords
+                        .filter((record) => {
+                          const employee = employees.find(
+                            (e) => e.name === record.employeeName,
+                          );
+                          if (!employee) return false;
+
+                          if (employeeFilter === "active")
+                            return employee.status === "active";
+                          if (employeeFilter === "inactive")
+                            return employee.status === "inactive";
+                          return true; // "all"
+                        })
+                        .map((record) => (
+                          <TableRow key={record.id}>
+                            <TableCell className="font-medium">
+                              {record.employeeName}
                             </TableCell>
-                          )}
-                          <TableCell>
-                            {formatCurrency(record.advances)}
-                          </TableCell>
-                          <TableCell>
-                            {formatCurrency(record.whiteAmount)}
-                          </TableCell>
-                          <TableCell>
-                            {formatCurrency(record.informalAmount)}
-                          </TableCell>
-                          <TableCell>
-                            {record.presentismoAmount > 0 ? (
-                              <span className="text-green-600 font-medium">
-                                {formatCurrency(record.presentismoAmount)}
-                              </span>
-                            ) : (
-                              <span className="text-red-600">Perdido</span>
+                            <TableCell>{record.baseDays} días</TableCell>
+                            <TableCell>
+                              {record.holidayDays > 0 ? (
+                                <div>
+                                  <div className="font-medium">
+                                    {formatCurrency(record.holidayBonus)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {record.holidayDays} días
+                                  </div>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.overtimeHours > 0 ? (
+                                <div>
+                                  <div className="font-medium">
+                                    {formatCurrency(record.overtimeAmount)}
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {record.overtimeHours} hs
+                                  </div>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.bonusAmount > 0 ? (
+                                <span className="text-green-600 font-medium">
+                                  {formatCurrency(record.bonusAmount)}
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.discounts > 0 ? (
+                                <span className="text-red-600">
+                                  {formatCurrency(record.discounts)}
+                                </span>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            {isAguinaldoMonth && (
+                              <TableCell className="font-medium text-green-600">
+                                {record.aguinaldo > 0
+                                  ? formatCurrency(record.aguinaldo)
+                                  : "-"}
+                              </TableCell>
                             )}
-                          </TableCell>
-                          <TableCell className="font-medium">
-                            {formatCurrency(record.netTotal)}
-                            {record.aguinaldo > 0 && (
-                              <div className="text-xs text-green-600">
-                                Incluye aguinaldo
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant={
-                                record.status === "processed"
-                                  ? "default"
+                            <TableCell>
+                              {formatCurrency(record.advances)}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(record.whiteAmount)}
+                            </TableCell>
+                            <TableCell>
+                              {formatCurrency(record.informalAmount)}
+                            </TableCell>
+                            <TableCell>
+                              {record.presentismoAmount > 0 ? (
+                                <span className="text-green-600 font-medium">
+                                  {formatCurrency(record.presentismoAmount)}
+                                </span>
+                              ) : (
+                                <span className="text-red-600">Perdido</span>
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium">
+                              {formatCurrency(record.netTotal)}
+                              {record.aguinaldo > 0 && (
+                                <div className="text-xs text-green-600">
+                                  Incluye aguinaldo
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant={
+                                  record.status === "processed"
+                                    ? "default"
+                                    : record.status === "pending"
+                                      ? "secondary"
+                                      : "outline"
+                                }
+                              >
+                                {record.status === "processed"
+                                  ? "Procesada"
                                   : record.status === "pending"
-                                    ? "secondary"
-                                    : "outline"
-                              }
-                            >
-                              {record.status === "processed"
-                                ? "Procesada"
-                                : record.status === "pending"
-                                  ? "Pendiente"
-                                  : "Borrador"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <FileUpload
-                              entityId={record.id}
-                              entityType="payroll"
-                              title={`Documentos - ${record.employeeName} (${record.period})`}
-                              description="Subir recibos de sueldo, comprobantes y otros documentos de la liquidación"
-                            />
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-2">
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleEditRecord(record)}
-                                    disabled={
-                                      record.status === "processed" &&
+                                    ? "Pendiente"
+                                    : "Borrador"}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <FileUpload
+                                entityId={record.id}
+                                entityType="payroll"
+                                title={`Documentos - ${record.employeeName} (${record.period})`}
+                                description="Subir recibos de sueldo, comprobantes y otros documentos de la liquidación"
+                              />
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEditRecord(record)}
+                                      disabled={
+                                        record.status === "processed" &&
+                                        !isAdmin()
+                                      }
+                                    >
+                                      <Calculator className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      {record.status === "processed" &&
                                       !isAdmin()
-                                    }
-                                  >
-                                    <Calculator className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>
-                                    {record.status === "processed" && !isAdmin()
-                                      ? "Solo admin puede editar liquidaciones procesadas"
-                                      : "Editar liquidación"}
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => generatePayslip(record)}
-                                  >
-                                    <FileText className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Generar recibo de sueldo</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                                        ? "Solo admin puede editar liquidaciones procesadas"
+                                        : "Editar liquidación"}
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => generatePayslip(record)}
+                                    >
+                                      <FileText className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Generar recibo de sueldo</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                     </TableBody>
                   </Table>
                 </div>
