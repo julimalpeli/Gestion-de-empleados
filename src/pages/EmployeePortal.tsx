@@ -97,33 +97,21 @@ const EmployeePortal = () => {
       (a, b) => new Date(b.period).getTime() - new Date(a.period).getTime(),
     );
 
-  // Mock vacation history
-  const vacationHistory = [
-    {
-      id: 1,
-      startDate: "2024-07-15",
-      endDate: "2024-07-19",
-      days: 5,
-      status: "approved",
-      reason: "Vacaciones familiares",
-    },
-    {
-      id: 2,
-      startDate: "2024-03-11",
-      endDate: "2024-03-11",
-      days: 1,
-      status: "approved",
-      reason: "Día personal",
-    },
-    {
-      id: 3,
-      startDate: "2024-12-23",
-      endDate: "2024-12-27",
-      days: 5,
-      status: "pending",
-      reason: "Navidad con familia",
-    },
-  ];
+  // Get real vacation history for current employee
+  const vacationHistory = vacationRequests
+    .filter((request) => request.employeeId === user?.employeeId)
+    .map((request) => ({
+      id: request.id,
+      startDate: request.startDate,
+      endDate: request.endDate,
+      days: request.days,
+      status: request.status,
+      reason: request.reason,
+    }))
+    .sort(
+      (a, b) =>
+        new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
+    );
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
