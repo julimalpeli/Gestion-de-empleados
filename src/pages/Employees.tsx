@@ -630,10 +630,17 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="cocinero">Cocinero</SelectItem>
-                      <SelectItem value="mesero">Mesero/a</SelectItem>
-                      <SelectItem value="cajero">Cajero/a</SelectItem>
+                      <SelectItem value="jefe_cocina">
+                        Jefe de Cocina
+                      </SelectItem>
                       <SelectItem value="ayudante">
                         Ayudante de Cocina
+                      </SelectItem>
+                      <SelectItem value="mesero">Mesero/a</SelectItem>
+                      <SelectItem value="jefe_salon">Jefe de Salón</SelectItem>
+                      <SelectItem value="cajero">Cajero/a</SelectItem>
+                      <SelectItem value="limpieza">
+                        Tareas de Limpieza
                       </SelectItem>
                       <SelectItem value="manager">Encargado/a</SelectItem>
                     </SelectContent>
