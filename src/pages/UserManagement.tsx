@@ -194,6 +194,36 @@ const UserManagement = () => {
     setIsResetPasswordOpen(true);
   };
 
+  const handleChangeMyPassword = async () => {
+    // Validaciones
+    if (!newPassword || !confirmPassword) {
+      alert("Por favor complete todos los campos");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    try {
+      await changePassword(newPassword);
+      setIsChangeMyPasswordOpen(false);
+      setNewPassword("");
+      setConfirmPassword("");
+      setCurrentPassword("");
+      alert("Contraseña cambiada exitosamente");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      alert("Error al cambiar contraseña: " + error.message);
+    }
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "admin":
