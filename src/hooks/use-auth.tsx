@@ -5,6 +5,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
+import { supabase } from "@/lib/supabase";
 
 interface User {
   username: string;
