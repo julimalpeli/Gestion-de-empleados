@@ -310,7 +310,7 @@ const Payroll = () => {
       ? hourlyRate * (parseInt(overtimeHours) || 0)
       : 0;
 
-    // Agregar presentismo según selección en liquidación
+    // Agregar presentismo según selección en liquidaci��n
     const presentismoAmount =
       presentismoStatus === "mantiene" ? employee.presentismo : 0;
 
@@ -454,16 +454,18 @@ const Payroll = () => {
                         <SelectValue placeholder="Seleccionar empleado" />
                       </SelectTrigger>
                       <SelectContent>
-                        {employees.map((employee) => (
-                          <SelectItem
-                            key={employee.id}
-                            value={employee.id.toString()}
-                          >
-                            {employee.name} -{" "}
-                            {formatCurrency(employee.dailyWage)}
-                            /día
-                          </SelectItem>
-                        ))}
+                        {employees
+                          .filter((employee) => employee.status === "active")
+                          .map((employee) => (
+                            <SelectItem
+                              key={employee.id}
+                              value={employee.id.toString()}
+                            >
+                              {employee.name} -{" "}
+                              {formatCurrency(employee.dailyWage)}
+                              /día
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </div>
