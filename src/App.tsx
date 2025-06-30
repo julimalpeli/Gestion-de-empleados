@@ -8,6 +8,7 @@ import Employees from "./pages/Employees";
 import Payroll from "./pages/Payroll";
 import Reports from "./pages/Reports";
 import UserRoles from "./pages/UserRoles";
+import UserManagement from "./pages/UserManagement";
 import EmployeePortal from "./pages/EmployeePortal";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
