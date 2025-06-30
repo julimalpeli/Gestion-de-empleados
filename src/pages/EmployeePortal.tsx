@@ -76,8 +76,8 @@ const EmployeePortal = () => {
 
   // Get real payroll history for current employee
   const payrollHistory = (payrollRecords || [])
-    .filter(record => record.employeeId === user?.employeeId)
-    .map(record => ({
+    .filter((record) => record.employeeId === user?.employeeId)
+    .map((record) => ({
       id: record.id,
       period: record.period,
       workDays: record.baseDays,
@@ -88,23 +88,23 @@ const EmployeePortal = () => {
       adelanto: record.advances,
       netTotal: record.netTotal + (record.aguinaldo || 0),
       status: record.status,
-      paidDate: record.processedDate ? new Date(record.processedDate).toLocaleDateString('es-AR') : "-",
+      paidDate: record.processedDate
+        ? new Date(record.processedDate).toLocaleDateString("es-AR")
+        : "-",
       hasDocument: true, // TODO: Check if document exists
     }))
-    .sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime());
+    .sort(
+      (a, b) => new Date(b.period).getTime() - new Date(a.period).getTime(),
+    );
 
   // Get real vacation history for current employee
   const vacationHistory = (vacationRequests || [])
-    .filter(request => request.employeeId === user?.employeeId)
-    .map(request => ({
+    .filter((request) => request.employeeId === user?.employeeId)
+    .map((request) => ({
       id: request.id,
       startDate: request.startDate,
       endDate: request.endDate,
       days: request.days,
-      status: request.status,
-      reason: request.reason,
-    }))
-    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
       status: request.status,
       reason: request.reason,
     }))
@@ -540,37 +540,42 @@ const EmployeePortal = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {vacationHistory.length > 0 ? vacationHistory.map((vacation) => (
-                          <TableRow key={vacation.id}>
-                            <TableCell>
-                              {formatDate(vacation.startDate)}
-                            </TableCell>
-                            <TableCell>
-                              {formatDate(vacation.endDate)}
-                            </TableCell>
-                            <TableCell>{vacation.days} días</TableCell>
-                            <TableCell>{vacation.reason}</TableCell>
-                            <TableCell>
-                              <Badge
-                                variant={
-                                  vacation.status === "approved"
-                                    ? "default"
+                        {vacationHistory.length > 0 ? (
+                          vacationHistory.map((vacation) => (
+                            <TableRow key={vacation.id}>
+                              <TableCell>
+                                {formatDate(vacation.startDate)}
+                              </TableCell>
+                              <TableCell>
+                                {formatDate(vacation.endDate)}
+                              </TableCell>
+                              <TableCell>{vacation.days} días</TableCell>
+                              <TableCell>{vacation.reason}</TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={
+                                    vacation.status === "approved"
+                                      ? "default"
+                                      : vacation.status === "pending"
+                                        ? "secondary"
+                                        : "destructive"
+                                  }
+                                >
+                                  {vacation.status === "approved"
+                                    ? "Aprobado"
                                     : vacation.status === "pending"
-                                      ? "secondary"
-                                      : "destructive"
-                                }
-                              >
-                                {vacation.status === "approved"
-                                  ? "Aprobado"
-                                  : vacation.status === "pending"
-                                    ? "Pendiente"
-                                    : "Rechazado"}
-                              </Badge>
-                            </TableCell>
-                          </TableRow>
-                        )) : (
+                                      ? "Pendiente"
+                                      : "Rechazado"}
+                                </Badge>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
                           <TableRow>
-                            <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                            <TableCell
+                              colSpan={5}
+                              className="text-center text-muted-foreground py-8"
+                            >
                               No hay solicitudes de vacaciones registradas
                             </TableCell>
                           </TableRow>
