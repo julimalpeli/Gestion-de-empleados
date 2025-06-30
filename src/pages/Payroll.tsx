@@ -366,6 +366,30 @@ const Payroll = () => {
     }).format(amount);
   };
 
+  const formatPeriod = (period: string) => {
+    const [year, month] = period.split("-");
+    const monthNames = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    return `${monthNames[parseInt(month) - 1]} ${year}`;
+  };
+
+  const isAguinaldoPeriod = (period: string) => {
+    const [year, month] = period.split("-");
+    return month === "06" || month === "12"; // Junio o Diciembre
+  };
+
   // Manejo de loading y error
   if (payrollLoading || employeesLoading) {
     return (
