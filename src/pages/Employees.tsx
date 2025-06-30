@@ -618,7 +618,7 @@ const Employees = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nombre</TableHead>
-                  <TableHead>DNI</TableHead>
+                  <TableHead>Documento</TableHead>
                   <TableHead>Puesto</TableHead>
                   <TableHead>Fecha Ingreso</TableHead>
                   <TableHead>Sueldo Diario</TableHead>
