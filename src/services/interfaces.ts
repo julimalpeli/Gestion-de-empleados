@@ -224,6 +224,8 @@ export interface AuthResponse {
 export interface VacationCalculation {
   years: number;
   vacationDays: number;
+  totalMonths: number;
+  eligible: boolean;
   startDate: string;
 }
 
