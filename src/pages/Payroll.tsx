@@ -1048,6 +1048,14 @@ const Payroll = () => {
                             <TableCell className="font-medium">
                               {record.employeeName}
                             </TableCell>
+                            <TableCell className="font-medium">
+                              {formatPeriod(record.period)}
+                              {isAguinaldoPeriod(record.period) && (
+                                <div className="text-xs text-green-600">
+                                  Período con aguinaldo
+                                </div>
+                              )}
+                            </TableCell>
                             <TableCell>{record.baseDays} días</TableCell>
                             <TableCell>
                               {record.holidayDays > 0 ? (
