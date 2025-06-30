@@ -147,6 +147,13 @@ const Employees = () => {
         alert("La fecha de ingreso es requerida");
         return;
       }
+      if (
+        newEmployee.email &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmployee.email.trim())
+      ) {
+        alert("Por favor ingresa un email válido");
+        return;
+      }
 
       const employeeData = {
         name: newEmployee.name.trim(),
