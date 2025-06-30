@@ -74,79 +74,28 @@ const EmployeePortal = () => {
         address: "",
       };
 
-  // Mock payroll history
-  const payrollHistory = [
-    {
-      id: 1,
-      period: "Diciembre 2024",
-      workDays: 22,
-      holidayDays: 1,
-      grossSalary: 480000, // Unified white + informal
-      presentismo: 25000,
-      aguinaldo: 240000, // Half of gross salary for December
-      adelanto: 50000,
-      netTotal: 695000,
-      status: "paid",
-      paidDate: "31/12/2024",
-      hasDocument: true,
-    },
-    {
-      id: 2,
-      period: "Noviembre 2024",
-      workDays: 22,
-      holidayDays: 1,
-      grossSalary: 480000,
-      presentismo: 25000,
-      aguinaldo: 0,
-      adelanto: 50000,
-      netTotal: 455000,
-      status: "paid",
-      paidDate: "30/11/2024",
-      hasDocument: true,
-    },
-    {
-      id: 3,
-      period: "Octubre 2024",
-      workDays: 21,
-      holidayDays: 0,
-      grossSalary: 450000,
-      presentismo: 25000,
-      aguinaldo: 0,
-      adelanto: 0,
-      netTotal: 475000,
-      status: "paid",
-      paidDate: "31/10/2024",
-      hasDocument: true,
-    },
-    {
-      id: 4,
-      period: "Septiembre 2024",
-      workDays: 20,
-      holidayDays: 2,
-      grossSalary: 460000,
-      presentismo: 0, // Perdió presentismo
-      aguinaldo: 0,
-      adelanto: 30000,
-      netTotal: 430000,
-      status: "paid",
-      paidDate: "30/09/2024",
-      hasDocument: true,
-    },
-    {
-      id: 5,
-      period: "Junio 2024",
-      workDays: 20,
-      holidayDays: 1,
-      grossSalary: 450000,
-      presentismo: 25000,
-      aguinaldo: 225000, // Half of gross salary for June
-      adelanto: 0,
-      netTotal: 700000,
-      status: "paid",
-      paidDate: "30/06/2024",
-      hasDocument: true,
-    },
-  ];
+  // Get real payroll history for current employee
+  const payrollHistory = payrollRecords
+    .filter((record) => record.employeeId === user?.employeeId)
+    .map((record) => ({
+      id: record.id,
+      period: record.period,
+      workDays: record.baseDays,
+      holidayDays: record.holidayDays,
+      grossSalary: record.whiteAmount + record.informalAmount,
+      presentismo: record.presentismoAmount,
+      aguinaldo: record.aguinaldo,
+      adelanto: record.advances,
+      netTotal: record.netTotal + (record.aguinaldo || 0),
+      status: record.status,
+      paidDate: record.processedDate
+        ? new Date(record.processedDate).toLocaleDateString("es-AR")
+        : "-",
+      hasDocument: true, // TODO: Check if document exists
+    }))
+    .sort(
+      (a, b) => new Date(b.period).getTime() - new Date(a.period).getTime(),
+    );
 
   // Mock vacation history
   const vacationHistory = [
