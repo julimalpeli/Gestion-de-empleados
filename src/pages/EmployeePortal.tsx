@@ -42,6 +42,7 @@ const EmployeePortal = () => {
   // Mock employee data based on logged user
   const employeeData = {
     name: user?.name || "Juan Pérez",
+    dni: user?.username || "12345678", // DNI es el username para empleados
     position: "Cocinero",
     employeeId: user?.employeeId || 1,
     startDate: "2023-01-15",
