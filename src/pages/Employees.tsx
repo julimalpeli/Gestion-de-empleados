@@ -504,20 +504,22 @@ const Employees = () => {
                       <SelectValue placeholder="Seleccionar puesto" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="cocinero">Cocinero</SelectItem>
-                      <SelectItem value="jefe_cocina">
+                      <SelectItem value="Cocinero">Cocinero</SelectItem>
+                      <SelectItem value="Jefe de Cocina">
                         Jefe de Cocina
                       </SelectItem>
-                      <SelectItem value="ayudante">
+                      <SelectItem value="Ayudante de Cocina">
                         Ayudante de Cocina
                       </SelectItem>
-                      <SelectItem value="mesero">Mesero/a</SelectItem>
-                      <SelectItem value="jefe_salon">Jefe de Salón</SelectItem>
-                      <SelectItem value="cajero">Cajero/a</SelectItem>
-                      <SelectItem value="limpieza">
+                      <SelectItem value="Mesero/a">Mesero/a</SelectItem>
+                      <SelectItem value="Jefe de Salón">
+                        Jefe de Salón
+                      </SelectItem>
+                      <SelectItem value="Cajero/a">Cajero/a</SelectItem>
+                      <SelectItem value="Tareas de Limpieza">
                         Tareas de Limpieza
                       </SelectItem>
-                      <SelectItem value="manager">Encargado/a</SelectItem>
+                      <SelectItem value="Encargado/a">Encargado/a</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
