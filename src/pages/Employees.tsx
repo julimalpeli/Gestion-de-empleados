@@ -309,6 +309,7 @@ const Employees = () => {
     const vacationInfo = calculateVacationDays(employee.startDate);
     alert(`Información de ${employee.name}:
 
+DNI: ${employee.dni || "No registrado"}
 Fecha de Ingreso: ${vacationInfo.startDate}
 Antigüedad: ${vacationInfo.years} años
 Días de Vacaciones: ${vacationInfo.vacationDays} días (según antigüedad)
