@@ -166,17 +166,18 @@ const UserManagement = () => {
     }
   };
 
-  const handleDeleteUser = async (user) => {
+  const handleToggleUserStatus = async (user) => {
+    const action = user.isActive ? "desactivar" : "activar";
     if (
       confirm(
-        `¿Estás seguro de que quieres eliminar el usuario ${user.username}?`,
+        `¿Estás seguro de que quieres ${action} el usuario ${user.username}?`,
       )
     ) {
       try {
-        await deleteUser(user.id);
+        await updateUser(user.id, { isActive: !user.isActive });
       } catch (error) {
-        console.error("Error deleting user:", error);
-        alert("Error al eliminar usuario");
+        console.error("Error toggling user status:", error);
+        alert(`Error al ${action} usuario`);
       }
     }
   };
