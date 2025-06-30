@@ -405,7 +405,9 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                 </DialogHeader>
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Nombre Completo</Label>
+                    <Label htmlFor="name">
+                      Nombre Completo <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="name"
                       placeholder="Ej: Juan Pérez"
@@ -413,11 +415,14 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                       onChange={(e) =>
                         setNewEmployee({ ...newEmployee, name: e.target.value })
                       }
+                      required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="dni">DNI (sin puntos)</Label>
+                    <Label htmlFor="dni">
+                      DNI (sin puntos) <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       id="dni"
                       type="text"
@@ -428,11 +433,14 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                         const value = e.target.value.replace(/\D/g, ""); // Solo números
                         setNewEmployee({ ...newEmployee, dni: value });
                       }}
+                      required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="position">Puesto</Label>
+                    <Label htmlFor="position">
+                      Puesto <span className="text-red-500">*</span>
+                    </Label>
                     <Select
                       value={newEmployee.position}
                       onValueChange={(value) =>
