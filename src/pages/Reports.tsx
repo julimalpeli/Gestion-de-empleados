@@ -396,7 +396,7 @@ const Reports = () => {
                         <div>
                           <p>{emp.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {emp.position}
+                            DNI: {emp.dni || "N/A"} • {emp.position}
                           </p>
                         </div>
                       </TableCell>
