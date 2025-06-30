@@ -985,23 +985,39 @@ Presentismo: ${formatCurrency(employee.presentismo)} ${employee.losesPresentismo
                   <TableCell>
                     {(() => {
                       const vacInfo = calculateVacationDays(employee.startDate);
+                      const vacationDays = employee.vacationDays || 0; // Usar datos de la BD
+                      const available = Math.max(
+                        0,
+                        vacationDays - (employee.vacationsTaken || 0),
+                      );
+
                       return (
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <Badge variant="default" className="text-xs">
-                              {vacInfo.vacationDays} anuales
+                            <Badge
+                              variant={
+                                vacInfo.eligible ? "default" : "secondary"
+                              }
+                              className="text-xs"
+                            >
+                              {vacationDays} anuales
                             </Badge>
                             <span className="text-xs text-muted-foreground">
                               ({vacInfo.years} años)
                             </span>
                           </div>
+                          {!vacInfo.eligible && (
+                            <div className="text-xs text-orange-600">
+                              Habilitadas en{" "}
+                              {Math.max(0, 6 - vacInfo.totalMonths)} meses
+                            </div>
+                          )}
                           <div className="flex items-center gap-2">
                             <Badge variant="secondary" className="text-xs">
-                              {employee.vacationsTaken} tomados
+                              {employee.vacationsTaken || 0} tomados
                             </Badge>
                             <Badge variant="outline" className="text-xs">
-                              {vacInfo.vacationDays - employee.vacationsTaken}{" "}
-                              disponibles
+                              {available} disponibles
                             </Badge>
                           </div>
                           <Button
