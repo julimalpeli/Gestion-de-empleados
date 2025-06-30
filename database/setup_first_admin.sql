@@ -39,8 +39,8 @@ INSERT INTO auth.users (
 ) VALUES (
   gen_random_uuid(), -- id único
   '00000000-0000-0000-0000-000000000000', -- instance_id estándar
-  'julian@cadizbartapas.com', -- Email del administrador
-  crypt('CadizBar2024!', gen_salt('bf')), -- Contraseña segura
+  'julimalpeli@gmail.com', -- Email del administrador
+  crypt('Jmalpeli3194', gen_salt('bf')), -- Contraseña segura
   NOW(), -- email confirmado
   NOW(), -- created_at
   NOW(), -- updated_at
@@ -84,8 +84,8 @@ INSERT INTO public.users (
   created_at,
   updated_at
 ) VALUES (
-  (SELECT id FROM auth.users WHERE email = 'julian@cadizbartapas.com'),
-  'julian@cadizbartapas.com',
+  (SELECT id FROM auth.users WHERE email = 'julimalpeli@gmail.com'),
+  'julimalpeli@gmail.com',
   'admin',
   'Julian Malpeli',
   'admin',
@@ -111,7 +111,7 @@ SELECT
   pu.created_at as profile_created_at
 FROM auth.users au
 LEFT JOIN public.users pu ON au.id = pu.id
-WHERE au.email = 'julian@cadizbartapas.com';
+WHERE au.email = 'julimalpeli@gmail.com';
 
 -- 4. (OPCIONAL) Si quieres crear un segundo admin de respaldo
 -- Descomenta las siguientes líneas y cambia los datos:
