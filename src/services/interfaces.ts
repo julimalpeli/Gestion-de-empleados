@@ -91,6 +91,7 @@ export interface IReportsService {
 export interface Employee {
   id: string;
   name: string;
+  dni: string;
   position: string;
   whiteWage: number;
   informalWage: number;
@@ -107,6 +108,7 @@ export interface Employee {
 
 export interface CreateEmployeeRequest {
   name: string;
+  dni: string;
   position: string;
   whiteWage: number;
   informalWage: number;
