@@ -332,9 +332,7 @@ const Payroll = () => {
     const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
 
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
-    const aguinaldoAmount = isAguinaldoPeriod(selectedPeriod)
-      ? (employee.whiteWage + employee.informalWage) / 2
-      : 0;
+    const aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod);
 
     // Total neto = total después de deducciones (incluye horas extras, presentismo, bonos, etc.)
     const netTotal = totalAfterDeductions;
