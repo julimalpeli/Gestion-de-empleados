@@ -18,51 +18,57 @@ const ProtectedRoute = ({
   requireAllPermissions = false,
   allowedRoles = [],
 }: ProtectedRouteProps) => {
-  const { isAuthenticated, user } = useAuth();
-  const {
-    hasPermission,
-    hasAllPermissions,
-    hasAnyPermission,
-    isAdmin,
-    isManager,
-    isEmployee,
-  } = usePermissions();
+  try {
+    const { isAuthenticated, user } = useAuth();
+    const {
+      hasPermission,
+      hasAllPermissions,
+      hasAnyPermission,
+      isAdmin,
+      isManager,
+      isEmployee,
+    } = usePermissions();
 
-  if (!isAuthenticated) {
+    if (!isAuthenticated) {
+      return <Navigate to="/login" replace />;
+    }
+
+    // Check specific role requirement
+    if (requiredRole && user?.role !== requiredRole) {
+      // Redirect to appropriate dashboard based on role
+      if (isEmployee()) {
+        return <Navigate to="/portal-empleado" replace />;
+      } else {
+        return <Navigate to="/" replace />;
+      }
+    }
+
+    // Check allowed roles
+    if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role || "")) {
+      if (isEmployee()) {
+        return <Navigate to="/portal-empleado" replace />;
+      } else {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    }
+
+    // Check permissions
+    if (requiredPermissions.length > 0) {
+      const hasRequiredPermissions = requireAllPermissions
+        ? hasAllPermissions(requiredPermissions)
+        : hasAnyPermission(requiredPermissions);
+
+      if (!hasRequiredPermissions && !isAdmin()) {
+        return <Navigate to="/unauthorized" replace />;
+      }
+    }
+
+    return <>{children}</>;
+  } catch (error) {
+    console.error("ProtectedRoute error:", error);
+    // If there's an error with auth context, redirect to login
     return <Navigate to="/login" replace />;
   }
-
-  // Check specific role requirement
-  if (requiredRole && user?.role !== requiredRole) {
-    // Redirect to appropriate dashboard based on role
-    if (isEmployee()) {
-      return <Navigate to="/portal-empleado" replace />;
-    } else {
-      return <Navigate to="/" replace />;
-    }
-  }
-
-  // Check allowed roles
-  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role || "")) {
-    if (isEmployee()) {
-      return <Navigate to="/portal-empleado" replace />;
-    } else {
-      return <Navigate to="/unauthorized" replace />;
-    }
-  }
-
-  // Check permissions
-  if (requiredPermissions.length > 0) {
-    const hasRequiredPermissions = requireAllPermissions
-      ? hasAllPermissions(requiredPermissions)
-      : hasAnyPermission(requiredPermissions);
-
-    if (!hasRequiredPermissions && !isAdmin()) {
-      return <Navigate to="/unauthorized" replace />;
-    }
-  }
-
-  return <>{children}</>;
 };
 
 export default ProtectedRoute;
