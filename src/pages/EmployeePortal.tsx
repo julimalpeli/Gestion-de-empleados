@@ -46,38 +46,36 @@ const EmployeePortal = () => {
   };
 
   // Get current employee data
-  const currentEmployee = employees.find((emp) => emp.id === user?.employeeId);
+  const currentEmployee = employees.find(emp => emp.id === user?.employeeId);
 
-  const employeeData = currentEmployee
-    ? {
-        name: currentEmployee.name,
-        dni: currentEmployee.dni,
-        position: currentEmployee.position,
-        employeeId: currentEmployee.id,
-        startDate: currentEmployee.startDate,
-        vacationDays: currentEmployee.vacationDays || 14,
-        vacationsTaken: currentEmployee.vacationsTaken || 0,
-        phone: "+54 11 1234-5678", // TODO: Add to employee model
-        email: `${currentEmployee.name.toLowerCase().replace(/\s+/g, ".")}@cadizbartapas.com`,
-        address: "Av. Corrientes 1234, CABA", // TODO: Add to employee model
-      }
-    : {
-        name: user?.name || "Empleado",
-        dni: user?.username || "--------",
-        position: "Empleado",
-        employeeId: user?.employeeId || "",
-        startDate: new Date().toISOString().split("T")[0],
-        vacationDays: 0,
-        vacationsTaken: 0,
-        phone: "",
-        email: "",
-        address: "",
-      };
+  const employeeData = currentEmployee ? {
+    name: currentEmployee.name,
+    dni: currentEmployee.dni,
+    position: currentEmployee.position,
+    employeeId: currentEmployee.id,
+    startDate: currentEmployee.startDate,
+    vacationDays: currentEmployee.vacationDays || 14,
+    vacationsTaken: currentEmployee.vacationsTaken || 0,
+    phone: "+54 11 1234-5678", // TODO: Add to employee model
+    email: `${currentEmployee.name.toLowerCase().replace(/\s+/g, '.')}@cadizbartapas.com`,
+    address: "Av. Corrientes 1234, CABA", // TODO: Add to employee model
+  } : {
+    name: user?.name || "Empleado",
+    dni: user?.username || "--------",
+    position: "Empleado",
+    employeeId: user?.employeeId || "",
+    startDate: new Date().toISOString().split('T')[0],
+    vacationDays: 0,
+    vacationsTaken: 0,
+    phone: "",
+    email: "",
+    address: "",
+  };
 
   // Get real payroll history for current employee
   const payrollHistory = payrollRecords
-    .filter((record) => record.employeeId === user?.employeeId)
-    .map((record) => ({
+    .filter(record => record.employeeId === user?.employeeId)
+    .map(record => ({
       id: record.id,
       period: record.period,
       workDays: record.baseDays,
@@ -88,19 +86,15 @@ const EmployeePortal = () => {
       adelanto: record.advances,
       netTotal: record.netTotal + (record.aguinaldo || 0),
       status: record.status,
-      paidDate: record.processedDate
-        ? new Date(record.processedDate).toLocaleDateString("es-AR")
-        : "-",
+      paidDate: record.processedDate ? new Date(record.processedDate).toLocaleDateString('es-AR') : "-",
       hasDocument: true, // TODO: Check if document exists
     }))
-    .sort(
-      (a, b) => new Date(b.period).getTime() - new Date(a.period).getTime(),
-    );
+    .sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime());
 
   // Get real vacation history for current employee
   const vacationHistory = vacationRequests
-    .filter((request) => request.employeeId === user?.employeeId)
-    .map((request) => ({
+    .filter(request => request.employeeId === user?.employeeId)
+    .map(request => ({
       id: request.id,
       startDate: request.startDate,
       endDate: request.endDate,
@@ -108,10 +102,7 @@ const EmployeePortal = () => {
       status: request.status,
       reason: request.reason,
     }))
-    .sort(
-      (a, b) =>
-        new Date(b.startDate).getTime() - new Date(a.startDate).getTime(),
-    );
+    .sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
@@ -126,20 +117,10 @@ const EmployeePortal = () => {
   };
 
   const formatPeriod = (period: string) => {
-    const [year, month] = period.split("-");
+    const [year, month] = period.split('-');
     const monthNames = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
+      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
     ];
     return `${monthNames[parseInt(month) - 1]} ${year}`;
   };
@@ -159,9 +140,7 @@ const EmployeePortal = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
         <div className="text-center">
-          <p className="text-red-500 mb-4">
-            Error: No se encontró información del empleado
-          </p>
+          <p className="text-red-500 mb-4">Error: No se encontró información del empleado</p>
           <Button onClick={handleLogout}>Volver al Login</Button>
         </div>
       </div>
@@ -377,20 +356,13 @@ const EmployeePortal = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {payrollHistory.map((record) => (
+                      {payrollHistory.length > 0 ? payrollHistory.map((record) => (
                         <TableRow key={record.id}>
                           <TableCell className="font-medium">
-                            {record.period}
+                            {formatPeriod(record.period)}
                           </TableCell>
+                          <TableCell>{record.workDays} días</TableCell>
                           <TableCell>
-                            {record.workDays + record.holidayDays} días
-                            {record.holidayDays > 0 && (
-                              <div className="text-xs text-muted-foreground">
-                                ({record.holidayDays} feriados)
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell className="font-medium">
                             {formatCurrency(record.grossSalary)}
                           </TableCell>
                           <TableCell>
@@ -404,46 +376,64 @@ const EmployeePortal = () => {
                           </TableCell>
                           <TableCell>
                             {record.aguinaldo > 0 ? (
-                              <span className="text-blue-600 font-medium">
+                              <span className="text-green-600 font-medium">
                                 {formatCurrency(record.aguinaldo)}
                               </span>
                             ) : (
-                              <span className="text-muted-foreground">-</span>
+                              "-"
                             )}
                           </TableCell>
                           <TableCell>
                             {record.adelanto > 0 ? (
-                              <span className="text-orange-600">
-                                -{formatCurrency(record.adelanto)}
+                              <span className="text-red-600">
+                                {formatCurrency(record.adelanto)}
                               </span>
                             ) : (
-                              <span className="text-muted-foreground">-</span>
+                              "-"
                             )}
                           </TableCell>
-                          <TableCell className="font-bold text-primary">
+                          <TableCell className="font-bold">
                             {formatCurrency(record.netTotal)}
                           </TableCell>
                           <TableCell>
-                            <Badge variant="default">Pagado</Badge>
-                            <div className="text-xs text-muted-foreground mt-1">
-                              {record.paidDate}
-                            </div>
+                            <Badge
+                              variant={
+                                record.status === "paid"
+                                  ? "default"
+                                  : record.status === "pending" || record.status === "approved" || record.status === "processed"
+                                    ? "secondary"
+                                    : "outline"
+                              }
+                            >
+                              {record.status === "paid"
+                                ? "Pagado"
+                                : record.status === "approved"
+                                  ? "Aprobado"
+                                  : record.status === "processed"
+                                    ? "Procesado"
+                                    : record.status === "pending"
+                                      ? "Pendiente"
+                                      : "Borrador"}
+                            </Badge>
                           </TableCell>
                           <TableCell className="text-right">
                             <Button
                               variant="ghost"
                               size="sm"
                               disabled={!record.hasDocument}
+                              title="Descargar recibo"
                             >
                               <Download className="h-4 w-4" />
                             </Button>
                           </TableCell>
                         </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
+                      )) : (
+                        <TableRow>
+                          <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
+                            No hay liquidaciones disponibles
+                          </TableCell>
+                        </TableRow>
+                      )}
             </Card>
           </TabsContent>
 
