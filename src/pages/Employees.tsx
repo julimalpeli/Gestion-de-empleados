@@ -213,6 +213,8 @@ const Employees = () => {
       whiteWage: employee.whiteWage?.toString() || "",
       informalWage: employee.informalWage?.toString() || "",
       presentismo: employee.presentismo?.toString() || "",
+      address: employee.address || "",
+      email: employee.email || "",
     });
     setIsEditDialogOpen(true);
   };
