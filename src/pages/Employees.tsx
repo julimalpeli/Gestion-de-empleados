@@ -97,7 +97,7 @@ const Employees = () => {
     deleteEmployee,
   } = useEmployees();
 
-  const { createEmployeeUser } = useUsers();
+  const { createEmployeeUser, updateUserEmail } = useUsers();
 
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
