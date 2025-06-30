@@ -281,6 +281,16 @@ const Employees = () => {
       };
 
       await updateEmployee(editingEmployee.id, employeeData);
+
+      // Sync email with user account if email was changed
+      if (employeeData.email && employeeData.email !== editingEmployee.email) {
+        try {
+          await syncEmployeeUserEmail(editingEmployee.id, employeeData.email);
+        } catch (error) {
+          console.error("Error syncing user email:", error);
+        }
+      }
+
       showSuccessMessage(
         `Empleado ${employeeData.name} actualizado exitosamente`,
       );
