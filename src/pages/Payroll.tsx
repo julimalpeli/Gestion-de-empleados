@@ -707,6 +707,11 @@ const Payroll = () => {
                     if (!calculation) return;
 
                     try {
+                      if (!selectedPeriod) {
+                        alert("Debes seleccionar un período para liquidar");
+                        return;
+                      }
+
                       const period = selectedPeriod;
 
                       if (isEditMode && editingRecord) {
