@@ -45,6 +45,7 @@ import {
   UserX,
   Power,
   PowerOff,
+  Lock,
 } from "lucide-react";
 import {
   Tooltip,
