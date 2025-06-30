@@ -18,6 +18,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Table,
   TableBody,
   TableCell,
@@ -63,6 +73,8 @@ const Employees = () => {
   const [selectedEmployeeForVacations, setSelectedEmployeeForVacations] =
     useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     dni: "",
@@ -95,6 +107,10 @@ const Employees = () => {
       return () => clearTimeout(timer);
     }
   }, [successMessage]);
+
+  const showSuccessMessage = (message) => {
+    setSuccessMessage(message);
+  };
 
   const handleAddEmployee = async () => {
     try {
@@ -144,11 +160,11 @@ const Employees = () => {
       }
 
       if (userCreated) {
-        setSuccessMessage(
+        showSuccessMessage(
           `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}`,
         );
       } else {
-        setSuccessMessage(
+        showSuccessMessage(
           "Empleado creado exitosamente, pero hubo un error al crear el usuario. Contacte al administrador.",
         );
       }
@@ -171,13 +187,126 @@ const Employees = () => {
     }
   };
 
-  const formatCurrency = (amount: number) => {
+  const handleEditEmployee = (employee) => {
+    setEditingEmployee({
+      ...employee,
+      whiteWage: employee.whiteWage?.toString() || "",
+      informalWage: employee.informalWage?.toString() || "",
+      presentismo: employee.presentismo?.toString() || "",
+    });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleUpdateEmployee = async () => {
+    try {
+      if (!editingEmployee.name.trim()) {
+        alert("El nombre es requerido");
+        return;
+      }
+      if (!editingEmployee.dni.trim()) {
+        alert("El DNI es requerido");
+        return;
+      }
+      if (!/^\d{1,8}$/.test(editingEmployee.dni.trim())) {
+        alert("El DNI debe ser un número de máximo 8 dígitos");
+        return;
+      }
+      if (!editingEmployee.position.trim()) {
+        alert("El puesto es requerido");
+        return;
+      }
+      if (!editingEmployee.startDate) {
+        alert("La fecha de ingreso es requerida");
+        return;
+      }
+
+      const employeeData = {
+        name: editingEmployee.name.trim(),
+        dni: editingEmployee.dni.trim(),
+        position: editingEmployee.position.trim(),
+        whiteWage: parseFloat(editingEmployee.whiteWage) || 0,
+        informalWage: parseFloat(editingEmployee.informalWage) || 0,
+        presentismo: parseFloat(editingEmployee.presentismo) || 0,
+        startDate: editingEmployee.startDate,
+      };
+
+      await updateEmployee(editingEmployee.id, employeeData);
+      showSuccessMessage(
+        `Empleado ${employeeData.name} actualizado exitosamente`,
+      );
+      setIsEditDialogOpen(false);
+      setEditingEmployee(null);
+    } catch (error) {
+      console.error("Error updating employee:", error);
+      alert(
+        `Error al actualizar empleado: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
+    }
+  };
+
+  const handleDeleteEmployee = async () => {
+    if (!employeeToDelete) return;
+
+    try {
+      await deleteEmployee(employeeToDelete.id);
+      showSuccessMessage(
+        `Empleado ${employeeToDelete.name} eliminado exitosamente`,
+      );
+      setDeleteConfirmOpen(false);
+      setEmployeeToDelete(null);
+    } catch (error) {
+      console.error("Error deleting employee:", error);
+      alert(
+        `Error al eliminar empleado: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
+    }
+  };
+
+  const handleStatusChange = async (employee, newStatus) => {
+    try {
+      await updateEmployee(employee.id, { status: newStatus });
+      showSuccessMessage(
+        `Estado de ${employee.name} cambiado a ${newStatus === "active" ? "activo" : "inactivo"}`,
+      );
+    } catch (error) {
+      console.error("Error updating employee status:", error);
+      alert(
+        `Error al cambiar estado: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      );
+    }
+  };
+
+  const formatCurrency = (amount) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
       currency: "ARS",
       minimumFractionDigits: 0,
     }).format(amount);
   };
+
+  const formatPosition = (position) => {
+    const positions = {
+      cocinero: "Cocinero",
+      jefe_cocina: "Jefe de Cocina",
+      ayudante: "Ayudante de Cocina",
+      mesero: "Mesero/a",
+      jefe_salon: "Jefe de Salón",
+      cajero: "Cajero/a",
+      limpieza: "Tareas de Limpieza",
+      manager: "Encargado/a",
+    };
+    return positions[position] || position;
+  };
+
+  if (!canViewModule("employees")) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center justify-center h-32">
+          <p>No tienes permisos para acceder a este módulo.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -202,7 +331,9 @@ const Employees = () => {
   const filteredEmployees = employees.filter((employee) => {
     const matchesSearch =
       employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      employee.position.toLowerCase().includes(searchTerm.toLowerCase());
+      employee.position.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (employee.dni &&
+        employee.dni.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesStatus =
       statusFilter === "all" || employee.status === statusFilter;
@@ -223,96 +354,152 @@ const Employees = () => {
           </div>
         </div>
 
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nuevo Empleado
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
-              <DialogDescription>
-                Completa la información del nuevo empleado
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">
-                  Nombre Completo <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="name"
-                  placeholder="Ej: Juan Pérez"
-                  value={newEmployee.name}
-                  onChange={(e) =>
-                    setNewEmployee({ ...newEmployee, name: e.target.value })
-                  }
-                  required
-                />
-              </div>
+        <PermissionGate module="employees" action="create">
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nuevo Empleado
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
+                <DialogDescription>
+                  Completa la información del nuevo empleado
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">
+                    Nombre Completo <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="name"
+                    placeholder="Ej: Juan Pérez"
+                    value={newEmployee.name}
+                    onChange={(e) =>
+                      setNewEmployee({ ...newEmployee, name: e.target.value })
+                    }
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="dni">
-                  DNI (sin puntos) <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="dni"
-                  type="text"
-                  placeholder="Ej: 12345678"
-                  maxLength={8}
-                  value={newEmployee.dni}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, "");
-                    setNewEmployee({ ...newEmployee, dni: value });
-                  }}
-                  required
-                />
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="dni">
+                    DNI (sin puntos) <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="dni"
+                    type="text"
+                    placeholder="Ej: 12345678"
+                    maxLength={8}
+                    value={newEmployee.dni}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      setNewEmployee({ ...newEmployee, dni: value });
+                    }}
+                    required
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="position">
-                  Puesto <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={newEmployee.position}
-                  onValueChange={(value) =>
-                    setNewEmployee({ ...newEmployee, position: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar puesto" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="cocinero">Cocinero</SelectItem>
-                    <SelectItem value="jefe_cocina">Jefe de Cocina</SelectItem>
-                    <SelectItem value="ayudante">Ayudante de Cocina</SelectItem>
-                    <SelectItem value="mesero">Mesero/a</SelectItem>
-                    <SelectItem value="jefe_salon">Jefe de Salón</SelectItem>
-                    <SelectItem value="cajero">Cajero/a</SelectItem>
-                    <SelectItem value="limpieza">Tareas de Limpieza</SelectItem>
-                    <SelectItem value="manager">Encargado/a</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="position">
+                    Puesto <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={newEmployee.position}
+                    onValueChange={(value) =>
+                      setNewEmployee({ ...newEmployee, position: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccionar puesto" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="cocinero">Cocinero</SelectItem>
+                      <SelectItem value="jefe_cocina">
+                        Jefe de Cocina
+                      </SelectItem>
+                      <SelectItem value="ayudante">
+                        Ayudante de Cocina
+                      </SelectItem>
+                      <SelectItem value="mesero">Mesero/a</SelectItem>
+                      <SelectItem value="jefe_salon">Jefe de Salón</SelectItem>
+                      <SelectItem value="cajero">Cajero/a</SelectItem>
+                      <SelectItem value="limpieza">
+                        Tareas de Limpieza
+                      </SelectItem>
+                      <SelectItem value="manager">Encargado/a</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="startDate">
-                  Fecha de Ingreso <span className="text-red-500">*</span>
-                </Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={newEmployee.startDate}
-                  onChange={(e) =>
-                    setNewEmployee({
-                      ...newEmployee,
-                      startDate: e.target.value,
-                    })
-                  }
-                  required
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="startDate">
+                    Fecha de Ingreso <span className="text-red-500">*</span>
+                  </Label>
+                  <Input
+                    id="startDate"
+                    type="date"
+                    value={newEmployee.startDate}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        startDate: e.target.value,
+                      })
+                    }
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="whiteWage">Sueldo en Blanco</Label>
+                  <Input
+                    id="whiteWage"
+                    type="number"
+                    placeholder="0"
+                    value={newEmployee.whiteWage}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        whiteWage: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="informalWage">Sueldo en Negro</Label>
+                  <Input
+                    id="informalWage"
+                    type="number"
+                    placeholder="0"
+                    value={newEmployee.informalWage}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        informalWage: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="presentismo">Presentismo</Label>
+                  <Input
+                    id="presentismo"
+                    type="number"
+                    placeholder="0"
+                    value={newEmployee.presentismo}
+                    onChange={(e) =>
+                      setNewEmployee({
+                        ...newEmployee,
+                        presentismo: e.target.value,
+                      })
+                    }
+                  />
+                </div>
               </div>
 
               <div className="flex gap-2 pt-4">
@@ -327,16 +514,17 @@ const Employees = () => {
                   Cancelar
                 </Button>
               </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+        </PermissionGate>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Lista de Empleados</CardTitle>
           <CardDescription>
-            Administra todos los empleados del bar de tapas
+            Administra todos los empleados del bar de tapas (
+            {filteredEmployees.length} empleados)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -371,6 +559,8 @@ const Employees = () => {
                   <TableHead>Nombre</TableHead>
                   <TableHead>DNI</TableHead>
                   <TableHead>Puesto</TableHead>
+                  <TableHead>Fecha Ingreso</TableHead>
+                  <TableHead>Sueldo Total</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
                 </TableRow>
@@ -384,7 +574,21 @@ const Employees = () => {
                     <TableCell className="font-mono text-sm">
                       {employee.dni || "No registrado"}
                     </TableCell>
-                    <TableCell>{employee.position}</TableCell>
+                    <TableCell>{formatPosition(employee.position)}</TableCell>
+                    <TableCell>
+                      {employee.startDate
+                        ? new Date(employee.startDate).toLocaleDateString(
+                            "es-AR",
+                          )
+                        : "No registrada"}
+                    </TableCell>
+                    <TableCell>
+                      {formatCurrency(
+                        (employee.whiteWage || 0) +
+                          (employee.informalWage || 0) +
+                          (employee.presentismo || 0),
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Badge
                         variant={
@@ -396,12 +600,70 @@ const Employees = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="sm">
-                          <Info className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        <PermissionGate module="vacations" action="view">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedEmployeeForVacations(employee);
+                              setIsVacationManagerOpen(true);
+                            }}
+                            title="Gestionar vacaciones"
+                          >
+                            <Plane className="h-4 w-4" />
+                          </Button>
+                        </PermissionGate>
+
+                        <PermissionGate module="employees" action="edit">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditEmployee(employee)}
+                            title="Editar empleado"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </PermissionGate>
+
+                        <PermissionGate module="employees" action="edit">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() =>
+                              handleStatusChange(
+                                employee,
+                                employee.status === "active"
+                                  ? "inactive"
+                                  : "active",
+                              )
+                            }
+                            title={
+                              employee.status === "active"
+                                ? "Desactivar empleado"
+                                : "Activar empleado"
+                            }
+                          >
+                            {employee.status === "active" ? (
+                              <UserX className="h-4 w-4" />
+                            ) : (
+                              <UserCheck className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </PermissionGate>
+
+                        <PermissionGate module="employees" action="delete">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEmployeeToDelete(employee);
+                              setDeleteConfirmOpen(true);
+                            }}
+                            title="Eliminar empleado"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </PermissionGate>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -412,6 +674,193 @@ const Employees = () => {
         </CardContent>
       </Card>
 
+      {/* Edit Employee Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Editar Empleado</DialogTitle>
+            <DialogDescription>
+              Modifica la información del empleado
+            </DialogDescription>
+          </DialogHeader>
+          {editingEmployee && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-name">
+                  Nombre Completo <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-name"
+                  placeholder="Ej: Juan Pérez"
+                  value={editingEmployee.name}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      name: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-dni">
+                  DNI (sin puntos) <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-dni"
+                  type="text"
+                  placeholder="Ej: 12345678"
+                  maxLength={8}
+                  value={editingEmployee.dni}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    setEditingEmployee({ ...editingEmployee, dni: value });
+                  }}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-position">
+                  Puesto <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={editingEmployee.position}
+                  onValueChange={(value) =>
+                    setEditingEmployee({ ...editingEmployee, position: value })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar puesto" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cocinero">Cocinero</SelectItem>
+                    <SelectItem value="jefe_cocina">Jefe de Cocina</SelectItem>
+                    <SelectItem value="ayudante">Ayudante de Cocina</SelectItem>
+                    <SelectItem value="mesero">Mesero/a</SelectItem>
+                    <SelectItem value="jefe_salon">Jefe de Salón</SelectItem>
+                    <SelectItem value="cajero">Cajero/a</SelectItem>
+                    <SelectItem value="limpieza">Tareas de Limpieza</SelectItem>
+                    <SelectItem value="manager">Encargado/a</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-startDate">
+                  Fecha de Ingreso <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="edit-startDate"
+                  type="date"
+                  value={editingEmployee.startDate}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      startDate: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-whiteWage">Sueldo en Blanco</Label>
+                <Input
+                  id="edit-whiteWage"
+                  type="number"
+                  placeholder="0"
+                  value={editingEmployee.whiteWage}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      whiteWage: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-informalWage">Sueldo en Negro</Label>
+                <Input
+                  id="edit-informalWage"
+                  type="number"
+                  placeholder="0"
+                  value={editingEmployee.informalWage}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      informalWage: e.target.value,
+                    })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2 col-span-2">
+                <Label htmlFor="edit-presentismo">Presentismo</Label>
+                <Input
+                  id="edit-presentismo"
+                  type="number"
+                  placeholder="0"
+                  value={editingEmployee.presentismo}
+                  onChange={(e) =>
+                    setEditingEmployee({
+                      ...editingEmployee,
+                      presentismo: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-2 pt-4">
+            <Button onClick={handleUpdateEmployee} className="w-full">
+              Actualizar Empleado
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+              className="w-full"
+            >
+              Cancelar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta acción no se puede deshacer. Esto eliminará permanentemente
+              al empleado <strong>{employeeToDelete?.name}</strong> y todos sus
+              datos asociados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteEmployee}>
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Vacation Manager */}
+      <VacationManager
+        isOpen={isVacationManagerOpen}
+        onClose={() => {
+          setIsVacationManagerOpen(false);
+          setSelectedEmployeeForVacations(null);
+        }}
+        employee={selectedEmployeeForVacations}
+      />
+
+      {/* Success Message */}
       {successMessage && (
         <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50">
           <div className="flex items-center gap-2">
