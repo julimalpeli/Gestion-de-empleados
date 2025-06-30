@@ -39,9 +39,8 @@ const Login = () => {
     setIsLoading(true);
     setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      const userData = validateLogin(username, password);
+    try {
+      const userData = await validateLogin(username, password);
 
       if (userData) {
         login(userData);
