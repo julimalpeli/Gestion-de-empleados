@@ -45,7 +45,6 @@ import {
   UserX,
   Power,
   PowerOff,
-  Lock,
 } from "lucide-react";
 import {
   Tooltip,
@@ -58,7 +57,6 @@ import { Switch } from "@/components/ui/switch";
 import { useUsers } from "@/hooks/use-users";
 import { useEmployees } from "@/hooks/use-employees";
 import usePermissions from "@/hooks/use-permissions";
-import { useAuth } from "@/hooks/use-auth";
 import { ChangePasswordDialog } from "@/components/ChangePasswordDialog";
 
 const UserManagement = () => {
@@ -67,7 +65,6 @@ const UserManagement = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
-  const [isChangeMyPasswordOpen, setIsChangeMyPasswordOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newUser, setNewUser] = useState({
     username: "",
@@ -79,8 +76,6 @@ const UserManagement = () => {
     isActive: true,
   });
   const [newPassword, setNewPassword] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
 
   const {
     users,
@@ -94,7 +89,6 @@ const UserManagement = () => {
 
   const { employees } = useEmployees();
   const { isAdmin } = usePermissions();
-  const { changePassword } = useAuth();
 
   // Filtrar usuarios
   const filteredUsers = users.filter((user) => {
@@ -136,16 +130,10 @@ const UserManagement = () => {
     }
   };
 
-  const handleEditUser = (user) => {
-    setSelectedUser(user);
-    setIsEditDialogOpen(true);
-  };
-
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
     try {
       await updateUser(selectedUser.id, {
-        username: selectedUser.username,
         email: selectedUser.email,
         name: selectedUser.name,
         role: selectedUser.role,
@@ -193,36 +181,6 @@ const UserManagement = () => {
     setSelectedUser(user);
     setNewPassword(user.role === "employee" ? user.username : ""); // Default: DNI para empleados
     setIsResetPasswordOpen(true);
-  };
-
-  const handleChangeMyPassword = async () => {
-    // Validaciones
-    if (!newPassword || !confirmPassword) {
-      alert("Por favor complete todos los campos");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      alert("La contraseña debe tener al menos 6 caracteres");
-      return;
-    }
-
-    try {
-      await changePassword(newPassword);
-      setIsChangeMyPasswordOpen(false);
-      setNewPassword("");
-      setConfirmPassword("");
-      setCurrentPassword("");
-      alert("Contraseña cambiada exitosamente");
-    } catch (error) {
-      console.error("Error changing password:", error);
-      alert("Error al cambiar contraseña: " + error.message);
-    }
   };
 
   const getRoleBadgeVariant = (role: string) => {
@@ -293,192 +251,461 @@ const UserManagement = () => {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-border pb-4">
-        <div className="flex items-center gap-4">
-          <SidebarTrigger />
-          <div>
-            <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
-            <p className="text-muted-foreground">
-              Administra usuarios, roles y permisos del sistema
-            </p>
+    <TooltipProvider>
+      <div className="flex flex-col gap-6 p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-border pb-4">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <div>
+              <h1 className="text-2xl font-bold">Gestión de Usuarios</h1>
+              <p className="text-muted-foreground">
+                Administra usuarios, roles y permisos del sistema
+              </p>
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+            <ChangePasswordDialog />
+
+            <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nuevo Usuario
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Crear Nuevo Usuario</DialogTitle>
+                  <DialogDescription>
+                    Completa la información del nuevo usuario
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="username">Nombre de Usuario</Label>
+                    <Input
+                      id="username"
+                      placeholder="ej: admin, 12345678"
+                      value={newUser.username}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, username: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="usuario@cadizbar.com"
+                      value={newUser.email}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, email: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Nombre Completo</Label>
+                    <Input
+                      id="name"
+                      placeholder="Juan Pérez"
+                      value={newUser.name}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, name: e.target.value })
+                      }
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Rol</Label>
+                    <Select
+                      value={newUser.role}
+                      onValueChange={(value) =>
+                        setNewUser({ ...newUser, role: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="employee">Empleado</SelectItem>
+                        <SelectItem value="manager">Gerente</SelectItem>
+                        <SelectItem value="hr">RRHH</SelectItem>
+                        <SelectItem value="admin">Administrador</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="employeeId">
+                      Empleado Asociado (opcional)
+                    </Label>
+                    <Select
+                      value={newUser.employeeId}
+                      onValueChange={(value) =>
+                        setNewUser({ ...newUser, employeeId: value })
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar empleado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Sin asociar</SelectItem>
+                        {employees.map((employee) => (
+                          <SelectItem
+                            key={employee.id}
+                            value={employee.id.toString()}
+                          >
+                            {employee.name} - {employee.dni}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Contraseña</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Contraseña temporal"
+                      value={newUser.password}
+                      onChange={(e) =>
+                        setNewUser({ ...newUser, password: e.target.value })
+                      }
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Para empleados se recomienda usar su DNI
+                    </p>
+                  </div>
+
+                  <div className="flex gap-2 pt-4">
+                    <Button onClick={handleCreateUser} className="w-full">
+                      Crear Usuario
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsAddDialogOpen(false)}
+                      className="w-full"
+                    >
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <Dialog open={isChangeMyPasswordOpen} onOpenChange={setIsChangeMyPasswordOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline">
-                <Lock className="h-4 w-4 mr-2" />
-                Cambiar Mi Contraseña
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle>Cambiar Mi Contraseña</DialogTitle>
-                <DialogDescription>
-                  Ingresa tu nueva contraseña. Debe tener al menos 6 caracteres.
-                </DialogDescription>
-              </DialogHeader>
+        {/* Search and Filters */}
+        <div className="flex gap-4 items-center">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nombre, usuario o email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="Filtrar por rol" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos los roles</SelectItem>
+              <SelectItem value="admin">Administradores</SelectItem>
+              <SelectItem value="manager">Gerentes</SelectItem>
+              <SelectItem value="hr">RRHH</SelectItem>
+              <SelectItem value="employee">Empleados</SelectItem>
+              <SelectItem value="readonly">Solo Lectura</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Users Table */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Usuarios del Sistema
+                </CardTitle>
+                <CardDescription>
+                  {filteredUsers.length} usuarios encontrados
+                </CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Usuario</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Rol</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Empleado Asociado</TableHead>
+                    <TableHead>Último Acceso</TableHead>
+                    <TableHead className="text-right">Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.length > 0 ? (
+                    filteredUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <Shield className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <div className="font-medium">{user.name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                @{user.username}
+                              </div>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant={getRoleBadgeVariant(user.role)}>
+                            {getRoleDisplayName(user.role)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {user.isActive ? (
+                              <UserCheck className="h-4 w-4 text-green-600" />
+                            ) : (
+                              <UserX className="h-4 w-4 text-red-600" />
+                            )}
+                            <span
+                              className={
+                                user.isActive
+                                  ? "text-green-600"
+                                  : "text-red-600"
+                              }
+                            >
+                              {user.isActive ? "Activo" : "Inactivo"}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {user.employeeId
+                            ? employees.find(
+                                (emp) => emp.id.toString() === user.employeeId,
+                              )?.name || "Empleado no encontrado"
+                            : "Sin asociar"}
+                        </TableCell>
+                        <TableCell>
+                          {user.lastLoginAt
+                            ? new Date(user.lastLoginAt).toLocaleString("es-AR")
+                            : "Nunca"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => {
+                                    setSelectedUser(user);
+                                    setIsEditDialogOpen(true);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Editar usuario</p>
+                              </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => openResetPassword(user)}
+                                >
+                                  <Key className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Blanquear contraseña</p>
+                              </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleToggleUserStatus(user)}
+                                >
+                                  {user.isActive ? (
+                                    <PowerOff className="h-4 w-4 text-red-600" />
+                                  ) : (
+                                    <Power className="h-4 w-4 text-green-600" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>
+                                  {user.isActive
+                                    ? "Desactivar usuario"
+                                    : "Activar usuario"}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={7}
+                        className="text-center text-muted-foreground py-8"
+                      >
+                        No se encontraron usuarios con los filtros aplicados
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Edit User Dialog */}
+        <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Usuario</DialogTitle>
+              <DialogDescription>
+                Modifica la información del usuario
+              </DialogDescription>
+            </DialogHeader>
+            {selectedUser && (
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="newPassword">Nueva Contraseña</Label>
+                  <Label>Nombre</Label>
                   <Input
-                    id="newPassword"
-                    type="password"
-                    placeholder="Mínimo 6 caracteres"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
+                    value={selectedUser.name}
+                    onChange={(e) =>
+                      setSelectedUser({ ...selectedUser, name: e.target.value })
+                    }
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirmar Contraseña</Label>
+                  <Label>Email</Label>
                   <Input
-                    id="confirmPassword"
-                    type="password"
-                    placeholder="Repite la contraseña"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={selectedUser.email}
+                    onChange={(e) =>
+                      setSelectedUser({
+                        ...selectedUser,
+                        email: e.target.value,
+                      })
+                    }
                   />
                 </div>
 
-                <div className="flex justify-end space-x-2">
+                <div className="space-y-2">
+                  <Label>Rol</Label>
+                  <Select
+                    value={selectedUser.role}
+                    onValueChange={(value) =>
+                      setSelectedUser({ ...selectedUser, role: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="employee">Empleado</SelectItem>
+                      <SelectItem value="manager">Gerente</SelectItem>
+                      <SelectItem value="hr">RRHH</SelectItem>
+                      <SelectItem value="admin">Administrador</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    checked={selectedUser.isActive}
+                    onCheckedChange={(checked) =>
+                      setSelectedUser({ ...selectedUser, isActive: checked })
+                    }
+                  />
+                  <Label>Usuario activo</Label>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button onClick={handleUpdateUser} className="w-full">
+                    Actualizar
+                  </Button>
                   <Button
                     variant="outline"
-                    onClick={() => {
-                      setIsChangeMyPasswordOpen(false);
-                      setNewPassword("");
-                      setConfirmPassword("");
-                    }}
+                    onClick={() => setIsEditDialogOpen(false)}
+                    className="w-full"
                   >
                     Cancelar
                   </Button>
-                  <Button onClick={handleChangeMyPassword}>
-                    Cambiar Contraseña
-                  </Button>
                 </div>
               </div>
-            </DialogContent>
-          </Dialog>
+            )}
+          </DialogContent>
+        </Dialog>
 
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Usuario
-              </Button>
-            </DialogTrigger>
+        {/* Reset Password Dialog */}
+        <Dialog
+          open={isResetPasswordOpen}
+          onOpenChange={setIsResetPasswordOpen}
+        >
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Crear Nuevo Usuario</DialogTitle>
+              <DialogTitle>Blanquear Contraseña</DialogTitle>
               <DialogDescription>
-                Completa la información del nuevo usuario
+                Establece una nueva contraseña para{" "}
+                <strong>{selectedUser?.name}</strong>
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Nombre de Usuario</Label>
+                <Label htmlFor="newPassword">Nueva Contraseña</Label>
                 <Input
-                  id="username"
-                  placeholder="ej: admin, 12345678"
-                  value={newUser.username}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, username: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="usuario@cadizbar.com"
-                  value={newUser.email}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, email: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="name">Nombre Completo</Label>
-                <Input
-                  id="name"
-                  placeholder="Juan Pérez"
-                  value={newUser.name}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, name: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="role">Rol</Label>
-                <Select
-                  value={newUser.role}
-                  onValueChange={(value) =>
-                    setNewUser({ ...newUser, role: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="manager">Gerente</SelectItem>
-                    <SelectItem value="hr">RRHH</SelectItem>
-                    <SelectItem value="employee">Empleado</SelectItem>
-                    <SelectItem value="readonly">Solo Lectura</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {newUser.role === "employee" && (
-                <div className="space-y-2">
-                  <Label htmlFor="employeeId">Empleado Asociado</Label>
-                  <Select
-                    value={newUser.employeeId}
-                    onValueChange={(value) =>
-                      setNewUser({ ...newUser, employeeId: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar empleado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees.map((employee) => (
-                        <SelectItem key={employee.id} value={employee.id}>
-                          {employee.name} - {employee.dni}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
-              <div className="space-y-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
+                  id="newPassword"
                   type="password"
-                  placeholder="Contraseña inicial"
-                  value={newUser.password}
-                  onChange={(e) =>
-                    setNewUser({ ...newUser, password: e.target.value })
-                  }
+                  placeholder="Ingresa la nueva contraseña"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                 />
+                <p className="text-xs text-muted-foreground">
+                  Para empleados se recomienda usar su DNI como contraseña
+                  inicial
+                </p>
               </div>
 
               <div className="flex gap-2 pt-4">
-                <Button onClick={handleCreateUser} className="w-full">
-                  Crear Usuario
+                <Button
+                  onClick={handleResetPassword}
+                  className="w-full"
+                  disabled={!newPassword}
+                >
+                  Blanquear Contraseña
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => setIsAddDialogOpen(false)}
+                  onClick={() => setIsResetPasswordOpen(false)}
                   className="w-full"
                 >
                   Cancelar
@@ -488,349 +715,7 @@ const UserManagement = () => {
           </DialogContent>
         </Dialog>
       </div>
-
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Usuarios
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{users.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Usuarios Activos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {users.filter((u) => u.isActive).length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">
-              Administradores
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-600">
-              {users.filter((u) => u.role === "admin").length}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Empleados</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">
-              {users.filter((u) => u.role === "employee").length}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Lista de Usuarios
-          </CardTitle>
-          <CardDescription>
-            Gestiona todos los usuarios del sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mb-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar usuarios..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos los roles</SelectItem>
-                <SelectItem value="admin">Administrador</SelectItem>
-                <SelectItem value="manager">Gerente</SelectItem>
-                <SelectItem value="hr">RRHH</SelectItem>
-                <SelectItem value="employee">Empleado</SelectItem>
-                <SelectItem value="readonly">Solo Lectura</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Usuario</TableHead>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Último Login</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell className="font-medium">
-                      {user.username}
-                    </TableCell>
-                    <TableCell>{user.name}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
-                      <Badge variant={getRoleBadgeVariant(user.role)}>
-                        {getRoleDisplayName(user.role)}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={user.isActive ? "default" : "secondary"}>
-                        {user.isActive ? "Activo" : "Inactivo"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {user.lastLogin
-                        ? new Date(user.lastLogin).toLocaleDateString("es-AR")
-                        : "Nunca"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleEditUser(user)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Editar usuario</p>
-                          </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => openResetPassword(user)}
-                            >
-                              <Key className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>Resetear contraseña</p>
-                          </TooltipContent>
-                        </Tooltip>
-
-                        {user.role !== "admin" && (
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleToggleUserStatus(user)}
-                              >
-                                {user.isActive ? (
-                                  <PowerOff className="h-4 w-4 text-red-600" />
-                                ) : (
-                                  <Power className="h-4 w-4 text-green-600" />
-                                )}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>
-                                {user.isActive
-                                  ? "Desactivar usuario"
-                                  : "Activar usuario"}
-                              </p>
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Edit User Dialog */}
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Editar Usuario</DialogTitle>
-            <DialogDescription>
-              Modifica la información de {selectedUser?.username}
-            </DialogDescription>
-          </DialogHeader>
-          {selectedUser && (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="editUsername">Nombre de Usuario</Label>
-                <Input
-                  id="editUsername"
-                  value={selectedUser.username}
-                  onChange={(e) =>
-                    setSelectedUser({
-                      ...selectedUser,
-                      username: e.target.value,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="editEmail">Email</Label>
-                <Input
-                  id="editEmail"
-                  type="email"
-                  value={selectedUser.email}
-                  onChange={(e) =>
-                    setSelectedUser({ ...selectedUser, email: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="editName">Nombre Completo</Label>
-                <Input
-                  id="editName"
-                  value={selectedUser.name}
-                  onChange={(e) =>
-                    setSelectedUser({ ...selectedUser, name: e.target.value })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="editRole">Rol</Label>
-                <Select
-                  value={selectedUser.role}
-                  onValueChange={(value) =>
-                    setSelectedUser({ ...selectedUser, role: value })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="admin">Administrador</SelectItem>
-                    <SelectItem value="manager">Gerente</SelectItem>
-                    <SelectItem value="hr">RRHH</SelectItem>
-                    <SelectItem value="employee">Empleado</SelectItem>
-                    <SelectItem value="readonly">Solo Lectura</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="editActive"
-                  checked={selectedUser.isActive}
-                  onCheckedChange={(checked) =>
-                    setSelectedUser({ ...selectedUser, isActive: checked })
-                  }
-                />
-                <Label htmlFor="editActive">Usuario activo</Label>
-              </div>
-
-              <div className="flex gap-2 pt-4">
-                <Button onClick={handleUpdateUser} className="w-full">
-                  Guardar Cambios
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditDialogOpen(false)}
-                  className="w-full"
-                >
-                  Cancelar
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      {/* Reset Password Dialog */}
-      <Dialog open={isResetPasswordOpen} onOpenChange={setIsResetPasswordOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              Blanquear Contraseña
-            </DialogTitle>
-            <DialogDescription>
-              Restablecer contraseña para {selectedUser?.username}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-              <p className="text-sm text-orange-800">
-                El usuario deber�� cambiar esta contraseña en su próximo login.
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="newPassword">Nueva Contraseña</Label>
-              <Input
-                id="newPassword"
-                type="password"
-                placeholder="Ingresa la nueva contraseña"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Para empleados se recomienda usar su DNI como contraseña inicial
-              </p>
-            </div>
-
-            <div className="flex gap-2 pt-4">
-              <Button
-                onClick={handleResetPassword}
-                className="w-full"
-                disabled={!newPassword}
-              >
-                Blanquear Contraseña
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => setIsResetPasswordOpen(false)}
-                className="w-full"
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+    </TooltipProvider>
   );
 };
 
