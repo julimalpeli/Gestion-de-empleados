@@ -156,6 +156,9 @@ const Employees = () => {
     deleteEmployee,
   } = useEmployees();
 
+  // Usar hook para gestión de usuarios
+  const { createEmployeeUser } = useUsers();
+
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
 
@@ -292,7 +295,7 @@ const Employees = () => {
 
 Fecha de Ingreso: ${vacationInfo.startDate}
 Antigüedad: ${vacationInfo.years} años
-D��as de Vacaciones: ${vacationInfo.vacationDays} días (según antigüedad)
+Días de Vacaciones: ${vacationInfo.vacationDays} días (según antigüedad)
 Puesto: ${employee.position}
 Estado: ${employee.status === "active" ? "Activo" : "Inactivo"}
 Sueldo Mensual Total: ${formatCurrency(employee.whiteWage + employee.informalWage)}
