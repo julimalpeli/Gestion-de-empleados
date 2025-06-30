@@ -307,7 +307,7 @@ const Employees = () => {
     return (
       <div className="flex flex-col gap-6 p-6">
         <div className="flex items-center justify-center h-32">
-          <p>No tienes permisos para acceder a este módulo.</p>
+          <p>No tienes permisos para acceder a este m��dulo.</p>
         </div>
       </div>
     );
@@ -607,12 +607,22 @@ const Employees = () => {
                           )
                         : "No registrada"}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="font-semibold">
                       {formatCurrency(
-                        (employee.whiteWage || 0) +
-                          (employee.informalWage || 0) +
-                          (employee.presentismo || 0),
+                        calculateDailySalary(
+                          employee.whiteWage || 0,
+                          employee.informalWage || 0,
+                        ),
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {formatCurrency(employee.whiteWage || 0)}
+                    </TableCell>
+                    <TableCell>
+                      {formatCurrency(employee.informalWage || 0)}
+                    </TableCell>
+                    <TableCell>
+                      {formatCurrency(employee.presentismo || 0)}
                     </TableCell>
                     <TableCell>
                       <Badge
