@@ -45,6 +45,30 @@ export const useEmployees = () => {
     }
   };
 
+  // Función auxiliar para sincronizar estado del usuario cuando se desactiva un empleado
+  const syncUserStatusWithEmployee = async (
+    employeeId: string,
+    employeeStatus: string,
+  ) => {
+    try {
+      // Solo desactivar usuario si el empleado se desactiva, no activar automáticamente
+      if (employeeStatus === "inactive") {
+        const associatedUser = users.find(
+          (user) => user.employeeId === employeeId,
+        );
+        if (associatedUser && associatedUser.isActive) {
+          await updateUser(associatedUser.id, { isActive: false });
+          console.log(
+            `Usuario ${associatedUser.username} desactivado al desactivar empleado`,
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error syncing user status:", error);
+      // No throw error here, just log it to avoid breaking the employee update
+    }
+  };
+
   // Actualizar empleado
   const updateEmployee = async (
     id: string,
@@ -59,6 +83,12 @@ export const useEmployees = () => {
       setEmployees((prev) =>
         prev.map((emp) => (emp.id === id ? updatedEmployee : emp)),
       );
+
+      // Sync user status if employee status changed to inactive
+      if (employee.status) {
+        await syncUserStatusWithEmployee(id, employee.status);
+      }
+
       return updatedEmployee;
     } catch (err) {
       const errorMsg =
