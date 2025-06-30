@@ -25,8 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Edit, Trash2, Calendar, Info } from "lucide-react";
+import {
+  Plus,
+  Edit,
+  Trash2,
+  Calendar,
+  Info,
+  AlertTriangle,
+} from "lucide-react";
 import { useVacations } from "@/hooks/use-vacations";
+import { employeeService } from "@/services/employeeService";
 
 // Mock vacation data - COMENTADO porque ahora usamos Supabase
 const mockVacations = [
