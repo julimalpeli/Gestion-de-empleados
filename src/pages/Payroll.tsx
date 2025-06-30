@@ -1014,7 +1014,7 @@ const Payroll = () => {
                               />
                             </TableCell>
                             <TableCell className="text-right">
-                              <div className="flex items-center justify-end gap-2">
+                              <div className="flex items-center justify-end gap-1">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button
@@ -1022,8 +1022,9 @@ const Payroll = () => {
                                       size="sm"
                                       onClick={() => handleEditRecord(record)}
                                       disabled={
-                                        record.status === "processed" &&
-                                        !isAdmin()
+                                        record.status === "paid" ||
+                                        (record.status === "processed" &&
+                                          !isAdmin())
                                       }
                                     >
                                       <Calculator className="h-4 w-4" />
@@ -1031,13 +1032,76 @@ const Payroll = () => {
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <p>
-                                      {record.status === "processed" &&
-                                      !isAdmin()
-                                        ? "Solo admin puede editar liquidaciones procesadas"
-                                        : "Editar liquidación"}
+                                      {record.status === "paid"
+                                        ? "No se puede editar liquidación pagada"
+                                        : record.status === "processed" &&
+                                            !isAdmin()
+                                          ? "Solo admin puede editar liquidaciones procesadas"
+                                          : "Editar liquidación"}
                                     </p>
                                   </TooltipContent>
                                 </Tooltip>
+
+                                {/* State transition buttons */}
+                                {record.status === "draft" && isAdmin() && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleStateChange(record, "pending")
+                                        }
+                                      >
+                                        <UserCheck className="h-4 w-4 text-orange-600" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Marcar como pendiente</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+
+                                {record.status === "pending" && isAdmin() && (
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() =>
+                                          handleStateChange(record, "approved")
+                                        }
+                                      >
+                                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Aprobar liquidación</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
+
+                                {(record.status === "approved" ||
+                                  record.status === "processed") &&
+                                  isAdmin() && (
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() =>
+                                            handleStateChange(record, "paid")
+                                          }
+                                        >
+                                          <DollarSign className="h-4 w-4 text-green-600" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Marcar como pagada</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  )}
+
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button
