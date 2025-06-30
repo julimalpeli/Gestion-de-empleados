@@ -1226,6 +1226,26 @@ const Employees = () => {
               </div>
 
               <div className="space-y-2">
+                <Label>Antigüedad</Label>
+                <p className="text-lg">
+                  {viewingEmployee.startDate
+                    ? (() => {
+                        const vacationInfo = calculateVacationDays(
+                          viewingEmployee.startDate,
+                        );
+                        const years = vacationInfo.years;
+                        const months = vacationInfo.totalMonths % 12;
+                        if (years > 0) {
+                          return `${years} año${years > 1 ? "s" : ""}${months > 0 ? ` y ${months} mes${months > 1 ? "es" : ""}` : ""}`;
+                        } else {
+                          return `${months} mes${months > 1 ? "es" : ""}`;
+                        }
+                      })()
+                    : "No calculada"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label>Sueldo Diario</Label>
                 <p className="text-lg font-semibold text-green-600">
                   {formatCurrency(viewingEmployee.dailyWage || 0)}
