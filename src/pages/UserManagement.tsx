@@ -522,64 +522,62 @@ const UserManagement = () => {
                         : "Nunca"}
                     </TableCell>
                     <TableCell className="text-right">
-                      <TooltipProvider>
-                        <div className="flex justify-end gap-2">
+                      <div className="flex justify-end gap-2">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditUser(user)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Editar usuario</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openResetPassword(user)}
+                            >
+                              <Key className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Resetear contraseña</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        {user.role !== "admin" && (
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleEditUser(user)}
+                                onClick={() => handleToggleUserStatus(user)}
                               >
-                                <Edit className="h-4 w-4" />
+                                {user.isActive ? (
+                                  <PowerOff className="h-4 w-4 text-red-600" />
+                                ) : (
+                                  <Power className="h-4 w-4 text-green-600" />
+                                )}
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Editar usuario</p>
+                              <p>
+                                {user.isActive
+                                  ? "Desactivar usuario"
+                                  : "Activar usuario"}
+                              </p>
                             </TooltipContent>
                           </Tooltip>
-
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => openResetPassword(user)}
-                              >
-                                <Key className="h-4 w-4" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                              <p>Resetear contraseña</p>
-                            </TooltipContent>
-                          </Tooltip>
-
-                          {user.role !== "admin" && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => handleToggleUserStatus(user)}
-                                >
-                                  {user.isActive ? (
-                                    <PowerOff className="h-4 w-4 text-red-600" />
-                                  ) : (
-                                    <Power className="h-4 w-4 text-green-600" />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>
-                                  {user.isActive
-                                    ? "Desactivar usuario"
-                                    : "Activar usuario"}
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                      </TooltipProvider>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
