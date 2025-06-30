@@ -146,6 +146,22 @@ const Payroll = () => {
     }
   };
 
+  const handleDeletePayroll = async () => {
+    if (!recordToDelete) return;
+
+    try {
+      await deletePayrollRecord(recordToDelete.id);
+      setSuccessMessage(
+        `Liquidación de ${recordToDelete.employeeName} eliminada exitosamente`,
+      );
+      setDeleteConfirmOpen(false);
+      setRecordToDelete(null);
+    } catch (error) {
+      console.error("Error deleting payroll:", error);
+      alert("Error al eliminar liquidación");
+    }
+  };
+
   const handleEditRecord = (record) => {
     setIsEditMode(true);
     setEditingRecord(record);
@@ -253,7 +269,7 @@ const Payroll = () => {
     const holidayPay = employee.dailyWage * 2 * (parseInt(holidayDays) || 0);
 
     // Calcular horas extra si está habilitado
-    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario ÷ 8
+    const hourlyRate = employee.dailyWage / 8; // Sueldo por hora = sueldo diario �� 8
     const overtimePay = overtimeEnabled
       ? hourlyRate * (parseInt(overtimeHours) || 0)
       : 0;
