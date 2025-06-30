@@ -157,6 +157,8 @@ const Employees = () => {
         informalWage: parseFloat(newEmployee.informalWage) || 0,
         presentismo: parseFloat(newEmployee.presentismo) || 0,
         startDate: newEmployee.startDate,
+        address: newEmployee.address.trim(),
+        email: newEmployee.email.trim(),
       };
 
       const newEmployeeRecord = await createEmployee(employeeData);
