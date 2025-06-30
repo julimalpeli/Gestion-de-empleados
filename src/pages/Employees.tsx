@@ -149,6 +149,7 @@ const Employees = () => {
       const employeeData = {
         name: newEmployee.name.trim(),
         dni: newEmployee.dni.trim(),
+        documentType: newEmployee.documentType,
         position: newEmployee.position.trim(),
         whiteWage: parseFloat(newEmployee.whiteWage) || 0,
         informalWage: parseFloat(newEmployee.informalWage) || 0,
