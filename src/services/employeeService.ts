@@ -82,6 +82,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const newEmployee = {
         name: employee.name,
         dni: employee.dni,
+        document_type: employee.documentType || "dni",
         job_position: employee.position,
         white_wage: employee.whiteWage,
         informal_wage: employee.informalWage,
@@ -92,6 +93,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
         start_date: employee.startDate,
         vacation_days: vacationInfo.vacationDays,
         vacations_taken: 0,
+        address: employee.address || "",
+        email: employee.email || "",
       };
 
       console.log("Sending to Supabase:", newEmployee);
