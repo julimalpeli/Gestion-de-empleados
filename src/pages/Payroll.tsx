@@ -39,6 +39,10 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useEmployees } from "@/hooks/use-employees";
 import {
+  generatePayrollReceiptPDF,
+  generatePayrollReceiptExcel,
+} from "@/utils/receiptGenerator";
+import {
   Plus,
   Calculator,
   DollarSign,
@@ -206,10 +210,44 @@ const Payroll = () => {
     setIsNewPayrollOpen(true);
   };
 
-  const generatePayslip = (record) => {
-    // Generate payslip PDF logic here
-    console.log("Generating payslip for:", record.employeeName);
-    alert(`Generando recibo de sueldo para ${record.employeeName}`);
+  const generatePayslip = async (record) => {
+    try {
+      const employee = employees.find((emp) => emp.id === record.employeeId);
+      if (!employee) {
+        alert("No se encontró la información del empleado");
+        return;
+      }
+
+      const receiptData = {
+        employee: {
+          name: employee.name,
+          dni: employee.dni,
+          position: employee.position,
+          startDate: employee.startDate,
+        },
+        payroll: record,
+        period: record.period,
+        company: {
+          name: "Cádiz Bar de Tapas",
+          address: "Av. Corrientes 1234, CABA",
+          phone: "+54 11 4567-8900",
+        },
+      };
+
+      // Show options to user
+      const format = confirm(
+        "¿Generar como PDF? \n\nOK = PDF\nCancelar = Excel/CSV",
+      );
+
+      if (format) {
+        await generatePayrollReceiptPDF(receiptData);
+      } else {
+        await generatePayrollReceiptExcel(receiptData);
+      }
+    } catch (error) {
+      console.error("Error generating payslip:", error);
+      alert(`Error al generar el recibo: ${error.message}`);
+    }
   };
   const [selectedAguinaldoPeriod, setSelectedAguinaldoPeriod] =
     useState("2024-2");
