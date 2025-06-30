@@ -1449,9 +1449,74 @@ const Payroll = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8 text-muted-foreground">
-                  Funcionalidad de historial disponible próximamente
-                </div>
+                {historyRecords.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No hay liquidaciones de períodos anteriores
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Empleado</TableHead>
+                          <TableHead>Período Liquidado</TableHead>
+                          <TableHead>Días Base</TableHead>
+                          <TableHead>Total Neto</TableHead>
+                          <TableHead>Estado</TableHead>
+                          <TableHead className="text-right">Acciones</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {historyRecords
+                          .sort((a, b) => b.period.localeCompare(a.period)) // Sort by period descending
+                          .map((record) => (
+                            <TableRow key={record.id}>
+                              <TableCell className="font-medium">
+                                {record.employeeName}
+                              </TableCell>
+                              <TableCell className="font-medium">
+                                {formatPeriod(record.period)}
+                                {isAguinaldoPeriod(record.period) && (
+                                  <div className="text-xs text-green-600">
+                                    Período con aguinaldo
+                                  </div>
+                                )}
+                              </TableCell>
+                              <TableCell>{record.baseDays} días</TableCell>
+                              <TableCell className="font-medium text-green-600">
+                                {formatCurrency(record.netTotal)}
+                              </TableCell>
+                              <TableCell>
+                                <Badge
+                                  variant={getStatusVariant(record.status)}
+                                >
+                                  {getStatusText(record.status)}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-1">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => generatePayslip(record)}
+                                      >
+                                        <FileText className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Generar recibo</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
