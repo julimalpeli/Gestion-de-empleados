@@ -44,9 +44,18 @@ const EmployeePortal = () => {
   const {
     documents,
     loading: documentsLoading,
+    error: documentsError,
     downloadDocument,
     getCategoryDisplayName,
   } = useDocuments(user?.employeeId);
+
+  // Debug logging for documents
+  console.log("EmployeePortal documents state:", {
+    employeeId: user?.employeeId,
+    documentsCount: documents?.length,
+    documentsLoading,
+    documentsError,
+  });
 
   const handleLogout = () => {
     logout();
