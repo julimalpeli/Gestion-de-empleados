@@ -678,6 +678,16 @@ const Payroll = () => {
                             <span>+{formatCurrency(calculation.bonusPay)}</span>
                           </div>
                         )}
+                        {calculation.aguinaldo > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>
+                              Aguinaldo ({formatPeriod(selectedPeriod)}):
+                            </span>
+                            <span>
+                              +{formatCurrency(calculation.aguinaldo)}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex justify-between font-medium">
                           <span>Subtotal bruto:</span>
                           <span>{formatCurrency(calculation.grossTotal)}</span>
