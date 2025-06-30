@@ -280,6 +280,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       id: data.id,
       name: data.name,
       dni: data.dni,
+      documentType: data.document_type,
       position: data.job_position,
       whiteWage: data.white_wage,
       informalWage: data.informal_wage,
@@ -290,6 +291,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
       startDate: data.start_date,
       vacationDays: data.vacation_days,
       vacationsTaken: data.vacations_taken,
+      address: data.address || "",
+      email: data.email || "",
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     };
