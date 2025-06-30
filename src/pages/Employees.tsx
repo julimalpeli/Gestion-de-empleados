@@ -816,110 +816,108 @@ const Employees = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <TooltipProvider>
-                        <div className="flex justify-end gap-1">
+                      <div className="flex justify-end gap-1">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleViewEmployee(employee)}
+                            >
+                              <Info className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Ver información del empleado</p>
+                          </TooltipContent>
+                        </Tooltip>
+
+                        <PermissionGate module="vacations" action="view">
                           <Tooltip>
                             <TooltipTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleViewEmployee(employee)}
+                                onClick={() => {
+                                  setSelectedEmployeeForVacations(employee);
+                                  setIsVacationManagerOpen(true);
+                                }}
                               >
-                                <Info className="h-4 w-4" />
+                                <Plane className="h-4 w-4" />
                               </Button>
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Ver información del empleado</p>
+                              <p>Gestionar vacaciones</p>
                             </TooltipContent>
                           </Tooltip>
+                        </PermissionGate>
 
-                          <PermissionGate module="vacations" action="view">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    setSelectedEmployeeForVacations(employee);
-                                    setIsVacationManagerOpen(true);
-                                  }}
-                                >
-                                  <Plane className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Gestionar vacaciones</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </PermissionGate>
-
-                          <PermissionGate module="employees" action="edit">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleEditEmployee(employee)}
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Editar empleado</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </PermissionGate>
-
-                          <PermissionGate module="employees" action="edit">
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() =>
-                                    handleStatusChange(
-                                      employee,
-                                      employee.status === "active"
-                                        ? "inactive"
-                                        : "active",
-                                    )
-                                  }
-                                >
-                                  {employee.status === "active" ? (
-                                    <UserX className="h-4 w-4 text-red-600" />
-                                  ) : (
-                                    <UserCheck className="h-4 w-4 text-green-600" />
-                                  )}
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>
-                                  {employee.status === "active"
-                                    ? "Desactivar empleado"
-                                    : "Activar empleado"}
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </PermissionGate>
-
-                          {/* Delete button temporarily hidden */}
-                          {false && (
-                            <PermissionGate module="employees" action="delete">
+                        <PermissionGate module="employees" action="edit">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => {
-                                  setEmployeeToDelete(employee);
-                                  setDeleteConfirmOpen(true);
-                                }}
-                                title="Eliminar empleado"
+                                onClick={() => handleEditEmployee(employee)}
                               >
-                                <Trash2 className="h-4 w-4 text-red-600" />
+                                <Edit className="h-4 w-4" />
                               </Button>
-                            </PermissionGate>
-                          )}
-                        </div>
-                      </TooltipProvider>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Editar empleado</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </PermissionGate>
+
+                        <PermissionGate module="employees" action="edit">
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleStatusChange(
+                                    employee,
+                                    employee.status === "active"
+                                      ? "inactive"
+                                      : "active",
+                                  )
+                                }
+                              >
+                                {employee.status === "active" ? (
+                                  <UserX className="h-4 w-4 text-red-600" />
+                                ) : (
+                                  <UserCheck className="h-4 w-4 text-green-600" />
+                                )}
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>
+                                {employee.status === "active"
+                                  ? "Desactivar empleado"
+                                  : "Activar empleado"}
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </PermissionGate>
+
+                        {/* Delete button temporarily hidden */}
+                        {false && (
+                          <PermissionGate module="employees" action="delete">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEmployeeToDelete(employee);
+                                setDeleteConfirmOpen(true);
+                              }}
+                              title="Eliminar empleado"
+                            >
+                              <Trash2 className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </PermissionGate>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
