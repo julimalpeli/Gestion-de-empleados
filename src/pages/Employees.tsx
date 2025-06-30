@@ -68,6 +68,7 @@ import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
 import { useEmployees } from "@/hooks/use-employees";
 import { useUsers } from "@/hooks/use-users";
+import { employeeService } from "@/services/employeeService";
 
 const Employees = () => {
   const [searchTerm, setSearchTerm] = useState("");
