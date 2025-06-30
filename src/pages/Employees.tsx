@@ -475,7 +475,7 @@ const Employees = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="informalWage">Sueldo en Negro</Label>
+                  <Label htmlFor="informalWage">Sueldo Informal</Label>
                   <Input
                     id="informalWage"
                     type="number"
