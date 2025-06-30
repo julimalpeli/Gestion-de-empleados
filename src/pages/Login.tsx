@@ -13,7 +13,9 @@ import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { LogIn, User, Shield } from "lucide-react";
-import { useAuth, validateLogin, DEMO_USERS } from "@/hooks/use-auth";
+import { validateLogin, DEMO_USERS } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth";
+import ForcePasswordChange from "@/components/ForcePasswordChange";
 
 const Login = () => {
   const [username, setUsername] = useState("");
