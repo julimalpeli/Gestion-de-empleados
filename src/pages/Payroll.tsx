@@ -222,10 +222,12 @@ const Payroll = () => {
       return totalSalary / 2;
     } else {
       // Aguinaldo proporcional
-      // Calcular días trabajados desde fecha de ingreso hasta fecha límite
+      // Calcular días trabajados desde el día posterior a la fecha de ingreso hasta fecha límite
+      const dayAfterStart = new Date(startDate);
+      dayAfterStart.setDate(dayAfterStart.getDate() + 1);
       const workStartDate =
-        startDate > new Date(parseInt(year), 0, 1)
-          ? startDate
+        dayAfterStart > new Date(parseInt(year), 0, 1)
+          ? dayAfterStart
           : new Date(parseInt(year), 0, 1);
       const daysWorked = Math.max(
         0,
