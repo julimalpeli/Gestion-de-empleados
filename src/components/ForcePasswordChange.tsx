@@ -67,8 +67,16 @@ const ForcePasswordChange = ({
         return;
       }
 
-      // Verificar contraseña actual (simple base64 para demo)
-      const storedPassword = atob(user.password_hash);
+      // Verificar contraseña actual
+      let storedPassword;
+      try {
+        // Intentar decodificar como base64
+        storedPassword = atob(user.password_hash);
+      } catch (e) {
+        // Si falla la decodificación, asumir que el hash no es base64
+        storedPassword = user.password_hash;
+      }
+
       if (storedPassword !== currentPassword) {
         setError("La contraseña actual es incorrecta");
         setIsLoading(false);
