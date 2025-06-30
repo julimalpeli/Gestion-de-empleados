@@ -687,7 +687,21 @@ const EmployeePortal = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {documentsLoading ? (
+                {documentsError ? (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-yellow-800">
+                      <FileText className="h-5 w-5" />
+                      <div>
+                        <p className="font-medium">Error cargando documentos</p>
+                        <p className="text-sm mt-1">
+                          {documentsError.includes("does not exist")
+                            ? "El sistema de documentos no está configurado aún."
+                            : "No se pudieron cargar los documentos en este momento."}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : documentsLoading ? (
                   <div className="text-center py-8">
                     <p>Cargando documentos...</p>
                   </div>
