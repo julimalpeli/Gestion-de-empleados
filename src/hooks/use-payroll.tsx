@@ -193,10 +193,21 @@ export const usePayroll = () => {
         .update(updateData)
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase update error:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          updateData: updateData,
+          id: id,
+        });
+        throw new Error(error.message || "Database update error");
+      }
 
       await fetchPayrollRecords();
     } catch (err) {
+      console.error("Update error details:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error updating payroll record",
       );
