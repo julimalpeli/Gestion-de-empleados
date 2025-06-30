@@ -244,10 +244,12 @@ export default function DocumentManager({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Documentos de {employee.name}
+            {title || `Documentos de ${employee.name}`}
           </DialogTitle>
           <DialogDescription>
-            Gestiona los documentos y archivos del empleado
+            {payrollId
+              ? "Subir, descargar y gestionar documentos de esta liquidación específica"
+              : "Gestiona los documentos y archivos del empleado"}
           </DialogDescription>
         </DialogHeader>
 
