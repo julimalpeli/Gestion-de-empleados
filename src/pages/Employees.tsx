@@ -326,6 +326,15 @@ const Employees = () => {
 
   const formatPosition = (position) => {
     const positions = {
+      Cocinero: "Cocinero",
+      "Jefe de Cocina": "Jefe de Cocina",
+      "Ayudante de Cocina": "Ayudante de Cocina",
+      "Mesero/a": "Mesero/a",
+      "Jefe de Salón": "Jefe de Salón",
+      "Cajero/a": "Cajero/a",
+      "Tareas de Limpieza": "Tareas de Limpieza",
+      "Encargado/a": "Encargado/a",
+      // Backward compatibility for old format
       cocinero: "Cocinero",
       jefe_cocina: "Jefe de Cocina",
       ayudante: "Ayudante de Cocina",
