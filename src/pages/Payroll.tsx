@@ -908,31 +908,29 @@ const Payroll = () => {
                     </p>
                   )}
                 </div>
+              </div>
 
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    onClick={
-                      isEditMode ? handleUpdatePayroll : handleCreatePayroll
-                    }
-                    disabled={!selectedEmployee || !selectedPeriod}
-                    className="flex-1"
-                  >
-                    {isEditMode
-                      ? "Actualizar Liquidación"
-                      : "Crear Liquidación"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsNewPayrollOpen(false);
-                      setIsEditMode(false);
-                      setEditingRecord(null);
-                    }}
-                    className="flex-1"
-                  >
-                    Cancelar
-                  </Button>
-                </div>
+              <div className="flex gap-2 pt-4">
+                <Button
+                  onClick={
+                    isEditMode ? handleUpdatePayroll : handleCreatePayroll
+                  }
+                  disabled={!selectedEmployee || !selectedPeriod}
+                  className="flex-1"
+                >
+                  {isEditMode ? "Actualizar Liquidación" : "Crear Liquidación"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsNewPayrollOpen(false);
+                    setIsEditMode(false);
+                    setEditingRecord(null);
+                  }}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
