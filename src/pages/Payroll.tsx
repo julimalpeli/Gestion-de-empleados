@@ -50,6 +50,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/components/FileUpload";
 import usePermissions from "@/hooks/use-permissions";
+import { useAuth } from "@/hooks/use-auth";
 import {
   Tooltip,
   TooltipContent,
@@ -920,7 +921,7 @@ const Payroll = () => {
         {/* Payroll Records */}
         <Tabs defaultValue="current" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="current">Período Actual</TabsTrigger>
+            <TabsTrigger value="current">Per��odo Actual</TabsTrigger>
             <TabsTrigger value="history">Historial</TabsTrigger>
           </TabsList>
 
