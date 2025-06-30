@@ -130,6 +130,7 @@ class DocumentService {
         .from("employee_documents")
         .select("*")
         .eq("employee_id", employeeId)
+        .is("payroll_id", null) // Only get general employee documents (not payroll-specific)
         .order("uploaded_at", { ascending: false });
 
       console.log("Supabase response:", { data, error });
