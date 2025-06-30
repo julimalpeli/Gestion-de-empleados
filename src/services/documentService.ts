@@ -290,6 +290,7 @@ class DocumentService {
     return {
       id: data.id,
       employeeId: data.employee_id,
+      payrollId: data.payroll_id,
       fileName: data.file_name,
       originalFileName: data.original_file_name,
       fileType: data.file_type,
