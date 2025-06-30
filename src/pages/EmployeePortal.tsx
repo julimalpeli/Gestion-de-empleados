@@ -36,25 +36,43 @@ import { useVacations } from "@/hooks/use-vacations";
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { employees, loading: employeesLoading } = useEmployees();
+  const { payrollRecords, loading: payrollLoading } = usePayroll();
+  const { vacationRequests, loading: vacationsLoading } = useVacations();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  // Mock employee data based on logged user
-  const employeeData = {
-    name: user?.name || "Juan Pérez",
-    dni: user?.username || "12345678", // DNI es el username para empleados
-    position: "Cocinero",
-    employeeId: user?.employeeId || 1,
-    startDate: "2023-01-15",
-    vacationDays: 14,
-    vacationsTaken: 7,
-    phone: "+54 11 1234-5678",
-    email: "juan.perez@cadizbartapas.com",
-    address: "Av. Corrientes 1234, CABA",
-  };
+  // Get current employee data
+  const currentEmployee = employees.find((emp) => emp.id === user?.employeeId);
+
+  const employeeData = currentEmployee
+    ? {
+        name: currentEmployee.name,
+        dni: currentEmployee.dni,
+        position: currentEmployee.position,
+        employeeId: currentEmployee.id,
+        startDate: currentEmployee.startDate,
+        vacationDays: currentEmployee.vacationDays || 14,
+        vacationsTaken: currentEmployee.vacationsTaken || 0,
+        phone: "+54 11 1234-5678", // TODO: Add to employee model
+        email: `${currentEmployee.name.toLowerCase().replace(/\s+/g, ".")}@cadizbartapas.com`,
+        address: "Av. Corrientes 1234, CABA", // TODO: Add to employee model
+      }
+    : {
+        name: user?.name || "Empleado",
+        dni: user?.username || "--------",
+        position: "Empleado",
+        employeeId: user?.employeeId || "",
+        startDate: new Date().toISOString().split("T")[0],
+        vacationDays: 0,
+        vacationsTaken: 0,
+        phone: "",
+        email: "",
+        address: "",
+      };
 
   // Mock payroll history
   const payrollHistory = [
