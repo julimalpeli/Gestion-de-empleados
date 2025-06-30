@@ -204,6 +204,7 @@ const Payroll = () => {
   } = useEmployees();
 
   const { isAdmin, canEditModule } = usePermissions();
+  const { user } = useAuth();
 
   // Initialize period with current month
   useEffect(() => {
@@ -921,7 +922,7 @@ const Payroll = () => {
         {/* Payroll Records */}
         <Tabs defaultValue="current" className="space-y-4">
           <TabsList>
-            <TabsTrigger value="current">Per��odo Actual</TabsTrigger>
+            <TabsTrigger value="current">Período Actual</TabsTrigger>
             <TabsTrigger value="history">Historial</TabsTrigger>
           </TabsList>
 
