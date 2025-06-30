@@ -732,8 +732,17 @@ const Payroll = () => {
                         <hr />
                         <div className="flex justify-between font-bold text-lg">
                           <span>Total Neto:</span>
-                          <span>{formatCurrency(calculation.netTotal)}</span>
+                          <span>
+                            {formatCurrency(
+                              calculation.netTotal + calculation.aguinaldo,
+                            )}
+                          </span>
                         </div>
+                        {calculation.aguinaldo > 0 && (
+                          <div className="text-xs text-green-600 text-center">
+                            Incluye aguinaldo de {formatPeriod(selectedPeriod)}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   ) : (
