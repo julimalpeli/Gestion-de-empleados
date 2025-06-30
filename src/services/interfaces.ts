@@ -92,6 +92,7 @@ export interface Employee {
   id: string;
   name: string;
   dni: string;
+  documentType?: string;
   position: string;
   whiteWage: number;
   informalWage: number;
@@ -102,6 +103,8 @@ export interface Employee {
   startDate: string;
   vacationDays: number;
   vacationsTaken: number;
+  address?: string;
+  email?: string;
   createdAt: string;
   updatedAt: string;
 }
