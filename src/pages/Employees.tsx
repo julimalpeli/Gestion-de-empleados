@@ -212,6 +212,7 @@ const Employees = () => {
       const newEmployeeRecord = await createEmployee(employeeData);
 
       // Crear usuario automáticamente para acceso al portal
+      let userCreated = false;
       try {
         await createEmployeeUser({
           id: newEmployeeRecord.id,
@@ -219,17 +220,20 @@ const Employees = () => {
           dni: newEmployeeRecord.dni,
         });
         console.log("✅ Usuario creado automáticamente para empleado");
+        userCreated = true;
       } catch (userError) {
         console.error("❌ Error creando usuario:", userError);
         // No fallar la creación del empleado por error de usuario
-        setSuccessMessage(
-          "Empleado creado exitosamente, pero hubo un error al crear el usuario. Contacte al administrador.",
-        );
       }
 
-      if (!userError) {
+      // Mensaje de éxito según el resultado
+      if (userCreated) {
         setSuccessMessage(
           `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}`,
+        );
+      } else {
+        setSuccessMessage(
+          "Empleado creado exitosamente, pero hubo un error al crear el usuario. Contacte al administrador.",
         );
       }
 
