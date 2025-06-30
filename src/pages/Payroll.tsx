@@ -1038,10 +1038,34 @@ const Payroll = () => {
           <TabsContent value="current">
             <Card>
               <CardHeader>
-                <CardTitle>Liquidaciones del Período</CardTitle>
-                <CardDescription>
-                  Estado actual de las liquidaciones registradas
-                </CardDescription>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle>Liquidaciones del Período</CardTitle>
+                    <CardDescription>
+                      Estado actual de las liquidaciones registradas
+                    </CardDescription>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      // Use the first employee as default, or let user select
+                      const firstEmployee = employees.find(
+                        (emp) => emp.status === "active",
+                      );
+                      if (firstEmployee) {
+                        setSelectedEmployeeForDocs(firstEmployee);
+                        setIsDocumentManagerOpen(true);
+                      } else {
+                        alert(
+                          "No hay empleados activos para gestionar documentos",
+                        );
+                      }
+                    }}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Gestionar Documentos
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {/* Filtros */}
