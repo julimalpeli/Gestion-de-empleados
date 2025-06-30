@@ -224,12 +224,12 @@ export const generatePayrollReceiptExcel = async (data: ReceiptData) => {
       ["DETALLE DE LIQUIDACIÓN"],
       ["Concepto", "Cantidad/Días", "Importe"],
       [
-        "Sueldo en Blanco",
+        "Sueldo Depósito",
         data.payroll.baseDays + " días",
         "$" + formatAmount(data.payroll.whiteAmount),
       ],
       [
-        "Sueldo Informal",
+        "Sueldo Efectivo",
         data.payroll.baseDays + " días",
         "$" + formatAmount(data.payroll.informalAmount),
       ],
