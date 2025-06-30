@@ -69,6 +69,11 @@ const EmployeePortal = () => {
     employeeAddress: currentEmployee?.address,
   });
 
+  // Calculate vacation eligibility
+  const vacationInfo = currentEmployee?.startDate
+    ? employeeService.calculateVacationDays(currentEmployee.startDate)
+    : { vacationDays: 0, eligibleForVacations: false, totalMonths: 0 };
+
   const employeeData = currentEmployee
     ? {
         name: currentEmployee.name,
@@ -77,11 +82,15 @@ const EmployeePortal = () => {
         position: currentEmployee.position,
         employeeId: currentEmployee.id,
         startDate: currentEmployee.startDate,
-        vacationDays: currentEmployee.vacationDays || 14,
+        vacationDays: vacationInfo.eligibleForVacations
+          ? vacationInfo.vacationDays
+          : 0,
         vacationsTaken: currentEmployee.vacationsTaken || 0,
         phone: "+54 11 1234-5678", // TODO: Add to employee model
         email: currentEmployee.email || "",
         address: currentEmployee.address || "",
+        isEligibleForVacations: vacationInfo.eligibleForVacations,
+        monthsOfService: vacationInfo.totalMonths || 0,
       }
     : {
         name: user?.name || "Empleado",
