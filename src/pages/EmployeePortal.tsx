@@ -59,6 +59,15 @@ const EmployeePortal = () => {
     (emp) => emp.id === user?.employeeId,
   );
 
+  // Debug: Log employee data
+  console.log("Debug - Employee Portal:", {
+    userId: user?.employeeId,
+    currentEmployee,
+    employees: employees?.length,
+    employeeEmail: currentEmployee?.email,
+    employeeAddress: currentEmployee?.address,
+  });
+
   const employeeData = currentEmployee
     ? {
         name: currentEmployee.name,
