@@ -4,6 +4,7 @@ import {
   Calculator,
   FileBarChart,
   Shield,
+  UserCog,
   LogOut,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
