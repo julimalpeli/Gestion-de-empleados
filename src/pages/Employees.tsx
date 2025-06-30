@@ -861,32 +861,34 @@ const Employees = () => {
                                   size="sm"
                                   onClick={() => handleEditEmployee(employee)}
                                 >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        </PermissionGate>
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Editar empleado</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </PermissionGate>
 
-                        <PermissionGate module="employees" action="edit">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() =>
-                              handleStatusChange(
-                                employee,
-                                employee.status === "active"
-                                  ? "inactive"
-                                  : "active",
-                              )
-                            }
-                            title={
-                              employee.status === "active"
-                                ? "Desactivar empleado"
-                                : "Activar empleado"
-                            }
-                          >
-                            {employee.status === "active" ? (
-                              <UserX className="h-4 w-4 text-red-600" />
-                            ) : (
-                              <UserCheck className="h-4 w-4" />
+                          <PermissionGate module="employees" action="edit">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleStatusChange(
+                                      employee,
+                                      employee.status === "active"
+                                        ? "inactive"
+                                        : "active",
+                                    )
+                                  }
+                                >
+                                  {employee.status === "active" ? (
+                                    <UserX className="h-4 w-4 text-red-600" />
+                                  ) : (
+                                    <UserCheck className="h-4 w-4 text-green-600" />
                             )}
                           </Button>
                         </PermissionGate>
