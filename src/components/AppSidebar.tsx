@@ -50,6 +50,12 @@ const items = [
     url: "/roles",
     icon: Shield,
   },
+  {
+    title: "Gestión de Usuarios",
+    url: "/usuarios",
+    icon: UserCog,
+    adminOnly: true, // Solo para admin
+  },
 ];
 
 export function AppSidebar() {
