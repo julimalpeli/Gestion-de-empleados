@@ -149,25 +149,116 @@ export const useAuth = () => {
   return context;
 };
 
-// Helper function for login validation
-export const validateLogin = (username: string, password: string) => {
-  const user = Object.values(DEMO_USERS).find(
-    (u) => u.username === username && u.password === password,
-  );
+// Helper function for login validation with database
+export const validateLogin = async (username: string, password: string) => {
+  try {
+    console.log("🔐 Validating login for:", username);
 
-  if (user) {
+    // Primero intentar con usuarios demo (admin, gerente, etc.)
+    const demoUser = Object.values(DEMO_USERS).find(
+      (u) => u.username === username && u.password === password,
+    );
+
+    if (demoUser) {
+      console.log("✅ Demo user authenticated:", demoUser.username);
+      return {
+        username: demoUser.username,
+        name: demoUser.name,
+        role: demoUser.role,
+        employeeId: demoUser.employeeId,
+        email: demoUser.email,
+        permissions: demoUser.permissions,
+        loginTime: new Date().toISOString(),
+      };
+    }
+
+    // Si no es usuario demo, consultar base de datos
+    const { data: user, error } = await supabase
+      .from("users")
+      .select(
+        `
+        *,
+        employee:employees(id, name)
+      `,
+      )
+      .eq("username", username)
+      .eq("is_active", true)
+      .single();
+
+    if (error || !user) {
+      console.log("❌ User not found or inactive");
+      return null;
+    }
+
+    // Verificar contraseña (simple base64 decode para demo)
+    const storedPassword = atob(user.password_hash);
+    if (storedPassword !== password) {
+      console.log("❌ Invalid password");
+      return null;
+    }
+
+    console.log("✅ Database user authenticated:", user.username);
+
+    // Actualizar último login
+    await supabase
+      .from("users")
+      .update({ last_login: new Date().toISOString() })
+      .eq("id", user.id);
+
+    // Mapear permisos según rol
+    const permissions = getRolePermissions(user.role);
+
     return {
       username: user.username,
       name: user.name,
       role: user.role,
-      employeeId: user.employeeId,
+      employeeId: user.employee?.id,
       email: user.email,
-      permissions: user.permissions,
+      permissions,
       loginTime: new Date().toISOString(),
+      needsPasswordChange: user.needs_password_change,
     };
+  } catch (error) {
+    console.error("❌ Login validation error:", error);
+    return null;
   }
+};
 
-  return null;
+// Helper para obtener permisos según rol
+const getRolePermissions = (role: string): string[] => {
+  switch (role) {
+    case "admin":
+      return ["all"];
+    case "manager":
+      return [
+        "employees:view",
+        "employees:create",
+        "employees:edit",
+        "payroll:view",
+        "payroll:create",
+        "payroll:edit",
+        "reports:view",
+        "vacations:view",
+        "vacations:approve",
+      ];
+    case "hr":
+      return [
+        "employees:view",
+        "employees:create",
+        "employees:edit",
+        "payroll:view",
+        "payroll:create",
+        "payroll:edit",
+        "reports:view",
+        "vacations:approve",
+      ];
+    case "employee":
+      return ["portal:view"];
+    case "readonly":
+      return ["employees:view", "payroll:view", "reports:view"];
+    default:
+      return [];
+  }
 };
 
 export { DEMO_USERS };
