@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileText, Download, Calendar, DollarSign } from "lucide-react";
+import { usePayroll } from "@/hooks/use-payroll";
 
 // Real report data - will be populated from database
 const reportData = [];
@@ -42,7 +43,16 @@ interface LiquidationsReportProps {
 }
 
 const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
-  const [selectedPeriod, setSelectedPeriod] = useState("2024-12");
+  const { payrollRecords } = usePayroll();
+
+  // Get unique periods from real payroll data
+  const availablePeriods = [
+    ...new Set(payrollRecords.map((record) => record.period)),
+  ].sort((a, b) => b.localeCompare(a)); // Sort descending (newest first)
+
+  const [selectedPeriod, setSelectedPeriod] = useState(
+    availablePeriods[0] || "2024-12",
+  );
   const [selectedType, setSelectedType] = useState("all");
 
   const formatCurrency = (amount: number) => {
