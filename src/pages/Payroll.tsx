@@ -1200,44 +1200,81 @@ const Payroll = () => {
                               )}
                             </TableCell>
                             <TableCell className="font-medium text-green-600">
-                              {isAguinaldoPeriod(record.period) &&
-                              record.aguinaldo > 0 ? (
-                                <div>
-                                  <div>{formatCurrency(record.aguinaldo)}</div>
-                                  {(() => {
+                              {isAguinaldoPeriod(record.period)
+                                ? (() => {
                                     const employee = employees.find(
                                       (e) => e.name === record.employeeName,
                                     );
-                                    if (!employee) return null;
+                                    if (!employee) return "-";
+
+                                    const correctAguinaldo = calculateAguinaldo(
+                                      employee,
+                                      record.period,
+                                    );
+                                    if (correctAguinaldo === 0) return "-";
+
+                                    // Determinar si es proporcional usando la lógica correcta
+                                    const [year, month] =
+                                      record.period.split("-");
+                                    const currentYear = parseInt(year);
+                                    const currentMonth = parseInt(month);
+
+                                    const semesterStart =
+                                      currentMonth === 6
+                                        ? new Date(currentYear, 0, 1)
+                                        : new Date(currentYear, 6, 1);
+
+                                    const semesterEnd =
+                                      currentMonth === 6
+                                        ? new Date(currentYear, 5, 30)
+                                        : new Date(currentYear, 11, 31);
 
                                     const startDate = new Date(
                                       employee.startDate,
                                     );
-                                    const [year, month] =
-                                      record.period.split("-");
-                                    const liquidationDate = new Date(
-                                      parseInt(year),
-                                      parseInt(month) - 1,
-                                      1,
+                                    const effectiveStartDate = new Date(
+                                      startDate,
                                     );
-                                    const hasMoreThanSixMonths =
-                                      (liquidationDate - startDate) /
-                                        (1000 * 60 * 60 * 24) >=
-                                      180;
+                                    effectiveStartDate.setDate(
+                                      effectiveStartDate.getDate() + 1,
+                                    );
 
-                                    if (!hasMoreThanSixMonths) {
-                                      return (
-                                        <div className="text-xs text-green-700">
-                                          Proporcional
+                                    const effectiveStart =
+                                      effectiveStartDate > semesterStart
+                                        ? effectiveStartDate
+                                        : semesterStart;
+
+                                    const totalSemesterDays =
+                                      Math.ceil(
+                                        (semesterEnd.getTime() -
+                                          semesterStart.getTime()) /
+                                          (1000 * 60 * 60 * 24),
+                                      ) + 1;
+
+                                    const daysWorked =
+                                      Math.ceil(
+                                        (semesterEnd.getTime() -
+                                          effectiveStart.getTime()) /
+                                          (1000 * 60 * 60 * 24),
+                                      ) + 1;
+
+                                    const isProportional =
+                                      daysWorked < totalSemesterDays;
+
+                                    return (
+                                      <div>
+                                        <div>
+                                          {formatCurrency(correctAguinaldo)}
                                         </div>
-                                      );
-                                    }
-                                    return null;
-                                  })()}
-                                </div>
-                              ) : (
-                                "-"
-                              )}
+                                        {isProportional && (
+                                          <div className="text-xs text-green-700">
+                                            Proporcional
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })()
+                                : "-"}
                             </TableCell>
                             <TableCell>
                               {formatCurrency(record.advances)}
@@ -1565,46 +1602,82 @@ const Payroll = () => {
                                 )}
                               </TableCell>
                               <TableCell className="font-medium text-green-600">
-                                {isAguinaldoPeriod(record.period) &&
-                                record.aguinaldo > 0 ? (
-                                  <div>
-                                    <div>
-                                      {formatCurrency(record.aguinaldo)}
-                                    </div>
-                                    {(() => {
+                                {isAguinaldoPeriod(record.period)
+                                  ? (() => {
                                       const employee = employees.find(
                                         (e) => e.name === record.employeeName,
                                       );
-                                      if (!employee) return null;
+                                      if (!employee) return "-";
+
+                                      const correctAguinaldo =
+                                        calculateAguinaldo(
+                                          employee,
+                                          record.period,
+                                        );
+                                      if (correctAguinaldo === 0) return "-";
+
+                                      // Determinar si es proporcional usando la lógica correcta
+                                      const [year, month] =
+                                        record.period.split("-");
+                                      const currentYear = parseInt(year);
+                                      const currentMonth = parseInt(month);
+
+                                      const semesterStart =
+                                        currentMonth === 6
+                                          ? new Date(currentYear, 0, 1)
+                                          : new Date(currentYear, 6, 1);
+
+                                      const semesterEnd =
+                                        currentMonth === 6
+                                          ? new Date(currentYear, 5, 30)
+                                          : new Date(currentYear, 11, 31);
 
                                       const startDate = new Date(
                                         employee.startDate,
                                       );
-                                      const [year, month] =
-                                        record.period.split("-");
-                                      const liquidationDate = new Date(
-                                        parseInt(year),
-                                        parseInt(month) - 1,
-                                        1,
+                                      const effectiveStartDate = new Date(
+                                        startDate,
                                       );
-                                      const hasMoreThanSixMonths =
-                                        (liquidationDate - startDate) /
-                                          (1000 * 60 * 60 * 24) >=
-                                        180;
+                                      effectiveStartDate.setDate(
+                                        effectiveStartDate.getDate() + 1,
+                                      );
 
-                                      if (!hasMoreThanSixMonths) {
-                                        return (
-                                          <div className="text-xs text-green-700">
-                                            Proporcional
+                                      const effectiveStart =
+                                        effectiveStartDate > semesterStart
+                                          ? effectiveStartDate
+                                          : semesterStart;
+
+                                      const totalSemesterDays =
+                                        Math.ceil(
+                                          (semesterEnd.getTime() -
+                                            semesterStart.getTime()) /
+                                            (1000 * 60 * 60 * 24),
+                                        ) + 1;
+
+                                      const daysWorked =
+                                        Math.ceil(
+                                          (semesterEnd.getTime() -
+                                            effectiveStart.getTime()) /
+                                            (1000 * 60 * 60 * 24),
+                                        ) + 1;
+
+                                      const isProportional =
+                                        daysWorked < totalSemesterDays;
+
+                                      return (
+                                        <div>
+                                          <div>
+                                            {formatCurrency(correctAguinaldo)}
                                           </div>
-                                        );
-                                      }
-                                      return null;
-                                    })()}
-                                  </div>
-                                ) : (
-                                  "-"
-                                )}
+                                          {isProportional && (
+                                            <div className="text-xs text-green-700">
+                                              Proporcional
+                                            </div>
+                                          )}
+                                        </div>
+                                      );
+                                    })()
+                                  : "-"}
                               </TableCell>
                               <TableCell>
                                 {formatCurrency(record.advances)}
