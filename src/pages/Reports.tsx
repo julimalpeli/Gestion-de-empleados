@@ -849,7 +849,12 @@ const Reports = () => {
                       return (
                         <TableRow key={employee.id}>
                           <TableCell className="font-medium">
-                            {employee.name}
+                            <div>
+                              <p>{employee.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                DNI: {employee.dni || "N/A"}
+                              </p>
+                            </div>
                           </TableCell>
                           <TableCell>
                             <div>
