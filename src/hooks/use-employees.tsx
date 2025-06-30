@@ -5,6 +5,7 @@ import type {
   CreateEmployeeRequest,
   UpdateEmployeeRequest,
 } from "@/services/interfaces";
+import { useUsers } from "@/hooks/use-users";
 
 export const useEmployees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
