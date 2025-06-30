@@ -331,6 +331,11 @@ const Payroll = () => {
     // Sueldo informal = Total después de deducciones - Sueldo en blanco manual
     const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
 
+    // Calculate aguinaldo if it's an aguinaldo period (June or December)
+    const aguinaldoAmount = isAguinaldoPeriod(selectedPeriod)
+      ? (employee.whiteWage + employee.informalWage) / 2
+      : 0;
+
     // Total neto = total después de deducciones (incluye horas extras, presentismo, bonos, etc.)
     const netTotal = totalAfterDeductions;
 
@@ -351,7 +356,7 @@ const Payroll = () => {
       total: netTotal, // Agregar alias para compatibilidad
       baseAmount: basePay,
       holidayBonus: holidayPay,
-      aguinaldo: 0, // Por ahora 0, se puede calcular después
+      aguinaldo: aguinaldoAmount,
       overtimeAmount: overtimePay,
     };
   };
