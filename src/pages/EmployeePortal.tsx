@@ -309,8 +309,47 @@ const EmployeePortal = () => {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">1.9</div>
-              <p className="text-xs text-muted-foreground">Años trabajados</p>
+              {currentEmployee?.startDate ? (
+                (() => {
+                  const vacationInfo = employeeService.calculateVacationDays(
+                    currentEmployee.startDate,
+                  );
+                  const years = vacationInfo.years;
+                  const months = vacationInfo.totalMonths % 12;
+
+                  if (years > 0) {
+                    return (
+                      <>
+                        <div className="text-2xl font-bold">
+                          {years}.{Math.floor((months / 12) * 10)}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          {years} año{years > 1 ? "s" : ""}
+                          {months > 0
+                            ? ` ${months} mes${months > 1 ? "es" : ""}`
+                            : ""}
+                        </p>
+                      </>
+                    );
+                  } else {
+                    return (
+                      <>
+                        <div className="text-2xl font-bold">{months}</div>
+                        <p className="text-xs text-muted-foreground">
+                          {months} mes{months > 1 ? "es" : ""} trabajados
+                        </p>
+                      </>
+                    );
+                  }
+                })()
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">0</div>
+                  <p className="text-xs text-muted-foreground">
+                    Sin fecha de ingreso
+                  </p>
+                </>
+              )}
             </CardContent>
           </Card>
 
