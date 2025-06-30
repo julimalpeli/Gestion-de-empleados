@@ -175,7 +175,7 @@ const Payroll = () => {
 
     // Verificar si ya existe liquidación para este período
     const existingRecord = await getExistingPayrollRecord(
-      parseInt(selectedEmployee),
+      selectedEmployee,
       selectedPeriod,
     );
 
@@ -190,7 +190,7 @@ const Payroll = () => {
 
     try {
       const payrollData = {
-        employeeId: parseInt(selectedEmployee),
+        employeeId: selectedEmployee,
         employeeName: employee.name,
         period: selectedPeriod,
         baseDays: parseInt(workDays),

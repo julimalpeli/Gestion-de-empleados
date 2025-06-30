@@ -85,7 +85,12 @@ export const usePayroll = () => {
 
       return data;
     } catch (err) {
-      console.error("Error checking existing payroll:", err);
+      console.error("Error checking existing payroll:", {
+        message: err?.message,
+        details: err?.details,
+        code: err?.code,
+        full: err,
+      });
       return null;
     }
   };
@@ -128,7 +133,9 @@ export const usePayroll = () => {
           code: error.code,
           full: error,
         });
-        throw new Error(error.message || "Database error");
+        throw new Error(
+          `Database error: ${error.message || error.details || "Unknown error"}`,
+        );
       }
 
       await fetchPayrollRecords();
