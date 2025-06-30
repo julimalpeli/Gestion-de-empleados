@@ -35,6 +35,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useDocuments } from "@/hooks/use-documents";
+import { documentService } from "@/services/documentService";
 import type { Employee } from "@/services/interfaces";
 
 interface DocumentManagerProps {
@@ -181,6 +182,28 @@ export default function DocumentManager({
     } catch (error) {
       console.error("Error downloading document:", error);
       alert("Error al descargar el documento");
+    }
+  };
+
+  const handleVerifySetup = async () => {
+    try {
+      console.log("Verifying documents system setup...");
+      const result = await documentService.verifySetup();
+
+      const status = [
+        `Tabla: ${result.table ? "✅ OK" : "❌ Error"}`,
+        `Storage: ${result.bucket ? "✅ OK" : "❌ Error"}`,
+        ...result.errors.map((err) => `❌ ${err}`),
+      ].join("\n");
+
+      alert(`Estado del sistema de documentos:\n\n${status}`);
+
+      if (result.errors.length > 0) {
+        console.error("Setup verification errors:", result.errors);
+      }
+    } catch (error) {
+      console.error("Error verifying setup:", error);
+      alert("Error verificando configuración del sistema");
     }
   };
 
