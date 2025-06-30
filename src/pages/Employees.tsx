@@ -51,6 +51,7 @@ import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
 import { useEmployees } from "@/hooks/use-employees";
+import { useUsers } from "@/hooks/use-users";
 
 // Ya no usamos mock data - ahora viene de Supabase
 const mockEmployees = [
@@ -291,7 +292,7 @@ const Employees = () => {
 
 Fecha de Ingreso: ${vacationInfo.startDate}
 Antigüedad: ${vacationInfo.years} años
-Días de Vacaciones: ${vacationInfo.vacationDays} días (según antigüedad)
+D��as de Vacaciones: ${vacationInfo.vacationDays} días (según antigüedad)
 Puesto: ${employee.position}
 Estado: ${employee.status === "active" ? "Activo" : "Inactivo"}
 Sueldo Mensual Total: ${formatCurrency(employee.whiteWage + employee.informalWage)}
