@@ -111,19 +111,31 @@ export const useUsers = () => {
     dni: string;
     email?: string;
   }) => {
+    if (!employee.email) {
+      console.warn("Employee has no email, skipping user creation");
+      return;
+    }
+
     try {
-      await createUser({
-        username: employee.dni,
-        email: employee.email || `${employee.dni}@cadizbar.com`,
-        name: employee.name,
-        role: "employee",
-        employeeId: employee.id,
-        password: employee.dni, // Contraseña inicial = DNI
-        needsPasswordChange: true, // Forzar cambio en primer login
-      });
+      // Import the helper function from use-auth
+      const { createSupabaseUser } = await import("@/hooks/use-auth");
+
+      await createSupabaseUser(
+        employee.email,
+        employee.dni, // Contraseña inicial = DNI
+        {
+          username: employee.dni,
+          name: employee.name,
+          role: "employee",
+          employeeId: employee.id,
+          needsPasswordChange: true, // Forzar cambio en primer login
+        },
+      );
+
+      console.log("✅ Supabase user created for employee:", employee.name);
     } catch (err) {
-      console.error("Error creating employee user:", err);
-      throw err;
+      console.error("❌ Error creating Supabase user for employee:", err);
+      // No lanzar error para no interferir con la creación del empleado
     }
   };
 
