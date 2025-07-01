@@ -188,11 +188,8 @@ const Login = () => {
     }
   };
 
-  const fillDemoCredentials = (userType: keyof typeof DEMO_USERS) => {
-    setUsername(userType);
-    setPassword(DEMO_USERS[userType].password);
-    setError("");
-  };
+  // Demo credentials are no longer available with Supabase Auth
+  // Users must be created through the admin panel
 
   const handlePasswordChanged = () => {
     if (pendingUser) {
