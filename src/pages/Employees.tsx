@@ -389,6 +389,8 @@ const Employees = () => {
       "Cajero/a": "Cajero/a",
       "Tareas de Limpieza": "Tareas de Limpieza",
       "Encargado/a": "Encargado/a",
+      Barra: "Barra",
+      "Jefe de Barra": "Jefe de Barra",
       // Backward compatibility for old format
       cocinero: "Cocinero",
       jefe_cocina: "Jefe de Cocina",
