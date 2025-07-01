@@ -98,22 +98,100 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (savedUser) {
       try {
         const userData = JSON.parse(savedUser);
-        // Verify the login is not too old (optional - 8 hours limit)
+        // Verify the login is not too old (4 hours for security)
         const loginTime = new Date(userData.loginTime);
         const now = new Date();
         const hoursDiff =
           (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
 
-        if (hoursDiff < 8) {
+        if (hoursDiff < 4) {
           setUser(userData);
+
+          // Set up session expiration warning (warn 15 minutes before expiry)
+          const timeUntilWarning =
+            4 * 60 * 60 * 1000 -
+            15 * 60 * 1000 -
+            (now.getTime() - loginTime.getTime());
+          if (timeUntilWarning > 0) {
+            setTimeout(() => {
+              if (
+                confirm("Su sesión expirará en 15 minutos. ¿Desea continuar?")
+              ) {
+                // Extend session by updating login time
+                const extendedUser = {
+                  ...userData,
+                  loginTime: new Date().toISOString(),
+                };
+                setUser(extendedUser);
+                localStorage.setItem("user", JSON.stringify(extendedUser));
+              }
+            }, timeUntilWarning);
+          }
+
+          // Set up automatic logout
+          const timeUntilExpiry =
+            4 * 60 * 60 * 1000 - (now.getTime() - loginTime.getTime());
+          if (timeUntilExpiry > 0) {
+            setTimeout(() => {
+              console.log("🕐 Session expired - automatic logout");
+              setUser(null);
+              localStorage.removeItem("user");
+              alert(
+                "Su sesión ha expirado por seguridad. Por favor, inicie sesión nuevamente.",
+              );
+              window.location.href = "/login";
+            }, timeUntilExpiry);
+          }
         } else {
+          console.log("🕐 Session expired on startup");
           localStorage.removeItem("user");
         }
       } catch (error) {
         localStorage.removeItem("user");
       }
     }
-  }, []);
+
+    // Set up activity detection to extend session
+    let activityTimeout: NodeJS.Timeout;
+
+    const resetActivityTimer = () => {
+      clearTimeout(activityTimeout);
+      activityTimeout = setTimeout(
+        () => {
+          if (user) {
+            // Update last activity time
+            const extendedUser = {
+              ...user,
+              lastActivity: new Date().toISOString(),
+            };
+            setUser(extendedUser);
+            localStorage.setItem("user", JSON.stringify(extendedUser));
+          }
+        },
+        5 * 60 * 1000,
+      ); // Update every 5 minutes of activity
+    };
+
+    // Listen for user activity
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+      "click",
+    ];
+    events.forEach((event) => {
+      document.addEventListener(event, resetActivityTimer, true);
+    });
+
+    return () => {
+      events.forEach((event) => {
+        document.removeEventListener(event, resetActivityTimer, true);
+      });
+      clearTimeout(activityTimeout);
+    };
+  }, [user]);
 
   const login = (userData: User) => {
     setUser(userData);
