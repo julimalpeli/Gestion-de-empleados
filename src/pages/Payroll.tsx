@@ -1280,12 +1280,29 @@ const Payroll = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
-                                    onClick={() =>
-                                      generatePayrollReceiptPDF(
-                                        record,
-                                        employee,
-                                      )
-                                    }
+                                    onClick={() => {
+                                      if (employee) {
+                                        generatePayrollReceiptPDF({
+                                          employee: {
+                                            name: employee.name,
+                                            dni: employee.dni,
+                                            position: employee.position,
+                                            startDate: employee.startDate,
+                                          },
+                                          payroll: record,
+                                          period: formatPeriod(record.period),
+                                          company: {
+                                            name: "Cadiz Bar",
+                                            address: "Dirección del Local",
+                                            phone: "Teléfono de Contacto",
+                                          },
+                                        });
+                                      } else {
+                                        alert(
+                                          "Error: No se encontró información del empleado",
+                                        );
+                                      }
+                                    }}
                                   >
                                     <FileText className="h-4 w-4" />
                                   </Button>
