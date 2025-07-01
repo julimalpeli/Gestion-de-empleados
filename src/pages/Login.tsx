@@ -288,8 +288,8 @@ const Login = () => {
                 </div>
               </div>
 
-              {/* Security Status Indicators */}
-              {failedAttempts > 0 && !isBlocked && (
+              {/* Security Status Indicators - Only show in production */}
+              {failedAttempts > 0 && !isBlocked && import.meta.env.PROD && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
