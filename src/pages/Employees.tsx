@@ -577,6 +577,10 @@ const Employees = () => {
                         Tareas de Limpieza
                       </SelectItem>
                       <SelectItem value="Encargado/a">Encargado/a</SelectItem>
+                      <SelectItem value="Barra">Barra</SelectItem>
+                      <SelectItem value="Jefe de Barra">
+                        Jefe de Barra
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1042,6 +1046,8 @@ const Employees = () => {
                       Tareas de Limpieza
                     </SelectItem>
                     <SelectItem value="Encargado/a">Encargado/a</SelectItem>
+                    <SelectItem value="Barra">Barra</SelectItem>
+                    <SelectItem value="Jefe de Barra">Jefe de Barra</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
