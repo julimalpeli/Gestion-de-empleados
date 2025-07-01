@@ -1856,14 +1856,24 @@ const Payroll = () => {
                                       setRecordToDelete(record);
                                       setDeleteConfirmOpen(true);
                                     }}
-                                    disabled={record.status === "paid"}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    disabled={
+                                      record.status === "paid" && !isManager()
+                                    }
+                                    className={
+                                      record.status === "paid" && !isManager()
+                                        ? "opacity-50 cursor-not-allowed text-gray-400"
+                                        : "text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    }
                                   >
                                     <Trash2 className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Eliminar liquidación</p>
+                                  <p>
+                                    {record.status === "paid" && !isManager()
+                                      ? "Solo gerentes/admins pueden eliminar liquidaciones pagadas"
+                                      : "Eliminar liquidación"}
+                                  </p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
