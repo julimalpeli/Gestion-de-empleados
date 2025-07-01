@@ -214,6 +214,61 @@ const Payroll = () => {
     }
   };
 
+  // Handle duplicate payroll record
+  const handleDuplicateRecord = (record) => {
+    try {
+      const employee = employees.find((e) => e.name === record.employeeName);
+      if (!employee) {
+        alert("No se encontró el empleado para duplicar la liquidación");
+        return;
+      }
+
+      // Set all form fields with the original record data
+      setSelectedEmployee(employee.id.toString());
+      setWorkDays(record.baseDays.toString());
+      setHolidayDays(record.holidayDays?.toString() || "");
+      setAdvances(record.advances?.toString() || "");
+      setDiscounts(record.discounts?.toString() || "");
+      setWhiteWage(record.whiteAmount?.toString() || "");
+      setBonusAmount(record.bonusAmount?.toString() || "");
+
+      // Set overtime data
+      if (record.overtimeHours && record.overtimeHours > 0) {
+        setOvertimeEnabled(true);
+        setOvertimeHours(record.overtimeHours.toString());
+      } else {
+        setOvertimeEnabled(false);
+        setOvertimeHours("");
+      }
+
+      // Set presentismo status based on amount
+      if (record.presentismoAmount > 0) {
+        setPresentismoStatus("mantiene");
+      } else {
+        setPresentismoStatus("pierde");
+      }
+
+      // Set current period as default for the duplicate
+      const currentDate = new Date();
+      const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
+      setSelectedPeriod(currentPeriod);
+
+      // Open the form in create mode (not edit mode)
+      setIsEditMode(false);
+      setEditingRecord(null);
+      setIsNewPayrollOpen(true);
+
+      // Show success message
+      setSuccessMessage(
+        `Liquidación duplicada. Modifica los datos necesarios y guarda.`,
+      );
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch (error) {
+      console.error("Error duplicating record:", error);
+      alert("Error al duplicar la liquidación");
+    }
+  };
+
   // Configurar período actual automáticamente
   useEffect(() => {
     if (!selectedPeriod) {
