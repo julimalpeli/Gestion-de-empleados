@@ -1295,3 +1295,11 @@ const Payroll = () => {
                               )}
                             </TableCell>
                             <TableCell className="font-medium">
+                              {
+                                isAguinaldoPeriod(record.period)
+                                  ? (() => {
+                                      if (employee) {
+                                      }
+                                    })()
+                                  : formatCurrency(record.netTotal)
+                              }
