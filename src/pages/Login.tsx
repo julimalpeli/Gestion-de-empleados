@@ -288,12 +288,6 @@ const Login = () => {
                 </div>
               </div>
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
               {/* Security Status Indicators */}
               {failedAttempts > 0 && !isBlocked && (
                 <Alert variant="destructive">
@@ -303,6 +297,12 @@ const Login = () => {
                     bloqueará tras {MAX_FAILED_ATTEMPTS - failedAttempts}{" "}
                     intentos más.
                   </AlertDescription>
+                </Alert>
+              )}
+
+              {error && failedAttempts === 0 && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
