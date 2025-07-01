@@ -206,7 +206,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       "",
     ]);
 
-    (doc as any).autoTable({
+    autoTable(doc, {
       head: [
         [
           "Empleado",
@@ -222,8 +222,6 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       startY: 85,
       styles: { fontSize: 8 },
       headStyles: { fillColor: [41, 128, 185] },
-      footStyles: { fillColor: [52, 73, 94], textColor: [255, 255, 255] },
-      foot: [["", "", "", "", "", "", ""]],
       didParseCell: function (data: any) {
         // Make totals row bold
         if (data.row.index === tableData.length - 1) {
