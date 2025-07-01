@@ -1627,15 +1627,31 @@ const Payroll = () => {
                                     onClick={() => handleEditRecord(record)}
                                     disabled={
                                       record.status === "paid" ||
-                                      (record.status === "processed" &&
-                                        !isAdmin())
+                                      (!isAdmin() && record.status !== "draft")
+                                    }
+                                    className={
+                                      record.status === "paid"
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
                                     }
                                   >
-                                    <Calculator className="h-4 w-4" />
+                                    {record.status === "paid" ? (
+                                      <Eye className="h-4 w-4" />
+                                    ) : (
+                                      <Calculator className="h-4 w-4" />
+                                    )}
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
-                                  <p>Editar liquidación</p>
+                                  <p>
+                                    {record.status === "paid"
+                                      ? "Ver liquidación"
+                                      : record.status === "draft"
+                                        ? "Editar liquidación"
+                                        : isAdmin()
+                                          ? "Editar liquidación (Admin)"
+                                          : "Solo lectura"}
+                                  </p>
                                 </TooltipContent>
                               </Tooltip>
                             </TooltipProvider>
