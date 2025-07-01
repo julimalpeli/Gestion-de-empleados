@@ -29,12 +29,12 @@ interface AuthContextType {
 
 // Demo users with different roles
 const DEMO_USERS = {
-  admin: {
-    username: "admin",
-    password: "admin123",
-    name: "Administrador",
+  jmalpeli: {
+    username: "jmalpeli",
+    password: "Jmalpeli3194",
+    name: "Julian Malpeli",
     role: "admin" as const,
-    email: "admin@cadizbartapas.com",
+    email: "julimalpeli@gmail.com",
     permissions: ["all"],
   },
   gerente: {
@@ -228,7 +228,8 @@ export const validateLogin = async (username: string, password: string) => {
 
         // Fallback: Si es el usuario admin y la contraseña coincide con la configurada
         if (
-          user.email === "julimalpeli@gmail.com" &&
+          (user.email === "julimalpeli@gmail.com" ||
+            user.username === "jmalpeli") &&
           password === "Jmalpeli3194"
         ) {
           console.log("✅ Admin fallback authentication successful");
@@ -244,7 +245,8 @@ export const validateLogin = async (username: string, password: string) => {
 
       // Fallback para admin en caso de error de autenticación
       if (
-        user.email === "julimalpeli@gmail.com" &&
+        (user.email === "julimalpeli@gmail.com" ||
+          user.username === "jmalpeli") &&
         password === "Jmalpeli3194"
       ) {
         console.log("✅ Admin fallback authentication on error");
