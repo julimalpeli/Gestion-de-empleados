@@ -62,6 +62,7 @@ import {
   Send,
   ArrowRight,
   X,
+  Copy,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
