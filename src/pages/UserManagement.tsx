@@ -229,6 +229,54 @@ const UserManagement = () => {
     setIsResetPasswordOpen(true);
   };
 
+  // 🚨 Crear usuario administrador de emergencia
+  const createEmergencyAdmin = async () => {
+    const confirmed = confirm(
+      `🚨 CREAR ADMINISTRADOR DE EMERGENCIA 🚨\n\n` +
+        `Esta función creará un usuario administrador de respaldo:\n` +
+        `• Usuario: emergency_admin\n` +
+        `• Email: emergency@cadizbar.com\n` +
+        `• Contraseña: Emergency2025!\n` +
+        `• Rol: Administrador\n\n` +
+        `⚠️ ÚSALO SOLO EN EMERGENCIAS ⚠️\n\n` +
+        `¿Confirmas crear este usuario de emergencia?`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const emergencyUser = {
+        username: "emergency_admin",
+        email: "emergency@cadizbar.com",
+        name: "Administrador de Emergencia",
+        role: "admin" as const,
+        password: "Emergency2025!",
+        needsPasswordChange: true,
+      };
+
+      await createUser(emergencyUser);
+
+      alert(
+        `✅ ADMINISTRADOR DE EMERGENCIA CREADO\n\n` +
+          `Usuario: emergency_admin\n` +
+          `Contraseña: Emergency2025!\n\n` +
+          `⚠️ CAMBIA LA CONTRASEÑA INMEDIATAMENTE después del primer login.\n\n` +
+          `🔐 Este usuario queda registrado en los logs de seguridad.`,
+      );
+
+      // Log security event
+      console.log(`🚨 Security Event: EMERGENCY_ADMIN_CREATED`, {
+        emergencyUser: emergencyUser.username,
+        createdBy: "current_admin",
+        timestamp: new Date().toISOString(),
+        reason: "Administrative emergency access",
+      });
+    } catch (error) {
+      console.error("Error creating emergency admin:", error);
+      alert(`Error creando administrador de emergencia: ${error.message}`);
+    }
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "admin":
