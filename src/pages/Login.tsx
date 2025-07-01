@@ -28,8 +28,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
-  const [pendingUser, setPendingUser] = useState(null);
+  // Removed showPasswordChange and pendingUser - handled by Supabase Auth
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
