@@ -134,17 +134,25 @@ const Dashboard = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Resumen de {currentMonth}</p>
-          {/* Debug Info */}
-          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
-            <strong>Debug:</strong> Empleados: {employees.length} |
-            Liquidaciones: {payrollRecords.length} | Activos:{" "}
-            {activeEmployees.length} | Período actual: {currentPeriod} |
-            Liquidaciones mes: {currentMonthPayrolls.length}
-            {hasConnectionError && (
-              <div className="mt-1 text-red-600">
-                <strong>Error de conexión:</strong>{" "}
-                {employeesError || payrollError}
-              </div>
+
+          {/* Always show debug info */}
+          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+            <div>
+              <strong>Estado actual:</strong>
+            </div>
+            <div>
+              • Empleados: {employees.length} (Activos: {activeEmployees.length}
+              )
+            </div>
+            <div>• Liquidaciones: {payrollRecords.length}</div>
+            <div>• Período actual: {currentPeriod}</div>
+            <div>• Liquidaciones mes: {currentMonthPayrolls.length}</div>
+            <div>• Total a pagar: {formatCurrency(totalToPay)}</div>
+            {hasError && (
+              <div className="text-red-600">• Error en hooks detectado</div>
+            )}
+            {(employeesLoading || payrollLoading) && (
+              <div className="text-orange-600">• Cargando datos...</div>
             )}
           </div>
         </div>
