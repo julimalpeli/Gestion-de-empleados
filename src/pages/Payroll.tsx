@@ -133,7 +133,7 @@ const Payroll = () => {
     error: employeesError,
   } = useEmployees();
 
-  const { isAdmin, canEditModule } = usePermissions();
+  const { isAdmin, isManager, canEditModule } = usePermissions();
   const { user } = useAuth();
 
   // Handle status changes
@@ -1482,7 +1482,7 @@ const Payroll = () => {
                               )}
 
                               {/* Approve */}
-                              {record.status === "pending" && isAdmin() && (
+                              {record.status === "pending" && isManager() && (
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
@@ -1508,7 +1508,7 @@ const Payroll = () => {
                               )}
 
                               {/* Process */}
-                              {record.status === "approved" && isAdmin() && (
+                              {record.status === "approved" && isManager() && (
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
@@ -1534,7 +1534,7 @@ const Payroll = () => {
                               )}
 
                               {/* Mark as Paid */}
-                              {record.status === "processed" && isAdmin() && (
+                              {record.status === "processed" && isManager() && (
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
@@ -1559,7 +1559,7 @@ const Payroll = () => {
                               {/* Reject/Return to Draft */}
                               {(record.status === "pending" ||
                                 record.status === "approved") &&
-                                isAdmin() && (
+                                isManager() && (
                                   <TooltipProvider>
                                     <Tooltip>
                                       <TooltipTrigger asChild>
@@ -1627,7 +1627,8 @@ const Payroll = () => {
                                     onClick={() => handleEditRecord(record)}
                                     disabled={
                                       record.status === "paid" ||
-                                      (!isAdmin() && record.status !== "draft")
+                                      (!isManager() &&
+                                        record.status !== "draft")
                                     }
                                     className={
                                       record.status === "paid"
