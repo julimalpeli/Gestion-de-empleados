@@ -275,6 +275,37 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Export security logs for audit
+  const exportSecurityLogs = () => {
+    const logs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
+    const blob = new Blob([JSON.stringify(logs, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `security-logs-${new Date().toISOString().split("T")[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  // Get security logs summary
+  const getSecurityLogsSummary = () => {
+    const logs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
+    const summary = logs.reduce((acc: any, log: any) => {
+      acc[log.eventType] = (acc[log.eventType] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      totalEvents: logs.length,
+      eventTypes: summary,
+      lastEvents: logs.slice(-10).reverse(),
+    };
+  };
+
   const value = {
     user,
     login,
@@ -282,6 +313,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isAuthenticated: !!user,
     hasPermission,
     changePassword,
+    exportSecurityLogs,
+    getSecurityLogsSummary,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
