@@ -1500,35 +1500,15 @@ const Payroll = () => {
       </AlertDialog>
 
       {/* Document Manager Dialog */}
-      <Dialog
-        open={isPayrollDocManagerOpen}
-        onOpenChange={setIsPayrollDocManagerOpen}
-      >
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
-              Documentos de Liquidación -{" "}
-              {selectedEmployeeForDocs?.name || "Empleado"}
-            </DialogTitle>
-            <DialogDescription>
-              Gestiona los documentos relacionados con esta liquidación
-              {selectedPayrollRecord
-                ? ` del período ${formatPeriod(selectedPayrollRecord.period)}`
-                : ""}
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedEmployeeForDocs && (
-            <DocumentManager
-              isOpen={true}
-              onClose={() => {}}
-              employee={selectedEmployeeForDocs}
-              payrollId={selectedPayrollRecord?.id}
-              title={`Documentos de ${selectedEmployeeForDocs.name} - ${selectedPayrollRecord ? formatPeriod(selectedPayrollRecord.period) : "Liquidación"}`}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {selectedEmployeeForDocs && (
+        <DocumentManager
+          isOpen={isPayrollDocManagerOpen}
+          onClose={() => setIsPayrollDocManagerOpen(false)}
+          employee={selectedEmployeeForDocs}
+          payrollId={selectedPayrollRecord?.id}
+          title={`Documentos de ${selectedEmployeeForDocs.name} - ${selectedPayrollRecord ? formatPeriod(selectedPayrollRecord.period) : "Liquidación"}`}
+        />
+      )}
     </div>
   );
 };
