@@ -1832,6 +1832,26 @@ const Payroll = () => {
                                   <Button
                                     variant="ghost"
                                     size="sm"
+                                    onClick={() =>
+                                      handleDuplicateRecord(record)
+                                    }
+                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  >
+                                    <Copy className="h-4 w-4" />
+                                  </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Duplicar liquidación</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
                                     onClick={() => {
                                       setRecordToDelete(record);
                                       setDeleteConfirmOpen(true);
