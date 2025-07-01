@@ -295,6 +295,18 @@ const Login = () => {
                 </div>
               </div>
 
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm"
+                  onClick={handleResetPassword}
+                  disabled={!email}
+                >
+                  ¿Olvidaste tu contraseña?
+                </Button>
+              </div>
+
               {/* Security Status Indicators - Only show in production */}
               {failedAttempts > 0 && !isBlocked && import.meta.env.PROD && (
                 <Alert variant="destructive">
