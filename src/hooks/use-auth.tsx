@@ -371,28 +371,78 @@ export const validateLogin = async (username: string, password: string) => {
       timestamp: new Date().toISOString(),
     });
 
-    // Primero intentar con usuarios demo (admin, gerente, etc.)
-    const demoUser = Object.values(DEMO_USERS).find(
-      (u) => u.username === username && u.password === password,
-    );
+    // En producción, solo permitir jmalpeli (admin principal)
+    // En desarrollo, permitir todos los usuarios demo
+    if (import.meta.env.DEV) {
+      // MODO DESARROLLO: Permitir todos los usuarios demo
+      const demoUser = Object.values(DEMO_USERS).find(
+        (u) => u.username === username && u.password === password,
+      );
 
-    if (demoUser) {
-      console.log("✅ Demo user authenticated:", demoUser.username);
+      if (demoUser) {
+        console.log("✅ Demo user authenticated (DEV):", demoUser.username);
 
-      logSecurityEvent("DEMO_LOGIN_SUCCESS", {
-        username: demoUser.username,
-        role: demoUser.role,
-      });
+        logSecurityEvent("DEMO_LOGIN_SUCCESS_DEV", {
+          username: demoUser.username,
+          role: demoUser.role,
+          environment: "development",
+        });
 
-      return {
-        username: demoUser.username,
-        name: demoUser.name,
-        role: demoUser.role,
-        employeeId: demoUser.employeeId,
-        email: demoUser.email,
-        permissions: demoUser.permissions,
-        loginTime: new Date().toISOString(),
-      };
+        return {
+          username: demoUser.username,
+          name: demoUser.name,
+          role: demoUser.role,
+          employeeId: demoUser.employeeId,
+          email: demoUser.email,
+          permissions: demoUser.permissions,
+          loginTime: new Date().toISOString(),
+        };
+      }
+    } else {
+      // MODO PRODUCCIÓN: Solo permitir el admin principal jmalpeli
+      const adminUser = DEMO_USERS.jmalpeli;
+      if (
+        adminUser &&
+        adminUser.username === username &&
+        adminUser.password === password
+      ) {
+        console.log("✅ Production admin authenticated:", adminUser.username);
+
+        logSecurityEvent("ADMIN_LOGIN_SUCCESS_PROD", {
+          username: adminUser.username,
+          role: adminUser.role,
+          environment: "production",
+        });
+
+        return {
+          username: adminUser.username,
+          name: adminUser.name,
+          role: adminUser.role,
+          employeeId: adminUser.employeeId,
+          email: adminUser.email,
+          permissions: adminUser.permissions,
+          loginTime: new Date().toISOString(),
+        };
+      }
+
+      // En producción, bloquear usuarios demo excepto jmalpeli
+      const blockedDemoUser = Object.values(DEMO_USERS).find(
+        (u) => u.username === username && u.username !== "jmalpeli",
+      );
+
+      if (blockedDemoUser) {
+        console.warn("❌ Demo user blocked in production:", username);
+
+        logSecurityEvent("DEMO_LOGIN_BLOCKED_PROD", {
+          username: username,
+          blockedRole: blockedDemoUser.role,
+          environment: "production",
+          reason: "Demo users disabled in production",
+        });
+
+        // Retornar null para denegar acceso
+        return null;
+      }
     }
 
     // Si no es usuario demo, consultar base de datos
