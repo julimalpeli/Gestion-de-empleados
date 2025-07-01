@@ -104,92 +104,87 @@ const Login = () => {
       return;
     }
 
-    setIsLoading(true);
-    setError("");
+    if (!email || !password) {
+      setError("Por favor complete todos los campos");
+      return;
+    }
 
     try {
-      const userData = await validateLogin(username, password);
+      await login(email, password);
 
-      if (userData) {
-        // Success - reset failed attempts
-        setFailedAttempts(0);
-        localStorage.removeItem("loginBlock");
+      // Reset failed attempts on successful login
+      setFailedAttempts(0);
+      localStorage.removeItem("loginBlock");
 
-        // Log successful login
-        console.log("✅ Successful login:", {
-          username: userData.username,
-          role: userData.role,
-          timestamp: new Date().toISOString(),
-          ip: "client-side",
-        });
+      // Navigation will be handled by the auth state change
+    } catch (error: any) {
+      console.error("❌ Login error:", error);
 
-        // Verificar si necesita cambiar contraseña
-        if (userData.needsPasswordChange) {
-          setPendingUser(userData);
-          setShowPasswordChange(true);
-          setIsLoading(false);
-          return;
-        }
+      // Incrementar contador de intentos fallidos
+      const newFailedAttempts = failedAttempts + 1;
+      setFailedAttempts(newFailedAttempts);
 
-        login(userData);
+      // Log failed login attempt
+      console.warn("❌ Failed login attempt:", {
+        email,
+        attempt: newFailedAttempts,
+        timestamp: new Date().toISOString(),
+        ip: "client-side",
+      });
 
-        // Redirect based on role
-        if (userData.role === "employee") {
-          navigate("/portal-empleado");
-        } else {
-          navigate("/");
-        }
-      } else {
-        // Failed login - increment attempts
-        const newFailedAttempts = failedAttempts + 1;
-        setFailedAttempts(newFailedAttempts);
-
-        // Log failed login attempt
-        console.warn("❌ Failed login attempt:", {
-          username,
-          attempt: newFailedAttempts,
-          timestamp: new Date().toISOString(),
-          ip: "client-side",
-        });
-
-        if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
-          // Block user
-          const blockedUntil = new Date().getTime() + BLOCK_DURATION;
-          setIsBlocked(true);
-          setBlockTimeRemaining(BLOCK_DURATION / 1000);
-
-          localStorage.setItem(
-            "loginBlock",
-            JSON.stringify({
-              blockedUntil,
-              attempts: newFailedAttempts,
-              timestamp: new Date().toISOString(),
-            }),
-          );
-
-          setError(
-            `Demasiados intentos fallidos. Acceso bloqueado por 15 minutos.`,
-          );
-
-          // Log security block
-          console.error("🚫 User blocked due to failed attempts:", {
-            username,
+      // Bloquear después de 6 intentos
+      if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+        const blockUntil = new Date().getTime() + BLOCK_DURATION;
+        localStorage.setItem(
+          "loginBlock",
+          JSON.stringify({
             attempts: newFailedAttempts,
-            blockedUntil: new Date(blockedUntil).toISOString(),
-            ip: "client-side",
-          });
-        } else {
-          const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+            blockedUntil: blockUntil,
+          }),
+        );
+        setIsBlocked(true);
+        setBlockTimeRemaining(Math.ceil(BLOCK_DURATION / 1000));
+
+        setError(
+          "Demasiados intentos fallidos. Acceso bloqueado por 5 minutos.",
+        );
+      } else {
+        const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+
+        // Set error message based on error type
+        if (error.message?.includes("Invalid login credentials")) {
           setError(
-            `Usuario o contraseña incorrectos. ${remainingAttempts} intentos restantes.`,
+            `Email o contraseña incorrectos. ${remainingAttempts} intentos restantes.`,
+          );
+        } else if (error.message?.includes("Email not confirmed")) {
+          setError("Por favor confirma tu email antes de iniciar sesión");
+        } else if (error.message?.includes("Usuario no autorizado")) {
+          setError("Usuario no autorizado en el sistema");
+        } else {
+          setError(
+            error.message ||
+              `Error de autenticación. ${remainingAttempts} intentos restantes.`,
           );
         }
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      setError("Error al intentar iniciar sesión");
-    } finally {
-      setIsLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError("Por favor ingresa tu email primero");
+      return;
+    }
+
+    try {
+      await resetPassword(email);
+      alert(
+        "Se ha enviado un email con instrucciones para restablecer tu contraseña",
+      );
+      setShowResetPassword(false);
+    } catch (error: any) {
+      console.error("Error sending reset email:", error);
+      setError("Error al enviar email de restablecimiento: " + error.message);
     }
   };
 
