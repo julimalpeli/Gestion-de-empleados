@@ -136,6 +136,101 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
     document.body.removeChild(a);
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    // Add title
+    doc.setFontSize(18);
+    doc.text("Reporte de Liquidaciones", 14, 22);
+
+    // Add period
+    doc.setFontSize(12);
+    const [year, month] = selectedPeriod.split("-");
+    const monthNames = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    const monthName = monthNames[parseInt(month) - 1];
+    doc.text(`Período: ${monthName} ${year}`, 14, 32);
+
+    // Add summary
+    doc.text("Resumen:", 14, 45);
+    doc.text(`Total Efectivo: ${formatCurrency(totals.efectivo)}`, 14, 52);
+    doc.text(`Total Depósito: ${formatCurrency(totals.deposito)}`, 14, 59);
+    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 14, 66);
+    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 14, 73);
+
+    // Add table
+    const tableData = filteredData.map((record) => [
+      record.employeeName,
+      record.period,
+      formatCurrency(record.efectivo),
+      formatCurrency(record.deposito),
+      record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
+      formatCurrency(record.totalNeto),
+      record.status === "paid"
+        ? "Pagada"
+        : record.status === "processed"
+          ? "Procesada"
+          : record.status === "approved"
+            ? "Aprobada"
+            : record.status === "pending"
+              ? "Pendiente"
+              : "Borrador",
+    ]);
+
+    // Add totals row
+    tableData.push([
+      "TOTALES",
+      "",
+      formatCurrency(totals.efectivo),
+      formatCurrency(totals.deposito),
+      formatCurrency(totals.aguinaldo),
+      formatCurrency(totals.totalNeto),
+      "",
+    ]);
+
+    (doc as any).autoTable({
+      head: [
+        [
+          "Empleado",
+          "Período",
+          "Efectivo",
+          "Depósito",
+          "Aguinaldo",
+          "Total Neto",
+          "Estado",
+        ],
+      ],
+      body: tableData,
+      startY: 85,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [41, 128, 185] },
+      footStyles: { fillColor: [52, 73, 94], textColor: [255, 255, 255] },
+      foot: [["", "", "", "", "", "", ""]],
+      didParseCell: function (data: any) {
+        // Make totals row bold
+        if (data.row.index === tableData.length - 1) {
+          data.cell.styles.fontStyle = "bold";
+          data.cell.styles.fillColor = [236, 240, 241];
+        }
+      },
+    });
+
+    // Save the PDF
+    doc.save(`liquidaciones-${selectedPeriod}.pdf`);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
