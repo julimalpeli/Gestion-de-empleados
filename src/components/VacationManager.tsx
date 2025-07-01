@@ -306,15 +306,7 @@ const VacationManager = ({
           {/* Add Vacation Button */}
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">Solicitudes de Vacaciones</h3>
-            <Button
-              onClick={() => setIsAddingVacation(true)}
-              disabled={!isEligibleForVacations}
-              title={
-                !isEligibleForVacations
-                  ? "El empleado necesita 6 meses de antigüedad para solicitar vacaciones"
-                  : ""
-              }
-            >
+            <Button onClick={() => setIsAddingVacation(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Nueva Solicitud
             </Button>
