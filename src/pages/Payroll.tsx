@@ -136,6 +136,83 @@ const Payroll = () => {
   const { isAdmin, canEditModule } = usePermissions();
   const { user } = useAuth();
 
+  // Handle status changes
+  const handleStatusChange = async (recordId: string, newStatus: string) => {
+    try {
+      const record = payrollRecords.find((r) => r.id === recordId);
+      if (!record) {
+        alert("No se encontró la liquidación");
+        return;
+      }
+
+      // Validate status transition
+      const validTransitions = {
+        draft: ["pending"],
+        pending: ["approved", "draft"],
+        approved: ["processed", "draft"],
+        processed: ["paid"],
+        paid: [], // No transitions from paid
+      };
+
+      if (!validTransitions[record.status]?.includes(newStatus)) {
+        alert("Transición de estado no válida");
+        return;
+      }
+
+      // Show confirmation for critical actions
+      if (newStatus === "paid") {
+        if (
+          !confirm(
+            "¿Confirma que desea marcar esta liquidación como pagada? Esta acción no se puede deshacer.",
+          )
+        ) {
+          return;
+        }
+      }
+
+      if (
+        newStatus === "draft" &&
+        (record.status === "pending" || record.status === "approved")
+      ) {
+        if (
+          !confirm(
+            "¿Confirma que desea rechazar esta liquidación y devolverla a borrador?",
+          )
+        ) {
+          return;
+        }
+      }
+
+      // Update the record with new status and timestamp
+      const updateData = {
+        status: newStatus,
+        processedDate:
+          newStatus === "paid"
+            ? new Date().toISOString()
+            : record.processedDate,
+      };
+
+      await updatePayrollRecord(recordId, updateData);
+
+      // Show success message
+      const statusNames = {
+        draft: "Borrador",
+        pending: "Pendiente",
+        approved: "Aprobada",
+        processed: "Procesada",
+        paid: "Pagada",
+      };
+
+      setSuccessMessage(
+        `Liquidación actualizada a estado: ${statusNames[newStatus]}`,
+      );
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Error al actualizar el estado de la liquidación");
+    }
+  };
+
   // Configurar período actual automáticamente
   useEffect(() => {
     if (!selectedPeriod) {
