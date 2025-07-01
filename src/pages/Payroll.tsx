@@ -1192,11 +1192,22 @@ const Payroll = () => {
                                     employee,
                                     record.period,
                                   );
-                                  return formatCurrency(
-                                    record.netTotal -
-                                      (record.aguinaldo || 0) +
-                                      correctAguinaldo,
-                                  );
+                                  // Si netTotal ya incluye aguinaldo, solo mostrar netTotal
+                                  // Si no, calcular correctamente
+                                  const hasCorrectAguinaldo =
+                                    Math.abs(
+                                      (record.aguinaldo || 0) -
+                                        correctAguinaldo,
+                                    ) < 1;
+                                  if (hasCorrectAguinaldo) {
+                                    return formatCurrency(record.netTotal);
+                                  } else {
+                                    return formatCurrency(
+                                      record.netTotal -
+                                        (record.aguinaldo || 0) +
+                                        correctAguinaldo,
+                                    );
+                                  }
                                 }
                                 return formatCurrency(record.netTotal);
                               })()
