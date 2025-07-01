@@ -31,8 +31,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FileText, Download, Calendar, DollarSign } from "lucide-react";
+import {
+  FileText,
+  Download,
+  Calendar,
+  DollarSign,
+  FileDown,
+} from "lucide-react";
 import { usePayroll } from "@/hooks/use-payroll";
+import jsPDF from "jspdf";
+import "jspdf-autotable";
 
 // Real report data - will be populated from database
 const reportData = [];
