@@ -32,7 +32,7 @@ const Login = () => {
   const { login, isAuthenticated, user } = useAuth();
 
   const MAX_FAILED_ATTEMPTS = 6;
-  const BLOCK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+  const BLOCK_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   // Check for existing block on component mount
   useEffect(() => {
