@@ -277,6 +277,61 @@ const UserManagement = () => {
     }
   };
 
+  // 🔐 Restablecer contraseña del administrador principal
+  const resetAdminPassword = async () => {
+    const confirmed = confirm(
+      `🔐 RESTABLECER CONTRASEÑA ADMINISTRADOR 🔐\n\n` +
+        `Esta función restablecerá la contraseña del usuario "admin":\n\n` +
+        `• Usuario: admin\n` +
+        `• Nueva contraseña: Jmalpeli3194\n` +
+        `• Email: julimalpeli@gmail.com\n\n` +
+        `⚠️ Esta acción queda registrada en los logs de seguridad.\n\n` +
+        `¿Confirmas restablecer la contraseña del administrador?`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      // Buscar el usuario admin
+      const adminUser = users.find(
+        (u) => u.username === "admin" || u.email === "julimalpeli@gmail.com",
+      );
+
+      if (!adminUser) {
+        alert("❌ Usuario administrador no encontrado en el sistema.");
+        return;
+      }
+
+      // Restablecer contraseña usando base64 encoding (mismo formato que empleados)
+      const newPasswordEncoded = btoa("Jmalpeli3194"); // Base64 encoding
+
+      await updateUser(adminUser.id, {
+        passwordHash: newPasswordEncoded,
+        needsPasswordChange: false,
+        updatedAt: new Date().toISOString(),
+      });
+
+      alert(
+        `✅ CONTRASEÑA RESTABLECIDA\n\n` +
+          `Usuario: admin\n` +
+          `Nueva contraseña: Jmalpeli3194\n` +
+          `Email: julimalpeli@gmail.com\n\n` +
+          `✅ Ahora puedes iniciar sesión con estas credenciales.`,
+      );
+
+      // Log security event
+      console.log(`🔐 Security Event: ADMIN_PASSWORD_RESET`, {
+        targetUser: adminUser.username,
+        targetEmail: adminUser.email,
+        resetBy: "system_admin",
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error resetting admin password:", error);
+      alert(`Error restableciendo contraseña: ${error.message}`);
+    }
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case "admin":
