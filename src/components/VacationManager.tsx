@@ -277,12 +277,28 @@ const VacationManager = ({
                 <div className="text-sm text-orange-700">Días tomados</div>
               </div>
             </div>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div
+              className={`border rounded-lg p-4 ${
+                availableDays >= 0
+                  ? "bg-green-50 border-green-200"
+                  : "bg-red-50 border-red-200"
+              }`}
+            >
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-900">
+                <div
+                  className={`text-2xl font-bold ${
+                    availableDays >= 0 ? "text-green-900" : "text-red-900"
+                  }`}
+                >
                   {availableDays}
                 </div>
-                <div className="text-sm text-green-700">Días disponibles</div>
+                <div
+                  className={`text-sm ${
+                    availableDays >= 0 ? "text-green-700" : "text-red-700"
+                  }`}
+                >
+                  {availableDays >= 0 ? "Días disponibles" : "Días adeudados"}
+                </div>
               </div>
             </div>
           </div>
