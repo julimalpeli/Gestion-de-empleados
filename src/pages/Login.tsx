@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { LogIn, User, Shield, AlertTriangle } from "lucide-react";
+import { LogIn, User, Shield, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { validateLogin, DEMO_USERS } from "@/hooks/use-auth";
 import { useAuth } from "@/hooks/use-auth";
 import ForcePasswordChange from "@/components/ForcePasswordChange";
@@ -27,6 +27,7 @@ const Login = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login, isAuthenticated, user } = useAuth();
 
@@ -261,14 +262,30 @@ const Login = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Ingresa tu contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Ingresa tu contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-muted-foreground" />
+                    )}
+                  </Button>
+                </div>
               </div>
 
               {error && (
@@ -307,128 +324,70 @@ const Login = () => {
           </CardContent>
         </Card>
 
-        {/* Access Information */}
-        <Card
-          className={
-            import.meta.env.DEV
-              ? "border-green-200 bg-green-50"
-              : "border-blue-200 bg-blue-50"
-          }
-        >
-          <CardHeader>
-            <CardTitle
-              className={`text-sm flex items-center gap-2 ${import.meta.env.DEV ? "text-green-800" : "text-blue-800"}`}
-            >
-              <Shield className="h-4 w-4" />
-              {import.meta.env.DEV
-                ? "Credenciales de Desarrollo"
-                : "Acceso de Producción"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {import.meta.env.DEV ? (
-              // DESARROLLO: Mostrar todos los usuarios demo
-              <>
-                <div className="space-y-2">
-                  {Object.entries(DEMO_USERS).map(([key, user]) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Badge
-                          variant={
-                            user.role === "admin" ? "default" : "secondary"
-                          }
-                          className={
-                            user.role === "admin"
-                              ? "bg-blue-100 text-blue-800"
-                              : user.role === "manager"
-                                ? "bg-purple-100 text-purple-800"
-                                : user.role === "hr"
-                                  ? "bg-orange-100 text-orange-800"
-                                  : user.role === "employee"
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-gray-100 text-gray-800"
-                          }
-                        >
-                          <Shield className="h-3 w-3 mr-1" />
-                          {user.role === "admin"
-                            ? "Admin"
+        {/* Access Information - Only in Development */}
+        {import.meta.env.DEV && (
+          <Card className="border-green-200 bg-green-50">
+            <CardHeader>
+              <CardTitle className="text-sm text-green-800 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Credenciales de Desarrollo
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="space-y-2">
+                {Object.entries(DEMO_USERS).map(([key, user]) => (
+                  <div key={key} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant={
+                          user.role === "admin" ? "default" : "secondary"
+                        }
+                        className={
+                          user.role === "admin"
+                            ? "bg-blue-100 text-blue-800"
                             : user.role === "manager"
-                              ? "Gerente"
+                              ? "bg-purple-100 text-purple-800"
                               : user.role === "hr"
-                                ? "RRHH"
+                                ? "bg-orange-100 text-orange-800"
                                 : user.role === "employee"
-                                  ? "Empleado"
-                                  : "Auditor"}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {key} / {user.password}
-                        </span>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          fillDemoCredentials(key as keyof typeof DEMO_USERS)
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
                         }
                       >
-                        Usar
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs text-green-700 mt-2">
-                  🔧 <strong>Modo Desarrollo</strong> - Todas las credenciales
-                  están disponibles para pruebas.
-                </p>
-              </>
-            ) : (
-              // PRODUCCIÓN: Solo mostrar acceso limitado
-              <>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Badge className="bg-blue-100 text-blue-800">
                         <Shield className="h-3 w-3 mr-1" />
-                        Administrador
+                        {user.role === "admin"
+                          ? "Admin"
+                          : user.role === "manager"
+                            ? "Gerente"
+                            : user.role === "hr"
+                              ? "RRHH"
+                              : user.role === "employee"
+                                ? "Empleado"
+                                : "Auditor"}
                       </Badge>
                       <span className="text-xs text-muted-foreground">
-                        jmalpeli / Jmalpeli3194
+                        {key} / {user.password}
                       </span>
                     </div>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() =>
-                        fillDemoCredentials(
-                          "jmalpeli" as keyof typeof DEMO_USERS,
-                        )
+                        fillDemoCredentials(key as keyof typeof DEMO_USERS)
                       }
                     >
                       Usar
                     </Button>
                   </div>
-                </div>
-
-                <div className="p-2 bg-red-50 border border-red-200 rounded">
-                  <p className="text-xs text-red-700">
-                    🔒 <strong>Modo Producción</strong> - Solo usuarios
-                    autorizados pueden acceder.
-                    <br />❌ Usuarios de prueba (gerente, rrhh, empleado,
-                    auditor) bloqueados.
-                  </p>
-                </div>
-
-                <p className="text-xs text-blue-700 mt-2">
-                  ✅ <strong>Acceso disponible:</strong> Administrador principal
-                  y usuarios de la base de datos.
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+              <p className="text-xs text-green-700 mt-2">
+                🔧 <strong>Modo Desarrollo</strong> - Todas las credenciales
+                están disponibles para pruebas.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Modal de cambio de contraseña obligatorio */}
