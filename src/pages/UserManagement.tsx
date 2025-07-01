@@ -362,6 +362,17 @@ const UserManagement = () => {
           <div className="flex gap-2">
             <ChangePasswordDialog />
 
+            {/* Botón de emergencia */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={createEmergencyAdmin}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              Admin Emergencia
+            </Button>
+
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
