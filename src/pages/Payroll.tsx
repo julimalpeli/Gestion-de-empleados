@@ -405,8 +405,8 @@ const Payroll = () => {
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
     const aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod);
 
-    // Total neto = total después de deducciones (incluye horas extras, presentismo, bonos, etc.)
-    const netTotal = totalAfterDeductions;
+    // Total neto = total después de deducciones + aguinaldo
+    const netTotal = totalAfterDeductions + aguinaldoAmount;
 
     return {
       basePay,
