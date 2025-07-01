@@ -179,7 +179,7 @@ const Payroll = () => {
 
     const daysWorked =
       Math.ceil(
-        (effectiveStart.getTime() - semesterEnd.getTime()) /
+        (semesterEnd.getTime() - effectiveStart.getTime()) /
           (1000 * 60 * 60 * 24),
       ) + 1;
 
