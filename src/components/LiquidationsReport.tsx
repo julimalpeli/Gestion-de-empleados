@@ -504,10 +504,24 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
           <Button variant="outline" onClick={onClose}>
             Cerrar
           </Button>
-          <Button onClick={exportToCSV}>
-            <Download className="h-4 w-4 mr-2" />
-            Descargar Reporte
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button>
+                <Download className="h-4 w-4 mr-2" />
+                Descargar Reporte
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem onClick={exportToCSV}>
+                <FileText className="h-4 w-4 mr-2" />
+                Descargar CSV
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={exportToPDF}>
+                <FileDown className="h-4 w-4 mr-2" />
+                Descargar PDF
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </DialogContent>
     </Dialog>
