@@ -28,8 +28,19 @@ const Dashboard = () => {
   });
 
   // Get real data from hooks
-  const { employees, loading: employeesLoading } = useEmployees();
-  const { payrollRecords, loading: payrollLoading } = usePayroll();
+  const {
+    employees,
+    loading: employeesLoading,
+    error: employeesError,
+  } = useEmployees();
+  const {
+    payrollRecords,
+    loading: payrollLoading,
+    error: payrollError,
+  } = usePayroll();
+
+  // Check if we have connection errors
+  const hasConnectionError = employeesError || payrollError;
 
   // Calculate real statistics
   const activeEmployees = employees.filter((emp) => emp.status === "active");
@@ -129,6 +140,12 @@ const Dashboard = () => {
             Liquidaciones: {payrollRecords.length} | Activos:{" "}
             {activeEmployees.length} | Período actual: {currentPeriod} |
             Liquidaciones mes: {currentMonthPayrolls.length}
+            {hasConnectionError && (
+              <div className="mt-1 text-red-600">
+                <strong>Error de conexión:</strong>{" "}
+                {employeesError || payrollError}
+              </div>
+            )}
           </div>
         </div>
       </div>
