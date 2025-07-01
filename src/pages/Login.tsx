@@ -174,11 +174,11 @@ const Login = () => {
         </Card>
 
         {/* Demo Credentials */}
-        <Card className="border-amber-200 bg-amber-50">
+        <Card className="border-green-200 bg-green-50">
           <CardHeader>
-            <CardTitle className="text-sm text-amber-800 flex items-center gap-2">
+            <CardTitle className="text-sm text-green-800 flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              Credenciales de Demostración
+              Credenciales de Acceso
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -228,9 +228,10 @@ const Login = () => {
               ))}
             </div>
 
-            <p className="text-xs text-amber-700 mt-2">
-              Estas son credenciales de demostración. En producción se usarían
-              usuarios reales.
+            <p className="text-xs text-green-700 mt-2">
+              ✅ <strong>Credenciales de administrador actualizadas</strong> -
+              Usa las credenciales del administrador para acceso completo al
+              sistema.
             </p>
           </CardContent>
         </Card>
