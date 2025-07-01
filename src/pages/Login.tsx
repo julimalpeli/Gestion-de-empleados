@@ -25,18 +25,18 @@ import { useAuth } from "@/hooks/use-auth";
 import ForcePasswordChange from "@/components/ForcePasswordChange";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [pendingUser, setPendingUser] = useState(null);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [isBlocked, setIsBlocked] = useState(false);
   const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
   const navigate = useNavigate();
-  const { login, isAuthenticated, user } = useAuth();
+  const { login, isAuthenticated, user, loading, resetPassword } = useAuth();
 
   const MAX_FAILED_ATTEMPTS = 6;
   const BLOCK_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
