@@ -325,12 +325,7 @@ const Login = () => {
         {/* Supabase Auth - No demo users needed */}
       </div>
 
-      {/* Modal de cambio de contraseña obligatorio */}
-      <ForcePasswordChange
-        isOpen={showPasswordChange}
-        username={username}
-        onPasswordChanged={handlePasswordChanged}
-      />
+      {/* Password changes now handled by Supabase Auth */}
     </div>
   );
 };
