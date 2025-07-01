@@ -193,12 +193,55 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [user]);
 
+  // Security logging function
+  const logSecurityEvent = (eventType: string, details: any) => {
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      eventType,
+      details,
+      userAgent: navigator.userAgent,
+      url: window.location.href,
+    };
+
+    console.log(`🔐 Security Event: ${eventType}`, logEntry);
+
+    // Store in localStorage for audit (in production, send to server)
+    const existingLogs = JSON.parse(
+      localStorage.getItem("securityLogs") || "[]",
+    );
+    existingLogs.push(logEntry);
+
+    // Keep only last 100 entries
+    if (existingLogs.length > 100) {
+      existingLogs.splice(0, existingLogs.length - 100);
+    }
+
+    localStorage.setItem("securityLogs", JSON.stringify(existingLogs));
+  };
+
   const login = (userData: User) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+
+    // Log successful login
+    logSecurityEvent("LOGIN_SUCCESS", {
+      username: userData.username,
+      role: userData.role,
+      loginTime: userData.loginTime,
+    });
   };
 
   const logout = () => {
+    if (user) {
+      // Log logout
+      logSecurityEvent("LOGOUT", {
+        username: user.username,
+        role: user.role,
+        sessionDuration:
+          new Date().getTime() - new Date(user.loginTime).getTime(),
+      });
+    }
+
     setUser(null);
     localStorage.removeItem("user");
   };
@@ -252,10 +295,39 @@ export const useAuth = () => {
   return context;
 };
 
+// Security logging helper
+const logSecurityEvent = (eventType: string, details: any) => {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    eventType,
+    details,
+    userAgent: navigator.userAgent,
+  };
+
+  console.log(`🔐 Security Event: ${eventType}`, logEntry);
+
+  // Store in localStorage for audit (in production, send to server)
+  const existingLogs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
+  existingLogs.push(logEntry);
+
+  // Keep only last 100 entries
+  if (existingLogs.length > 100) {
+    existingLogs.splice(0, existingLogs.length - 100);
+  }
+
+  localStorage.setItem("securityLogs", JSON.stringify(existingLogs));
+};
+
 // Helper function for login validation with database
 export const validateLogin = async (username: string, password: string) => {
   try {
     console.log("🔐 Validating login for:", username);
+
+    // Log login attempt
+    logSecurityEvent("LOGIN_ATTEMPT", {
+      username,
+      timestamp: new Date().toISOString(),
+    });
 
     // Primero intentar con usuarios demo (admin, gerente, etc.)
     const demoUser = Object.values(DEMO_USERS).find(
@@ -264,6 +336,12 @@ export const validateLogin = async (username: string, password: string) => {
 
     if (demoUser) {
       console.log("✅ Demo user authenticated:", demoUser.username);
+
+      logSecurityEvent("DEMO_LOGIN_SUCCESS", {
+        username: demoUser.username,
+        role: demoUser.role,
+      });
+
       return {
         username: demoUser.username,
         name: demoUser.name,
@@ -290,6 +368,12 @@ export const validateLogin = async (username: string, password: string) => {
 
     if (error || !user) {
       console.log("❌ User not found or inactive");
+
+      logSecurityEvent("LOGIN_FAILED_USER_NOT_FOUND", {
+        username,
+        error: error?.message || "User not found or inactive",
+      });
+
       return null;
     }
 
@@ -335,6 +419,13 @@ export const validateLogin = async (username: string, password: string) => {
 
     console.log("✅ Database user authenticated:", user.username);
 
+    logSecurityEvent("DATABASE_LOGIN_SUCCESS", {
+      username: user.username,
+      role: user.role,
+      email: user.email,
+      employeeId: user.employee?.id,
+    });
+
     // Actualizar último login
     await supabase
       .from("users")
@@ -356,6 +447,12 @@ export const validateLogin = async (username: string, password: string) => {
     };
   } catch (error) {
     console.error("❌ Login validation error:", error);
+
+    logSecurityEvent("LOGIN_VALIDATION_ERROR", {
+      username,
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+
     return null;
   }
 };
