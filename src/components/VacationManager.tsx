@@ -476,17 +476,45 @@ const VacationManager = ({
                     <TableCell>{formatDate(vacation.requestDate)}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditVacation(vacation)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
+                        {vacation.status === "pending" &&
+                          canApproveVacations && (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleApproveVacation(vacation.id)
+                                }
+                                className="text-green-600 hover:text-green-700"
+                              >
+                                <Check className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  handleRejectVacation(vacation.id)
+                                }
+                                className="text-red-600 hover:text-red-700"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </>
+                          )}
+                        {vacation.status === "pending" && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleEditVacation(vacation)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteVacation(vacation.id)}
+                          disabled={vacation.status === "approved"}
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
