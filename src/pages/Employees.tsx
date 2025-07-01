@@ -399,6 +399,8 @@ const Employees = () => {
       jefe_salon: "Jefe de Salón",
       cajero: "Cajero/a",
       limpieza: "Tareas de Limpieza",
+      barra: "Barra",
+      jefe_barra: "Jefe de Barra",
       manager: "Encargado/a",
     };
     return positions[position] || position;
