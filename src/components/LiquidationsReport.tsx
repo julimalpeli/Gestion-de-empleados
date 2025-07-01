@@ -46,7 +46,7 @@ import {
 } from "lucide-react";
 import { usePayroll } from "@/hooks/use-payroll";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
 // Real report data - will be populated from database
 const reportData = [];
