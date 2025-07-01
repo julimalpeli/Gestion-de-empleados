@@ -178,6 +178,27 @@ const VacationManager = ({
     }
   };
 
+  const handleApproveVacation = async (vacationId) => {
+    if (confirm("¿Aprobar esta solicitud de vacaciones?")) {
+      try {
+        await processVacation(vacationId, "approved");
+      } catch (error) {
+        console.error("Error approving vacation:", error);
+        alert("Error al aprobar vacación");
+      }
+    }
+  };
+
+  const handleRejectVacation = async (vacationId) => {
+    const reason = prompt("Motivo de rechazo (opcional):");
+    try {
+      await processVacation(vacationId, "rejected", reason || undefined);
+    } catch (error) {
+      console.error("Error rejecting vacation:", error);
+      alert("Error al rechazar vacación");
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "approved":
