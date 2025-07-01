@@ -1649,8 +1649,8 @@ const Payroll = () => {
                                       ? "Ver liquidación"
                                       : record.status === "draft"
                                         ? "Editar liquidación"
-                                        : isAdmin()
-                                          ? "Editar liquidación (Admin)"
+                                        : isManager()
+                                          ? "Editar liquidación (Gerente/Admin)"
                                           : "Solo lectura"}
                                   </p>
                                 </TooltipContent>
