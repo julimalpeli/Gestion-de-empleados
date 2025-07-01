@@ -32,9 +32,12 @@ import {
   Calendar,
   Info,
   AlertTriangle,
+  Check,
+  X,
 } from "lucide-react";
 import { useVacations } from "@/hooks/use-vacations";
 import { employeeService } from "@/services/employeeService";
+import { usePermissions } from "@/hooks/use-permissions";
 
 // Mock vacation data - COMENTADO porque ahora usamos Supabase
 const mockVacations = [
