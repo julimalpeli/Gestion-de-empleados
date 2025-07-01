@@ -6,215 +6,54 @@ import {
   ReactNode,
 } from "react";
 import { supabase } from "@/lib/supabase";
+import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
 
 interface User {
+  id: string;
   username: string;
   name: string;
   role: "admin" | "manager" | "hr" | "employee" | "readonly";
-  employeeId?: number;
+  employeeId?: string;
   email: string;
   permissions: string[];
   loginTime: string;
   needsPasswordChange?: boolean;
+  supabaseUser?: SupabaseUser;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (userData: User) => void;
-  logout: () => void;
+  session: Session | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
   isAuthenticated: boolean;
   hasPermission: (permission: string) => boolean;
   changePassword: (newPassword: string) => Promise<void>;
+  resetPassword: (email: string) => Promise<void>;
+  exportSecurityLogs: () => void;
 }
-
-// Demo users with different roles
-const DEMO_USERS = {
-  jmalpeli: {
-    username: "jmalpeli",
-    password: "Jmalpeli3194",
-    name: "Julian Malpeli",
-    role: "admin" as const,
-    email: "julimalpeli@gmail.com",
-    permissions: ["all"],
-  },
-  gerente: {
-    username: "gerente",
-    password: "gerente123",
-    name: "María López",
-    role: "manager" as const,
-    email: "maria.lopez@cadizbartapas.com",
-    permissions: [
-      "employees:view",
-      "employees:create",
-      "employees:edit",
-      "payroll:view",
-      "payroll:create",
-      "payroll:edit",
-      "reports:view",
-    ],
-  },
-  rrhh: {
-    username: "rrhh",
-    password: "rrhh123",
-    name: "Ana García",
-    role: "hr" as const,
-    email: "ana.garcia@cadizbartapas.com",
-    permissions: [
-      "employees:view",
-      "employees:create",
-      "employees:edit",
-      "payroll:view",
-      "payroll:create",
-      "vacations:manage",
-    ],
-  },
-  employee: {
-    username: "employee",
-    password: "empleado123",
-    name: "Juan Pérez",
-    role: "employee" as const,
-    employeeId: 1,
-    email: "juan.perez@cadizbartapas.com",
-    permissions: ["profile:view", "payroll:view:own", "vacations:view:own"],
-  },
-  readonly: {
-    username: "auditor",
-    password: "auditor123",
-    name: "Carlos Auditor",
-    role: "readonly" as const,
-    email: "auditor@cadizbartapas.com",
-    permissions: ["employees:view", "payroll:view", "reports:view"],
-  },
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
+// Security event logging
+const logSecurityEvent = (
+  eventType: string,
+  details: Record<string, any> = {},
+) => {
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    timestamp,
+    eventType,
+    details,
+    userAgent: navigator.userAgent,
+    ip: "client-side", // En producción podrías obtener la IP real
+  };
 
-  useEffect(() => {
-    // Check if user is logged in on app start
-    const savedUser = localStorage.getItem("user");
-    if (savedUser) {
-      try {
-        const userData = JSON.parse(savedUser);
-        // Verify the login is not too old (4 hours for security)
-        const loginTime = new Date(userData.loginTime);
-        const now = new Date();
-        const hoursDiff =
-          (now.getTime() - loginTime.getTime()) / (1000 * 60 * 60);
+  console.log(`🔒 Security Event: ${eventType}`, logEntry);
 
-        if (hoursDiff < 4) {
-          setUser(userData);
-
-          // Set up session expiration warning (warn 15 minutes before expiry)
-          const timeUntilWarning =
-            4 * 60 * 60 * 1000 -
-            15 * 60 * 1000 -
-            (now.getTime() - loginTime.getTime());
-          if (timeUntilWarning > 0) {
-            setTimeout(() => {
-              if (
-                confirm("Su sesión expirará en 15 minutos. ¿Desea continuar?")
-              ) {
-                // Extend session by updating login time
-                const extendedUser = {
-                  ...userData,
-                  loginTime: new Date().toISOString(),
-                };
-                setUser(extendedUser);
-                localStorage.setItem("user", JSON.stringify(extendedUser));
-              }
-            }, timeUntilWarning);
-          }
-
-          // Set up automatic logout
-          const timeUntilExpiry =
-            4 * 60 * 60 * 1000 - (now.getTime() - loginTime.getTime());
-          if (timeUntilExpiry > 0) {
-            setTimeout(() => {
-              console.log("🕐 Session expired - automatic logout");
-              setUser(null);
-              localStorage.removeItem("user");
-              alert(
-                "Su sesión ha expirado por seguridad. Por favor, inicie sesión nuevamente.",
-              );
-              window.location.href = "/login";
-            }, timeUntilExpiry);
-          }
-        } else {
-          console.log("🕐 Session expired on startup");
-          localStorage.removeItem("user");
-        }
-      } catch (error) {
-        localStorage.removeItem("user");
-      }
-    }
-  }, []);
-
-  // Separate useEffect for activity detection to avoid infinite loops
-  useEffect(() => {
-    if (!user) return;
-
-    let activityTimeout: NodeJS.Timeout;
-
-    const resetActivityTimer = () => {
-      clearTimeout(activityTimeout);
-      activityTimeout = setTimeout(
-        () => {
-          // Get current user from localStorage to avoid stale closure
-          const currentUser = localStorage.getItem("user");
-          if (currentUser) {
-            try {
-              const userData = JSON.parse(currentUser);
-              const extendedUser = {
-                ...userData,
-                lastActivity: new Date().toISOString(),
-              };
-              localStorage.setItem("user", JSON.stringify(extendedUser));
-            } catch (error) {
-              console.error("Error updating activity:", error);
-            }
-          }
-        },
-        5 * 60 * 1000,
-      ); // Update every 5 minutes of activity
-    };
-
-    // Listen for user activity
-    const events = [
-      "mousedown",
-      "mousemove",
-      "keypress",
-      "scroll",
-      "touchstart",
-      "click",
-    ];
-    events.forEach((event) => {
-      document.addEventListener(event, resetActivityTimer, true);
-    });
-
-    return () => {
-      events.forEach((event) => {
-        document.removeEventListener(event, resetActivityTimer, true);
-      });
-      clearTimeout(activityTimeout);
-    };
-  }, [user?.username]); // Only depend on username to avoid infinite loops
-
-  // Security logging function
-  const logSecurityEvent = (eventType: string, details: any) => {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      eventType,
-      details,
-      userAgent: navigator.userAgent,
-      url: window.location.href,
-    };
-
-    console.log(`🔐 Security Event: ${eventType}`, logEntry);
-
-    // Store in localStorage for audit (in production, send to server)
+  // Guardar en localStorage para auditoría
+  try {
     const existingLogs = JSON.parse(
       localStorage.getItem("securityLogs") || "[]",
     );
@@ -226,114 +65,360 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
 
     localStorage.setItem("securityLogs", JSON.stringify(existingLogs));
-  };
+  } catch (error) {
+    console.error("Error logging security event:", error);
+  }
+};
 
-  const login = (userData: User) => {
-    setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-    // Log successful login
-    logSecurityEvent("LOGIN_SUCCESS", {
-      username: userData.username,
-      role: userData.role,
-      loginTime: userData.loginTime,
+  // Initialize Supabase Auth listener
+  useEffect(() => {
+    let mounted = true;
+
+    const getInitialSession = async () => {
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("Error getting session:", error);
+          return;
+        }
+
+        if (mounted) {
+          setSession(session);
+          if (session?.user) {
+            await loadUserProfile(session.user);
+          }
+        }
+      } catch (error) {
+        console.error("Error in getInitialSession:", error);
+      } finally {
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    getInitialSession();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("🔐 Auth state changed:", event, session?.user?.email);
+
+      if (mounted) {
+        setSession(session);
+
+        if (session?.user) {
+          await loadUserProfile(session.user);
+          logSecurityEvent("SESSION_ESTABLISHED", {
+            userId: session.user.id,
+            email: session.user.email,
+            event,
+          });
+        } else {
+          setUser(null);
+          if (event === "SIGNED_OUT") {
+            logSecurityEvent("SESSION_ENDED", { event });
+          }
+        }
+
+        setLoading(false);
+      }
     });
-  };
 
-  const logout = () => {
-    if (user) {
-      // Log logout
-      logSecurityEvent("LOGOUT", {
-        username: user.username,
-        role: user.role,
-        sessionDuration:
-          new Date().getTime() - new Date(user.loginTime).getTime(),
-      });
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Load user profile from our users table
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
+    try {
+      const { data: userProfile, error } = await supabase
+        .from("users")
+        .select(
+          `
+          *,
+          employee:employees(id, name)
+        `,
+        )
+        .eq("email", supabaseUser.email)
+        .eq("is_active", true)
+        .single();
+
+      if (error || !userProfile) {
+        console.error("Error loading user profile:", error);
+
+        // If user doesn't exist in our users table, sign them out
+        await supabase.auth.signOut();
+        throw new Error("Usuario no autorizado en el sistema");
+      }
+
+      const userData: User = {
+        id: userProfile.id,
+        username: userProfile.username,
+        name: userProfile.name,
+        role: userProfile.role,
+        email: userProfile.email,
+        employeeId: userProfile.employee_id,
+        permissions: getRolePermissions(userProfile.role),
+        loginTime: new Date().toISOString(),
+        needsPasswordChange: userProfile.needs_password_change || false,
+        supabaseUser,
+      };
+
+      setUser(userData);
+
+      // Update last login
+      await supabase
+        .from("users")
+        .update({ last_login: new Date().toISOString() })
+        .eq("id", userProfile.id);
+    } catch (error) {
+      console.error("Error loading user profile:", error);
+      throw error;
     }
-
-    setUser(null);
-    localStorage.removeItem("user");
   };
 
-  const hasPermission = (permission: string) => {
+  // Get permissions based on role
+  const getRolePermissions = (role: string): string[] => {
+    const rolePermissions = {
+      admin: ["all"],
+      manager: [
+        "employees:view",
+        "employees:create",
+        "employees:edit",
+        "employees:export",
+        "payroll:view",
+        "payroll:create",
+        "payroll:edit",
+        "payroll:process",
+        "vacations:view",
+        "vacations:approve",
+        "vacations:manage",
+        "reports:view",
+        "reports:generate",
+        "files:manage",
+      ],
+      hr: [
+        "employees:view",
+        "employees:create",
+        "employees:edit",
+        "employees:export",
+        "payroll:view",
+        "payroll:create",
+        "payroll:edit",
+        "vacations:view",
+        "vacations:approve",
+        "vacations:manage",
+        "reports:view",
+        "files:manage",
+      ],
+      employee: [
+        "employees:view-own",
+        "payroll:view-own",
+        "vacations:view-own",
+        "files:view-own",
+      ],
+      readonly: [
+        "employees:view",
+        "payroll:view",
+        "vacations:view",
+        "reports:view",
+      ],
+    };
+
+    return rolePermissions[role as keyof typeof rolePermissions] || [];
+  };
+
+  // Login function
+  const login = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+
+      logSecurityEvent("LOGIN_ATTEMPT", {
+        email,
+        timestamp: new Date().toISOString(),
+      });
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
+
+      if (error) {
+        logSecurityEvent("LOGIN_FAILED", {
+          email,
+          error: error.message,
+          timestamp: new Date().toISOString(),
+        });
+        throw error;
+      }
+
+      if (!data.user) {
+        throw new Error("No se pudo autenticar el usuario");
+      }
+
+      logSecurityEvent("LOGIN_SUCCESS", {
+        userId: data.user.id,
+        email: data.user.email,
+        timestamp: new Date().toISOString(),
+      });
+
+      // User profile will be loaded automatically by onAuthStateChange
+      console.log("✅ Login successful:", data.user.email);
+    } catch (error) {
+      setLoading(false);
+      console.error("❌ Login error:", error);
+      throw error;
+    }
+  };
+
+  // Logout function
+  const logout = async () => {
+    try {
+      if (user) {
+        logSecurityEvent("LOGOUT", {
+          userId: user.id,
+          username: user.username,
+          email: user.email,
+        });
+      }
+
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Error during logout:", error);
+      }
+
+      // Clear local state (will also be cleared by onAuthStateChange)
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    }
+  };
+
+  // Check permissions
+  const hasPermission = (permission: string): boolean => {
     if (!user) return false;
+
     return (
       user.permissions.includes("all") || user.permissions.includes(permission)
     );
   };
 
+  // Change password
   const changePassword = async (newPassword: string) => {
     try {
-      if (!user) {
-        throw new Error("No hay usuario autenticado");
+      if (!session?.user) {
+        throw new Error("No hay sesión activa");
       }
 
-      // For local authentication system, we simulate password change
-      // In a real implementation, this would update the database
-      const updatedUser = {
-        ...user,
-        needsPasswordChange: false,
-        // Note: In a real system, you'd hash and store the password securely
-        lastPasswordChange: new Date().toISOString(),
-      };
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
 
-      setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
+      if (error) {
+        throw error;
+      }
 
-      // Log password change event
+      // Update user profile to remove password change requirement
+      if (user?.needsPasswordChange) {
+        await supabase
+          .from("users")
+          .update({ needs_password_change: false })
+          .eq("id", user.id);
+
+        const updatedUser = { ...user, needsPasswordChange: false };
+        setUser(updatedUser);
+      }
+
       logSecurityEvent("PASSWORD_CHANGE", {
-        username: user.username,
-        role: user.role,
+        userId: user?.id,
+        email: user?.email,
         timestamp: new Date().toISOString(),
       });
 
-      console.log("Password changed successfully for user:", user.username);
+      console.log("✅ Password changed successfully");
     } catch (error) {
-      console.error("Error changing password:", error);
+      console.error("❌ Error changing password:", error);
+      throw error;
+    }
+  };
+
+  // Reset password (send email)
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      logSecurityEvent("PASSWORD_RESET_REQUESTED", {
+        email,
+        timestamp: new Date().toISOString(),
+      });
+
+      console.log("✅ Password reset email sent");
+    } catch (error) {
+      console.error("❌ Error sending password reset:", error);
       throw error;
     }
   };
 
   // Export security logs for audit
   const exportSecurityLogs = () => {
-    const logs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
-    const blob = new Blob([JSON.stringify(logs, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `security-logs-${new Date().toISOString().split("T")[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    try {
+      const logs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
+      const dataStr = JSON.stringify(logs, null, 2);
+      const dataUri =
+        "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+      const exportFileDefaultName = `security-logs-${
+        new Date().toISOString().split("T")[0]
+      }.json`;
+
+      const linkElement = document.createElement("a");
+      linkElement.setAttribute("href", dataUri);
+      linkElement.setAttribute("download", exportFileDefaultName);
+      linkElement.click();
+
+      logSecurityEvent("SECURITY_LOGS_EXPORTED", {
+        userId: user?.id,
+        email: user?.email,
+        logsCount: logs.length,
+      });
+    } catch (error) {
+      console.error("Error exporting security logs:", error);
+    }
   };
 
-  // Get security logs summary
-  const getSecurityLogsSummary = () => {
-    const logs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
-    const summary = logs.reduce((acc: any, log: any) => {
-      acc[log.eventType] = (acc[log.eventType] || 0) + 1;
-      return acc;
-    }, {});
-
-    return {
-      totalEvents: logs.length,
-      eventTypes: summary,
-      lastEvents: logs.slice(-10).reverse(),
-    };
-  };
-
-  const value = {
+  const value: AuthContextType = {
     user,
+    session,
+    loading,
     login,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: !!session?.user && !!user,
     hasPermission,
     changePassword,
+    resetPassword,
     exportSecurityLogs,
-    getSecurityLogsSummary,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -347,253 +432,60 @@ export const useAuth = () => {
   return context;
 };
 
-// Security logging helper
-const logSecurityEvent = (eventType: string, details: any) => {
-  const logEntry = {
-    timestamp: new Date().toISOString(),
-    eventType,
-    details,
-    userAgent: navigator.userAgent,
-  };
+// Export for compatibility
+export { logSecurityEvent };
 
-  console.log(`🔐 Security Event: ${eventType}`, logEntry);
-
-  // Store in localStorage for audit (in production, send to server)
-  const existingLogs = JSON.parse(localStorage.getItem("securityLogs") || "[]");
-  existingLogs.push(logEntry);
-
-  // Keep only last 100 entries
-  if (existingLogs.length > 100) {
-    existingLogs.splice(0, existingLogs.length - 100);
-  }
-
-  localStorage.setItem("securityLogs", JSON.stringify(existingLogs));
-};
-
-// Helper function for login validation with database
-export const validateLogin = async (username: string, password: string) => {
+// Helper function to create user in Supabase Auth (for admin use)
+export const createSupabaseUser = async (
+  email: string,
+  password: string,
+  userData: any,
+) => {
   try {
-    console.log("🔐 Validating login for:", username);
-
-    // Log login attempt
-    logSecurityEvent("LOGIN_ATTEMPT", {
-      username,
-      timestamp: new Date().toISOString(),
-    });
-
-    // En producción, solo permitir jmalpeli (admin principal)
-    // En desarrollo, permitir todos los usuarios demo
-    if (import.meta.env.DEV) {
-      // MODO DESARROLLO: Permitir todos los usuarios demo
-      const demoUser = Object.values(DEMO_USERS).find(
-        (u) => u.username === username && u.password === password,
-      );
-
-      if (demoUser) {
-        console.log("✅ Demo user authenticated (DEV):", demoUser.username);
-
-        logSecurityEvent("DEMO_LOGIN_SUCCESS_DEV", {
-          username: demoUser.username,
-          role: demoUser.role,
-          environment: "development",
-        });
-
-        return {
-          username: demoUser.username,
-          name: demoUser.name,
-          role: demoUser.role,
-          employeeId: demoUser.employeeId,
-          email: demoUser.email,
-          permissions: demoUser.permissions,
-          loginTime: new Date().toISOString(),
-        };
-      }
-    } else {
-      // MODO PRODUCCIÓN: Solo permitir el admin principal jmalpeli
-      const adminUser = DEMO_USERS.jmalpeli;
-      if (
-        adminUser &&
-        adminUser.username === username &&
-        adminUser.password === password
-      ) {
-        console.log("✅ Production admin authenticated:", adminUser.username);
-
-        logSecurityEvent("ADMIN_LOGIN_SUCCESS_PROD", {
-          username: adminUser.username,
-          role: adminUser.role,
-          environment: "production",
-        });
-
-        return {
-          username: adminUser.username,
-          name: adminUser.name,
-          role: adminUser.role,
-          employeeId: adminUser.employeeId,
-          email: adminUser.email,
-          permissions: adminUser.permissions,
-          loginTime: new Date().toISOString(),
-        };
-      }
-
-      // En producción, bloquear usuarios demo excepto jmalpeli
-      const blockedDemoUser = Object.values(DEMO_USERS).find(
-        (u) => u.username === username && u.username !== "jmalpeli",
-      );
-
-      if (blockedDemoUser) {
-        console.warn("❌ Demo user blocked in production:", username);
-
-        logSecurityEvent("DEMO_LOGIN_BLOCKED_PROD", {
-          username: username,
-          blockedRole: blockedDemoUser.role,
-          environment: "production",
-          reason: "Demo users disabled in production",
-        });
-
-        // Retornar null para denegar acceso
-        return null;
-      }
-    }
-
-    // Si no es usuario demo, consultar base de datos
-    const { data: user, error } = await supabase
-      .from("users")
-      .select(
-        `
-        *,
-        employee:employees(id, name)
-      `,
-      )
-      .eq("username", username)
-      .eq("is_active", true)
-      .single();
-
-    if (error || !user) {
-      console.log("❌ User not found or inactive");
-
-      logSecurityEvent("LOGIN_FAILED_USER_NOT_FOUND", {
-        username,
-        error: error?.message || "User not found or inactive",
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } =
+      await supabase.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // Auto-confirm email
+        user_metadata: {
+          name: userData.name,
+          role: userData.role,
+        },
       });
 
-      return null;
+    if (authError) {
+      throw authError;
     }
 
-    // Verificar contraseña usando Supabase Auth
-    try {
-      const { data: authData, error: authError } =
-        await supabase.auth.signInWithPassword({
-          email: user.email,
-          password: password,
-        });
-
-      if (authError || !authData.user) {
-        console.log("❌ Invalid password:", authError?.message);
-
-        // Fallback: Si es el usuario admin y la contraseña coincide con la configurada
-        if (
-          (user.email === "julimalpeli@gmail.com" ||
-            user.username === "jmalpeli") &&
-          password === "Jmalpeli3194"
-        ) {
-          console.log("✅ Admin fallback authentication successful");
-        } else {
-          return null;
-        }
-      } else {
-        // Sign out immediately after validation (we're using session-based auth)
-        await supabase.auth.signOut();
-      }
-    } catch (authValidationError) {
-      console.log("❌ Password validation error:", authValidationError);
-
-      // Fallback para admin en caso de error de autenticación
-      if (
-        (user.email === "julimalpeli@gmail.com" ||
-          user.username === "jmalpeli") &&
-        password === "Jmalpeli3194"
-      ) {
-        console.log("✅ Admin fallback authentication on error");
-      } else {
-        return null;
-      }
-    }
-
-    console.log("✅ Database user authenticated:", user.username);
-
-    logSecurityEvent("DATABASE_LOGIN_SUCCESS", {
-      username: user.username,
-      role: user.role,
-      email: user.email,
-      employeeId: user.employee?.id,
+    // Create user in our users table
+    const { error: dbError } = await supabase.from("users").insert({
+      id: authData.user.id,
+      username: userData.username,
+      email: email,
+      name: userData.name,
+      role: userData.role,
+      employee_id: userData.employeeId,
+      is_active: true,
+      needs_password_change: userData.needsPasswordChange || false,
     });
 
-    // Actualizar último login
-    await supabase
-      .from("users")
-      .update({ last_login: new Date().toISOString() })
-      .eq("id", user.id);
+    if (dbError) {
+      // If user table creation fails, delete the auth user
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      throw dbError;
+    }
 
-    // Mapear permisos según rol
-    const permissions = getRolePermissions(user.role);
+    logSecurityEvent("USER_CREATED", {
+      userId: authData.user.id,
+      email: email,
+      role: userData.role,
+      createdBy: "system",
+    });
 
-    return {
-      username: user.username,
-      name: user.name,
-      role: user.role,
-      employeeId: user.employee?.id,
-      email: user.email,
-      permissions,
-      loginTime: new Date().toISOString(),
-      needsPasswordChange: user.needs_password_change,
-    };
+    return authData.user;
   } catch (error) {
-    console.error("❌ Login validation error:", error);
-
-    logSecurityEvent("LOGIN_VALIDATION_ERROR", {
-      username,
-      error: error instanceof Error ? error.message : "Unknown error",
-    });
-
-    return null;
+    console.error("Error creating Supabase user:", error);
+    throw error;
   }
 };
-
-// Helper para obtener permisos según rol
-const getRolePermissions = (role: string): string[] => {
-  switch (role) {
-    case "admin":
-      return ["all"];
-    case "manager":
-      return [
-        "employees:view",
-        "employees:create",
-        "employees:edit",
-        "payroll:view",
-        "payroll:create",
-        "payroll:edit",
-        "reports:view",
-        "vacations:view",
-        "vacations:approve",
-      ];
-    case "hr":
-      return [
-        "employees:view",
-        "employees:create",
-        "employees:edit",
-        "payroll:view",
-        "payroll:create",
-        "payroll:edit",
-        "reports:view",
-        "vacations:approve",
-      ];
-    case "employee":
-      return ["portal:view"];
-    case "readonly":
-      return ["employees:view", "payroll:view", "reports:view"];
-    default:
-      return [];
-  }
-};
-
-export { DEMO_USERS };
