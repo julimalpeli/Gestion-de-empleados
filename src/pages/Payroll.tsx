@@ -53,6 +53,15 @@ import {
   Info,
   TrendingUp,
   Trash2,
+  Edit3,
+  Clock,
+  Check,
+  Settings,
+  CircleDollarSign,
+  Eye,
+  Send,
+  ArrowRight,
+  X,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
@@ -1262,42 +1271,210 @@ const Payroll = () => {
                             })()}
                         </TableCell>
                         <TableCell>
-                          <div className="flex flex-col gap-1">
+                          <div className="flex flex-col gap-2">
+                            {/* Status Badge with Icon */}
                             <Badge
-                              variant={
-                                record.status === "processed"
-                                  ? "default"
-                                  : record.status === "pending"
-                                    ? "secondary"
-                                    : record.status === "approved"
-                                      ? "default"
-                                      : record.status === "paid"
-                                        ? "default"
-                                        : "outline"
-                              }
+                              variant="outline"
                               className={
-                                record.status === "paid"
-                                  ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                  : record.status === "approved"
-                                    ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                                    : ""
+                                record.status === "draft"
+                                  ? "bg-gray-50 text-gray-700 border-gray-200"
+                                  : record.status === "pending"
+                                    ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                                    : record.status === "approved"
+                                      ? "bg-blue-50 text-blue-700 border-blue-200"
+                                      : record.status === "processed"
+                                        ? "bg-purple-50 text-purple-700 border-purple-200"
+                                        : record.status === "paid"
+                                          ? "bg-green-50 text-green-700 border-green-200"
+                                          : "bg-gray-50 text-gray-700 border-gray-200"
                               }
                             >
                               <div className="flex items-center gap-1">
-                                {record.status === "paid" && (
-                                  <CheckCircle className="h-3 w-3" />
+                                {record.status === "draft" && (
+                                  <Edit3 className="h-3 w-3" />
                                 )}
-                                {record.status === "processed"
-                                  ? "Procesada"
-                                  : record.status === "pending"
-                                    ? "Pendiente"
-                                    : record.status === "approved"
-                                      ? "Aprobada"
-                                      : record.status === "paid"
-                                        ? "Pagada"
-                                        : "Borrador"}
+                                {record.status === "pending" && (
+                                  <Clock className="h-3 w-3" />
+                                )}
+                                {record.status === "approved" && (
+                                  <Check className="h-3 w-3" />
+                                )}
+                                {record.status === "processed" && (
+                                  <Settings className="h-3 w-3" />
+                                )}
+                                {record.status === "paid" && (
+                                  <CircleDollarSign className="h-3 w-3" />
+                                )}
+                                <span className="font-medium">
+                                  {record.status === "draft"
+                                    ? "Borrador"
+                                    : record.status === "pending"
+                                      ? "Pendiente"
+                                      : record.status === "approved"
+                                        ? "Aprobada"
+                                        : record.status === "processed"
+                                          ? "Procesada"
+                                          : record.status === "paid"
+                                            ? "Pagada"
+                                            : "Sin Estado"}
+                                </span>
                               </div>
                             </Badge>
+
+                            {/* Status Actions */}
+                            <div className="flex gap-1">
+                              {/* Send to Pending */}
+                              {record.status === "draft" && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0 text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                                        onClick={() =>
+                                          handleStatusChange(
+                                            record.id,
+                                            "pending",
+                                          )
+                                        }
+                                      >
+                                        <Send className="h-3 w-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Enviar para revisión</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+
+                              {/* Approve */}
+                              {record.status === "pending" && isAdmin() && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                        onClick={() =>
+                                          handleStatusChange(
+                                            record.id,
+                                            "approved",
+                                          )
+                                        }
+                                      >
+                                        <Check className="h-3 w-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Aprobar liquidación</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+
+                              {/* Process */}
+                              {record.status === "approved" && isAdmin() && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0 text-purple-600 hover:text-purple-700 hover:bg-purple-50"
+                                        onClick={() =>
+                                          handleStatusChange(
+                                            record.id,
+                                            "processed",
+                                          )
+                                        }
+                                      >
+                                        <Settings className="h-3 w-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Procesar para pago</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+
+                              {/* Mark as Paid */}
+                              {record.status === "processed" && isAdmin() && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                        onClick={() =>
+                                          handleStatusChange(record.id, "paid")
+                                        }
+                                      >
+                                        <CircleDollarSign className="h-3 w-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Marcar como pagada</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+
+                              {/* Reject/Return to Draft */}
+                              {(record.status === "pending" ||
+                                record.status === "approved") &&
+                                isAdmin() && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          className="h-6 w-6 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                          onClick={() =>
+                                            handleStatusChange(
+                                              record.id,
+                                              "draft",
+                                            )
+                                          }
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>Rechazar / Volver a borrador</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+
+                              {/* View Only for Paid */}
+                              {record.status === "paid" && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="h-6 w-6 p-0 text-gray-500"
+                                        onClick={() => handleEditRecord(record)}
+                                      >
+                                        <Eye className="h-3 w-3" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Ver detalles</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </div>
+
+                            {/* Status Date */}
                             {record.processedDate && (
                               <span className="text-xs text-muted-foreground">
                                 {new Date(
