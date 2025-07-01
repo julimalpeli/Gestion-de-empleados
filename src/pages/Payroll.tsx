@@ -1897,6 +1897,13 @@ const Payroll = () => {
               Esta acción no se puede deshacer. Esto eliminará permanentemente
               la liquidación de {recordToDelete?.employeeName} para el período{" "}
               {recordToDelete ? formatPeriod(recordToDelete.period) : ""}.
+              {recordToDelete?.status === "paid" && (
+                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
+                  ⚠️ <strong>Advertencia:</strong> Esta liquidación está marcada
+                  como PAGADA. Eliminarla afectará los registros de pagos
+                  realizados.
+                </div>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
