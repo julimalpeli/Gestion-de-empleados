@@ -430,7 +430,6 @@ const VacationManager = ({
                       startDate: "",
                       endDate: "",
                       reason: "",
-                      status: "pending",
                     });
                   }}
                 >
