@@ -24,8 +24,55 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [pendingUser, setPendingUser] = useState(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockTimeRemaining, setBlockTimeRemaining] = useState(0);
   const navigate = useNavigate();
   const { login, isAuthenticated, user } = useAuth();
+
+  const MAX_FAILED_ATTEMPTS = 6;
+  const BLOCK_DURATION = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+  // Check for existing block on component mount
+  useEffect(() => {
+    const blockData = localStorage.getItem("loginBlock");
+    if (blockData) {
+      try {
+        const { blockedUntil, attempts } = JSON.parse(blockData);
+        const now = new Date().getTime();
+
+        if (now < blockedUntil) {
+          setIsBlocked(true);
+          setFailedAttempts(attempts);
+          setBlockTimeRemaining(Math.ceil((blockedUntil - now) / 1000));
+
+          // Start countdown timer
+          const timer = setInterval(() => {
+            const remaining = Math.ceil(
+              (blockedUntil - new Date().getTime()) / 1000,
+            );
+            if (remaining <= 0) {
+              clearInterval(timer);
+              setIsBlocked(false);
+              setFailedAttempts(0);
+              setBlockTimeRemaining(0);
+              localStorage.removeItem("loginBlock");
+            } else {
+              setBlockTimeRemaining(remaining);
+            }
+          }, 1000);
+
+          return () => clearInterval(timer);
+        } else {
+          // Block expired, clean up
+          localStorage.removeItem("loginBlock");
+          setFailedAttempts(attempts < MAX_FAILED_ATTEMPTS ? attempts : 0);
+        }
+      } catch (error) {
+        localStorage.removeItem("loginBlock");
+      }
+    }
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -40,6 +87,15 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if blocked
+    if (isBlocked) {
+      setError(
+        `Acceso bloqueado. Intenta nuevamente en ${Math.ceil(blockTimeRemaining / 60)} minutos.`,
+      );
+      return;
+    }
+
     setIsLoading(true);
     setError("");
 
@@ -47,6 +103,18 @@ const Login = () => {
       const userData = await validateLogin(username, password);
 
       if (userData) {
+        // Success - reset failed attempts
+        setFailedAttempts(0);
+        localStorage.removeItem("loginBlock");
+
+        // Log successful login
+        console.log("✅ Successful login:", {
+          username: userData.username,
+          role: userData.role,
+          timestamp: new Date().toISOString(),
+          ip: "client-side",
+        });
+
         // Verificar si necesita cambiar contraseña
         if (userData.needsPasswordChange) {
           setPendingUser(userData);
@@ -64,7 +132,50 @@ const Login = () => {
           navigate("/");
         }
       } else {
-        setError("Usuario o contraseña incorrectos");
+        // Failed login - increment attempts
+        const newFailedAttempts = failedAttempts + 1;
+        setFailedAttempts(newFailedAttempts);
+
+        // Log failed login attempt
+        console.warn("❌ Failed login attempt:", {
+          username,
+          attempt: newFailedAttempts,
+          timestamp: new Date().toISOString(),
+          ip: "client-side",
+        });
+
+        if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+          // Block user
+          const blockedUntil = new Date().getTime() + BLOCK_DURATION;
+          setIsBlocked(true);
+          setBlockTimeRemaining(BLOCK_DURATION / 1000);
+
+          localStorage.setItem(
+            "loginBlock",
+            JSON.stringify({
+              blockedUntil,
+              attempts: newFailedAttempts,
+              timestamp: new Date().toISOString(),
+            }),
+          );
+
+          setError(
+            `Demasiados intentos fallidos. Acceso bloqueado por 15 minutos.`,
+          );
+
+          // Log security block
+          console.error("🚫 User blocked due to failed attempts:", {
+            username,
+            attempts: newFailedAttempts,
+            blockedUntil: new Date(blockedUntil).toISOString(),
+            ip: "client-side",
+          });
+        } else {
+          const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+          setError(
+            `Usuario o contraseña incorrectos. ${remainingAttempts} intentos restantes.`,
+          );
+        }
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -163,6 +274,29 @@ const Login = () => {
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Security Status Indicators */}
+              {failedAttempts > 0 && !isBlocked && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    ⚠️ {failedAttempts} intento(s) fallido(s). El acceso se
+                    bloqueará tras {MAX_FAILED_ATTEMPTS - failedAttempts}{" "}
+                    intentos más.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {isBlocked && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    🚫 Acceso bloqueado por seguridad. Tiempo restante:{" "}
+                    {Math.floor(blockTimeRemaining / 60)}:
+                    {String(blockTimeRemaining % 60).padStart(2, "0")}
+                  </AlertDescription>
                 </Alert>
               )}
 
