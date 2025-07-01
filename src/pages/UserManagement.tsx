@@ -411,6 +411,12 @@ const UserManagement = () => {
               <p className="text-muted-foreground">
                 Administra usuarios, roles y permisos del sistema
               </p>
+              {/* Security Status */}
+              <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded text-sm">
+                🛡️ <strong>Estado de Seguridad:</strong>{" "}
+                {users.filter((u) => u.role === "admin" && u.isActive).length}{" "}
+                administradores activos | Protecciones anti-bloqueo: ✅ Activas
+              </div>
             </div>
           </div>
 
