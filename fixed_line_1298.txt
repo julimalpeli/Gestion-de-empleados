@@ -1,0 +1,8 @@
+{isAguinaldoPeriod(record.period) ? (() => {
+                                const employee = employees.find((e) => e.name === record.employeeName);
+                                if (employee) {
+                                  const correctAguinaldo = calculateAguinaldo(employee, record.period);
+                                  return formatCurrency(record.netTotal - (record.aguinaldo || 0) + correctAguinaldo);
+                                }
+                                return formatCurrency(record.netTotal);
+                              })() : formatCurrency(record.netTotal)}
