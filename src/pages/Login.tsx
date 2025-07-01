@@ -22,7 +22,6 @@ import {
   Mail,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import ForcePasswordChange from "@/components/ForcePasswordChange";
 
 const Login = () => {
   const [email, setEmail] = useState("");
