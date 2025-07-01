@@ -1090,10 +1090,10 @@ const Payroll = () => {
                           {record.overtimeHours > 0 ? (
                             <div className="text-center">
                               <div className="font-medium text-purple-600">
-                                {record.overtimeHours}h
+                                {formatCurrency(record.overtimeAmount || 0)}
                               </div>
                               <div className="text-xs text-purple-600">
-                                {formatCurrency(record.overtimeAmount || 0)}
+                                {record.overtimeHours}h
                               </div>
                             </div>
                           ) : (
@@ -1104,10 +1104,10 @@ const Payroll = () => {
                           {record.holidayDays > 0 ? (
                             <div className="text-center">
                               <div className="font-medium text-blue-600">
-                                {record.holidayDays} días
+                                {formatCurrency(record.holidayBonus || 0)}
                               </div>
                               <div className="text-xs text-blue-600">
-                                {formatCurrency(record.holidayBonus || 0)}
+                                {record.holidayDays} días
                               </div>
                             </div>
                           ) : (
@@ -1283,15 +1283,20 @@ const Payroll = () => {
                                     : ""
                               }
                             >
-                              {record.status === "processed"
-                                ? "Procesada"
-                                : record.status === "pending"
-                                  ? "Pendiente"
-                                  : record.status === "approved"
-                                    ? "Aprobada"
-                                    : record.status === "paid"
-                                      ? "Pagada"
-                                      : "Borrador"}
+                              <div className="flex items-center gap-1">
+                                {record.status === "paid" && (
+                                  <CheckCircle className="h-3 w-3" />
+                                )}
+                                {record.status === "processed"
+                                  ? "Procesada"
+                                  : record.status === "pending"
+                                    ? "Pendiente"
+                                    : record.status === "approved"
+                                      ? "Aprobada"
+                                      : record.status === "paid"
+                                        ? "Pagada"
+                                        : "Borrador"}
+                              </div>
                             </Badge>
                             {record.processedDate && (
                               <span className="text-xs text-muted-foreground">
