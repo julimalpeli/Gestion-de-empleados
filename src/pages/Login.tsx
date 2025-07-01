@@ -12,8 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import { LogIn, User, Shield, AlertTriangle, Eye, EyeOff } from "lucide-react";
-import { validateLogin, DEMO_USERS } from "@/hooks/use-auth";
+import {
+  LogIn,
+  User,
+  Shield,
+  AlertTriangle,
+  Eye,
+  EyeOff,
+  Mail,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import ForcePasswordChange from "@/components/ForcePasswordChange";
 
