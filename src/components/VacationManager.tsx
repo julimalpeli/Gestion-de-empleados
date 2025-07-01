@@ -100,8 +100,8 @@ const VacationManager = ({
     processVacation,
   } = useVacations(employee?.id);
 
-  const { hasPermission } = usePermissions();
-  const canApproveVacations = hasPermission("vacations", "approve");
+  const { hasPermission, isManager } = usePermissions();
+  const canApproveVacations = isManager(); // Only admin and manager can approve
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-AR");
