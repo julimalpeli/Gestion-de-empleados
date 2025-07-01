@@ -150,22 +150,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         localStorage.removeItem("user");
       }
     }
+  }, []);
 
-    // Set up activity detection to extend session
+  // Separate useEffect for activity detection to avoid infinite loops
+  useEffect(() => {
+    if (!user) return;
+
     let activityTimeout: NodeJS.Timeout;
 
     const resetActivityTimer = () => {
       clearTimeout(activityTimeout);
       activityTimeout = setTimeout(
         () => {
-          if (user) {
-            // Update last activity time
-            const extendedUser = {
-              ...user,
-              lastActivity: new Date().toISOString(),
-            };
-            setUser(extendedUser);
-            localStorage.setItem("user", JSON.stringify(extendedUser));
+          // Get current user from localStorage to avoid stale closure
+          const currentUser = localStorage.getItem("user");
+          if (currentUser) {
+            try {
+              const userData = JSON.parse(currentUser);
+              const extendedUser = {
+                ...userData,
+                lastActivity: new Date().toISOString(),
+              };
+              localStorage.setItem("user", JSON.stringify(extendedUser));
+            } catch (error) {
+              console.error("Error updating activity:", error);
+            }
           }
         },
         5 * 60 * 1000,
@@ -191,7 +200,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       clearTimeout(activityTimeout);
     };
-  }, [user]);
+  }, [user?.username]); // Only depend on username to avoid infinite loops
 
   // Security logging function
   const logSecurityEvent = (eventType: string, details: any) => {
