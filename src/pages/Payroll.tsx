@@ -1326,94 +1326,88 @@ const Payroll = () => {
                               </Tooltip>
                             </TooltipProvider>
 
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <DropdownMenu>
+                            <DropdownMenu>
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
                                       <Button variant="ghost" size="sm">
                                         <FileText className="h-4 w-4" />
                                       </Button>
                                     </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem
-                                        onClick={() => {
-                                          const emp = employees.find(
-                                            (e) =>
-                                              e.name === record.employeeName,
-                                          );
-                                          if (emp) {
-                                            generatePayrollReceiptPDF({
-                                              employee: {
-                                                name: emp.name,
-                                                dni: emp.dni,
-                                                position: emp.position,
-                                                startDate: emp.startDate,
-                                              },
-                                              payroll: record,
-                                              period: formatPeriod(
-                                                record.period,
-                                              ),
-                                              company: {
-                                                name: "Cadiz Bar",
-                                                address: "Dirección del Local",
-                                                phone: "Teléfono de Contacto",
-                                              },
-                                            });
-                                          } else {
-                                            alert(
-                                              "Error: No se encontró información del empleado",
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        <FileText className="h-4 w-4 mr-2" />
-                                        Generar PDF
-                                      </DropdownMenuItem>
-                                      <DropdownMenuItem
-                                        onClick={() => {
-                                          const emp = employees.find(
-                                            (e) =>
-                                              e.name === record.employeeName,
-                                          );
-                                          if (emp) {
-                                            generatePayrollReceiptExcel({
-                                              employee: {
-                                                name: emp.name,
-                                                dni: emp.dni,
-                                                position: emp.position,
-                                                startDate: emp.startDate,
-                                              },
-                                              payroll: record,
-                                              period: formatPeriod(
-                                                record.period,
-                                              ),
-                                              company: {
-                                                name: "Cadiz Bar",
-                                                address: "Dirección del Local",
-                                                phone: "Teléfono de Contacto",
-                                              },
-                                            });
-                                          } else {
-                                            alert(
-                                              "Error: No se encontró información del empleado",
-                                            );
-                                          }
-                                        }}
-                                      >
-                                        <div className="h-4 w-4 mr-2 text-center">
-                                          📊
-                                        </div>
-                                        Generar Excel
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Generar Recibo</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Generar Recibo</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                              <DropdownMenuContent>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    const emp = employees.find(
+                                      (e) => e.name === record.employeeName,
+                                    );
+                                    if (emp) {
+                                      generatePayrollReceiptPDF({
+                                        employee: {
+                                          name: emp.name,
+                                          dni: emp.dni,
+                                          position: emp.position,
+                                          startDate: emp.startDate,
+                                        },
+                                        payroll: record,
+                                        period: formatPeriod(record.period),
+                                        company: {
+                                          name: "Cadiz Bar",
+                                          address: "Dirección del Local",
+                                          phone: "Teléfono de Contacto",
+                                        },
+                                      });
+                                    } else {
+                                      alert(
+                                        "Error: No se encontró información del empleado",
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <FileText className="h-4 w-4 mr-2" />
+                                  Generar PDF
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => {
+                                    const emp = employees.find(
+                                      (e) => e.name === record.employeeName,
+                                    );
+                                    if (emp) {
+                                      generatePayrollReceiptExcel({
+                                        employee: {
+                                          name: emp.name,
+                                          dni: emp.dni,
+                                          position: emp.position,
+                                          startDate: emp.startDate,
+                                        },
+                                        payroll: record,
+                                        period: formatPeriod(record.period),
+                                        company: {
+                                          name: "Cadiz Bar",
+                                          address: "Dirección del Local",
+                                          phone: "Teléfono de Contacto",
+                                        },
+                                      });
+                                    } else {
+                                      alert(
+                                        "Error: No se encontró información del empleado",
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <div className="h-4 w-4 mr-2 text-center">
+                                    📊
+                                  </div>
+                                  Generar Excel
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
 
                             <TooltipProvider>
                               <Tooltip>
