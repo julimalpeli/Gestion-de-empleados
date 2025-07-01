@@ -50,7 +50,7 @@ export const ChangePasswordDialog = () => {
       console.error("Error changing password:", error);
       alert(
         "Error al cambiar contraseña: " +
-          (error.message || "Error desconocido"),
+          (error?.message || "Error desconocido"),
       );
     } finally {
       setIsLoading(false);
