@@ -5,7 +5,44 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || "YOUR_SUPABASE_URL";
 const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_ANON_KEY || "YOUR_SUPABASE_ANON_KEY";
 
+// Debug environment variables on startup
+console.log("🔧 Supabase Configuration:");
+console.log("   - URL:", supabaseUrl);
+console.log(
+  "   - Key configured:",
+  !!supabaseAnonKey && supabaseAnonKey !== "YOUR_SUPABASE_ANON_KEY",
+);
+console.log("   - Key starts with:", supabaseAnonKey?.slice(0, 20) + "...");
+
+if (
+  supabaseUrl === "YOUR_SUPABASE_URL" ||
+  supabaseAnonKey === "YOUR_SUPABASE_ANON_KEY"
+) {
+  console.error("❌ Supabase environment variables not configured!");
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Test connectivity function
+export const testSupabaseConnection = async () => {
+  try {
+    console.log("🔄 Testing Supabase connection...");
+    const { data, error } = await supabase
+      .from("employees")
+      .select("count", { count: "exact", head: true });
+
+    if (error) {
+      console.error("❌ Supabase connection test failed:", error);
+      return false;
+    }
+
+    console.log("✅ Supabase connection test successful");
+    return true;
+  } catch (error) {
+    console.error("❌ Supabase connection test error:", error);
+    return false;
+  }
+};
 
 // Database Types - Estas se generarán automáticamente después
 export interface Database {
