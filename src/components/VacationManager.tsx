@@ -209,10 +209,9 @@ const VacationManager = ({
   const isEligibleForVacations = vacationInfo?.eligibleForVacations || false;
   const monthsOfService = vacationInfo?.totalMonths || 0;
 
-  const availableDays =
-    employee && isEligibleForVacations
-      ? employee.vacationDays - totalDaysUsed
-      : 0;
+  const availableDays = employee
+    ? (isEligibleForVacations ? employee.vacationDays : 0) - totalDaysUsed
+    : 0;
 
   // Mostrar loading si está cargando
   if (loading) {
