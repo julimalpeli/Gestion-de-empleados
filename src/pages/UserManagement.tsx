@@ -163,17 +163,63 @@ const UserManagement = () => {
 
   const handleToggleUserStatus = async (user) => {
     const action = user.isActive ? "desactivar" : "activar";
-    if (
-      confirm(
-        `¿Estás seguro de que quieres ${action} el usuario ${user.username}?`,
-      )
-    ) {
-      try {
-        await updateUser(user.id, { isActive: !user.isActive });
-      } catch (error) {
-        console.error("Error toggling user status:", error);
-        alert(`Error al ${action} usuario`);
+
+    // 🛡️ PROTECCIÓN CRÍTICA: Prevenir desactivación del último administrador
+    if (user.role === "admin" && user.isActive) {
+      const activeAdmins = users.filter(
+        (u) => u.role === "admin" && u.isActive,
+      );
+
+      if (activeAdmins.length <= 1) {
+        alert(
+          `🚨 ACCIÓN BLOQUEADA: No se puede desactivar el último administrador del sistema.\n\nEsto causaría pérdida total de acceso administrativo.\n\nPrimero crea otro usuario administrador antes de desactivar este.`,
+        );
+        return;
       }
+
+      // Confirmación especial para administradores
+      const confirmed = confirm(
+        `⚠️ CONFIRMACIÓN CRÍTICA ⚠️\n\n` +
+          `Estás a punto de DESACTIVAR un usuario ADMINISTRADOR:\n` +
+          `• Usuario: ${user.username} (${user.name})\n` +
+          `• Email: ${user.email}\n\n` +
+          `Quedarán ${activeAdmins.length - 1} administradores activos.\n\n` +
+          `¿Confirmas esta acción crítica de seguridad?`,
+      );
+
+      if (!confirmed) return;
+
+      // Segunda confirmación
+      const doubleConfirmed = confirm(
+        `🔐 ÚLTIMA CONFIRMACIÓN 🔐\n\n` +
+          `Escribirás "CONFIRMAR" para proceder con la desactivación del administrador.\n\n` +
+          `¿Estás completamente seguro?`,
+      );
+
+      if (!doubleConfirmed) return;
+    } else {
+      // Confirmación normal para otros usuarios
+      const confirmed = confirm(
+        `¿Estás seguro de que quieres ${action} el usuario ${user.username}?`,
+      );
+
+      if (!confirmed) return;
+    }
+
+    try {
+      await updateUser(user.id, { isActive: !user.isActive });
+
+      // Log security event
+      console.log(`🔐 Security Event: USER_STATUS_CHANGED`, {
+        targetUser: user.username,
+        targetRole: user.role,
+        action: action,
+        performedBy: "current_admin", // In real app, get from auth context
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+      alert(`Error al ${action} usuario: ${error.message}`);
     }
   };
 
