@@ -92,6 +92,7 @@ const Payroll = () => {
   const [editingRecord, setEditingRecord] = useState(null);
   const [employeeFilter, setEmployeeFilter] = useState("active"); // Por defecto solo activos
   const [statusFilter, setStatusFilter] = useState("all");
+  const [periodFilter, setPeriodFilter] = useState("all");
   const [selectedPeriod, setSelectedPeriod] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
@@ -471,6 +472,9 @@ const Payroll = () => {
 
     // Filtro por estado
     if (statusFilter !== "all" && record.status !== statusFilter) return false;
+
+    // Filtro por período
+    if (periodFilter !== "all" && record.period !== periodFilter) return false;
 
     return true;
   });
@@ -964,57 +968,66 @@ const Payroll = () => {
       </div>
 
       {/* Payroll Records */}
-      <Tabs defaultValue="current" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="current">Período Actual</TabsTrigger>
-          <TabsTrigger value="history">Historial</TabsTrigger>
-        </TabsList>
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>Liquidaciones</CardTitle>
+            <CardDescription>
+              Gestión de todas las liquidaciones del sistema
+            </CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Filtros */}
+          <div className="mb-4 flex gap-4">
+            <Select
+              value={employeeFilter}
+              onValueChange={setEmployeeFilter}
+            >
+              <SelectTrigger className="w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">
+                  Solo empleados activos
+                </SelectItem>
+                <SelectItem value="all">Todos los empleados</SelectItem>
+                <SelectItem value="inactive">
+                  Solo empleados inactivos
+                </SelectItem>
+              </SelectContent>
+            </Select>
 
-        <TabsContent value="current">
-          <Card>
-            <CardHeader>
-              <div>
-                <CardTitle>Liquidaciones del Período</CardTitle>
-                <CardDescription>
-                  Estado actual de las liquidaciones registradas
-                </CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Filtros */}
-              <div className="mb-4 flex gap-4">
-                <Select
-                  value={employeeFilter}
-                  onValueChange={setEmployeeFilter}
-                >
-                  <SelectTrigger className="w-64">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">
-                      Solo empleados activos
-                    </SelectItem>
-                    <SelectItem value="all">Todos los empleados</SelectItem>
-                    <SelectItem value="inactive">
-                      Solo empleados inactivos
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filtrar por estado" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="draft">Borrador</SelectItem>
+                <SelectItem value="pending">Pendientes</SelectItem>
+                <SelectItem value="approved">Aprobadas</SelectItem>
+                <SelectItem value="processed">Procesadas</SelectItem>
+                <SelectItem value="paid">Pagadas</SelectItem>
+              </SelectContent>
+            </Select>
 
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Filtrar por estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los estados</SelectItem>
-                    <SelectItem value="draft">Borrador</SelectItem>
-                    <SelectItem value="pending">Pendientes</SelectItem>
-                    <SelectItem value="approved">Aprobadas</SelectItem>
-                    <SelectItem value="processed">Procesadas</SelectItem>
-                    <SelectItem value="paid">Pagadas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+            <Select value={periodFilter} onValueChange={setPeriodFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="Filtrar por período" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los períodos</SelectItem>
+                {Array.from(new Set(payrollRecords.map(r => r.period)))
+                  .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+                  .map(period => (
+                    <SelectItem key={period} value={period}>
+                      {formatPeriod(period)}
+                    </SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
 
               <div className="overflow-x-auto">
                 <Table>
@@ -1037,18 +1050,7 @@ const Payroll = () => {
                   </TableHeader>
                   <TableBody>
                     {filteredRecords
-                      .filter((record) => {
-                        const recordDate = new Date(
-                          record.period + "-01",
-                        ).getTime();
-                        const today = new Date();
-                        const currentMonth = new Date(
-                          today.getFullYear(),
-                          today.getMonth(),
-                          1,
-                        ).getTime();
-                        return recordDate >= currentMonth;
-                      })
+                      .sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime())
                       .map((record) => {
                         const employee = employees.find(
                           (e) => e.name === record.employeeName,
@@ -1358,401 +1360,8 @@ const Payroll = () => {
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="history">
-          <Card>
-            <CardHeader>
-              <CardTitle>Historial de Liquidaciones</CardTitle>
-              <CardDescription>
-                Consulta liquidaciones de períodos anteriores
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* Filtros */}
-              <div className="mb-4 flex gap-4">
-                <Select
-                  value={employeeFilter}
-                  onValueChange={setEmployeeFilter}
-                >
-                  <SelectTrigger className="w-64">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">
-                      Solo empleados activos
-                    </SelectItem>
-                    <SelectItem value="all">Todos los empleados</SelectItem>
-                    <SelectItem value="inactive">
-                      Solo empleados inactivos
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue placeholder="Filtrar por estado" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos los estados</SelectItem>
-                    <SelectItem value="draft">Borrador</SelectItem>
-                    <SelectItem value="pending">Pendientes</SelectItem>
-                    <SelectItem value="approved">Aprobadas</SelectItem>
-                    <SelectItem value="processed">Procesadas</SelectItem>
-                    <SelectItem value="paid">Pagadas</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Empleado</TableHead>
-                      <TableHead>Período</TableHead>
-                      <TableHead>Días</TableHead>
-                      <TableHead>Adelantos</TableHead>
-                      <TableHead>Descuentos</TableHead>
-                      <TableHead>Aguinaldo</TableHead>
-                      <TableHead>Adelantos</TableHead>
-                      <TableHead>Depósito</TableHead>
-                      <TableHead>Informal</TableHead>
-                      <TableHead>Presentismo</TableHead>
-                      <TableHead>Total Neto</TableHead>
-                      <TableHead>Estado</TableHead>
-                      <TableHead>Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRecords
-                      .filter((record) => {
-                        const recordDate = new Date(
-                          record.period + "-01",
-                        ).getTime();
-                        const today = new Date();
-                        const currentMonth = new Date(
-                          today.getFullYear(),
-                          today.getMonth(),
-                          1,
-                        ).getTime();
-                        return recordDate < currentMonth;
-                      })
-                      .sort(
-                        (a, b) =>
-                          new Date(b.period).getTime() -
-                          new Date(a.period).getTime(),
-                      )
-                      .map((record) => {
-                        const employee = employees.find(
-                          (e) => e.name === record.employeeName,
-                        );
-                        return (
-                          <TableRow key={record.id}>
-                            <TableCell className="font-medium">
-                              <div>
-                                <p>{record.employeeName}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  {employee?.position || "Sin posición"}
-                                </p>
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div>
-                                {formatPeriod(record.period)}
-                                {isAguinaldoPeriod(record.period) && (
-                                  <div className="text-xs text-green-600">
-                                    Período con aguinaldo
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="text-center">
-                                <div className="font-medium">
-                                  {record.baseDays}
-                                </div>
-                                {record.holidayDays > 0 && (
-                                  <div className="text-xs text-blue-600">
-                                    +{record.holidayDays} feriados
-                                  </div>
-                                )}
-                                {record.overtimeHours > 0 && (
-                                  <div className="text-xs text-purple-600">
-                                    +{record.overtimeHours}h extras
-                                  </div>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              {formatCurrency(record.advances)}
-                            </TableCell>
-                            <TableCell>
-                              {formatCurrency(record.discounts)}
-                            </TableCell>
-                            <TableCell className="font-medium text-green-600">
-                              {isAguinaldoPeriod(record.period)
-                                ? (() => {
-                                    const employee = employees.find(
-                                      (e) => e.name === record.employeeName,
-                                    );
-                                    if (!employee) return "-";
-
-                                    const correctAguinaldo = calculateAguinaldo(
-                                      employee,
-                                      record.period,
-                                    );
-                                    if (correctAguinaldo === 0) return "-";
-
-                                    // Determinar si es proporcional usando la lógica correcta
-                                    const [year, month] =
-                                      record.period.split("-");
-                                    const currentYear = parseInt(year);
-                                    const currentMonth = parseInt(month);
-
-                                    const semesterStart =
-                                      currentMonth === 6
-                                        ? new Date(currentYear, 0, 1)
-                                        : new Date(currentYear, 6, 1);
-
-                                    const semesterEnd =
-                                      currentMonth === 6
-                                        ? new Date(currentYear, 5, 30)
-                                        : new Date(currentYear, 11, 31);
-
-                                    const startDate = new Date(
-                                      employee.startDate,
-                                    );
-                                    const effectiveStartDate = new Date(
-                                      startDate,
-                                    );
-                                    effectiveStartDate.setDate(
-                                      effectiveStartDate.getDate() + 1,
-                                    );
-
-                                    const effectiveStart =
-                                      effectiveStartDate > semesterStart
-                                        ? effectiveStartDate
-                                        : semesterStart;
-
-                                    const totalSemesterDays =
-                                      Math.ceil(
-                                        (semesterEnd.getTime() -
-                                          semesterStart.getTime()) /
-                                          (1000 * 60 * 60 * 24),
-                                      ) + 1;
-
-                                    const daysWorked =
-                                      Math.ceil(
-                                        (semesterEnd.getTime() -
-                                          effectiveStart.getTime()) /
-                                          (1000 * 60 * 60 * 24),
-                                      ) + 1;
-
-                                    const isProportional =
-                                      daysWorked < totalSemesterDays;
-
-                                    return (
-                                      <div>
-                                        <div>
-                                          {formatCurrency(correctAguinaldo)}
-                                        </div>
-                                        {isProportional && (
-                                          <div className="text-xs text-green-700">
-                                            Proporcional
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })()
-                                : "-"}
-                            </TableCell>
-                            <TableCell>
-                              {formatCurrency(record.advances)}
-                            </TableCell>
-                            <TableCell>
-                              {formatCurrency(record.whiteAmount)}
-                            </TableCell>
-                            <TableCell>
-                              {formatCurrency(record.informalAmount)}
-                            </TableCell>
-                            <TableCell>
-                              {record.presentismoAmount > 0 ? (
-                                <span className="text-green-600 font-medium">
-                                  {formatCurrency(record.presentismoAmount)}
-                                </span>
-                              ) : (
-                                <span className="text-red-600">Perdido</span>
-                              )}
-                            </TableCell>
-                            <TableCell className="font-medium">
-                              {isAguinaldoPeriod(record.period)
-                                ? (() => {
-                                    const employee = employees.find(
-                                      (e) => e.name === record.employeeName,
-                                    );
-                                    if (employee) {
-                                      const correctAguinaldo =
-                                        calculateAguinaldo(
-                                          employee,
-                                          record.period,
-                                        );
-                                      return formatCurrency(
-                                        record.netTotal -
-                                          (record.aguinaldo || 0) +
-                                          correctAguinaldo,
-                                      );
-                                    }
-                                    return formatCurrency(record.netTotal);
-                                  })()
-                                : formatCurrency(record.netTotal)}
-                              {isAguinaldoPeriod(record.period) &&
-                                record.aguinaldo > 0 && (
-                                  <div className="text-xs text-green-600">
-                                    Incluye aguinaldo:{" "}
-                                    {formatCurrency(record.aguinaldo)}
-                                  </div>
-                                )}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col gap-1">
-                                <Badge
-                                  variant={
-                                    record.status === "processed"
-                                      ? "default"
-                                      : record.status === "pending"
-                                        ? "secondary"
-                                        : record.status === "approved"
-                                          ? "default"
-                                          : record.status === "paid"
-                                            ? "default"
-                                            : "outline"
-                                  }
-                                  className={
-                                    record.status === "paid"
-                                      ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                      : record.status === "approved"
-                                        ? "bg-blue-100 text-blue-800 hover:bg-blue-100"
-                                        : ""
-                                  }
-                                >
-                                  {record.status === "processed"
-                                    ? "Procesada"
-                                    : record.status === "pending"
-                                      ? "Pendiente"
-                                      : record.status === "approved"
-                                        ? "Aprobada"
-                                        : record.status === "paid"
-                                          ? "Pagada"
-                                          : "Borrador"}
-                                </Badge>
-                                {record.processedDate && (
-                                  <span className="text-xs text-muted-foreground">
-                                    {new Date(
-                                      record.processedDate,
-                                    ).toLocaleDateString("es-AR")}
-                                  </span>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex gap-1">
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => handleEditRecord(record)}
-                                        disabled={
-                                          record.status === "paid" ||
-                                          (record.status === "processed" &&
-                                            !isAdmin())
-                                        }
-                                      >
-                                        <Calculator className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Editar liquidación</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() =>
-                                          generatePayrollReceiptPDF(
-                                            record,
-                                            employee,
-                                          )
-                                        }
-                                      >
-                                        <FileText className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Generar PDF</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setSelectedPayrollRecord(record);
-                                          setSelectedEmployeeForDocs(employee);
-                                          setIsPayrollDocManagerOpen(true);
-                                        }}
-                                      >
-                                        <FileText className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Gestionar documentos</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-
-                                <TooltipProvider>
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        onClick={() => {
-                                          setRecordToDelete(record);
-                                          setDeleteConfirmOpen(true);
-                                        }}
-                                        disabled={record.status === "paid"}
-                                      >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <p>Eliminar liquidación</p>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                </TooltipProvider>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                  </TableBody>
-                </Table>
-              </div>
             </CardContent>
           </Card>
-        </TabsContent>
-      </Tabs>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
