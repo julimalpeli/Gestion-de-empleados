@@ -273,14 +273,27 @@ const VacationManager = ({
         <div className="space-y-6">
           {/* Vacation Balance */}
           {!isEligibleForVacations && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <div className="flex items-center gap-2 text-yellow-800">
+                <AlertTriangle className="h-5 w-5" />
+                <div>
+                  <p className="font-medium">Vacaciones no disponibles</p>
+                  <p className="text-sm">
+                    El empleado necesita 6 meses de antigüedad para acceder a
+                    vacaciones. Tiempo actual: {monthsOfService} meses.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+          {!isEligibleForVacations && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
               <div className="flex items-center gap-2 text-blue-800">
                 <Calendar className="h-5 w-5" />
                 <div>
                   <p className="font-medium">Vacaciones por adelantado</p>
                   <p className="text-sm">
-                    El empleado tiene {monthsOfService} meses de antigüedad. Las
-                    vacaciones aprobadas serán deuda hasta cumplir 6 meses.
+                    Las vacaciones aprobadas serán deuda hasta cumplir 6 meses.
                   </p>
                 </div>
               </div>
