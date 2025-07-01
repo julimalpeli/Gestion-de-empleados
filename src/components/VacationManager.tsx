@@ -389,7 +389,7 @@ const VacationManager = ({
                     }
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="reason">Motivo</Label>
                   <Input
                     id="reason"
@@ -399,24 +399,6 @@ const VacationManager = ({
                       setNewVacation({ ...newVacation, reason: e.target.value })
                     }
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="status">Estado</Label>
-                  <Select
-                    value={newVacation.status}
-                    onValueChange={(value) =>
-                      setNewVacation({ ...newVacation, status: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="pending">Pendiente</SelectItem>
-                      <SelectItem value="approved">Aprobado</SelectItem>
-                      <SelectItem value="rejected">Rechazado</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
               </div>
 
