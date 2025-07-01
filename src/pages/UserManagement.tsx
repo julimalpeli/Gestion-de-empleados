@@ -428,6 +428,17 @@ const UserManagement = () => {
               Admin Emergencia
             </Button>
 
+            {/* Botón restablecer admin */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={resetAdminPassword}
+              className="border-red-300 text-red-700 hover:bg-red-50"
+            >
+              <Key className="h-4 w-4 mr-2" />
+              Reset Admin
+            </Button>
+
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
