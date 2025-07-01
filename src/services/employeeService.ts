@@ -18,6 +18,9 @@ export class SupabaseEmployeeService implements IEmployeeService {
         !!import.meta.env.VITE_SUPABASE_ANON_KEY,
       );
 
+      // Test basic connectivity first
+      console.log("🔍 Testing Supabase connectivity...");
+
       const { data, error } = await supabase
         .from("employees")
         .select("*")
@@ -45,6 +48,25 @@ export class SupabaseEmployeeService implements IEmployeeService {
       return mappedData;
     } catch (error) {
       console.error("❌ Error fetching employees:", error);
+
+      // Check if it's a network error
+      if (error instanceof TypeError && error.message === "Failed to fetch") {
+        console.error("🌐 Network connectivity issue detected");
+        console.error("🔧 Checking environment variables...");
+        console.error(
+          "   - VITE_SUPABASE_URL:",
+          import.meta.env.VITE_SUPABASE_URL,
+        );
+        console.error(
+          "   - VITE_SUPABASE_ANON_KEY:",
+          import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0, 20) + "...",
+        );
+
+        throw new Error(
+          "Error de conectividad: No se puede conectar a la base de datos. Verifique su conexión a internet y configuración.",
+        );
+      }
+
       if (error instanceof Error) {
         throw error; // Re-throw the original error with details
       }
