@@ -120,9 +120,16 @@ const Dashboard = () => {
       {/* Header */}
       <div className="flex items-center gap-4 border-b border-border pb-4">
         <SidebarTrigger />
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">Resumen de {currentMonth}</p>
+          {/* Debug Info */}
+          <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+            <strong>Debug:</strong> Empleados: {employees.length} |
+            Liquidaciones: {payrollRecords.length} | Activos:{" "}
+            {activeEmployees.length} | Período actual: {currentPeriod} |
+            Liquidaciones mes: {currentMonthPayrolls.length}
+          </div>
         </div>
       </div>
 
