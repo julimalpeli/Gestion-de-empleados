@@ -21,6 +21,24 @@ import AuthRedirect from "@/components/AuthRedirect";
 
 const queryClient = new QueryClient();
 
+// Loading component for auth state
+const AuthLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+          <p className="text-sm text-muted-foreground">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider delayDuration={200}>
