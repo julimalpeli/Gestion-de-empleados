@@ -1331,9 +1331,18 @@ const Payroll = () => {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => {
-                                      setSelectedPayrollRecord(record);
-                                      setSelectedEmployeeForDocs(employee);
-                                      setIsPayrollDocManagerOpen(true);
+                                      const emp = employees.find(
+                                        (e) => e.name === record.employeeName,
+                                      );
+                                      if (emp) {
+                                        setSelectedPayrollRecord(record);
+                                        setSelectedEmployeeForDocs(emp);
+                                        setIsPayrollDocManagerOpen(true);
+                                      } else {
+                                        alert(
+                                          "Error: No se encontró información del empleado",
+                                        );
+                                      }
                                     }}
                                   >
                                     <FileText className="h-4 w-4" />
