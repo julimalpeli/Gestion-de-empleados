@@ -27,8 +27,14 @@ export const debugAuth = async () => {
       canQuery: !testError,
       error: testError?.message,
       errorCode: testError?.code,
+      errorDetails: testError?.details,
+      errorHint: testError?.hint,
       dataCount: testQuery?.length || 0,
     });
+
+    if (testError) {
+      console.error("🎯 Full database error:", testError);
+    }
 
     // 3. Test auth context function (if it exists)
     try {
