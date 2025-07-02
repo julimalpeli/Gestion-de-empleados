@@ -925,7 +925,7 @@ const EmployeePortal = () => {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {documents.map((doc) => (
+                        {allDocuments.map((doc) => (
                           <TableRow key={doc.id}>
                             <TableCell className="font-medium">
                               {doc.originalFileName}
