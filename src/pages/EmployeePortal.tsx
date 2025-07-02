@@ -66,9 +66,15 @@ const EmployeePortal = () => {
     documentsError,
   });
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Error during logout:", error);
+    } finally {
+      // Always navigate to login, even if logout fails
+      navigate("/login");
+    }
   };
 
   const handleDownloadReceipt = async (record) => {
