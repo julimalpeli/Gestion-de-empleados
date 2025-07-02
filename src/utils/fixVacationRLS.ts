@@ -23,8 +23,8 @@ export const fixVacationRLS = async () => {
       FOR INSERT WITH CHECK (
         -- Admin users can insert for anyone
         EXISTS (
-          SELECT 1 FROM public.users 
-          WHERE users.id = auth.uid() 
+          SELECT 1 FROM public.users
+          WHERE users.id = auth.uid()
           AND users.role IN ('admin', 'manager', 'hr')
           AND users.is_active = true
         )
@@ -47,7 +47,11 @@ export const fixVacationRLS = async () => {
     });
 
     if (insertError) {
-      console.error("❌ Error creating INSERT policy:", insertError);
+      console.error("❌ Error creating INSERT policy:");
+      console.error("   - Message:", insertError.message);
+      console.error("   - Code:", insertError.code);
+      console.error("   - Details:", insertError.details);
+      console.error("   - Full error:", JSON.stringify(insertError, null, 2));
       throw insertError;
     }
 
@@ -56,8 +60,8 @@ export const fixVacationRLS = async () => {
       CREATE POLICY "vacation_requests_select_policy" ON public.vacation_requests
       FOR SELECT USING (
         EXISTS (
-          SELECT 1 FROM public.users 
-          WHERE users.id = auth.uid() 
+          SELECT 1 FROM public.users
+          WHERE users.id = auth.uid()
           AND users.role IN ('admin', 'manager', 'hr')
           AND users.is_active = true
         )
@@ -86,8 +90,8 @@ export const fixVacationRLS = async () => {
       CREATE POLICY "vacation_requests_update_policy" ON public.vacation_requests
       FOR UPDATE USING (
         EXISTS (
-          SELECT 1 FROM public.users 
-          WHERE users.id = auth.uid() 
+          SELECT 1 FROM public.users
+          WHERE users.id = auth.uid()
           AND users.role IN ('admin', 'manager', 'hr')
           AND users.is_active = true
         )
@@ -95,8 +99,8 @@ export const fixVacationRLS = async () => {
         (employee_id = auth.uid() AND status = 'pending')
       ) WITH CHECK (
         EXISTS (
-          SELECT 1 FROM public.users 
-          WHERE users.id = auth.uid() 
+          SELECT 1 FROM public.users
+          WHERE users.id = auth.uid()
           AND users.role IN ('admin', 'manager', 'hr')
           AND users.is_active = true
         )
@@ -118,8 +122,8 @@ export const fixVacationRLS = async () => {
       CREATE POLICY "vacation_requests_delete_policy" ON public.vacation_requests
       FOR DELETE USING (
         EXISTS (
-          SELECT 1 FROM public.users 
-          WHERE users.id = auth.uid() 
+          SELECT 1 FROM public.users
+          WHERE users.id = auth.uid()
           AND users.role IN ('admin', 'manager')
           AND users.is_active = true
         )
