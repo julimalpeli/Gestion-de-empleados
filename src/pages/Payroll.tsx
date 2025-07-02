@@ -1321,7 +1321,7 @@ const Payroll = () => {
                         <TableCell className="font-medium text-blue-600">
                           {formatCurrency(record.bonusAmount || 0)}
                         </TableCell>
-                        <TableCell className="font-medium text-green-600">
+                        <TableCell className="font-medium text-blue-600">
                           {isAguinaldoPeriod(record.period)
                             ? (() => {
                                 const employee = employees.find(
@@ -1393,22 +1393,22 @@ const Payroll = () => {
                               })()
                             : "-"}
                         </TableCell>
-                        <TableCell className="font-medium text-blue-600">
+                        <TableCell className="font-medium">
                           {formatCurrency(record.whiteAmount)}
                         </TableCell>
-                        <TableCell className="font-medium text-gray-600">
+                        <TableCell className="font-medium">
                           {formatCurrency(record.informalAmount)}
                         </TableCell>
                         <TableCell>
                           {record.presentismoAmount > 0 ? (
-                            <span className="text-green-600 font-medium">
+                            <span className="text-blue-600 font-medium">
                               {formatCurrency(record.presentismoAmount)}
                             </span>
                           ) : (
                             <span className="text-red-600">Perdido</span>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium text-green-600">
+                        <TableCell className="font-bold">
                           <div>
                             <div>{formatCurrency(record.netTotal)}</div>
                             {isAguinaldoPeriod(record.period) &&
