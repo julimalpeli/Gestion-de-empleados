@@ -139,6 +139,7 @@ export const getFallbackEmployeeData = (email: string) => {
       employee: fallbackEmployeeData,
       payroll: fallbackPayrollData,
       vacations: fallbackVacationData,
+      documents: fallbackDocumentData,
     };
   }
 
@@ -160,5 +161,6 @@ export const getFallbackEmployeeData = (email: string) => {
     },
     payroll: [],
     vacations: [],
+    documents: [],
   };
 };
