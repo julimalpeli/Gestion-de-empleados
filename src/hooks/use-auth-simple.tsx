@@ -117,8 +117,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Load user profile
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
+      console.log("🔍 Loading user profile for:", supabaseUser.email);
+
       // Admin fallback
       if (supabaseUser.email === "julimalpeli@gmail.com") {
+        console.log("👑 Admin user detected");
         const adminUser: User = {
           id: supabaseUser.id,
           username: "admin",
@@ -136,6 +139,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // Try to load from database
+      console.log("🔄 Querying database for user profile...");
       const { data: users, error } = await supabase
         .from("users")
         .select("*")
@@ -143,12 +147,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq("is_active", true)
         .limit(1);
 
-      if (error || !users?.[0]) {
-        // Fallback for other users
+      console.log("📊 Database query result:", {
+        users: users?.length,
+        error: error?.message,
+      });
+
+      if (error) {
+        console.warn("⚠️ Database error, using fallback user:", error.message);
+        // Fallback for database errors
         const fallbackUser: User = {
           id: supabaseUser.id,
           username: supabaseUser.email?.split("@")[0] || "user",
-          name: supabaseUser.user_metadata?.name || "User",
+          name: supabaseUser.user_metadata?.name || "Usuario",
+          role: "employee",
+          email: supabaseUser.email || "",
+          permissions: getRolePermissions("employee"),
+          loginTime: new Date().toISOString(),
+          needsPasswordChange: false,
+          supabaseUser,
+        };
+        setUser(fallbackUser);
+        return;
+      }
+
+      if (!users?.[0]) {
+        console.warn("⚠️ No user found in database, using fallback");
+        // Fallback for users not found in database
+        const fallbackUser: User = {
+          id: supabaseUser.id,
+          username: supabaseUser.email?.split("@")[0] || "user",
+          name: supabaseUser.user_metadata?.name || "Usuario",
           role: "employee",
           email: supabaseUser.email || "",
           permissions: getRolePermissions("employee"),
