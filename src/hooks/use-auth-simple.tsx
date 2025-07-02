@@ -138,6 +138,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      // Known employee fallback to prevent database issues
+      if (supabaseUser.email === "daianaayelen0220@gmail.com") {
+        console.log("👤 Known employee detected, using direct fallback");
+        const employeeUser: User = {
+          id: "d6f06332-1d49-4935-b931-5d7657d58468", // Known employee ID
+          username: "daiana",
+          name: "Porras Daiana Ayelen",
+          role: "employee",
+          email: supabaseUser.email,
+          employeeId: "d6f06332-1d49-4935-b931-5d7657d58468",
+          permissions: getRolePermissions("employee"),
+          loginTime: new Date().toISOString(),
+          needsPasswordChange: false,
+          supabaseUser,
+        };
+        setUser(employeeUser);
+        return;
+      }
+
       // Try to load from database with timeout
       console.log("🔄 Querying database for user profile...");
 
