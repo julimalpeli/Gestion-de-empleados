@@ -21,15 +21,6 @@ const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   try {
     const { isAuthenticated, user } = useAuth();
-
-    // Debug logging
-    console.log("🔒 ProtectedRoute check:", {
-      path: window.location.pathname,
-      isAuthenticated,
-      userRole: user?.role,
-      requiredRole,
-      allowedRoles,
-    });
     const {
       hasPermission,
       hasAllPermissions,
