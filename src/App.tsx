@@ -26,7 +26,7 @@ const AuthLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
   const { loading } = useAuth();
 
   // Only show loading on initial app load, not on login page
-  if (loading && window.location.pathname !== "/login") {
+  if (loading && window.location.pathname !== '/login') {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -47,115 +47,114 @@ const App = () => (
       <Sonner />
       <AuthProvider>
         <BrowserRouter>
-          <AuthLoadingWrapper>
-            <Routes>
-              {/* Public routes */}
-              <Route path="/login" element={<Login />} />
-              <Route path="/unauthorized" element={<Unauthorized />} />
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-              {/* Employee portal */}
-              <Route
-                path="/portal-empleado"
-                element={
-                  <ProtectedRoute requiredRole="employee">
-                    <EmployeePortal />
-                  </ProtectedRoute>
-                }
-              />
+            {/* Employee portal */}
+            <Route
+              path="/portal-empleado"
+              element={
+                <ProtectedRoute requiredRole="employee">
+                  <EmployeePortal />
+                </ProtectedRoute>
+              }
+            />
 
-              {/* Dashboard with sidebar - Allow admin, manager, hr */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["admin", "manager", "hr", "readonly"]}
-                  >
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto">
-                        <Index />
-                      </main>
-                    </SidebarProvider>
-                  </ProtectedRoute>
-                }
-              />
+            {/* Dashboard with sidebar - Allow admin, manager, hr */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute
+                  allowedRoles={["admin", "manager", "hr", "readonly"]}
+                >
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Index />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path="/empleados"
-                element={
-                  <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto">
-                        <Employees />
-                      </main>
-                    </SidebarProvider>
-                  </ProtectedRoute>
-                }
-              />
+            <Route
+              path="/empleados"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Employees />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path="/liquidaciones"
-                element={
-                  <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto">
-                        <Payroll />
-                      </main>
-                    </SidebarProvider>
-                  </ProtectedRoute>
-                }
-              />
+            <Route
+              path="/liquidaciones"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Payroll />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path="/reportes"
-                element={
-                  <ProtectedRoute
-                    allowedRoles={["admin", "manager", "hr", "readonly"]}
-                  >
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto">
-                        <Reports />
-                      </main>
-                    </SidebarProvider>
-                  </ProtectedRoute>
-                }
-              />
+            <Route
+              path="/reportes"
+              element={
+                <ProtectedRoute
+                  allowedRoles={["admin", "manager", "hr", "readonly"]}
+                >
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Reports />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
 
-              <Route
-                path="/roles"
-                element={
-                  <ProtectedRoute allowedRoles={["admin", "manager"]}>
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto">
-                        <UserRoles />
-                      </main>
-                    </SidebarProvider>
-                  </ProtectedRoute>
-                }
-              />
+            <Route
+              path="/roles"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <UserRoles />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
 
-              {/* User Management - Solo Admin */}
-              <Route
-                path="/usuarios"
-                element={
-                  <ProtectedRoute requiredRole="admin">
-                    <SidebarProvider>
-                      <AppSidebar />
-                      <main className="flex-1 overflow-auto">
-                        <UserManagement />
-                      </main>
-                    </SidebarProvider>
-                  </ProtectedRoute>
-                }
-              />
+            {/* User Management - Solo Admin */}
+            <Route
+              path="/usuarios"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <UserManagement />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
 
-              {/* Fallback routes */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            {/* Fallback routes */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           </AuthLoadingWrapper>
         </BrowserRouter>
       </AuthProvider>
