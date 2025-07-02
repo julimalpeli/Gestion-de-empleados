@@ -2,7 +2,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import "@/utils/recreateEmployeeUsers";
+// Load recreation utilities for development
+if (import.meta.env.DEV) {
+  import("@/utils/recreateEmployeeUsers").then((module) => {
+    (window as any).recreateEmployeeUsers = module.recreateEmployeeUsers;
+    (window as any).checkEmployeeUserStatus = module.checkEmployeeUserStatus;
+    console.log("🔧 Dev tools loaded:");
+    console.log("   - recreateEmployeeUsers()");
+    console.log("   - checkEmployeeUserStatus()");
+  });
+}
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Employees from "./pages/Employees";
