@@ -478,11 +478,6 @@ const EmployeePortal = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Teléfono</label>
-                    <p className="text-lg">{employeeData.phone}</p>
-                  </div>
-
-                  <div className="space-y-2">
                     <label className="text-sm font-medium">Email</label>
                     <p className="text-lg">
                       {employeeData.email || (
