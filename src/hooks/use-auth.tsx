@@ -317,6 +317,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // User profile will be loaded automatically by onAuthStateChange
       console.log("✅ Login successful:", data.user.email);
+
+      // Ensure loading clears after 2 seconds max
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     } catch (error) {
       setLoading(false);
       console.error("❌ Login error:", error);
