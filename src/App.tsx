@@ -14,14 +14,15 @@ if (import.meta.env.DEV) {
   import("@/utils/authDebugConsole").then((module) => {
     (window as any).debugAuth = module.debugAuth;
   });
-  import("@/utils/fixVacationRLS").then((module) => {
-    (window as any).fixVacationRLS = module.fixVacationRLS;
+  import("@/utils/fixVacationCreation").then((module) => {
+    (window as any).testVacationCreation = module.testVacationCreation;
+    (window as any).createVacationAsAdmin = module.createVacationAsAdmin;
   });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
   console.log("   - debugAuth()");
-  console.log("   - fixVacationRLS()");
+  console.log("   - testVacationCreation()");
   console.log("   - recreateEmployee44586777()");
   console.log("   - checkAuthContext()");
 }
