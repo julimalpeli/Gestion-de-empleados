@@ -99,10 +99,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         session?.user?.id,
         session?.user?.email,
       );
-      setSession(session);
-      if (session?.user) {
+
+      if (event === "SIGNED_OUT") {
+        console.log("👋 User signed out, clearing state");
+        setSession(null);
+        setUser(null);
+        return;
+      }
+
+      if (event === "SIGNED_IN" && session?.user) {
+        console.log("👋 User signed in, loading profile");
+        setSession(session);
         await loadUserProfile(session.user);
-      } else {
+        return;
+      }
+
+      if (event === "TOKEN_REFRESHED" && session?.user) {
+        console.log("🔄 Token refreshed");
+        setSession(session);
+        return;
+      }
+
+      // For any other event without a valid session, clear state
+      if (!session?.user) {
+        console.log("❌ No valid session in auth change, clearing state");
+        setSession(null);
         setUser(null);
       }
     });
