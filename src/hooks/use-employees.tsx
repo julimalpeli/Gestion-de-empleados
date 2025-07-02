@@ -6,6 +6,7 @@ import type {
   UpdateEmployeeRequest,
 } from "@/services/interfaces";
 import { useUsers } from "@/hooks/use-users";
+import { getFallbackEmployeeData } from "@/utils/offlineFallback";
 
 export const useEmployees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
