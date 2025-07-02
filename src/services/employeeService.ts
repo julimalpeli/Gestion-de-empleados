@@ -158,6 +158,15 @@ export class SupabaseEmployeeService implements IEmployeeService {
     employee: UpdateEmployeeRequest,
   ): Promise<Employee> {
     try {
+      console.log(`🔄 Updating employee ${id} with data:`, employee);
+
+      // First, check if the employee exists
+      const existingEmployee = await this.getEmployeeById(id);
+      if (!existingEmployee) {
+        throw new Error(`Employee with ID ${id} does not exist`);
+      }
+      console.log("✅ Employee exists:", existingEmployee.name);
+
       const updateData: any = {};
 
       if (employee.name) updateData.name = employee.name;
