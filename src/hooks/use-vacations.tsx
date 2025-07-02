@@ -133,11 +133,40 @@ export const useVacations = (employeeId?: string) => {
 
       console.log("📝 Insert data:", insertData);
 
-      const { data, error } = await supabase
-        .from("vacation_requests")
-        .insert(insertData)
-        .select()
-        .single();
+      let data, error;
+
+      // If admin/manager creating for someone else, use the special function
+      if (
+        (currentUser?.role === "admin" || currentUser?.role === "manager") &&
+        vacation.employeeId !== session?.user?.id
+      ) {
+        console.log(
+          "🔧 Using admin function to create vacation for another employee",
+        );
+
+        const { data: functionResult, error: functionError } =
+          await supabase.rpc("create_vacation_request_as_admin", {
+            p_employee_id: vacation.employeeId,
+            p_start_date: vacation.startDate,
+            p_end_date: vacation.endDate,
+            p_days: vacation.days,
+            p_reason: vacation.reason,
+            p_status: "approved",
+          });
+
+        data = functionResult;
+        error = functionError;
+      } else {
+        // Regular insert for employees creating their own vacations
+        const { data: insertResult, error: insertError } = await supabase
+          .from("vacation_requests")
+          .insert(insertData)
+          .select()
+          .single();
+
+        data = insertResult;
+        error = insertError;
+      }
 
       if (error) {
         console.error("❌ Supabase error creating vacation:");
