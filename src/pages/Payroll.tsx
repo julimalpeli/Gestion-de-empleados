@@ -1393,12 +1393,6 @@ const Payroll = () => {
                               })()
                             : "-"}
                         </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(record.whiteAmount)}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {formatCurrency(record.informalAmount)}
-                        </TableCell>
                         <TableCell>
                           {record.presentismoAmount > 0 ? (
                             <span className="text-blue-600 font-medium">
@@ -1407,6 +1401,12 @@ const Payroll = () => {
                           ) : (
                             <span className="text-red-600">Perdido</span>
                           )}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(record.whiteAmount)}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {formatCurrency(record.informalAmount)}
                         </TableCell>
                         <TableCell className="font-bold">
                           <div>
