@@ -1,4 +1,4 @@
-import { useAuth } from "./use-auth";
+import { useAuth } from "./use-auth-simple";
 
 export interface Permission {
   module: string;
