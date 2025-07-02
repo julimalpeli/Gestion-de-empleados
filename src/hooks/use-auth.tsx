@@ -146,12 +146,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const { data: userProfile, error } = await supabase
         .from("users")
-        .select(
-          `
-          *,
-          employee:employees(id, name)
-        `,
-        )
+        .select("*")
         .eq("email", supabaseUser.email)
         .eq("is_active", true)
         .single();
