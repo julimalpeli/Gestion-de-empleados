@@ -27,19 +27,34 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export const testSupabaseConnection = async () => {
   try {
     console.log("🔄 Testing Supabase connection...");
+    console.log("   - URL:", supabaseUrl);
+    console.log("   - Key length:", supabaseAnonKey?.length || 0);
+
     const { data, error } = await supabase
       .from("employees")
       .select("count", { count: "exact", head: true });
 
     if (error) {
-      console.error("❌ Supabase connection test failed:", error);
+      console.error("❌ Supabase connection test failed:");
+      console.error("   - Error code:", error.code);
+      console.error("   - Error message:", error.message);
+      console.error("   - Error details:", error.details);
+      console.error("   - Error hint:", error.hint);
+      console.error("   - Full error:", error);
       return false;
     }
 
     console.log("✅ Supabase connection test successful");
+    console.log("   - Data:", data);
     return true;
   } catch (error) {
-    console.error("❌ Supabase connection test error:", error);
+    console.error("❌ Supabase connection test exception:");
+    console.error("   - Error type:", typeof error);
+    console.error(
+      "   - Error message:",
+      error instanceof Error ? error.message : String(error),
+    );
+    console.error("   - Full error:", error);
     return false;
   }
 };
