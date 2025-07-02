@@ -1238,6 +1238,7 @@ const Payroll = () => {
                   <TableHead>Feriados</TableHead>
                   <TableHead>Adelantos</TableHead>
                   <TableHead>Descuentos</TableHead>
+                  <TableHead>Bono</TableHead>
                   <TableHead>Aguinaldo</TableHead>
                   <TableHead>Depósito</TableHead>
                   <TableHead>Informal</TableHead>
