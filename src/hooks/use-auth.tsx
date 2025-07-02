@@ -91,19 +91,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         console.log("🔄 Getting initial session...");
 
-        // Add race condition to prevent hanging
-        const sessionPromise = supabase.auth.getSession();
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error("Session timeout")), 2000),
-        );
-
         const {
           data: { session },
           error,
-        } = (await Promise.race([sessionPromise, timeoutPromise])) as any;
+        } = await supabase.auth.getSession();
 
         if (error) {
-          console.error("❌ Error getting session:", error);
+          console.warn(
+            "⚠️ Error getting session (will continue):",
+            error.message,
+          );
           if (mounted) setLoading(false);
           return;
         }
@@ -114,12 +111,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSession(session);
           if (session?.user) {
             console.log("🔄 Loading user profile...");
-            await loadUserProfile(session.user);
+            try {
+              await loadUserProfile(session.user);
+            } catch (profileError) {
+              console.warn(
+                "⚠️ Error loading profile (will continue):",
+                profileError,
+              );
+            }
           }
           setLoading(false);
         }
       } catch (error) {
-        console.error("❌ Error in getInitialSession:", error);
+        console.warn("⚠️ Error in getInitialSession (will continue):", error);
         if (mounted) setLoading(false);
       }
     };
