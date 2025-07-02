@@ -79,41 +79,48 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Add timeout to prevent infinite loading
+    // Force loading to false after 3 seconds max
     const loadingTimeout = setTimeout(() => {
       if (mounted) {
-        console.warn("Auth loading timeout - forcing loading to false");
+        console.warn("🔥 Auth loading timeout - forcing to false");
         setLoading(false);
       }
-    }, 10000); // 10 second timeout
+    }, 3000);
 
     const getInitialSession = async () => {
       try {
+        console.log("🔄 Getting initial session...");
+
+        // Add race condition to prevent hanging
+        const sessionPromise = supabase.auth.getSession();
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Session timeout")), 2000),
+        );
+
         const {
           data: { session },
           error,
-        } = await supabase.auth.getSession();
+        } = (await Promise.race([sessionPromise, timeoutPromise])) as any;
 
         if (error) {
-          console.error("Error getting session:", error);
+          console.error("❌ Error getting session:", error);
           if (mounted) setLoading(false);
           return;
         }
 
+        console.log("✅ Got session:", !!session);
+
         if (mounted) {
           setSession(session);
           if (session?.user) {
+            console.log("🔄 Loading user profile...");
             await loadUserProfile(session.user);
           }
+          setLoading(false);
         }
       } catch (error) {
-        console.error("Error in getInitialSession:", error);
+        console.error("❌ Error in getInitialSession:", error);
         if (mounted) setLoading(false);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-          clearTimeout(loadingTimeout);
-        }
       }
     };
 
