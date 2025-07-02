@@ -173,17 +173,27 @@ const VacationManager = ({
   };
 
   const handleDeleteVacation = async (vacationId) => {
+    console.log("🗑️ handleDeleteVacation called with ID:", vacationId);
+
     if (
       confirm(
         "¿Estás seguro de que quieres eliminar esta solicitud de vacaciones?",
       )
     ) {
+      console.log("✅ User confirmed deletion");
       try {
+        console.log("🔄 Calling deleteVacation function...");
         await deleteVacation(vacationId);
+        console.log("✅ deleteVacation completed successfully");
+        alert("Solicitud de vacación eliminada exitosamente");
       } catch (error) {
-        console.error("Error deleting vacation:", error);
-        alert("Error al eliminar vacación");
+        console.error("❌ Error deleting vacation:", error);
+        console.error("   - Error message:", error.message);
+        console.error("   - Full error:", error);
+        alert("Error al eliminar vacación: " + error.message);
       }
+    } else {
+      console.log("❌ User cancelled deletion");
     }
   };
 
