@@ -201,13 +201,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .limit(1);
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Database query timeout")), 5000),
+        setTimeout(() => reject(new Error("Database query timeout")), 3000),
       );
 
-      const { data: users, error } = (await Promise.race([
-        queryPromise,
-        timeoutPromise,
-      ])) as any;
+      let users, error;
+      try {
+        const result = (await Promise.race([
+          queryPromise,
+          timeoutPromise,
+        ])) as any;
+        users = result.data;
+        error = result.error;
+      } catch (timeoutError) {
+        console.warn("⏰ Database query timed out, using fallback");
+        users = null;
+        error = timeoutError;
+      }
 
       console.log("📊 User query result:", {
         users,
