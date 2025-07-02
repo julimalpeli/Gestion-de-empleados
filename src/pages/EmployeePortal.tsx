@@ -865,35 +865,12 @@ const EmployeePortal = () => {
                       <div className="text-xs text-blue-700">Días tomados</div>
                     </div>
                     <div>
-                      <div
-                        className={`font-medium ${
-                          employeeData.isEligibleForVacations
-                            ? "text-green-700"
-                            : employeeData.vacationsTaken > 0
-                              ? "text-red-600"
-                              : "text-gray-600"
-                        }`}
-                      >
-                        {employeeData.isEligibleForVacations
-                          ? employeeData.vacationDays -
-                            employeeData.vacationsTaken
-                          : -employeeData.vacationsTaken}
+                      <div className="font-medium text-green-700">
+                        {(employeeData.isEligibleForVacations
+                          ? employeeData.vacationDays
+                          : 0) - employeeData.vacationsTaken}
                       </div>
-                      <div
-                        className={`text-xs ${
-                          employeeData.isEligibleForVacations
-                            ? "text-green-600"
-                            : employeeData.vacationsTaken > 0
-                              ? "text-red-500"
-                              : "text-gray-500"
-                        }`}
-                      >
-                        {employeeData.isEligibleForVacations
-                          ? "Disponibles"
-                          : employeeData.vacationsTaken > 0
-                            ? "Adeudados"
-                            : "Disponibles"}
-                      </div>
+                      <div className="text-xs text-green-600">Disponibles</div>
                     </div>
                   </div>
                 </div>
