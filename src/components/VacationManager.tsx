@@ -130,6 +130,15 @@ const VacationManager = ({
           });
         } else {
           // Crear nueva vacación
+          console.log("🔄 Creating vacation for employee:", {
+            employeeId: employee.id,
+            employeeName: employee.name,
+            startDate: newVacation.startDate,
+            endDate: newVacation.endDate,
+            days,
+            reason: newVacation.reason,
+          });
+
           await createVacation({
             employeeId: employee.id,
             startDate: newVacation.startDate,
