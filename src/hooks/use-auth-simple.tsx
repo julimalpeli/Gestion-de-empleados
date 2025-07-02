@@ -316,11 +316,17 @@ const checkSession = async () => {
   return session;
 };
 
-// Make immediately available
+// Export for global access
+export { checkAuthContext, checkSession };
+
+// Make immediately available on module load
 if (typeof window !== "undefined") {
   (window as any).checkAuthContext = checkAuthContext;
   (window as any).checkSession = checkSession;
+  (window as any).authDebug = { checkAuthContext, checkSession };
   console.log("🔧 Auth debug functions loaded:");
   console.log("   - checkAuthContext()");
   console.log("   - checkSession()");
+  console.log("   - authDebug.checkAuthContext()");
+  console.log("   - authDebug.checkSession()");
 }
