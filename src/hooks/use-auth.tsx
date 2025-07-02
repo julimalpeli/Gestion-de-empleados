@@ -147,6 +147,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (mounted) {
         setSession(session);
 
+        // Clear loading immediately on any auth state change
+        setLoading(false);
+        console.log("🎯 Loading cleared on auth state change:", event);
+
         if (session?.user) {
           try {
             await loadUserProfile(session.user);
@@ -172,10 +176,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             logSecurityEvent("SESSION_ENDED", { event });
           }
         }
-
-        // Always clear loading state
-        console.log("🎯 Clearing loading state");
-        setLoading(false);
       }
     });
 
