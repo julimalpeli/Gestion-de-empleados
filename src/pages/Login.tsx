@@ -83,7 +83,6 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated && user) {
-      console.log("🔄 Redirecting authenticated user:", user.role);
       if (user.role === "employee") {
         navigate("/portal-empleado", { replace: true });
       } else {
