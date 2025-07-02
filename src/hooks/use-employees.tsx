@@ -25,7 +25,20 @@ export const useEmployees = () => {
       setEmployees(data);
     } catch (err) {
       console.error("❌ Error cargando empleados:", err);
-      setError(err instanceof Error ? err.message : "Error loading employees");
+
+      // Check if it's a connectivity error and use fallback data
+      if (err.message?.includes("Failed to fetch")) {
+        console.log("🔄 Using offline fallback employee data");
+        const fallbackData = getFallbackEmployeeData(
+          "daianaayelen0220@gmail.com",
+        );
+        setEmployees([fallbackData.employee]);
+        setError("Modo offline - Datos limitados disponibles");
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Error loading employees",
+        );
+      }
     } finally {
       setLoading(false);
     }
