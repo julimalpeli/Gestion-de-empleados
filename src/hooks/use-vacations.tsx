@@ -75,7 +75,21 @@ export const useVacations = (employeeId?: string) => {
 
       setVacations(mappedVacations);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error loading vacations");
+      console.error("❌ Error loading vacations:", err);
+
+      // Check if it's a connectivity error and use fallback data
+      if (err.message?.includes("Failed to fetch")) {
+        console.log("🔄 Using offline fallback vacation data");
+        const fallbackData = getFallbackEmployeeData(
+          "daianaayelen0220@gmail.com",
+        );
+        setVacations(fallbackData.vacations);
+        setError("Modo offline - Datos de vacaciones limitados");
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Error loading vacations",
+        );
+      }
     } finally {
       setLoading(false);
     }
