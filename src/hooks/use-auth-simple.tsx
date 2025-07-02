@@ -316,9 +316,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Logout
   const logout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
+    try {
+      console.log("🚪 Logging out user...");
+
+      // Clear local state first
+      setUser(null);
+      setSession(null);
+
+      // Clear any stored auth data
+      localStorage.removeItem("supabase.auth.token");
+      sessionStorage.clear();
+
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Error during logout:", error);
+        // Even if Supabase logout fails, we've cleared local state
+      }
+
+      console.log("✅ Logout completed");
+    } catch (error) {
+      console.error("❌ Logout error:", error);
+      // Ensure state is cleared even if there's an error
+      setUser(null);
+      setSession(null);
+    }
   };
 
   // Check permissions
