@@ -104,13 +104,15 @@ export const useVacations = (employeeId?: string) => {
         .single();
 
       if (error) {
-        console.error("❌ Supabase error creating vacation:", {
-          error,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-        });
+        console.error("❌ Supabase error creating vacation:");
+        console.error("   - Message:", error.message);
+        console.error("   - Code:", error.code);
+        console.error("   - Details:", error.details);
+        console.error("   - Hint:", error.hint);
+        console.error(
+          "   - Full error object:",
+          JSON.stringify(error, null, 2),
+        );
         throw error;
       }
 
@@ -118,7 +120,14 @@ export const useVacations = (employeeId?: string) => {
       await fetchVacations();
       return data;
     } catch (err) {
-      console.error("❌ Full error creating vacation:", err);
+      console.error("❌ Full error creating vacation:");
+      console.error("   - Error type:", typeof err);
+      console.error("   - Error instanceof Error:", err instanceof Error);
+      console.error(
+        "   - Error message:",
+        err instanceof Error ? err.message : String(err),
+      );
+      console.error("   - Full error:", JSON.stringify(err, null, 2));
       throw new Error(
         err instanceof Error ? err.message : "Error creating vacation request",
       );
