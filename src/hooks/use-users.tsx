@@ -117,25 +117,50 @@ export const useUsers = () => {
     }
 
     try {
-      // Import the helper function from use-auth
-      const { createSupabaseUser } = await import("@/hooks/use-auth");
+      // Create user in Supabase Auth using admin API
+      const { data: authUser, error: authError } =
+        await supabase.auth.admin.createUser({
+          email: employee.email,
+          password: employee.dni, // Password = DNI
+          email_confirm: true, // Auto-confirm email
+          user_metadata: {
+            name: employee.name,
+            role: "employee",
+            employee_id: employee.id,
+          },
+        });
 
-      await createSupabaseUser(
-        employee.email,
-        employee.dni, // Contraseña inicial = DNI
-        {
-          username: employee.dni,
-          name: employee.name,
-          role: "employee",
-          employeeId: employee.id,
-          needsPasswordChange: true, // Forzar cambio en primer login
-        },
-      );
+      if (authError) {
+        throw authError;
+      }
 
-      console.log("✅ Supabase user created for employee:", employee.name);
+      console.log("✅ Supabase Auth user created:", authUser.user.email);
+
+      // Create user in public.users table
+      const { error: dbError } = await supabase.from("users").insert({
+        id: authUser.user.id,
+        username: employee.dni,
+        email: employee.email,
+        name: employee.name,
+        role: "employee",
+        employee_id: employee.id,
+        is_active: true,
+        password_hash: "$supabase$auth$handled",
+        needs_password_change: true, // Force password change on first login
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+      if (dbError) {
+        // If public.users creation fails, cleanup auth user
+        await supabase.auth.admin.deleteUser(authUser.user.id);
+        throw dbError;
+      }
+
+      console.log("✅ Employee user created successfully:", employee.name);
     } catch (err) {
-      console.error("❌ Error creating Supabase user for employee:", err);
-      // No lanzar error para no interferir con la creación del empleado
+      console.error("❌ Error creating employee user:", err);
+      // Don't throw error to not interfere with employee creation
     }
   };
 
