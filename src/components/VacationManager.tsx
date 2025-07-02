@@ -516,7 +516,17 @@ const VacationManager = ({
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleDeleteVacation(vacation.id)}
+                          onClick={() => {
+                            console.log("Delete vacation clicked:", {
+                              vacationId: vacation.id,
+                              vacationStatus: vacation.status,
+                              isAdmin: isAdmin(),
+                              isManager: isManager(),
+                              disabled:
+                                vacation.status === "approved" && !isAdmin(),
+                            });
+                            handleDeleteVacation(vacation.id);
+                          }}
                           disabled={
                             vacation.status === "approved" && !isAdmin()
                           }
