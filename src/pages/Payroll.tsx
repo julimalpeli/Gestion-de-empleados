@@ -1234,10 +1234,10 @@ const Payroll = () => {
                   <TableHead>Empleado</TableHead>
                   <TableHead>Período</TableHead>
                   <TableHead>Días</TableHead>
-                  <TableHead>Horas Extra</TableHead>
-                  <TableHead>Feriados</TableHead>
                   <TableHead>Adelantos</TableHead>
                   <TableHead>Descuentos</TableHead>
+                  <TableHead>Horas Extra</TableHead>
+                  <TableHead>Feriados</TableHead>
                   <TableHead>Bono</TableHead>
                   <TableHead>Aguinaldo</TableHead>
                   <TableHead>Presentismo</TableHead>
