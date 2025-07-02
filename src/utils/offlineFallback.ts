@@ -105,6 +105,27 @@ export const fallbackVacationData = [
   },
 ];
 
+export const fallbackDocumentData = [
+  {
+    id: "doc-1",
+    originalFileName: "Contrato_Porras_Daiana.pdf",
+    category: "contract",
+    uploadedAt: "2024-01-15T10:00:00Z",
+  },
+  {
+    id: "doc-2",
+    originalFileName: "Liquidacion_Nov_2024.pdf",
+    category: "payroll",
+    uploadedAt: "2024-11-30T15:30:00Z",
+  },
+  {
+    id: "doc-3",
+    originalFileName: "Certificado_Trabajo.pdf",
+    category: "certificate",
+    uploadedAt: "2024-10-01T09:15:00Z",
+  },
+];
+
 // Check if we're in offline mode
 export const isOfflineMode = () => {
   // You could enhance this with actual network detection
