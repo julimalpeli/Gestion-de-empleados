@@ -25,7 +25,8 @@ const queryClient = new QueryClient();
 const AuthLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
   const { loading } = useAuth();
 
-  if (loading) {
+  // Only show loading on initial app load, not on login page
+  if (loading && window.location.pathname !== "/login") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
