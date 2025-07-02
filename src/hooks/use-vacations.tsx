@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { getFallbackEmployeeData } from "@/utils/offlineFallback";
 
 export interface VacationRequest {
   id: string;
