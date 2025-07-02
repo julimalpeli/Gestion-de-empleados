@@ -66,17 +66,24 @@ const EmployeePortal = () => {
 
       console.log("Loading documents for employee:", employeeId);
 
-      // Load employee documents
-      const employeeDocuments =
-        await documentService.getEmployeeDocuments(employeeId);
-      console.log("Employee documents:", employeeDocuments.length);
+      let employeeDocuments = [];
+      let payrollDocuments = [];
 
-      // Load payroll documents for this employee
+      // Try to load employee documents with graceful error handling
+      try {
+        employeeDocuments =
+          await documentService.getEmployeeDocuments(employeeId);
+        console.log("Employee documents:", employeeDocuments.length);
+      } catch (error) {
+        console.warn("Could not load employee documents:", error.message);
+        // Continue without employee documents
+      }
+
+      // Try to load payroll documents for this employee
       const employeePayrollRecords = (payrollRecords || []).filter(
         (record) => record.employeeId === employeeId,
       );
 
-      let payrollDocuments = [];
       for (const record of employeePayrollRecords) {
         try {
           const docs = await documentService.getPayrollDocuments(record.id);
@@ -86,18 +93,30 @@ const EmployeePortal = () => {
             "Could not load payroll documents for record:",
             record.id,
           );
+          // Continue with other records
         }
       }
 
       console.log("Payroll documents:", payrollDocuments.length);
 
-      // Combine all documents
+      // Combine all documents (even if some failed to load)
       const combinedDocuments = [...employeeDocuments, ...payrollDocuments];
 
       setAllDocuments(combinedDocuments);
+
+      // Set a friendly error message if no documents could be loaded due to connection issues
+      if (combinedDocuments.length === 0) {
+        setDocumentsError(
+          "Los documentos no están disponibles en este momento debido a problemas de conexión.",
+        );
+      }
     } catch (error) {
       console.error("Error loading documents:", error);
-      setDocumentsError(error.message);
+      setDocumentsError(
+        "Los documentos no están disponibles en este momento. Intente nuevamente más tarde.",
+      );
+      // Set empty array so the portal still works
+      setAllDocuments([]);
     } finally {
       setDocumentsLoading(false);
     }
