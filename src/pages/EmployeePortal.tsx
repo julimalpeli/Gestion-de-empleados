@@ -250,6 +250,19 @@ const EmployeePortal = () => {
     return null;
   }
 
+  // Additional safety check - prevent crashes
+  try {
+    if (!user.email) {
+      console.error("User has no email, redirecting to login");
+      navigate("/login");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in user safety check:", error);
+    navigate("/login");
+    return null;
+  }
+
   if (employeesLoading || payrollLoading || vacationsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
