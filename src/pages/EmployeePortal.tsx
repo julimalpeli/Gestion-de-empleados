@@ -45,19 +45,18 @@ const EmployeePortal = () => {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const { vacationRequests, loading: vacationsLoading } = useVacations();
-
-  // Get current employee data first - try by employeeId first, then by email
-  const currentEmployee = (employees || []).find(
-    (emp) => emp.id === user?.employeeId || emp.email === user?.email,
-  );
-
   const {
     documents,
     loading: documentsLoading,
     error: documentsError,
     downloadDocument,
     getCategoryDisplayName,
-  } = useDocuments(currentEmployee?.id || user?.employeeId);
+  } = useDocuments(user?.employeeId);
+
+  // Get current employee data safely
+  const currentEmployee = employees?.find(
+    (emp) => emp.id === user?.employeeId || emp.email === user?.email,
+  );
 
   // Debug logging for documents
   console.log("EmployeePortal documents state:", {
