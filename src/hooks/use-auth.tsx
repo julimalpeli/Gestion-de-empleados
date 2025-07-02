@@ -73,7 +73,7 @@ const logSecurityEvent = (
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(false); // Start with FALSE
+  const [loading, setLoading] = useState(true); // Start with TRUE, clear quickly
 
   // Initialize Supabase Auth listener
   useEffect(() => {
