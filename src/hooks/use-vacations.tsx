@@ -249,15 +249,23 @@ export const useVacations = (employeeId?: string) => {
   // Eliminar solicitud de vacaciones
   const deleteVacation = async (id: string) => {
     try {
+      console.log("🗑️ deleteVacation called with ID:", id);
+
       const { error } = await supabase
         .from("vacation_requests")
         .delete()
         .eq("id", id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Supabase deletion error:", error);
+        throw error;
+      }
 
+      console.log("✅ Vacation deleted from database, refreshing list...");
       await fetchVacations();
+      console.log("✅ Vacation list refreshed");
     } catch (err) {
+      console.error("❌ Error in deleteVacation:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error deleting vacation request",
       );
