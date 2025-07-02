@@ -129,10 +129,6 @@ const EmployeePortal = () => {
     return categories[category] || category;
   };
 
-  // Get current employee data safely
-  const currentEmployee =
-    employees?.find((emp) => emp.email === user?.email) || null;
-
   // Debug logging for documents
   console.log("EmployeePortal documents state:", {
     employeeId: user?.employeeId,
