@@ -108,8 +108,11 @@ export const useEmployees = () => {
 
       return updatedEmployee;
     } catch (err) {
+      console.error("Employee update error:", err);
       const errorMsg =
-        err instanceof Error ? err.message : "Error updating employee";
+        err instanceof Error
+          ? err.message
+          : `Error updating employee: ${JSON.stringify(err)}`;
       setError(errorMsg);
       throw new Error(errorMsg);
     }
