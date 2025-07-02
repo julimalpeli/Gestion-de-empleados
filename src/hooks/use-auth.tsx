@@ -73,17 +73,7 @@ const logSecurityEvent = (
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  // EMERGENCY: Force loading to false after 1 second no matter what
-  useEffect(() => {
-    const emergencyOverride = setTimeout(() => {
-      console.error("🚨 EMERGENCY: Force clearing loading after 1 second");
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(emergencyOverride);
-  }, []);
+  const [loading, setLoading] = useState(false); // Start with FALSE
 
   // Initialize Supabase Auth listener
   useEffect(() => {
