@@ -83,25 +83,42 @@ export const useVacations = (employeeId?: string) => {
   // Crear solicitud de vacaciones
   const createVacation = async (vacation: CreateVacationRequest) => {
     try {
+      console.log("🔄 Creating vacation request:", vacation);
+
+      const insertData = {
+        employee_id: vacation.employeeId,
+        start_date: vacation.startDate,
+        end_date: vacation.endDate,
+        days: vacation.days,
+        reason: vacation.reason,
+        status: "pending",
+        request_date: new Date().toISOString().split("T")[0],
+      };
+
+      console.log("📝 Insert data:", insertData);
+
       const { data, error } = await supabase
         .from("vacation_requests")
-        .insert({
-          employee_id: vacation.employeeId,
-          start_date: vacation.startDate,
-          end_date: vacation.endDate,
-          days: vacation.days,
-          reason: vacation.reason,
-          status: "pending",
-          request_date: new Date().toISOString().split("T")[0],
-        })
+        .insert(insertData)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Supabase error creating vacation:", {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw error;
+      }
 
+      console.log("✅ Vacation created successfully:", data);
       await fetchVacations();
       return data;
     } catch (err) {
+      console.error("❌ Full error creating vacation:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error creating vacation request",
       );
