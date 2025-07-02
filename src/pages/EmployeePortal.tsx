@@ -906,7 +906,7 @@ const EmployeePortal = () => {
                   <div className="text-center py-8">
                     <p>Cargando documentos...</p>
                   </div>
-                ) : documents.length === 0 ? (
+                ) : allDocuments.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
                     <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
                     <p>No tienes documentos disponibles</p>
