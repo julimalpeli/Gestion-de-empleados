@@ -45,6 +45,12 @@ const EmployeePortal = () => {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const { vacationRequests, loading: vacationsLoading } = useVacations();
+
+  // Get current employee data first - try by employeeId first, then by email
+  const currentEmployee = (employees || []).find(
+    (emp) => emp.id === user?.employeeId || emp.email === user?.email,
+  );
+
   const {
     documents,
     loading: documentsLoading,
