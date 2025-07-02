@@ -88,18 +88,31 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
   async getEmployeeById(id: string): Promise<Employee | null> {
     try {
+      console.log(`🔍 Looking for employee with ID: ${id}`);
+
       const { data, error } = await supabase
         .from("employees")
         .select("*")
-        .eq("id", id)
-        .single();
+        .eq("id", id);
+
+      console.log("📊 Employee lookup result:", {
+        data,
+        error,
+        found: data?.length,
+      });
 
       if (error) {
-        if (error.code === "PGRST116") return null; // Not found
+        console.error("Error in getEmployeeById:", error);
         throw error;
       }
 
-      return this.mapFromSupabase(data);
+      if (!data || data.length === 0) {
+        console.log("❌ Employee not found");
+        return null;
+      }
+
+      console.log("✅ Employee found:", data[0].name);
+      return this.mapFromSupabase(data[0]);
     } catch (error) {
       console.error("Error fetching employee:", error);
       throw new Error("Failed to fetch employee");
