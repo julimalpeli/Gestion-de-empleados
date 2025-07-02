@@ -296,7 +296,20 @@ const checkAuthContext = async () => {
   }
 };
 
+// Simple session check
+const checkSession = async () => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  console.log("Current session:", session);
+  return session;
+};
+
 // Make immediately available
 if (typeof window !== "undefined") {
   (window as any).checkAuthContext = checkAuthContext;
+  (window as any).checkSession = checkSession;
+  console.log("🔧 Auth debug functions loaded:");
+  console.log("   - checkAuthContext()");
+  console.log("   - checkSession()");
 }
