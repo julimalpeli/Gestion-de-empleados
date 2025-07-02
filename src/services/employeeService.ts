@@ -173,10 +173,33 @@ export class SupabaseEmployeeService implements IEmployeeService {
     try {
       console.log(`🔄 Updating employee ${id} with data:`, employee);
 
-      // Skip existence check and go directly to update for better RLS handling
-      console.log(
-        "⚡ Proceeding directly to update (skipping existence check)",
-      );
+      // Check for problematic ID and provide specific diagnostics
+      if (id === "f33d0128-11b8-4ff2-b226-c6e9a2014fed") {
+        console.warn(
+          "⚠️ Problematic employee ID detected, running full diagnostics...",
+        );
+
+        // Get all employees to see what's available
+        const { data: allEmployees, error: allError } = await supabase
+          .from("employees")
+          .select("id, name, status")
+          .limit(5);
+
+        console.log(
+          "📊 Sample employees:",
+          JSON.stringify(allEmployees, null, 2),
+        );
+        console.log("📊 Total query error:", JSON.stringify(allError, null, 2));
+
+        const found = allEmployees?.find((emp) => emp.id === id);
+        if (!found) {
+          throw new Error(
+            `Employee ${id} does not exist. Available employees: ${allEmployees?.length || 0}. This may be a stale ID from the frontend.`,
+          );
+        }
+      }
+
+      console.log("⚡ Proceeding with update...");
 
       const updateData: any = {};
 
