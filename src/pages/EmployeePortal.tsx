@@ -54,9 +54,8 @@ const EmployeePortal = () => {
   } = useDocuments(user?.employeeId);
 
   // Get current employee data safely
-  const currentEmployee = employees?.find(
-    (emp) => emp.id === user?.employeeId || emp.email === user?.email,
-  );
+  const currentEmployee =
+    employees?.find((emp) => emp.email === user?.email) || null;
 
   // Debug logging for documents
   console.log("EmployeePortal documents state:", {
