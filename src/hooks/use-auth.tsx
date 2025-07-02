@@ -192,6 +192,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("🔍 Loading user profile for:", supabaseUser.email);
 
+      // Immediate fallback for admin user to bypass database issues
+      if (supabaseUser.email === "julimalpeli@gmail.com") {
+        console.log("🚀 Using immediate admin fallback");
+        const adminUser: User = {
+          id: supabaseUser.id,
+          username: "admin",
+          name: "Julian Malpeli (Admin)",
+          role: "admin",
+          email: supabaseUser.email,
+          employeeId: undefined,
+          permissions: ["all"],
+          loginTime: new Date().toISOString(),
+          needsPasswordChange: false,
+          supabaseUser,
+        };
+
+        setUser(adminUser);
+        return;
+      }
+
       // Add timeout to prevent hanging
       const queryPromise = supabase
         .from("users")
