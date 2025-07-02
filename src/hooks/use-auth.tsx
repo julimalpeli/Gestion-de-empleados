@@ -209,6 +209,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
         setUser(adminUser);
+        setLoading(false); // Ensure loading clears immediately
+        console.log("✅ Admin user set, loading cleared");
         return;
       }
 
