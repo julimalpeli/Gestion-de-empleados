@@ -79,6 +79,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    // Add timeout to prevent infinite loading
+    const loadingTimeout = setTimeout(() => {
+      if (mounted) {
+        console.warn("Auth loading timeout - forcing loading to false");
+        setLoading(false);
+      }
+    }, 10000); // 10 second timeout
+
     const getInitialSession = async () => {
       try {
         const {
@@ -88,6 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (error) {
           console.error("Error getting session:", error);
+          if (mounted) setLoading(false);
           return;
         }
 
@@ -99,9 +108,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       } catch (error) {
         console.error("Error in getInitialSession:", error);
+        if (mounted) setLoading(false);
       } finally {
         if (mounted) {
           setLoading(false);
+          clearTimeout(loadingTimeout);
         }
       }
     };
