@@ -46,6 +46,11 @@ const EmployeePortal = () => {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const { vacationRequests, loading: vacationsLoading } = useVacations();
+
+  // Get current employee data safely first
+  const currentEmployee =
+    employees?.find((emp) => emp.email === user?.email) || null;
+
   // Custom document loading that combines employee and payroll documents
   const [allDocuments, setAllDocuments] = useState([]);
   const [documentsLoading, setDocumentsLoading] = useState(false);
