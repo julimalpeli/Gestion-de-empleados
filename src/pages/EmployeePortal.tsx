@@ -170,29 +170,9 @@ const EmployeePortal = () => {
     },
   });
 
-  // Special logging for DNI 44586777
-  if (user?.username === "44586777" || currentEmployee?.dni === "44586777") {
-    console.log("🎯 SPECIAL DEBUG FOR DNI 44586777:");
-    console.log("   - User DNI:", user?.username);
-    console.log("   - Current Employee DNI:", currentEmployee?.dni);
-    console.log(
-      "   - Employee found by:",
-      currentEmployee?.dni === "44586777" ? "DNI match" : "Email/ID match",
-    );
-    console.log(
-      "   - Employee in DB:",
-      employees?.find((emp) => emp.dni === "44586777"),
-    );
-    console.log("   - User Employee ID:", user?.employeeId);
-    console.log("   - Current Employee ID:", currentEmployee?.id);
-    console.log(
-      "   - Payroll for this employee:",
-      payrollRecords?.filter(
-        (pr) =>
-          pr.employeeId === currentEmployee?.id ||
-          pr.employeeId === user?.employeeId,
-      ),
-    );
+  // Simple logging without complex operations
+  if (user?.username === "44586777") {
+    console.log("🎯 Employee 44586777 detected");
   }
 
   // Calculate vacation eligibility
