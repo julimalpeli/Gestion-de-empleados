@@ -234,6 +234,14 @@ const EmployeePortal = () => {
 
   // Get real payroll history for current employee
   const employeeId = currentEmployee?.id || user?.employeeId;
+
+  // Calculate actual vacation days taken from approved vacation requests
+  const actualVacationsTaken = (vacationRequests || [])
+    .filter(
+      (vacation) =>
+        vacation.employeeId === employeeId && vacation.status === "approved",
+    )
+    .reduce((total, vacation) => total + vacation.days, 0);
   const payrollHistory = (payrollRecords || [])
     .filter((record) => record.employeeId === employeeId)
     .map((record) => ({
