@@ -154,12 +154,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       console.log("🔐 Auth state changed:", event, !!session);
 
+      // IMMEDIATELY clear loading - highest priority
+      setLoading(false);
+      console.log("🎯 IMMEDIATELY cleared loading on auth change:", event);
+
       if (mounted) {
         setSession(session);
-
-        // Clear loading immediately on any auth state change
-        setLoading(false);
-        console.log("🎯 Loading cleared on auth state change:", event);
 
         if (session?.user) {
           try {
