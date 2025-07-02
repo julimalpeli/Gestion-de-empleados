@@ -127,53 +127,13 @@ const EmployeePortal = () => {
     }
   };
 
-  // Enhanced debugging for employee data - COMMENTED OUT TO FIX LOGIN
-  // console.log("🔍 Debug - Employee Portal Data:", {
-    userInfo: {
-      userId: user?.id,
-      userEmployeeId: user?.employeeId,
-      userEmail: user?.email,
-      userName: user?.name,
-      userDNI: user?.username,
-    },
-    employees: {
-      total: employees?.length || 0,
-      list:
-        employees?.map((emp) => ({
-          id: emp.id,
-          name: emp.name,
-          dni: emp.dni,
-          email: emp.email,
-        })) || [],
-    },
-    currentEmployee: currentEmployee
-      ? {
-          id: currentEmployee.id,
-          name: currentEmployee.name,
-          dni: currentEmployee.dni,
-          email: currentEmployee.email,
-          startDate: currentEmployee.startDate,
-        }
-      : null,
-    payrollRecords: {
-      total: payrollRecords?.length || 0,
-      forCurrentUser:
-        payrollRecords?.filter(
-          (record) => record.employeeId === user?.employeeId,
-        ).length || 0,
-    },
-    vacationRequests: {
-      total: vacationRequests?.length || 0,
-      forCurrentUser:
-        vacationRequests?.filter((req) => req.employeeId === user?.employeeId)
-          .length || 0,
-    },
-  });
-
-  // Simple logging without complex operations
-  if (user?.username === "44586777") {
-    console.log("🎯 Employee 44586777 detected");
-  }
+  // Simple debug logging to avoid crashes
+  console.log(
+    "🔍 Employee Portal - User:",
+    user?.name,
+    "Employee:",
+    currentEmployee?.name,
+  );
 
   // Calculate vacation eligibility
   const vacationInfo = currentEmployee?.startDate
