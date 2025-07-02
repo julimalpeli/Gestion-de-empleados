@@ -252,6 +252,23 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       // Check if any rows were updated
       if (!data || data.length === 0) {
+        console.error("❌ No rows were updated. Running diagnostics...");
+
+        // Try a simple count query to check if employee exists
+        try {
+          const { data: checkData, error: checkError } = await supabase
+            .from("employees")
+            .select("count", { count: "exact", head: true })
+            .eq("id", id);
+
+          console.error("🔍 Employee existence check:", {
+            checkData,
+            checkError,
+          });
+        } catch (checkErr) {
+          console.error("❌ Error checking employee existence:", checkErr);
+        }
+
         throw new Error(
           `Employee with ID ${id} not found or could not be updated`,
         );
