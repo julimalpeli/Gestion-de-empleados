@@ -114,19 +114,11 @@ const EmployeePortal = () => {
     } catch (error) {
       console.error("Error loading documents:", error);
 
-      // Check if it's a connectivity error and use fallback data
-      if (error.message?.includes("Failed to fetch")) {
-        console.log("🔄 Using offline fallback document data");
-        const fallbackData = getFallbackEmployeeData(user?.email || "");
-        setAllDocuments(fallbackData.documents || []);
-        setDocumentsError("Modo offline - Documentos de ejemplo disponibles");
-      } else {
-        setDocumentsError(
-          "Los documentos no están disponibles en este momento. Intente nuevamente más tarde.",
-        );
-        // Set empty array so the portal still works
-        setAllDocuments([]);
-      }
+      setDocumentsError(
+        "Los documentos no están disponibles en este momento. Intente nuevamente más tarde.",
+      );
+      // Set empty array so the portal still works
+      setAllDocuments([]);
     } finally {
       setDocumentsLoading(false);
     }
