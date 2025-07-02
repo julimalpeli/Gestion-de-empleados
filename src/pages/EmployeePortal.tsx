@@ -230,7 +230,11 @@ const EmployeePortal = () => {
 
   // Get real vacation history for current employee
   const vacationHistory = (vacationRequests || [])
-    .filter((request) => request.employeeId === currentEmployeeId)
+    .filter(
+      (request) =>
+        request.employeeId === user?.employeeId ||
+        request.employeeId === currentEmployee?.id,
+    )
     .map((request) => ({
       id: request.id,
       startDate: request.startDate,
