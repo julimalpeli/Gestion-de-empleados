@@ -130,18 +130,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("🔐 Auth state changed:", event, session?.user?.email);
+      console.log("🔐 Auth state changed:", event, !!session);
 
       if (mounted) {
         setSession(session);
 
         if (session?.user) {
-          await loadUserProfile(session.user);
-          logSecurityEvent("SESSION_ESTABLISHED", {
-            userId: session.user.id,
-            email: session.user.email,
-            event,
-          });
+          try {
+            await loadUserProfile(session.user);
+            logSecurityEvent("SESSION_ESTABLISHED", {
+              userId: session.user.id,
+              email: session.user.email,
+              event,
+            });
+          } catch (error) {
+            console.error("❌ Error loading user profile:", error);
+          }
         } else {
           setUser(null);
           if (event === "SIGNED_OUT") {
