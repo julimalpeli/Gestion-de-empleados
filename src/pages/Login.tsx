@@ -22,6 +22,7 @@ import {
   Mail,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { SupabaseTest } from "@/components/SupabaseTest";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -323,6 +324,9 @@ const Login = () => {
         </Card>
 
         {/* Supabase Auth - No demo users needed */}
+
+        {/* Temporary debugging component */}
+        {import.meta.env.DEV && <SupabaseTest />}
       </div>
 
       {/* Password changes now handled by Supabase Auth */}
