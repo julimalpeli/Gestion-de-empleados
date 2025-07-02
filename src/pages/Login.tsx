@@ -323,6 +323,39 @@ const Login = () => {
           </CardContent>
         </Card>
 
+        {/* Temporary admin access */}
+        {import.meta.env.DEV && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle className="text-sm">
+                Acceso Temporal - Desarrollo
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Button
+                onClick={() => {
+                  setEmail("julimalpeli@gmail.com");
+                  setPassword("Jmalpeli3194");
+                }}
+                className="w-full mb-2"
+                variant="outline"
+              >
+                Admin Login
+              </Button>
+              <Button
+                onClick={() => {
+                  setEmail("daianaayelen0220@gmail.com");
+                  setPassword("44586777");
+                }}
+                className="w-full"
+                variant="outline"
+              >
+                Employee Login (DNI: 44586777)
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Supabase Auth - No demo users needed */}
       </div>
 
