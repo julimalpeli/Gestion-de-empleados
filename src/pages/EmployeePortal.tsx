@@ -35,6 +35,7 @@ import { usePayroll } from "@/hooks/use-payroll";
 import { useVacations } from "@/hooks/use-vacations";
 import { documentService } from "@/services/documentService";
 import { employeeService } from "@/services/employeeService";
+import { getFallbackEmployeeData } from "@/utils/offlineFallback";
 import {
   generatePayrollReceiptPDF,
   generatePayrollReceiptExcel,
