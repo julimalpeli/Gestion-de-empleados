@@ -470,16 +470,15 @@ const EmployeePortal = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {employeeData.isEligibleForVacations
-                  ? employeeData.vacationDays - employeeData.vacationsTaken
-                  : -employeeData.vacationsTaken}
+                {(employeeData.isEligibleForVacations
+                  ? employeeData.vacationDays
+                  : 0) - employeeData.vacationsTaken}
               </div>
               <p className="text-xs text-muted-foreground">
+                Disponibles de{" "}
                 {employeeData.isEligibleForVacations
-                  ? `Disponibles de ${employeeData.vacationDays}`
-                  : employeeData.vacationsTaken > 0
-                    ? `${employeeData.vacationsTaken} días adeudados`
-                    : "Sin antigüedad suficiente"}
+                  ? employeeData.vacationDays
+                  : 0}
               </p>
             </CardContent>
           </Card>
