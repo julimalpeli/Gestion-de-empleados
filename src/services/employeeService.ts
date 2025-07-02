@@ -198,12 +198,25 @@ export class SupabaseEmployeeService implements IEmployeeService {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase update error:", {
+          error,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+          updateData,
+        });
+        throw error;
+      }
 
       return this.mapFromSupabase(data);
     } catch (error) {
       console.error("Error updating employee:", error);
-      throw new Error("Failed to update employee");
+      if (error && typeof error === "object" && "message" in error) {
+        throw new Error(`Failed to update employee: ${(error as any).message}`);
+      }
+      throw new Error("Failed to update employee: Unknown error");
     }
   }
 
