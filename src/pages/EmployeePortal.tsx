@@ -116,9 +116,9 @@ const EmployeePortal = () => {
     }
   };
 
-  // Get current employee data
+  // Get current employee data - try by employeeId first, then by email
   const currentEmployee = (employees || []).find(
-    (emp) => emp.id === user?.employeeId,
+    (emp) => emp.id === user?.employeeId || emp.email === user?.email,
   );
 
   // Debug: Log employee data
