@@ -122,10 +122,7 @@ const EmployeePortal = () => {
     }
   };
 
-  // Get current employee data - try by employeeId first, then by email
-  const currentEmployee = (employees || []).find(
-    (emp) => emp.id === user?.employeeId || emp.email === user?.email,
-  );
+  // currentEmployee is already defined above
 
   // Debug: Log employee data
   console.log("🔍 Debug - Employee Portal Data:", {
