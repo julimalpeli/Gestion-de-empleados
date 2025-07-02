@@ -73,16 +73,11 @@ const logSecurityEvent = (
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true); // Start with TRUE, clear quickly
+  const [loading, setLoading] = useState(false); // Always start false
 
   // Initialize Supabase Auth listener
   useEffect(() => {
     let mounted = true;
-
-    // Clear loading immediately to prevent infinite loading
-    const immediateTimeout = setTimeout(() => {
-      if (mounted) setLoading(false);
-    }, 100);
 
     const getInitialSession = async () => {
       try {
@@ -118,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (error) {
-        console.warn("⚠️ Error in getInitialSession (will continue):", error);
+        console.warn("��️ Error in getInitialSession (will continue):", error);
       }
     };
 
