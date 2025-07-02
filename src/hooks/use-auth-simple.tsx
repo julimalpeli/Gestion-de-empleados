@@ -192,7 +192,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (error) throw error;
       // User will be set by onAuthStateChange
     } catch (error) {
-      throw error;
+      console.error("Login error details:", error);
+
+      // Handle network connectivity errors
+      if (
+        error.message?.includes("Failed to fetch") ||
+        error.name === "AuthRetryableFetchError"
+      ) {
+        throw new Error(
+          "Error de conexión. Verifique su conexión a internet e intente nuevamente.",
+        );
+      }
+
+      // Handle other auth errors
+      if (error.message?.includes("Invalid login credentials")) {
+        throw new Error(
+          "Credenciales incorrectas. Verifique su email y contraseña.",
+        );
+      }
+
+      // Default error message
+      throw new Error(
+        error.message || "Error al iniciar sesión. Intente nuevamente.",
+      );
     } finally {
       setLoading(false);
     }
