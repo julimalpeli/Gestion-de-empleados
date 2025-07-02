@@ -127,15 +127,14 @@ const EmployeePortal = () => {
     }
   };
 
-  // currentEmployee is already defined above
-
-  // Debug: Log employee data
+  // Enhanced debugging for employee data
   console.log("🔍 Debug - Employee Portal Data:", {
     userInfo: {
       userId: user?.id,
       userEmployeeId: user?.employeeId,
       userEmail: user?.email,
       userName: user?.name,
+      userDNI: user?.username,
     },
     employees: {
       total: employees?.length || 0,
@@ -143,6 +142,7 @@ const EmployeePortal = () => {
         employees?.map((emp) => ({
           id: emp.id,
           name: emp.name,
+          dni: emp.dni,
           email: emp.email,
         })) || [],
     },
@@ -150,7 +150,9 @@ const EmployeePortal = () => {
       ? {
           id: currentEmployee.id,
           name: currentEmployee.name,
+          dni: currentEmployee.dni,
           email: currentEmployee.email,
+          startDate: currentEmployee.startDate,
         }
       : null,
     payrollRecords: {
