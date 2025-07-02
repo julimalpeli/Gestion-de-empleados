@@ -51,7 +51,7 @@ const EmployeePortal = () => {
     error: documentsError,
     downloadDocument,
     getCategoryDisplayName,
-  } = useDocuments(user?.employeeId);
+  } = useDocuments(currentEmployee?.id || user?.employeeId);
 
   // Debug logging for documents
   console.log("EmployeePortal documents state:", {
