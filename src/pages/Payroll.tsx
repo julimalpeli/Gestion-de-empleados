@@ -1318,6 +1318,9 @@ const Payroll = () => {
                         <TableCell className="text-red-600">
                           {formatCurrency(record.discounts)}
                         </TableCell>
+                        <TableCell className="font-medium text-blue-600">
+                          {formatCurrency(record.bonusAmount || 0)}
+                        </TableCell>
                         <TableCell className="font-medium text-green-600">
                           {isAguinaldoPeriod(record.period)
                             ? (() => {
