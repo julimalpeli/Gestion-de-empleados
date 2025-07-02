@@ -345,6 +345,7 @@ export const useVacations = (employeeId?: string) => {
 
   return {
     vacations,
+    vacationRequests: vacations, // Alias for backward compatibility
     loading,
     error,
     fetchVacations,
