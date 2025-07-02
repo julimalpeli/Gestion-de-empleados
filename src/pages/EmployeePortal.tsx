@@ -561,51 +561,63 @@ const EmployeePortal = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-blue-500">
+                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">
                       Nombre Completo
                     </label>
-                    <p className="text-lg">{employeeData.name}</p>
+                    <p className="text-xl font-semibold text-gray-900 mt-1">
+                      {employeeData.name}
+                    </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-green-500">
+                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">
                       {employeeData.documentType?.toUpperCase() || "DNI"}
                     </label>
-                    <p className="text-lg font-mono">{employeeData.dni}</p>
+                    <p className="text-xl font-mono font-semibold text-gray-900 mt-1">
+                      {employeeData.dni}
+                    </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Puesto</label>
-                    <p className="text-lg">{employeeData.position}</p>
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-purple-500">
+                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                      Puesto
+                    </label>
+                    <p className="text-xl font-semibold text-gray-900 mt-1">
+                      {employeeData.position}
+                    </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-orange-500">
+                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">
                       Fecha de Ingreso
                     </label>
-                    <p className="text-lg">
+                    <p className="text-xl font-semibold text-gray-900 mt-1">
                       {formatDate(employeeData.startDate)}
                     </p>
                   </div>
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-lg">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-500">
+                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                      Email
+                    </label>
+                    <p className="text-xl font-semibold text-gray-900 mt-1">
                       {employeeData.email || (
-                        <span className="text-muted-foreground italic">
+                        <span className="text-gray-500 italic text-base">
                           No registrado
                         </span>
                       )}
                     </p>
                   </div>
 
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium">Dirección</label>
-                    <p className="text-lg">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-teal-500 md:col-span-2">
+                    <label className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                      Dirección
+                    </label>
+                    <p className="text-xl font-semibold text-gray-900 mt-1">
                       {employeeData.address || (
-                        <span className="text-muted-foreground italic">
+                        <span className="text-gray-500 italic text-base">
                           No registrada
                         </span>
                       )}
