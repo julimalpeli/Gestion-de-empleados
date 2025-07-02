@@ -183,14 +183,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("🔍 Loading user profile for:", supabaseUser.email);
 
-      const { data: users, error } = await supabase
+      // Add timeout to prevent hanging
+      const queryPromise = supabase
         .from("users")
         .select("*")
         .eq("email", supabaseUser.email)
         .eq("is_active", true)
         .limit(1);
 
-      console.log("📊 User query result:", { users, error });
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Database query timeout")), 5000),
+      );
+
+      const { data: users, error } = (await Promise.race([
+        queryPromise,
+        timeoutPromise,
+      ])) as any;
+
+      console.log("📊 User query result:", {
+        users,
+        error,
+        userCount: users?.length,
+      });
 
       const userProfile = users?.[0];
 
