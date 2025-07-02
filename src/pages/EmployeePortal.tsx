@@ -26,7 +26,7 @@ import {
   Plane,
   Clock,
 } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-simple";
 import { useNavigate } from "react-router-dom";
 import useFiles from "@/hooks/use-files";
 import { useEmployees } from "@/hooks/use-employees";
