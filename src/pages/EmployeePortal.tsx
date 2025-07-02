@@ -132,7 +132,7 @@ const EmployeePortal = () => {
   // Debug logging for documents
   console.log("EmployeePortal documents state:", {
     employeeId: user?.employeeId,
-    documentsCount: documents?.length,
+    documentsCount: allDocuments?.length,
     documentsLoading,
     documentsError,
   });
