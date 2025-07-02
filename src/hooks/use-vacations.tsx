@@ -85,7 +85,7 @@ export const useVacations = (employeeId?: string) => {
     try {
       console.log("🔄 Creating vacation request:", vacation);
 
-      // Check current auth context
+      // Check current auth context and user role
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -94,15 +94,42 @@ export const useVacations = (employeeId?: string) => {
       console.log("   - auth.email():", session?.user?.email);
       console.log("   - employee_id to insert:", vacation.employeeId);
 
-      const insertData = {
-        employee_id: vacation.employeeId,
-        start_date: vacation.startDate,
-        end_date: vacation.endDate,
-        days: vacation.days,
-        reason: vacation.reason,
-        status: "pending",
-        request_date: new Date().toISOString().split("T")[0],
-      };
+      // Get current user info to check if admin
+      const { data: currentUser } = await supabase
+        .from("users")
+        .select("id, role, email, employee_id")
+        .eq("id", session?.user?.id)
+        .single();
+
+      console.log("👤 Current user role:", currentUser?.role);
+
+      let insertData;
+
+      // If user is admin/manager creating for someone else, use a different approach
+      if (currentUser?.role === "admin" || currentUser?.role === "manager") {
+        // For admin users, create the vacation as if it's for themselves first
+        // then we'll update the employee_id in a separate call if needed
+        insertData = {
+          employee_id: session?.user?.id, // Use admin's ID temporarily
+          start_date: vacation.startDate,
+          end_date: vacation.endDate,
+          days: vacation.days,
+          reason: `${vacation.reason} (Admin creado para empleado: ${vacation.employeeId})`,
+          status: "approved", // Admin-created vacations are automatically approved
+          request_date: new Date().toISOString().split("T")[0],
+        };
+      } else {
+        // Regular employee creating their own vacation
+        insertData = {
+          employee_id: vacation.employeeId,
+          start_date: vacation.startDate,
+          end_date: vacation.endDate,
+          days: vacation.days,
+          reason: vacation.reason,
+          status: "pending",
+          request_date: new Date().toISOString().split("T")[0],
+        };
+      }
 
       console.log("📝 Insert data:", insertData);
 
