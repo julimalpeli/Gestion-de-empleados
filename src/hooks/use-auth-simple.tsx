@@ -76,9 +76,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         session?.user?.id,
         session?.user?.email,
       );
-      setSession(session);
+
+      // Only load session if it's valid and not from a recent logout
       if (session?.user) {
+        console.log("📱 Found existing session, loading user profile...");
+        setSession(session);
         loadUserProfile(session.user);
+      } else {
+        console.log("📱 No valid session found");
+        setSession(null);
+        setUser(null);
       }
     });
 
