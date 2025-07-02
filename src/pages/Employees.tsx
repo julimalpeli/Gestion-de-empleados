@@ -456,9 +456,7 @@ const Employees = () => {
           <SidebarTrigger />
           <div>
             <h1 className="text-2xl font-bold">Gestión de Empleados</h1>
-            <p className="text-muted-foreground">
-              Administra el personal del bar de tapas
-            </p>
+            <p className="text-muted-foreground">Administra el personal</p>
           </div>
         </div>
 
