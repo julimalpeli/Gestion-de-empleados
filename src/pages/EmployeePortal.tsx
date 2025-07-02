@@ -127,8 +127,8 @@ const EmployeePortal = () => {
     }
   };
 
-  // Enhanced debugging for employee data
-  console.log("🔍 Debug - Employee Portal Data:", {
+  // Enhanced debugging for employee data - COMMENTED OUT TO FIX LOGIN
+  // console.log("🔍 Debug - Employee Portal Data:", {
     userInfo: {
       userId: user?.id,
       userEmployeeId: user?.employeeId,
