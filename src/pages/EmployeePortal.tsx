@@ -47,13 +47,83 @@ const EmployeePortal = () => {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const { vacationRequests, loading: vacationsLoading } = useVacations();
-  const {
-    documents,
-    loading: documentsLoading,
-    error: documentsError,
-    downloadDocument,
-    getCategoryDisplayName,
-  } = useDocuments(user?.employeeId);
+  // Custom document loading that combines employee and payroll documents
+  const [allDocuments, setAllDocuments] = useState([]);
+  const [documentsLoading, setDocumentsLoading] = useState(false);
+  const [documentsError, setDocumentsError] = useState(null);
+
+  const loadAllDocuments = async () => {
+    const employeeId = currentEmployee?.id || user?.employeeId;
+    if (!employeeId) return;
+
+    try {
+      setDocumentsLoading(true);
+      setDocumentsError(null);
+
+      console.log("Loading documents for employee:", employeeId);
+
+      // Load employee documents
+      const employeeDocuments =
+        await documentService.getEmployeeDocuments(employeeId);
+      console.log("Employee documents:", employeeDocuments.length);
+
+      // Load payroll documents for this employee
+      const employeePayrollRecords = (payrollRecords || []).filter(
+        (record) => record.employeeId === employeeId,
+      );
+
+      let payrollDocuments = [];
+      for (const record of employeePayrollRecords) {
+        try {
+          const docs = await documentService.getPayrollDocuments(record.id);
+          payrollDocuments.push(...docs);
+        } catch (error) {
+          console.warn(
+            "Could not load payroll documents for record:",
+            record.id,
+          );
+        }
+      }
+
+      console.log("Payroll documents:", payrollDocuments.length);
+
+      // Combine all documents
+      const combinedDocuments = [...employeeDocuments, ...payrollDocuments];
+
+      setAllDocuments(combinedDocuments);
+    } catch (error) {
+      console.error("Error loading documents:", error);
+      setDocumentsError(error.message);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  };
+
+  // Load documents when component mounts or when payroll records change
+  useEffect(() => {
+    if (currentEmployee?.id || user?.employeeId) {
+      loadAllDocuments();
+    }
+  }, [currentEmployee?.id, user?.employeeId, payrollRecords]);
+
+  const downloadDocument = async (docId, fileName) => {
+    try {
+      await documentService.downloadDocument(docId, fileName);
+    } catch (error) {
+      console.error("Error downloading document:", error);
+      alert("Error descargando documento");
+    }
+  };
+
+  const getCategoryDisplayName = (category) => {
+    const categories = {
+      contract: "Contrato",
+      payroll: "Liquidación",
+      certificate: "Certificado",
+      other: "Otro",
+    };
+    return categories[category] || category;
+  };
 
   // Get current employee data safely
   const currentEmployee =
