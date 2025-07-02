@@ -76,7 +76,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/components/FileUpload";
 import DocumentManager from "@/components/DocumentManager";
 import usePermissions from "@/hooks/use-permissions";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-simple";
 import {
   Tooltip,
   TooltipContent,

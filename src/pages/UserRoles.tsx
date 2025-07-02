@@ -30,7 +30,7 @@ import {
   DollarSign,
 } from "lucide-react";
 import usePermissions from "@/hooks/use-permissions";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-simple";
 
 const UserRoles = () => {
   const { roles, permissions } = usePermissions();

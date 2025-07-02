@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-simple";
 
 const Unauthorized = () => {
   const navigate = useNavigate();
