@@ -358,7 +358,7 @@ const EmployeePortal = () => {
         vacationDays: vacationInfo.eligibleForVacations
           ? vacationInfo.vacationDays
           : 0,
-        vacationsTaken: currentEmployee.vacationsTaken || 0,
+        vacationsTaken: actualVacationsTaken,
         phone: "",
         email: currentEmployee.email || "",
         address: currentEmployee.address || "",
