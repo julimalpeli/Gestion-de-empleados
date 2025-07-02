@@ -185,7 +185,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         updateData.vacation_days = vacationInfo.vacationDays;
         updateData.start_date = employee.startDate;
         console.log(
-          `🔄 Recalculando vacaciones para nueva fecha: ${employee.startDate} → ${vacationInfo.vacationDays} días`,
+          `🔄 Recalculando vacaciones para nueva fecha: ${employee.startDate} ��� ${vacationInfo.vacationDays} días`,
         );
       }
 
@@ -195,8 +195,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         .from("employees")
         .update(updateData)
         .eq("id", id)
-        .select()
-        .single();
+        .select();
 
       if (error) {
         console.error("Supabase update error:", {
@@ -206,11 +205,23 @@ export class SupabaseEmployeeService implements IEmployeeService {
           hint: error.hint,
           code: error.code,
           updateData,
+          employeeId: id,
         });
         throw error;
       }
 
-      return this.mapFromSupabase(data);
+      // Check if any rows were updated
+      if (!data || data.length === 0) {
+        throw new Error(
+          `Employee with ID ${id} not found or could not be updated`,
+        );
+      }
+
+      if (data.length > 1) {
+        console.warn(`Multiple employees found with ID ${id}, using first one`);
+      }
+
+      return this.mapFromSupabase(data[0]);
     } catch (error) {
       console.error("Error updating employee:", error);
       if (error && typeof error === "object" && "message" in error) {
