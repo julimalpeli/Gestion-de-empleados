@@ -1284,6 +1284,12 @@ const Payroll = () => {
                             <div className="font-medium">{record.baseDays}</div>
                           </div>
                         </TableCell>
+                        <TableCell className="text-red-600">
+                          {formatCurrency(record.advances)}
+                        </TableCell>
+                        <TableCell className="text-red-600">
+                          {formatCurrency(record.discounts)}
+                        </TableCell>
                         <TableCell>
                           {record.overtimeHours > 0 ? (
                             <div className="text-center">
@@ -1311,12 +1317,6 @@ const Payroll = () => {
                           ) : (
                             "-"
                           )}
-                        </TableCell>
-                        <TableCell className="text-red-600">
-                          {formatCurrency(record.advances)}
-                        </TableCell>
-                        <TableCell className="text-red-600">
-                          {formatCurrency(record.discounts)}
                         </TableCell>
                         <TableCell className="font-medium text-blue-600">
                           {formatCurrency(record.bonusAmount || 0)}
