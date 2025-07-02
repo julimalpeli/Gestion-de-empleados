@@ -643,7 +643,7 @@ const EmployeePortal = () => {
                       ) : (
                         <TableRow>
                           <TableCell
-                            colSpan={9}
+                            colSpan={12}
                             className="text-center text-muted-foreground py-8"
                           >
                             No hay liquidaciones disponibles
