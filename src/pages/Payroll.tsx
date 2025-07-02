@@ -1393,11 +1393,10 @@ const Payroll = () => {
                               })()
                             : "-"}
                         </TableCell>
-                        <TableCell>{formatCurrency(record.advances)}</TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium text-blue-600">
                           {formatCurrency(record.whiteAmount)}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="font-medium text-gray-600">
                           {formatCurrency(record.informalAmount)}
                         </TableCell>
                         <TableCell>
