@@ -79,22 +79,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // Force loading to false after 3 seconds max
-    const loadingTimeout = setTimeout(() => {
-      if (mounted) {
-        console.warn("🔥 Auth loading timeout - forcing to false");
-        setLoading(false);
-      }
-    }, 3000);
-
-    // Emergency loading clear after 10 seconds
-    const emergencyTimeout = setTimeout(() => {
-      if (mounted) {
-        console.error("🚨 Emergency loading state clear");
-        setLoading(false);
-      }
-    }, 10000);
-
     const getInitialSession = async () => {
       try {
         console.log("🔄 Getting initial session...");
