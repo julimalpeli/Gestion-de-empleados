@@ -138,14 +138,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // Try to load from database
+      // Try to load from database with timeout
       console.log("🔄 Querying database for user profile...");
-      const { data: users, error } = await supabase
+
+      const queryPromise = supabase
         .from("users")
         .select("*")
         .eq("email", supabaseUser.email)
         .eq("is_active", true)
         .limit(1);
+
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Database query timeout")), 8000),
+      );
+
+      let users, error;
+      try {
+        const result = await Promise.race([queryPromise, timeoutPromise]);
+        users = result.data;
+        error = result.error;
+      } catch (timeoutError) {
+        console.warn("⏰ Database query timed out, using fallback");
+        users = null;
+        error = timeoutError;
+      }
 
       console.log("📊 Database query result:", {
         users: users?.length,
