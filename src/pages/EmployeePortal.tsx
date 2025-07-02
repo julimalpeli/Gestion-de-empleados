@@ -133,42 +133,10 @@ const EmployeePortal = () => {
 
   const downloadDocument = async (docId, fileName) => {
     try {
-      // Check if we're in offline mode
-      if (
-        documentsError?.includes("offline") ||
-        documentsError?.includes("Failed to fetch")
-      ) {
-        // In offline mode, simulate document download with a message
-        const confirmDownload = confirm(
-          `¿Desea descargar "${fileName}"?\n\nNota: Este es un documento de ejemplo en modo offline. En modo normal podrá descargar el archivo real.`,
-        );
-
-        if (confirmDownload) {
-          // Create a simple text file as demonstration
-          const content = `Documento de ejemplo: ${fileName}\n\nEste es un archivo de demostración generado en modo offline.\nEn condiciones normales, aquí se descargaría el documento real.\n\nFecha: ${new Date().toLocaleString()}`;
-          const blob = new Blob([content], { type: "text/plain" });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = `ejemplo_${fileName.replace(".pdf", ".txt")}`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          window.URL.revokeObjectURL(url);
-        }
-        return;
-      }
-
       await documentService.downloadDocument(docId, fileName);
     } catch (error) {
       console.error("Error downloading document:", error);
-      if (error.message?.includes("Failed to fetch")) {
-        alert(
-          "Error de conexión. No se pueden descargar documentos en este momento.",
-        );
-      } else {
-        alert("Error descargando documento: " + error.message);
-      }
+      alert("Error descargando documento: " + error.message);
     }
   };
 
