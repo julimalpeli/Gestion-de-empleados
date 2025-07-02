@@ -144,12 +144,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Load user profile from our users table
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      const { data: userProfile, error } = await supabase
+      const { data: users, error } = await supabase
         .from("users")
         .select("*")
         .eq("email", supabaseUser.email)
         .eq("is_active", true)
-        .single();
+        .limit(1);
+
+      const userProfile = users?.[0];
 
       if (error || !userProfile) {
         console.error("Error loading user profile:", {
