@@ -4,6 +4,7 @@ import type {
   PayrollRecord,
   CreatePayrollRequest,
 } from "@/services/interfaces";
+import { getFallbackEmployeeData } from "@/utils/offlineFallback";
 
 export const usePayroll = () => {
   const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>([]);
