@@ -87,6 +87,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }, 3000);
 
+    // Emergency loading clear after 10 seconds
+    const emergencyTimeout = setTimeout(() => {
+      if (mounted) {
+        console.error("🚨 Emergency loading state clear");
+        setLoading(false);
+      }
+    }, 10000);
+
     const getInitialSession = async () => {
       try {
         console.log("🔄 Getting initial session...");
