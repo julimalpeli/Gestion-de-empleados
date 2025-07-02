@@ -272,6 +272,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           };
 
           setUser(fallbackUser);
+          setLoading(false); // Clear loading in fallback too
+          console.log("✅ Fallback admin user set, loading cleared");
           return;
         }
 
