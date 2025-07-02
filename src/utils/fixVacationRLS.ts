@@ -4,17 +4,18 @@ export const fixVacationRLS = async () => {
   console.log("🔧 Fixing vacation_requests RLS policies...");
 
   try {
-    // Drop existing policies
-    const dropPolicies = [
-      'DROP POLICY IF EXISTS "vacation_requests_select_policy" ON public.vacation_requests',
-      'DROP POLICY IF EXISTS "vacation_requests_insert_policy" ON public.vacation_requests',
-      'DROP POLICY IF EXISTS "vacation_requests_update_policy" ON public.vacation_requests',
-      'DROP POLICY IF EXISTS "vacation_requests_delete_policy" ON public.vacation_requests',
-    ];
+    // First, let's check current user role to confirm admin access
+    const { data: currentUser, error: userError } = await supabase
+      .from("users")
+      .select("id, role, email, is_active")
+      .eq("id", (await supabase.auth.getUser()).data.user?.id)
+      .single();
 
-    for (const sql of dropPolicies) {
-      const { error } = await supabase.rpc("exec_sql", { sql_query: sql });
-      if (error) console.warn("Warning dropping policy:", error.message);
+    console.log("👤 Current user:", currentUser);
+
+    if (!currentUser || currentUser.role !== "admin") {
+      console.error("❌ Only admin users can fix RLS policies");
+      return false;
     }
 
     // Create new INSERT policy that allows admins to insert for anyone
