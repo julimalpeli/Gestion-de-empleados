@@ -65,7 +65,7 @@ const ProtectedRoute = ({
         actualRole: user?.role,
       });
       if (isEmployee()) {
-        return <Navigate to="/portal-empleado" replace />;
+        return <EmployeeRedirect />;
       } else {
         return <Navigate to="/unauthorized" replace />;
       }
