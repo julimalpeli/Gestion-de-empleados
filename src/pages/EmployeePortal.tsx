@@ -414,6 +414,23 @@ const EmployeePortal = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Offline Mode Banner */}
+        {(documentsError?.includes("offline") ||
+          documentsError?.includes("Failed to fetch")) && (
+          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-yellow-800">
+              <div className="h-2 w-2 bg-yellow-600 rounded-full animate-pulse"></div>
+              <div>
+                <p className="font-medium">Modo Offline</p>
+                <p className="text-sm">
+                  Los datos mostrados pueden estar limitados. Revise su conexión
+                  a internet.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-2">
