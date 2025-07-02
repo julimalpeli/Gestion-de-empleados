@@ -26,7 +26,7 @@ const AuthLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
   const { loading } = useAuth();
 
   // Only show loading on initial app load, not on login page
-  if (loading && window.location.pathname !== '/login') {
+  if (loading && window.location.pathname !== "/login") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -155,7 +155,6 @@ const App = () => (
             {/* Fallback routes */}
             <Route path="*" element={<NotFound />} />
           </Routes>
-          </AuthLoadingWrapper>
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
