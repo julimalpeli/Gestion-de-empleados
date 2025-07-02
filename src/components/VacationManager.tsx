@@ -518,7 +518,9 @@ const VacationManager = ({
                           size="sm"
                           onClick={() => handleDeleteVacation(vacation.id)}
                           disabled={
-                            vacation.status === "approved" && !isManager()
+                            vacation.status === "approved" &&
+                            !isAdmin() &&
+                            !isManager()
                           }
                         >
                           <Trash2 className="h-4 w-4 text-red-600" />
