@@ -11,10 +11,14 @@ if (import.meta.env.DEV) {
   import("@/utils/quickFixEmployee").then((module) => {
     (window as any).recreateEmployee44586777 = module.recreateEmployee44586777;
   });
+  import("@/utils/authDebug").then((module) => {
+    (window as any).checkAuthContext = module.checkAuthContext;
+  });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
   console.log("   - recreateEmployee44586777()");
+  console.log("   - checkAuthContext()");
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
