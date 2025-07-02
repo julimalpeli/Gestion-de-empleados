@@ -212,3 +212,7 @@ export const checkEmployeeUserStatus = async () => {
     console.error("❌ Status check failed:", error);
   }
 };
+
+// Make functions available in console for easy access
+(window as any).recreateEmployeeUsers = recreateEmployeeUsers;
+(window as any).checkEmployeeUserStatus = checkEmployeeUserStatus;
