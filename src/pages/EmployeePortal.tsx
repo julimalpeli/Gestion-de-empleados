@@ -249,13 +249,15 @@ const EmployeePortal = () => {
         position: currentEmployee.position,
         employeeId: currentEmployee.id,
         startDate: currentEmployee.startDate,
-        vacationDays: 0, // Will be calculated below
+        vacationDays: vacationInfo.eligibleForVacations
+          ? vacationInfo.vacationDays
+          : 0,
         vacationsTaken: currentEmployee.vacationsTaken || 0,
         phone: "",
         email: currentEmployee.email || "",
         address: currentEmployee.address || "",
-        isEligibleForVacations: false, // Will be calculated below
-        monthsOfService: 0,
+        isEligibleForVacations: vacationInfo.eligibleForVacations,
+        monthsOfService: vacationInfo.totalMonths || 0,
       }
     : {
         name: user?.name || "Empleado",
