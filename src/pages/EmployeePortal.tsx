@@ -274,17 +274,42 @@ const EmployeePortal = () => {
     );
   }
 
+  // Create fallback employee data if not found to prevent crashes
+  const employeeData = currentEmployee
+    ? {
+        name: currentEmployee.name,
+        dni: currentEmployee.dni,
+        documentType: currentEmployee.documentType || "DNI",
+        position: currentEmployee.position,
+        employeeId: currentEmployee.id,
+        startDate: currentEmployee.startDate,
+        vacationDays: 0, // Will be calculated below
+        vacationsTaken: currentEmployee.vacationsTaken || 0,
+        phone: "",
+        email: currentEmployee.email || "",
+        address: currentEmployee.address || "",
+        isEligibleForVacations: false, // Will be calculated below
+        monthsOfService: 0,
+      }
+    : {
+        name: user?.name || "Empleado",
+        dni: user?.username || "--------",
+        documentType: "DNI",
+        position: "Empleado",
+        employeeId: user?.employeeId || "",
+        startDate: new Date().toISOString().split("T")[0],
+        vacationDays: 0,
+        vacationsTaken: 0,
+        phone: "",
+        email: user?.email || "",
+        address: "",
+        isEligibleForVacations: false,
+        monthsOfService: 0,
+      };
+
+  // Show warning if no employee found but continue with fallback data
   if (!currentEmployee) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-500 mb-4">
-            Error: No se encontró información del empleado
-          </p>
-          <Button onClick={handleLogout}>Volver al Login</Button>
-        </div>
-      </div>
-    );
+    console.warn("No employee data found, using fallback");
   }
 
   return (
