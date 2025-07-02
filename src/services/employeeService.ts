@@ -10,42 +10,53 @@ import type {
 // Implementación con Supabase - Se puede cambiar fácilmente
 export class SupabaseEmployeeService implements IEmployeeService {
   async getAllEmployees(): Promise<Employee[]> {
-    try {
-      console.log("🔄 Consultando empleados en Supabase...");
-      console.log("🔗 URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
-      console.log(
-        "🔑 Key configurada:",
-        !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-      );
+    const maxRetries = 3;
+    let lastError;
 
-      // Test basic connectivity first
-      console.log("🔍 Testing Supabase connectivity...");
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Consultando empleados en Supabase (intento ${attempt}/${maxRetries})...`);
 
-      const { data, error } = await supabase
-        .from("employees")
-        .select("*")
-        .order("created_at", { ascending: false });
+        if (attempt === 1) {
+          console.log("🔗 URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
+          console.log("🔑 Key configurada:", !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+        }
 
-      console.log("📊 Respuesta de Supabase:", {
-        data,
-        error,
-        dataLength: data?.length,
-      });
+        const { data, error } = await supabase
+          .from("employees")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (error) {
-        console.error("❌ Error de Supabase completo:", error);
-        console.error("❌ Error message:", error.message);
-        console.error("❌ Error code:", error.code);
-        console.error("❌ Error details:", error.details);
-        console.error("❌ Error hint:", error.hint);
-        throw new Error(
-          `Supabase error: ${error.message} (Code: ${error.code})`,
-        );
+        if (error) {
+          console.error("❌ Error de Supabase completo:", error);
+          console.error("❌ Error message:", error.message);
+          console.error("❌ Error code:", error.code);
+          console.error("❌ Error details:", error.details);
+          console.error("❌ Error hint:", error.hint);
+          throw new Error(`Supabase error: ${error.message} (Code: ${error.code})`);
+        }
+
+        console.log(`✅ Successfully fetched ${data.length} employees on attempt ${attempt}`);
+        const mappedData = data.map(this.mapFromSupabase);
+        return mappedData;
+      } catch (error) {
+        lastError = error;
+        console.error(`❌ Attempt ${attempt} failed:`, error);
+
+        // Check if it's a network connectivity error
+        const isNetworkError = error instanceof TypeError &&
+          (error.message.includes('Failed to fetch') || error.message.includes('Network'));
+
+        if (attempt < maxRetries && isNetworkError) {
+          console.log(`⏳ Network error detected, retrying in ${attempt * 2} seconds...`);
+          await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+          continue;
+        }
+
+        // If it's not a network error or we're out of retries, break
+        break;
       }
-
-      const mappedData = data.map(this.mapFromSupabase);
-      console.log("✅ Datos mapeados:", mappedData);
-      return mappedData;
+    }
     } catch (error) {
       console.error("❌ Error fetching employees:", error);
 
