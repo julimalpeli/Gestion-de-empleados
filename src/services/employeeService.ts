@@ -261,12 +261,24 @@ export class SupabaseEmployeeService implements IEmployeeService {
             .select("count", { count: "exact", head: true })
             .eq("id", id);
 
-          console.error("🔍 Employee existence check:", {
-            checkData,
-            checkError,
-          });
+          console.error("🔍 Employee existence check:");
+          console.error("   - Data:", JSON.stringify(checkData, null, 2));
+          console.error("   - Error:", JSON.stringify(checkError, null, 2));
+
+          // Also try to get the actual employee record
+          const { data: employeeData, error: employeeError } = await supabase
+            .from("employees")
+            .select("id, name, status")
+            .eq("id", id);
+
+          console.error("🔍 Employee record check:");
+          console.error("   - Data:", JSON.stringify(employeeData, null, 2));
+          console.error("   - Error:", JSON.stringify(employeeError, null, 2));
         } catch (checkErr) {
-          console.error("❌ Error checking employee existence:", checkErr);
+          console.error(
+            "❌ Error checking employee existence:",
+            JSON.stringify(checkErr, null, 2),
+          );
         }
 
         throw new Error(
