@@ -545,35 +545,60 @@ const EmployeePortal = () => {
                             <TableCell className="font-medium">
                               {formatPeriod(record.period)}
                             </TableCell>
-                            <TableCell>{record.workDays} días</TableCell>
                             <TableCell>
-                              {formatCurrency(record.grossSalary)}
+                              <div className="text-center">
+                                <div className="font-medium">
+                                  {record.workDays}
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-red-600">
+                              {formatCurrency(record.adelanto)}
+                            </TableCell>
+                            <TableCell className="text-red-600">
+                              {formatCurrency(record.discounts || 0)}
                             </TableCell>
                             <TableCell>
+                              {record.overtimeHours > 0 ? (
+                                <div className="text-center">
+                                  <div className="font-medium text-purple-600">
+                                    {formatCurrency(record.overtimeAmount || 0)}
+                                  </div>
+                                  <div className="text-xs text-purple-600">
+                                    {record.overtimeHours}h
+                                  </div>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {record.holidayDays > 0 ? (
+                                <div className="text-center">
+                                  <div className="font-medium text-blue-600">
+                                    {formatCurrency(record.holidayBonus || 0)}
+                                  </div>
+                                  <div className="text-xs text-blue-600">
+                                    {record.holidayDays} días
+                                  </div>
+                                </div>
+                              ) : (
+                                "-"
+                              )}
+                            </TableCell>
+                            <TableCell className="font-medium text-blue-600">
+                              {formatCurrency(record.bonusAmount || 0)}
+                            </TableCell>
+                            <TableCell className="font-medium text-blue-600">
+                              {record.aguinaldo > 0
+                                ? formatCurrency(record.aguinaldo)
+                                : "-"}
+                            </TableCell>
+                            <TableCell className="text-blue-600">
                               {record.presentismo > 0 ? (
-                                <span className="text-green-600">
-                                  {formatCurrency(record.presentismo)}
-                                </span>
+                                formatCurrency(record.presentismo)
                               ) : (
                                 <span className="text-red-600">Perdido</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {record.aguinaldo > 0 ? (
-                                <span className="text-green-600 font-medium">
-                                  {formatCurrency(record.aguinaldo)}
-                                </span>
-                              ) : (
-                                "-"
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              {record.adelanto > 0 ? (
-                                <span className="text-red-600">
-                                  {formatCurrency(record.adelanto)}
-                                </span>
-                              ) : (
-                                "-"
                               )}
                             </TableCell>
                             <TableCell className="font-bold">
