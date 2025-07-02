@@ -131,10 +131,27 @@ const EmployeePortal = () => {
 
   const downloadDocument = async (docId, fileName) => {
     try {
+      // Check if we're in offline mode
+      if (
+        documentsError?.includes("offline") ||
+        documentsError?.includes("Failed to fetch")
+      ) {
+        alert(
+          "Los documentos no están disponibles en modo offline. Verifique su conexión a internet e intente nuevamente.",
+        );
+        return;
+      }
+
       await documentService.downloadDocument(docId, fileName);
     } catch (error) {
       console.error("Error downloading document:", error);
-      alert("Error descargando documento");
+      if (error.message?.includes("Failed to fetch")) {
+        alert(
+          "Error de conexión. No se pueden descargar documentos en este momento.",
+        );
+      } else {
+        alert("Error descargando documento: " + error.message);
+      }
     }
   };
 
@@ -437,7 +454,7 @@ const EmployeePortal = () => {
             ¡Bienvenido, {employeeData.name}!
           </h2>
           <p className="text-muted-foreground">
-            Aquí puedes consultar tu información personal, liquidaciones y
+            Aquí puedes consultar tu informaci��n personal, liquidaciones y
             vacaciones.
           </p>
         </div>
