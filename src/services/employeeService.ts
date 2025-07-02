@@ -212,11 +212,19 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       updateData.updated_at = new Date().toISOString();
 
+      console.log("📝 Update data prepared:", updateData);
+
       const { data, error } = await supabase
         .from("employees")
         .update(updateData)
         .eq("id", id)
         .select();
+
+      console.log("📊 Update query result:", {
+        data,
+        error,
+        rowsAffected: data?.length,
+      });
 
       if (error) {
         console.error("Supabase update error:", {
