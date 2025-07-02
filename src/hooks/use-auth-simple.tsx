@@ -189,6 +189,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const userProfile = users[0];
+      console.log(
+        "✅ User found in database:",
+        userProfile.name,
+        userProfile.role,
+      );
+
       const userData: User = {
         id: userProfile.id,
         username: userProfile.username,
@@ -203,8 +209,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
 
       setUser(userData);
+      console.log(
+        "🎯 User profile loaded successfully:",
+        userData.name,
+        userData.role,
+      );
     } catch (error) {
-      console.error("Error loading user profile:", error);
+      console.error("❌ Error loading user profile:", error);
+
+      // Even if there's an error, try to create a fallback user so login doesn't completely fail
+      try {
+        const emergencyFallback: User = {
+          id: supabaseUser.id,
+          username: supabaseUser.email?.split("@")[0] || "user",
+          name: "Usuario",
+          role: "employee",
+          email: supabaseUser.email || "",
+          permissions: getRolePermissions("employee"),
+          loginTime: new Date().toISOString(),
+          needsPasswordChange: false,
+          supabaseUser,
+        };
+        setUser(emergencyFallback);
+        console.log("🆘 Emergency fallback user created");
+      } catch (fallbackError) {
+        console.error("❌ Even fallback failed:", fallbackError);
+      }
     }
   };
 
