@@ -33,6 +33,8 @@ import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useVacations } from "@/hooks/use-vacations";
 import { useDocuments } from "@/hooks/use-documents";
+import { useState, useEffect } from "react";
+import { documentService } from "@/services/documentService";
 import { employeeService } from "@/services/employeeService";
 import {
   generatePayrollReceiptPDF,
