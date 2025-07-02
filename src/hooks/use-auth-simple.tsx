@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log(
-        "�� Initial session:",
+        "🔐 Initial session:",
         session?.user?.id,
         session?.user?.email,
       );
@@ -243,3 +243,60 @@ export const useAuth = () => {
   }
   return context;
 };
+
+// Direct auth debugging function
+const checkAuthContext = async () => {
+  try {
+    console.log("🔐 Checking authentication context...");
+
+    // Check client-side session
+    const {
+      data: { session },
+      error: sessionError,
+    } = await supabase.auth.getSession();
+    console.log("📱 Client session:", {
+      session: !!session,
+      user: session?.user?.id,
+      email: session?.user?.email,
+      error: sessionError,
+    });
+
+    // Try a simple authenticated query
+    const { data: testQuery, error: testError } = await supabase
+      .from("vacation_requests")
+      .select("id")
+      .limit(1);
+
+    console.log("🎯 Test vacation query result:", {
+      data: testQuery,
+      error: testError,
+    });
+
+    // Test auth context with a simpler query
+    const { data: authTest, error: authError } =
+      await supabase.rpc("get_auth_context");
+
+    console.log("🛡️ Auth context test:", {
+      data: authTest,
+      error: authError,
+    });
+
+    return {
+      session: !!session,
+      userId: session?.user?.id,
+      email: session?.user?.email,
+      canQueryVacations: !testError,
+      sessionError,
+      queryError: testError,
+      authError,
+    };
+  } catch (error) {
+    console.error("❌ Error checking auth context:", error);
+    return { error };
+  }
+};
+
+// Make immediately available
+if (typeof window !== "undefined") {
+  (window as any).checkAuthContext = checkAuthContext;
+}
