@@ -14,10 +14,16 @@ if (import.meta.env.DEV) {
   import("@/utils/connectionTest").then((module) => {
     (window as any).testConnection = module.testConnection;
   });
+  import("@/utils/syncVacations").then((module) => {
+    (window as any).syncVacationsTaken = module.syncVacationsTaken;
+    (window as any).manualSyncVacations = module.manualSyncVacations;
+  });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
   console.log("   - testConnection()");
+  console.log("   - syncVacationsTaken()");
+  console.log("   - manualSyncVacations()");
   console.log("   - recreateEmployee44586777()");
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
