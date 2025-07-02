@@ -134,44 +134,10 @@ const EmployeePortal = () => {
     currentEmployee?.name,
   );
 
-  // Calculate vacation eligibility
+  // Calculate vacation eligibility for later use
   const vacationInfo = currentEmployee?.startDate
     ? employeeService.calculateVacationDays(currentEmployee.startDate)
     : { vacationDays: 0, eligibleForVacations: false, totalMonths: 0 };
-
-  const employeeData = currentEmployee
-    ? {
-        name: currentEmployee.name,
-        dni: currentEmployee.dni,
-        documentType: currentEmployee.documentType || "DNI",
-        position: currentEmployee.position,
-        employeeId: currentEmployee.id,
-        startDate: currentEmployee.startDate,
-        vacationDays: vacationInfo.eligibleForVacations
-          ? vacationInfo.vacationDays
-          : 0,
-        vacationsTaken: currentEmployee.vacationsTaken || 0,
-        phone: "+54 11 1234-5678", // TODO: Add to employee model
-        email: currentEmployee.email || "",
-        address: currentEmployee.address || "",
-        isEligibleForVacations: vacationInfo.eligibleForVacations,
-        monthsOfService: vacationInfo.totalMonths || 0,
-      }
-    : {
-        name: user?.name || "Empleado",
-        dni: user?.username || "--------",
-        documentType: "DNI",
-        position: "Empleado",
-        employeeId: user?.employeeId || "",
-        startDate: new Date().toISOString().split("T")[0],
-        vacationDays: 0,
-        vacationsTaken: 0,
-        phone: "",
-        email: "",
-        address: "",
-        isEligibleForVacations: false,
-        monthsOfService: 0,
-      };
 
   // Get real payroll history for current employee
   const employeeId = currentEmployee?.id || user?.employeeId;
