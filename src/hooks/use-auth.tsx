@@ -184,8 +184,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
         setUser(adminUser);
-        setLoading(false); // Ensure loading clears immediately
-        console.log("✅ Admin user set, loading cleared");
+        console.log("✅ Admin user set");
         return;
       }
 
@@ -232,7 +231,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Create fallback admin user for julimalpeli@gmail.com
         if (supabaseUser.email === "julimalpeli@gmail.com") {
-          console.log("🔧 Creating fallback admin user");
+          console.log("�� Creating fallback admin user");
           const fallbackUser: User = {
             id: supabaseUser.id,
             username: "admin",
