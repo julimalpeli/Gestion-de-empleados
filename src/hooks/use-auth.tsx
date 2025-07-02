@@ -150,7 +150,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           } catch (error) {
             console.error("❌ Error loading user profile:", error);
             // Sign out user if profile loading fails
-            await supabase.auth.signOut();
+            try {
+              await supabase.auth.signOut();
+            } catch (signOutError) {
+              console.error("Error signing out:", signOutError);
+            }
             setSession(null);
             setUser(null);
           }
@@ -161,6 +165,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
 
+        // Always clear loading state
+        console.log("🎯 Clearing loading state");
         setLoading(false);
       }
     });
