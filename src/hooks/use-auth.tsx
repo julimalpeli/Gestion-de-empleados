@@ -175,6 +175,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Load user profile from our users table
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
+      console.log("🔍 Loading user profile for:", supabaseUser.email);
+
       const { data: users, error } = await supabase
         .from("users")
         .select("*")
@@ -182,10 +184,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq("is_active", true)
         .limit(1);
 
+      console.log("📊 User query result:", { users, error });
+
       const userProfile = users?.[0];
 
       if (error || !userProfile) {
-        console.error("Error loading user profile:", {
+        console.error("❌ Error loading user profile:", {
           error: error,
           message: error?.message,
           details: error?.details,
@@ -201,6 +205,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           `Usuario no autorizado: ${error?.message || "Usuario no encontrado"}`,
         );
       }
+
+      console.log(
+        "✅ User profile loaded:",
+        userProfile.name,
+        userProfile.role,
+      );
 
       const userData: User = {
         id: userProfile.id,
