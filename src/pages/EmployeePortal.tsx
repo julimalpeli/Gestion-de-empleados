@@ -525,11 +525,14 @@ const EmployeePortal = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Período</TableHead>
-                        <TableHead>Días Trabajados</TableHead>
-                        <TableHead>Sueldo Bruto</TableHead>
-                        <TableHead>Presentismo</TableHead>
+                        <TableHead>Días</TableHead>
+                        <TableHead>Adelantos</TableHead>
+                        <TableHead>Descuentos</TableHead>
+                        <TableHead>Horas Extra</TableHead>
+                        <TableHead>Feriados</TableHead>
+                        <TableHead>Bono</TableHead>
                         <TableHead>Aguinaldo</TableHead>
-                        <TableHead>Adelanto</TableHead>
+                        <TableHead>Presentismo</TableHead>
                         <TableHead>Total Neto</TableHead>
                         <TableHead>Estado</TableHead>
                         <TableHead className="text-right">Recibo</TableHead>
