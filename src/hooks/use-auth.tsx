@@ -79,6 +79,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    // Clear loading immediately to prevent infinite loading
+    const immediateTimeout = setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 100);
+
     const getInitialSession = async () => {
       try {
         console.log("🔄 Getting initial session...");
