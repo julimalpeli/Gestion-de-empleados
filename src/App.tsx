@@ -11,12 +11,13 @@ if (import.meta.env.DEV) {
   import("@/utils/quickFixEmployee").then((module) => {
     (window as any).recreateEmployee44586777 = module.recreateEmployee44586777;
   });
-  import("@/utils/authDebug").then((module) => {
-    (window as any).checkAuthContext = module.checkAuthContext;
+  import("@/utils/authDebugConsole").then((module) => {
+    (window as any).debugAuth = module.debugAuth;
   });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
+  console.log("   - debugAuth()");
   console.log("   - recreateEmployee44586777()");
   console.log("   - checkAuthContext()");
 }
