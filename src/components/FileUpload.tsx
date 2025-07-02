@@ -30,7 +30,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import useFiles, { FileDocument } from "@/hooks/use-files";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-simple";
 
 interface FileUploadProps {
   entityId: number;
