@@ -103,6 +103,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
+  // Make debug functions available globally
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      (window as any).checkAuthContext = checkAuthContext;
+      (window as any).checkSession = checkSession;
+      console.log("🔧 Auth debug functions available:");
+      console.log("   - checkAuthContext()");
+      console.log("   - checkSession()");
+    }
+  }, []);
+
   // Load user profile
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
