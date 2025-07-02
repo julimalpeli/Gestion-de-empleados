@@ -152,7 +152,12 @@ const EmployeePortal = () => {
       presentismo: record.presentismoAmount,
       aguinaldo: record.aguinaldo,
       adelanto: record.advances,
-      netTotal: record.netTotal + (record.aguinaldo || 0),
+      netTotal: record.netTotal, // Fixed: Don't add aguinaldo twice, it's already included in netTotal
+      discounts: record.discounts,
+      overtimeHours: record.overtimeHours,
+      overtimeAmount: record.overtimeAmount,
+      bonusAmount: record.bonusAmount,
+      holidayBonus: record.holidayBonus,
       status: record.status,
       paidDate: record.processedDate
         ? new Date(record.processedDate).toLocaleDateString("es-AR")
