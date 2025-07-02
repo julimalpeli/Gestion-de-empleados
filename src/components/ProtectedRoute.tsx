@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import usePermissions from "@/hooks/use-permissions";
+import { EmployeeRedirect } from "@/components/EmployeeRedirect";
 
 interface ProtectedRouteProps {
   children: ReactNode;
