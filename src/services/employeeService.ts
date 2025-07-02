@@ -15,11 +15,16 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`🔄 Consultando empleados en Supabase (intento ${attempt}/${maxRetries})...`);
+        console.log(
+          `🔄 Consultando empleados en Supabase (intento ${attempt}/${maxRetries})...`,
+        );
 
         if (attempt === 1) {
           console.log("🔗 URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
-          console.log("🔑 Key configurada:", !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+          console.log(
+            "🔑 Key configurada:",
+            !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+          );
         }
 
         const { data, error } = await supabase
@@ -33,10 +38,14 @@ export class SupabaseEmployeeService implements IEmployeeService {
           console.error("❌ Error code:", error.code);
           console.error("❌ Error details:", error.details);
           console.error("❌ Error hint:", error.hint);
-          throw new Error(`Supabase error: ${error.message} (Code: ${error.code})`);
+          throw new Error(
+            `Supabase error: ${error.message} (Code: ${error.code})`,
+          );
         }
 
-        console.log(`✅ Successfully fetched ${data.length} employees on attempt ${attempt}`);
+        console.log(
+          `✅ Successfully fetched ${data.length} employees on attempt ${attempt}`,
+        );
         const mappedData = data.map(this.mapFromSupabase);
         return mappedData;
       } catch (error) {
@@ -44,12 +53,16 @@ export class SupabaseEmployeeService implements IEmployeeService {
         console.error(`❌ Attempt ${attempt} failed:`, error);
 
         // Check if it's a network connectivity error
-        const isNetworkError = error instanceof TypeError &&
-          (error.message.includes('Failed to fetch') || error.message.includes('Network'));
+        const isNetworkError =
+          error instanceof TypeError &&
+          (error.message.includes("Failed to fetch") ||
+            error.message.includes("Network"));
 
         if (attempt < maxRetries && isNetworkError) {
-          console.log(`⏳ Network error detected, retrying in ${attempt * 2} seconds...`);
-          await new Promise(resolve => setTimeout(resolve, attempt * 2000));
+          console.log(
+            `⏳ Network error detected, retrying in ${attempt * 2} seconds...`,
+          );
+          await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
           continue;
         }
 
@@ -57,32 +70,20 @@ export class SupabaseEmployeeService implements IEmployeeService {
         break;
       }
     }
-    } catch (error) {
-      console.error("❌ Error fetching employees:", error);
 
-      // Check if it's a network error
-      if (error instanceof TypeError && error.message === "Failed to fetch") {
-        console.error("🌐 Network connectivity issue detected");
-        console.error("🔧 Checking environment variables...");
-        console.error(
-          "   - VITE_SUPABASE_URL:",
-          import.meta.env.VITE_SUPABASE_URL,
-        );
-        console.error(
-          "   - VITE_SUPABASE_ANON_KEY:",
-          import.meta.env.VITE_SUPABASE_ANON_KEY?.slice(0, 20) + "...",
-        );
+    // If we get here, all retries failed
+    console.error("❌ All retries failed. Last error:", lastError);
 
-        throw new Error(
-          "Error de conectividad: No se puede conectar a la base de datos. Verifique su conexión a internet y configuración.",
-        );
-      }
-
-      if (error instanceof Error) {
-        throw error; // Re-throw the original error with details
-      }
-      throw new Error("Failed to fetch employees: Unknown error");
+    if (
+      lastError instanceof TypeError &&
+      lastError.message === "Failed to fetch"
+    ) {
+      throw new Error(
+        "Error de conectividad: No se puede conectar a la base de datos. Verifique su conexión a internet.",
+      );
     }
+
+    throw lastError || new Error("Unknown error occurred");
   }
 
   async getEmployeeById(id: string): Promise<Employee | null> {
