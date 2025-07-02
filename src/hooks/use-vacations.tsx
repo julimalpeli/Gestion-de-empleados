@@ -85,6 +85,15 @@ export const useVacations = (employeeId?: string) => {
     try {
       console.log("🔄 Creating vacation request:", vacation);
 
+      // Check current auth context
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      console.log("🔐 Current auth context:");
+      console.log("   - auth.uid():", session?.user?.id);
+      console.log("   - auth.email():", session?.user?.email);
+      console.log("   - employee_id to insert:", vacation.employeeId);
+
       const insertData = {
         employee_id: vacation.employeeId,
         start_date: vacation.startDate,
