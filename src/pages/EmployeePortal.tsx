@@ -279,6 +279,12 @@ const EmployeePortal = () => {
     return `${monthNames[parseInt(month) - 1]} ${year}`;
   };
 
+  // Safety check - if user is not authenticated, redirect to login
+  if (!user) {
+    navigate("/login");
+    return null;
+  }
+
   if (employeesLoading || payrollLoading || vacationsLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-background to-muted flex items-center justify-center">
