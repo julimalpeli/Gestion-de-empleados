@@ -122,12 +122,42 @@ const EmployeePortal = () => {
   );
 
   // Debug: Log employee data
-  console.log("Debug - Employee Portal:", {
-    userId: user?.employeeId,
-    currentEmployee,
-    employees: employees?.length,
-    employeeEmail: currentEmployee?.email,
-    employeeAddress: currentEmployee?.address,
+  console.log("🔍 Debug - Employee Portal Data:", {
+    userInfo: {
+      userId: user?.id,
+      userEmployeeId: user?.employeeId,
+      userEmail: user?.email,
+      userName: user?.name,
+    },
+    employees: {
+      total: employees?.length || 0,
+      list:
+        employees?.map((emp) => ({
+          id: emp.id,
+          name: emp.name,
+          email: emp.email,
+        })) || [],
+    },
+    currentEmployee: currentEmployee
+      ? {
+          id: currentEmployee.id,
+          name: currentEmployee.name,
+          email: currentEmployee.email,
+        }
+      : null,
+    payrollRecords: {
+      total: payrollRecords?.length || 0,
+      forCurrentUser:
+        payrollRecords?.filter(
+          (record) => record.employeeId === user?.employeeId,
+        ).length || 0,
+    },
+    vacationRequests: {
+      total: vacationRequests?.length || 0,
+      forCurrentUser:
+        vacationRequests?.filter((req) => req.employeeId === user?.employeeId)
+          .length || 0,
+    },
   });
 
   // Calculate vacation eligibility
