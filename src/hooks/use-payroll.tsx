@@ -60,19 +60,9 @@ export const usePayroll = () => {
     } catch (err) {
       console.error("❌ Error loading payroll records:", err);
 
-      // Check if it's a connectivity error and use fallback data
-      if (err.message?.includes("Failed to fetch")) {
-        console.log("🔄 Using offline fallback payroll data");
-        const fallbackData = getFallbackEmployeeData(
-          "daianaayelen0220@gmail.com",
-        );
-        setPayrollRecords(fallbackData.payroll);
-        setError("Modo offline - Datos de liquidaciones limitados");
-      } else {
-        setError(
-          err instanceof Error ? err.message : "Error loading payroll records",
-        );
-      }
+      setError(
+        err instanceof Error ? err.message : "Error loading payroll records",
+      );
     } finally {
       setLoading(false);
     }
