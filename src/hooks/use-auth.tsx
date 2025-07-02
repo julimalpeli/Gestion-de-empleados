@@ -218,17 +218,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userProfile = users?.[0];
 
       if (error || !userProfile) {
-        console.error("❌ Error loading user profile:", {
+        console.warn("⚠️ User profile not found, creating fallback:", {
           error: error,
           message: error?.message,
-          details: error?.details,
-          hint: error?.hint,
-          code: error?.code,
-          userProfile: userProfile,
           email: supabaseUser.email,
         });
 
-        // If user doesn't exist in our users table, sign them out
+        // Create fallback admin user for julimalpeli@gmail.com
+        if (supabaseUser.email === "julimalpeli@gmail.com") {
+          console.log("🔧 Creating fallback admin user");
+          const fallbackUser: User = {
+            id: supabaseUser.id,
+            username: "admin",
+            name: "Julian Malpeli (Admin)",
+            role: "admin",
+            email: supabaseUser.email,
+            employeeId: undefined,
+            permissions: ["all"],
+            loginTime: new Date().toISOString(),
+            needsPasswordChange: false,
+            supabaseUser,
+          };
+
+          setUser(fallbackUser);
+          return;
+        }
+
+        // For other users, sign them out
         await supabase.auth.signOut();
         throw new Error(
           `Usuario no autorizado: ${error?.message || "Usuario no encontrado"}`,
