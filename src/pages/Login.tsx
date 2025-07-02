@@ -116,8 +116,10 @@ const Login = () => {
     }
 
     try {
+      console.log("🔐 Attempting login for:", email);
       await login(email, password);
 
+      console.log("✅ Login successful");
       // Reset failed attempts on successful login
       setFailedAttempts(0);
       localStorage.removeItem("loginBlock");
