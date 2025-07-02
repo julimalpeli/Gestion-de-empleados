@@ -200,8 +200,9 @@ const EmployeePortal = () => {
       };
 
   // Get real payroll history for current employee
+  const currentEmployeeId = currentEmployee?.id || user?.employeeId;
   const payrollHistory = (payrollRecords || [])
-    .filter((record) => record.employeeId === user?.employeeId)
+    .filter((record) => record.employeeId === currentEmployeeId)
     .map((record) => ({
       id: record.id,
       period: record.period,
