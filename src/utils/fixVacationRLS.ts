@@ -141,7 +141,13 @@ export const fixVacationRLS = async () => {
     console.log("✅ Vacation RLS policies updated successfully!");
     return true;
   } catch (error) {
-    console.error("❌ Error fixing RLS policies:", error);
+    console.error("❌ Error fixing RLS policies:");
+    console.error("   - Error type:", typeof error);
+    console.error(
+      "   - Error message:",
+      error instanceof Error ? error.message : String(error),
+    );
+    console.error("   - Full error:", JSON.stringify(error, null, 2));
     return false;
   }
 };
