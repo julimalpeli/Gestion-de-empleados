@@ -270,10 +270,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         timestamp: new Date().toISOString(),
       });
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // Add timeout to prevent hanging
+      const loginPromise = supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password,
       });
+
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Login timeout")), 15000),
+      );
+
+      const { data, error } = await Promise.race([
+        loginPromise,
+        timeoutPromise,
+      ]);
 
       if (error) {
         logSecurityEvent("LOGIN_FAILED", {
@@ -281,10 +291,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           error: error.message,
           timestamp: new Date().toISOString(),
         });
+        setLoading(false);
         throw error;
       }
 
       if (!data.user) {
+        setLoading(false);
         throw new Error("No se pudo autenticar el usuario");
       }
 
