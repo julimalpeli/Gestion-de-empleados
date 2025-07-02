@@ -7,10 +7,14 @@ if (import.meta.env.DEV) {
   import("@/utils/recreateEmployeeUsers").then((module) => {
     (window as any).recreateEmployeeUsers = module.recreateEmployeeUsers;
     (window as any).checkEmployeeUserStatus = module.checkEmployeeUserStatus;
-    console.log("🔧 Dev tools loaded:");
-    console.log("   - recreateEmployeeUsers()");
-    console.log("   - checkEmployeeUserStatus()");
   });
+  import("@/utils/quickFixEmployee").then((module) => {
+    (window as any).recreateEmployee44586777 = module.recreateEmployee44586777;
+  });
+  console.log("🔧 Dev tools loaded:");
+  console.log("   - recreateEmployeeUsers()");
+  console.log("   - checkEmployeeUserStatus()");
+  console.log("   - recreateEmployee44586777()");
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
