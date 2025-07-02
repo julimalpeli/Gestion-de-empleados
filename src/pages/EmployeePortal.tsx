@@ -919,18 +919,6 @@ const EmployeePortal = () => {
                     </Table>
                   </div>
                 </div>
-
-                {/* Request New Vacation */}
-                <div className="border-t pt-6">
-                  <Button className="w-full sm:w-auto">
-                    <Plane className="h-4 w-4 mr-2" />
-                    Solicitar D��as de Vacaciones
-                  </Button>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    Contacta con tu supervisor para solicitar nuevos días de
-                    vacaciones
-                  </p>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
