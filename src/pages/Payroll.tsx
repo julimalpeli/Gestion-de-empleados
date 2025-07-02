@@ -1408,58 +1408,17 @@ const Payroll = () => {
                             <span className="text-red-600">Perdido</span>
                           )}
                         </TableCell>
-                        <TableCell className="font-medium">
-                          {isAguinaldoPeriod(record.period)
-                            ? (() => {
-                                const employee = employees.find(
-                                  (e) => e.name === record.employeeName,
-                                );
-                                if (employee) {
-                                  const correctAguinaldo = calculateAguinaldo(
-                                    employee,
-                                    record.period,
-                                  );
-                                  // Si netTotal ya incluye aguinaldo, solo mostrar netTotal
-                                  // Si no, calcular correctamente
-                                  const hasCorrectAguinaldo =
-                                    Math.abs(
-                                      (record.aguinaldo || 0) -
-                                        correctAguinaldo,
-                                    ) < 1;
-                                  if (hasCorrectAguinaldo) {
-                                    return formatCurrency(record.netTotal);
-                                  } else {
-                                    return formatCurrency(
-                                      record.netTotal -
-                                        (record.aguinaldo || 0) +
-                                        correctAguinaldo,
-                                    );
-                                  }
-                                }
-                                return formatCurrency(record.netTotal);
-                              })()
-                            : formatCurrency(record.netTotal)}
-                          {isAguinaldoPeriod(record.period) &&
-                            (() => {
-                              const employee = employees.find(
-                                (e) => e.name === record.employeeName,
-                              );
-                              if (employee) {
-                                const correctAguinaldo = calculateAguinaldo(
-                                  employee,
-                                  record.period,
-                                );
-                                if (correctAguinaldo > 0) {
-                                  return (
-                                    <div className="text-xs text-green-600">
-                                      Incluye aguinaldo:{" "}
-                                      {formatCurrency(correctAguinaldo)}
-                                    </div>
-                                  );
-                                }
-                              }
-                              return null;
-                            })()}
+                        <TableCell className="font-medium text-green-600">
+                          <div>
+                            <div>{formatCurrency(record.netTotal)}</div>
+                            {isAguinaldoPeriod(record.period) &&
+                              record.aguinaldo > 0 && (
+                                <div className="text-xs text-green-700">
+                                  Incluye aguinaldo:{" "}
+                                  {formatCurrency(record.aguinaldo)}
+                                </div>
+                              )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-2">
