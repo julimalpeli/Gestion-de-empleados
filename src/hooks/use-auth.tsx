@@ -93,7 +93,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             "⚠️ Error getting session (will continue):",
             error.message,
           );
-          if (mounted) setLoading(false);
           return;
         }
 
@@ -112,11 +111,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               );
             }
           }
-          setLoading(false);
         }
       } catch (error) {
         console.warn("⚠️ Error in getInitialSession (will continue):", error);
-        if (mounted) setLoading(false);
       }
     };
 
