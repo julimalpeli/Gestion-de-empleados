@@ -152,11 +152,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (error || !userProfile) {
-        console.error("Error loading user profile:", error);
+        console.error("Error loading user profile:", {
+          error: error,
+          message: error?.message,
+          details: error?.details,
+          hint: error?.hint,
+          code: error?.code,
+          userProfile: userProfile,
+          email: supabaseUser.email,
+        });
 
         // If user doesn't exist in our users table, sign them out
         await supabase.auth.signOut();
-        throw new Error("Usuario no autorizado en el sistema");
+        throw new Error(
+          `Usuario no autorizado: ${error?.message || "Usuario no encontrado"}`,
+        );
       }
 
       const userData: User = {
