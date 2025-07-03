@@ -220,7 +220,7 @@ const Payroll = () => {
     try {
       const employee = employees.find((e) => e.name === record.employeeName);
       if (!employee) {
-        alert("No se encontró el empleado para duplicar la liquidación");
+        alert("No se encontró el empleado para duplicar la liquidaci��n");
         return;
       }
 
@@ -1520,7 +1520,7 @@ const Payroll = () => {
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      <p>Aprobar liquidación</p>
+                                      <p>Aprobar liquidaci��n</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
@@ -1780,7 +1780,7 @@ const Payroll = () => {
                                       }
                                     }}
                                   >
-                                    <FileText className="h-4 w-4" />
+                                    <FolderOpen className="h-4 w-4" />
                                   </Button>
                                 </TooltipTrigger>
                                 <TooltipContent>
