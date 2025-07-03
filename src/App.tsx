@@ -18,12 +18,16 @@ if (import.meta.env.DEV) {
     (window as any).syncVacationsTaken = module.syncVacationsTaken;
     (window as any).manualSyncVacations = module.manualSyncVacations;
   });
+  import("@/utils/debugRLS").then((module) => {
+    (window as any).debugRLSPermissions = module.debugRLSPermissions;
+  });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
   console.log("   - testConnection()");
   console.log("   - syncVacationsTaken()");
   console.log("   - manualSyncVacations()");
+  console.log("   - debugRLSPermissions()");
   console.log("   - recreateEmployee44586777()");
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
