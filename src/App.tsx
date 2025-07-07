@@ -13,6 +13,7 @@ if (import.meta.env.DEV) {
     import("@/utils/debugRLS"),
     import("@/utils/fixAuthUsers"),
     import("@/utils/emergencyAuth"),
+    import("@/utils/emergencyAuthRepair"),
   ])
     .then(
       ([
@@ -23,6 +24,7 @@ if (import.meta.env.DEV) {
         debugModule,
         fixAuthModule,
         emergencyModule,
+        repairModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -42,6 +44,10 @@ if (import.meta.env.DEV) {
           emergencyModule.emergencyAdminLogin;
         (window as any).clearEmergencyAuth = emergencyModule.clearEmergencyAuth;
         (window as any).checkEmergencyAuth = emergencyModule.checkEmergencyAuth;
+        (window as any).emergencyAuthRepair = repairModule.emergencyAuthRepair;
+        (window as any).fixSupabaseAuthSettings =
+          repairModule.fixSupabaseAuthSettings;
+        (window as any).testBasicAuth = repairModule.testBasicAuth;
 
         console.log("🔧 Dev tools loaded and available:");
         console.log("   - recreateEmployeeUsers()");
@@ -57,6 +63,10 @@ if (import.meta.env.DEV) {
         console.log("   - listAuthUsers()");
         console.log("   - emergencyAdminLogin() [EMERGENCY ONLY]");
         console.log("   - recreateEmployee44586777()");
+        console.log("   🚨 EMERGENCY AUTH REPAIR:");
+        console.log("   - emergencyAuthRepair() - Complete auth diagnosis");
+        console.log("   - fixSupabaseAuthSettings() - Configuration guide");
+        console.log("   - testBasicAuth() - Basic signup/signin test");
       },
     )
     .catch((error) => {
