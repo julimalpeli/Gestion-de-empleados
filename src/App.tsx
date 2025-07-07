@@ -21,6 +21,11 @@ if (import.meta.env.DEV) {
   import("@/utils/debugRLS").then((module) => {
     (window as any).debugRLSPermissions = module.debugRLSPermissions;
   });
+  import("@/utils/fixAuthUsers").then((module) => {
+    (window as any).verifyAuthUsers = module.verifyAuthUsers;
+    (window as any).resetUserPassword = module.resetUserPassword;
+    (window as any).listAuthUsers = module.listAuthUsers;
+  });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
@@ -28,6 +33,7 @@ if (import.meta.env.DEV) {
   console.log("   - syncVacationsTaken()");
   console.log("   - manualSyncVacations()");
   console.log("   - debugRLSPermissions()");
+  console.log("   - verifyAuthUsers()");
   console.log("   - recreateEmployee44586777()");
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
