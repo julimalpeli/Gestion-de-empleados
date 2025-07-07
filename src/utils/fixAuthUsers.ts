@@ -70,6 +70,10 @@ export const verifyAuthUsers = async () => {
               name: user.name,
               role: user.role,
               is_active: true,
+              password_hash: btoa(user.password), // Base64 encoded password
+              needs_password_change: false,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
               employee_id:
                 user.role === "employee"
                   ? "d6f06332-1d49-4935-b931-5d7657d58468"
@@ -109,6 +113,10 @@ export const verifyAuthUsers = async () => {
           name: user.name,
           role: user.role,
           is_active: true,
+          password_hash: btoa(user.password), // Base64 encoded password
+          needs_password_change: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           employee_id:
             user.role === "employee"
               ? "d6f06332-1d49-4935-b931-5d7657d58468"
