@@ -16,6 +16,7 @@ if (import.meta.env.DEV) {
     import("@/utils/emergencyAuthRepair"),
     import("@/utils/fixNachitoUser"),
     import("@/utils/createEmployeeUsers"),
+    import("@/utils/diagnoseDatabase"),
   ])
     .then(
       ([
@@ -29,6 +30,7 @@ if (import.meta.env.DEV) {
         repairModule,
         nachitoModule,
         createUsersModule,
+        diagnoseModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -60,6 +62,10 @@ if (import.meta.env.DEV) {
           createUsersModule.createUsersForAllEmployees;
         (window as any).findEmployeesWithoutUsers =
           createUsersModule.findEmployeesWithoutUsers;
+        (window as any).diagnoseEmployeesTable =
+          diagnoseModule.diagnoseEmployeesTable;
+        (window as any).fixEmployeeUsersQuery =
+          diagnoseModule.fixEmployeeUsersQuery;
 
         console.log("🔧 Dev tools loaded and available:");
         console.log("   - recreateEmployeeUsers()");
@@ -92,6 +98,9 @@ if (import.meta.env.DEV) {
         console.log(
           "   - createUserForEmployee({ id, name, dni, email }) - Specific employee",
         );
+        console.log("   🔍 DATABASE DIAGNOSIS:");
+        console.log("   - diagnoseEmployeesTable() - Check table structure");
+        console.log("   - fixEmployeeUsersQuery() - Safe employee/user query");
       },
     )
     .catch((error) => {

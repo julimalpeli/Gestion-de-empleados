@@ -245,10 +245,10 @@ export const findEmployeesWithoutUsers = async () => {
   console.log("🔍 === FINDING EMPLOYEES WITHOUT USERS ===");
 
   try {
-    // Get all employees
+    // Get all employees (removed position column that doesn't exist)
     const { data: employees, error: employeesError } = await supabase
       .from("employees")
-      .select("id, name, dni, email, position");
+      .select("id, name, dni, email");
 
     if (employeesError) {
       console.error("❌ Failed to fetch employees:", employeesError);
