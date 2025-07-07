@@ -16,6 +16,12 @@ export const verifyAuthUsers = async () => {
       role: "employee",
       name: "Porras Daiana Ayelen",
     },
+    {
+      email: "nachito_ja@hotmail.com",
+      password: "30728007",
+      role: "employee",
+      name: "Ignacio Alvarez",
+    },
   ];
 
   for (const user of knownUsers) {
