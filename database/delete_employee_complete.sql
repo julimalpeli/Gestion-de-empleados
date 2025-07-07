@@ -105,6 +105,31 @@ SELECT
 FROM files
 WHERE entity_type = 'employee' AND entity_id = 'EMPLOYEE_ID_HERE';
 
+-- OPCIONAL: ELIMINAR TAMBIÉN ARCHIVOS DE PAYROLL DEL EMPLEADO
+-- Si quieres eliminar archivos asociados a payrolls del empleado, descomenta las siguientes líneas:
+
+-- Obtener payrolls del empleado y sus archivos asociados
+/*
+SELECT DISTINCT
+  f.id,
+  f.name,
+  f.type,
+  f.entity_type,
+  f.entity_id,
+  pr.employee_id,
+  'payroll_file' as file_source
+FROM files f
+JOIN payroll_records pr ON f.entity_type = 'payroll' AND f.entity_id = pr.id
+WHERE pr.employee_id = 'EMPLOYEE_ID_HERE';
+
+-- Eliminar archivos de payroll del empleado
+DELETE FROM files
+WHERE entity_type = 'payroll'
+AND entity_id IN (
+  SELECT id FROM payroll_records WHERE employee_id = 'EMPLOYEE_ID_HERE'
+);
+*/
+
 -- PASO 6: ELIMINAR USUARIO ASOCIADO
 -- Obtener datos del usuario antes de eliminar
 SELECT
