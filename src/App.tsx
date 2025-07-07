@@ -14,6 +14,7 @@ if (import.meta.env.DEV) {
     import("@/utils/fixAuthUsers"),
     import("@/utils/emergencyAuth"),
     import("@/utils/emergencyAuthRepair"),
+    import("@/utils/fixNachitoUser"),
   ])
     .then(
       ([
@@ -25,6 +26,7 @@ if (import.meta.env.DEV) {
         fixAuthModule,
         emergencyModule,
         repairModule,
+        nachitoModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -48,6 +50,8 @@ if (import.meta.env.DEV) {
         (window as any).fixSupabaseAuthSettings =
           repairModule.fixSupabaseAuthSettings;
         (window as any).testBasicAuth = repairModule.testBasicAuth;
+        (window as any).fixNachitoUser = nachitoModule.fixNachitoUser;
+        (window as any).testNachitoLogin = nachitoModule.testNachitoLogin;
 
         console.log("🔧 Dev tools loaded and available:");
         console.log("   - recreateEmployeeUsers()");
@@ -67,6 +71,9 @@ if (import.meta.env.DEV) {
         console.log("   - emergencyAuthRepair() - Complete auth diagnosis");
         console.log("   - fixSupabaseAuthSettings() - Configuration guide");
         console.log("   - testBasicAuth() - Basic signup/signin test");
+        console.log("   🔧 SPECIFIC USER FIXES:");
+        console.log("   - fixNachitoUser() - Fix nachito_ja@hotmail.com");
+        console.log("   - testNachitoLogin() - Test nachito login");
       },
     )
     .catch((error) => {
