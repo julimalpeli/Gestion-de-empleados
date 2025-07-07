@@ -179,12 +179,45 @@ export const useUsers = () => {
       if (updates.needsPasswordChange !== undefined)
         updateData.needs_password_change = updates.needsPasswordChange;
 
-      const { error } = await supabase
+      // Actualizar tabla users
+      const { error: userError } = await supabase
         .from("users")
         .update(updateData)
         .eq("id", id);
 
-      if (error) throw error;
+      if (userError) throw userError;
+
+      // Si se está actualizando el estado activo, sincronizar con tabla employees
+      if (updates.isActive !== undefined) {
+        // Obtener el employee_id del usuario
+        const { data: userData, error: userFetchError } = await supabase
+          .from("users")
+          .select("employee_id")
+          .eq("id", id)
+          .single();
+
+        if (!userFetchError && userData?.employee_id) {
+          console.log(
+            `🔄 Syncing employee status: ${userData.employee_id} -> ${updates.isActive ? "active" : "inactive"}`,
+          );
+
+          // Actualizar el campo status en la tabla employees
+          const { error: employeeError } = await supabase
+            .from("employees")
+            .update({
+              status: updates.isActive ? "active" : "inactive",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", userData.employee_id);
+
+          if (employeeError) {
+            console.error("❌ Error syncing employee status:", employeeError);
+            // No lanzar error para no bloquear la actualización del usuario
+          } else {
+            console.log("✅ Employee status synced successfully");
+          }
+        }
+      }
 
       await fetchUsers();
     } catch (err) {
