@@ -26,6 +26,11 @@ if (import.meta.env.DEV) {
     (window as any).resetUserPassword = module.resetUserPassword;
     (window as any).listAuthUsers = module.listAuthUsers;
   });
+  import("@/utils/emergencyAuth").then((module) => {
+    (window as any).emergencyAdminLogin = module.emergencyAdminLogin;
+    (window as any).clearEmergencyAuth = module.clearEmergencyAuth;
+    (window as any).checkEmergencyAuth = module.checkEmergencyAuth;
+  });
   console.log("🔧 Dev tools loaded:");
   console.log("   - recreateEmployeeUsers()");
   console.log("   - checkEmployeeUserStatus()");
@@ -34,6 +39,7 @@ if (import.meta.env.DEV) {
   console.log("   - manualSyncVacations()");
   console.log("   - debugRLSPermissions()");
   console.log("   - verifyAuthUsers()");
+  console.log("   - emergencyAdminLogin() [EMERGENCY ONLY]");
   console.log("   - recreateEmployee44586777()");
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
