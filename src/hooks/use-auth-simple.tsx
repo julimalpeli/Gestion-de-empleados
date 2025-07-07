@@ -7,6 +7,7 @@ import {
 } from "react";
 import { supabase } from "@/lib/supabase";
 import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
+import { checkEmergencyAuth } from "@/utils/emergencyAuth";
 
 interface User {
   id: string;
