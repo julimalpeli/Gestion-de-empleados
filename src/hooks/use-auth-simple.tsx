@@ -240,6 +240,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           permissions: getRolePermissions("employee"),
           loginTime: new Date().toISOString(),
           needsPasswordChange: false,
+          isActive: true,
           supabaseUser,
         };
         setUser(fallbackUser);
@@ -258,6 +259,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           permissions: getRolePermissions("employee"),
           loginTime: new Date().toISOString(),
           needsPasswordChange: false,
+          isActive: true,
           supabaseUser,
         };
         setUser(fallbackUser);
@@ -305,6 +307,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           permissions: getRolePermissions("employee"),
           loginTime: new Date().toISOString(),
           needsPasswordChange: false,
+          isActive: true,
           supabaseUser,
         };
         setUser(emergencyFallback);
