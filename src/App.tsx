@@ -15,6 +15,7 @@ if (import.meta.env.DEV) {
     import("@/utils/emergencyAuth"),
     import("@/utils/emergencyAuthRepair"),
     import("@/utils/fixNachitoUser"),
+    import("@/utils/createEmployeeUsers"),
   ])
     .then(
       ([
@@ -27,6 +28,7 @@ if (import.meta.env.DEV) {
         emergencyModule,
         repairModule,
         nachitoModule,
+        createUsersModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -52,6 +54,12 @@ if (import.meta.env.DEV) {
         (window as any).testBasicAuth = repairModule.testBasicAuth;
         (window as any).fixNachitoUser = nachitoModule.fixNachitoUser;
         (window as any).testNachitoLogin = nachitoModule.testNachitoLogin;
+        (window as any).createUserForEmployee =
+          createUsersModule.createUserForEmployee;
+        (window as any).createUsersForAllEmployees =
+          createUsersModule.createUsersForAllEmployees;
+        (window as any).findEmployeesWithoutUsers =
+          createUsersModule.findEmployeesWithoutUsers;
 
         console.log("🔧 Dev tools loaded and available:");
         console.log("   - recreateEmployeeUsers()");
@@ -74,6 +82,16 @@ if (import.meta.env.DEV) {
         console.log("   🔧 SPECIFIC USER FIXES:");
         console.log("   - fixNachitoUser() - Fix nachito_ja@hotmail.com");
         console.log("   - testNachitoLogin() - Test nachito login");
+        console.log("   👥 EMPLOYEE USER CREATION:");
+        console.log(
+          "   - findEmployeesWithoutUsers() - List employees without users",
+        );
+        console.log(
+          "   - createUsersForAllEmployees() - Create users for all employees",
+        );
+        console.log(
+          "   - createUserForEmployee({ id, name, dni, email }) - Specific employee",
+        );
       },
     )
     .catch((error) => {
