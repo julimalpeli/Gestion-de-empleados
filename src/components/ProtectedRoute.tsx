@@ -33,6 +33,12 @@ const ProtectedRoute = ({
       return <Navigate to="/login" replace />;
     }
 
+    // Check if user is active
+    if (user && !user.isActive) {
+      console.log("🚫 User is inactive, redirecting to login");
+      return <Navigate to="/login" replace />;
+    }
+
     // Check specific role requirement
     if (requiredRole && user?.role !== requiredRole) {
       // Redirect to appropriate dashboard based on role

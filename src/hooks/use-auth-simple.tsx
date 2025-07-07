@@ -19,6 +19,7 @@ interface User {
   permissions: string[];
   loginTime: string;
   needsPasswordChange?: boolean;
+  isActive?: boolean;
   supabaseUser?: SupabaseUser;
 }
 
@@ -169,6 +170,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           permissions: ["all"],
           loginTime: new Date().toISOString(),
           needsPasswordChange: false,
+          isActive: true,
           supabaseUser,
         };
         setUser(adminUser);
@@ -188,6 +190,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           permissions: getRolePermissions("employee"),
           loginTime: new Date().toISOString(),
           needsPasswordChange: false,
+          isActive: true,
           supabaseUser,
         };
         setUser(employeeUser);
@@ -278,6 +281,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         permissions: getRolePermissions(userProfile.role),
         loginTime: new Date().toISOString(),
         needsPasswordChange: userProfile.needs_password_change || false,
+        isActive: userProfile.is_active,
         supabaseUser,
       };
 
