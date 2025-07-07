@@ -13,6 +13,7 @@ if (import.meta.env.DEV) {
     import("@/utils/debugRLS"),
     import("@/utils/fixAuthUsers"),
     import("@/utils/emergencyAuth"),
+    import("@/utils/deleteEmployee"),
   ])
     .then(
       ([
@@ -23,6 +24,7 @@ if (import.meta.env.DEV) {
         debugModule,
         fixAuthModule,
         emergencyModule,
+        deleteModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -42,8 +44,15 @@ if (import.meta.env.DEV) {
           emergencyModule.emergencyAdminLogin;
         (window as any).clearEmergencyAuth = emergencyModule.clearEmergencyAuth;
         (window as any).checkEmergencyAuth = emergencyModule.checkEmergencyAuth;
+        (window as any).deleteEmployeeCompletely =
+          deleteModule.deleteEmployeeCompletely;
+        (window as any).previewEmployeeDeletion =
+          deleteModule.previewEmployeeDeletion;
+        (window as any).deleteEmployeeWithConfirmation =
+          deleteModule.deleteEmployeeWithConfirmation;
+        (window as any).forceDeleteEmployee = deleteModule.forceDeleteEmployee;
 
-        console.log("🔧 Dev tools loaded and available:");
+        console.log("���� Dev tools loaded and available:");
         console.log("   - recreateEmployeeUsers()");
         console.log("   - checkEmployeeUserStatus()");
         console.log("   - testConnection()");
@@ -57,6 +66,14 @@ if (import.meta.env.DEV) {
         console.log("   - listAuthUsers()");
         console.log("   - emergencyAdminLogin() [EMERGENCY ONLY]");
         console.log("   - recreateEmployee44586777()");
+        console.log("   🗑️  EMPLOYEE DELETION:");
+        console.log("   - previewEmployeeDeletion(employeeId) - Safe preview");
+        console.log(
+          "   - deleteEmployeeWithConfirmation(employeeId) - With prompts",
+        );
+        console.log(
+          "   - forceDeleteEmployee(employeeId) - Bypass confirmations",
+        );
       },
     )
     .catch((error) => {
