@@ -4,43 +4,64 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // Load recreation utilities for development
 if (import.meta.env.DEV) {
-  import("@/utils/recreateEmployeeUsers").then((module) => {
-    (window as any).recreateEmployeeUsers = module.recreateEmployeeUsers;
-    (window as any).checkEmployeeUserStatus = module.checkEmployeeUserStatus;
-  });
-  import("@/utils/quickFixEmployee").then((module) => {
-    (window as any).recreateEmployee44586777 = module.recreateEmployee44586777;
-  });
-  import("@/utils/connectionTest").then((module) => {
-    (window as any).testConnection = module.testConnection;
-  });
-  import("@/utils/syncVacations").then((module) => {
-    (window as any).syncVacationsTaken = module.syncVacationsTaken;
-    (window as any).manualSyncVacations = module.manualSyncVacations;
-  });
-  import("@/utils/debugRLS").then((module) => {
-    (window as any).debugRLSPermissions = module.debugRLSPermissions;
-  });
-  import("@/utils/fixAuthUsers").then((module) => {
-    (window as any).verifyAuthUsers = module.verifyAuthUsers;
-    (window as any).resetUserPassword = module.resetUserPassword;
-    (window as any).listAuthUsers = module.listAuthUsers;
-  });
-  import("@/utils/emergencyAuth").then((module) => {
-    (window as any).emergencyAdminLogin = module.emergencyAdminLogin;
-    (window as any).clearEmergencyAuth = module.clearEmergencyAuth;
-    (window as any).checkEmergencyAuth = module.checkEmergencyAuth;
-  });
-  console.log("🔧 Dev tools loaded:");
-  console.log("   - recreateEmployeeUsers()");
-  console.log("   - checkEmployeeUserStatus()");
-  console.log("   - testConnection()");
-  console.log("   - syncVacationsTaken()");
-  console.log("   - manualSyncVacations()");
-  console.log("   - debugRLSPermissions()");
-  console.log("   - verifyAuthUsers()");
-  console.log("   - emergencyAdminLogin() [EMERGENCY ONLY]");
-  console.log("   - recreateEmployee44586777()");
+  // Load auth debugging utilities immediately
+  Promise.all([
+    import("@/utils/recreateEmployeeUsers"),
+    import("@/utils/quickFixEmployee"),
+    import("@/utils/connectionTest"),
+    import("@/utils/syncVacations"),
+    import("@/utils/debugRLS"),
+    import("@/utils/fixAuthUsers"),
+    import("@/utils/emergencyAuth"),
+  ])
+    .then(
+      ([
+        recreateModule,
+        quickFixModule,
+        connectionModule,
+        syncModule,
+        debugModule,
+        fixAuthModule,
+        emergencyModule,
+      ]) => {
+        // Expose all functions globally
+        (window as any).recreateEmployeeUsers =
+          recreateModule.recreateEmployeeUsers;
+        (window as any).checkEmployeeUserStatus =
+          recreateModule.checkEmployeeUserStatus;
+        (window as any).recreateEmployee44586777 =
+          quickFixModule.recreateEmployee44586777;
+        (window as any).testConnection = connectionModule.testConnection;
+        (window as any).syncVacationsTaken = syncModule.syncVacationsTaken;
+        (window as any).manualSyncVacations = syncModule.manualSyncVacations;
+        (window as any).debugRLSPermissions = debugModule.debugRLSPermissions;
+        (window as any).verifyAuthUsers = fixAuthModule.verifyAuthUsers;
+        (window as any).resetUserPassword = fixAuthModule.resetUserPassword;
+        (window as any).listAuthUsers = fixAuthModule.listAuthUsers;
+        (window as any).emergencyAdminLogin =
+          emergencyModule.emergencyAdminLogin;
+        (window as any).clearEmergencyAuth = emergencyModule.clearEmergencyAuth;
+        (window as any).checkEmergencyAuth = emergencyModule.checkEmergencyAuth;
+
+        console.log("🔧 Dev tools loaded and available:");
+        console.log("   - recreateEmployeeUsers()");
+        console.log("   - checkEmployeeUserStatus()");
+        console.log("   - testConnection()");
+        console.log("   - syncVacationsTaken()");
+        console.log("   - manualSyncVacations()");
+        console.log("   - debugRLSPermissions()");
+        console.log(
+          "   - verifyAuthUsers() [NOW INCLUDES nachito_ja@hotmail.com]",
+        );
+        console.log("   - resetUserPassword(email, password)");
+        console.log("   - listAuthUsers()");
+        console.log("   - emergencyAdminLogin() [EMERGENCY ONLY]");
+        console.log("   - recreateEmployee44586777()");
+      },
+    )
+    .catch((error) => {
+      console.error("❌ Failed to load dev tools:", error);
+    });
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
