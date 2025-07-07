@@ -70,6 +70,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Check for emergency auth first
+    const emergencyUser = checkEmergencyAuth();
+    if (emergencyUser) {
+      console.log("🚨 Using emergency auth for:", emergencyUser.email);
+      setUser(emergencyUser);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       console.log(
