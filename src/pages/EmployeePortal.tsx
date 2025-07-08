@@ -150,13 +150,11 @@ const EmployeePortal = () => {
     return categories[category] || category;
   };
 
-  // Debug logging for documents
-  console.log("EmployeePortal documents state:", {
-    employeeId: user?.employeeId,
-    documentsCount: allDocuments?.length,
-    documentsLoading,
-    documentsError,
-  });
+  // Debug logging for documents (reduced frequency)
+  // Only log when there are actual changes or errors
+  if (documentsError) {
+    console.error("EmployeePortal documents error:", documentsError);
+  }
 
   const handleLogout = async () => {
     try {

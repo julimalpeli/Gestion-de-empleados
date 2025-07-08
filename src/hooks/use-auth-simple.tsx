@@ -81,19 +81,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log(
-        "🔐 Initial session:",
-        session?.user?.id,
-        session?.user?.email,
-      );
-
       // Only load session if it's valid and not from a recent logout
       if (session?.user) {
-        console.log("📱 Found existing session, loading user profile...");
         setSession(session);
         loadUserProfile(session.user);
       } else {
-        console.log("📱 No valid session found");
         setSession(null);
         setUser(null);
       }
@@ -103,36 +95,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log(
-        "🔐 Auth state change:",
-        event,
-        session?.user?.id,
-        session?.user?.email,
-      );
-
       if (event === "SIGNED_OUT") {
-        console.log("👋 User signed out, clearing state");
         setSession(null);
         setUser(null);
         return;
       }
 
       if (event === "SIGNED_IN" && session?.user) {
-        console.log("👋 User signed in, loading profile");
         setSession(session);
         await loadUserProfile(session.user);
         return;
       }
 
       if (event === "TOKEN_REFRESHED" && session?.user) {
-        console.log("🔄 Token refreshed");
         setSession(session);
         return;
       }
 
       // For any other event without a valid session, clear state
       if (!session?.user) {
-        console.log("❌ No valid session in auth change, clearing state");
         setSession(null);
         setUser(null);
       }
@@ -155,11 +136,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Load user profile
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      console.log("🔍 Loading user profile for:", supabaseUser.email);
-
       // Admin fallback
       if (supabaseUser.email === "julimalpeli@gmail.com") {
-        console.log("👑 Admin user detected");
         const adminUser: User = {
           id: supabaseUser.id,
           username: "admin",
@@ -179,7 +157,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Known employee fallback to prevent database issues
       if (supabaseUser.email === "daianaayelen0220@gmail.com") {
-        console.log("👤 Known employee detected, using direct fallback");
         const employeeUser: User = {
           id: "d6f06332-1d49-4935-b931-5d7657d58468", // Known employee ID
           username: "daiana",
