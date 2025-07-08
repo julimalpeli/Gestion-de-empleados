@@ -235,19 +235,7 @@ const EmployeePortal = () => {
     )
     .reduce((total, vacation) => total + vacation.days, 0);
 
-  console.log("🏖️ Vacation calculation for employee:", employeeId);
-  console.log(
-    "   - Database vacations_taken:",
-    currentEmployee?.vacationsTaken,
-  );
-  console.log("   - Calculated from approved requests:", actualVacationsTaken);
-  console.log("   - Total vacation requests:", (vacationRequests || []).length);
-  console.log(
-    "   - Approved for this employee:",
-    (vacationRequests || []).filter(
-      (v) => v.employeeId === employeeId && v.status === "approved",
-    ).length,
-  );
+  // Vacation calculation logging removed to reduce console noise
   const payrollHistory = (payrollRecords || [])
     .filter((record) => record.employeeId === employeeId)
     .map((record) => ({

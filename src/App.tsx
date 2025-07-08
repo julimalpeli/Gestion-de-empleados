@@ -17,6 +17,7 @@ if (import.meta.env.DEV) {
     import("@/utils/fixNachitoUser"),
     import("@/utils/createEmployeeUsers"),
     import("@/utils/diagnoseDatabase"),
+    import("@/utils/debugControl"),
   ])
     .then(
       ([
@@ -31,6 +32,7 @@ if (import.meta.env.DEV) {
         nachitoModule,
         createUsersModule,
         diagnoseModule,
+        debugControlModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -67,6 +69,8 @@ if (import.meta.env.DEV) {
         (window as any).fixEmployeeUsersQuery =
           diagnoseModule.fixEmployeeUsersQuery;
 
+        // Debug control functions are auto-exposed by the module
+
         console.log("🔧 Dev tools loaded and available:");
         console.log("   - recreateEmployeeUsers()");
         console.log("   - checkEmployeeUserStatus()");
@@ -101,6 +105,10 @@ if (import.meta.env.DEV) {
         console.log("   🔍 DATABASE DIAGNOSIS:");
         console.log("   - diagnoseEmployeesTable() - Check table structure");
         console.log("   - fixEmployeeUsersQuery() - Safe employee/user query");
+        console.log("   🔇 DEBUG CONTROL:");
+        console.log("   - silentMode() - Turn off console noise");
+        console.log("   - debugModeProduction() - Only errors");
+        console.log("   - showDebugStatus() - Current debug settings");
       },
     )
     .catch((error) => {
