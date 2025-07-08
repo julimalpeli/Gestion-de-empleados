@@ -94,19 +94,7 @@ const Dashboard = () => {
     }).format(amount);
   };
 
-  // Debug: Log data to console
-  console.log("Dashboard Debug:", {
-    employeesLoading,
-    payrollLoading,
-    employeesCount: employees.length,
-    payrollRecordsCount: payrollRecords.length,
-    activeEmployees: activeEmployees.length,
-    currentPeriod,
-    currentMonthPayrolls: currentMonthPayrolls.length,
-    totalToPay,
-    employees: employees.slice(0, 2), // First 2 for debug
-    payrollRecords: payrollRecords.slice(0, 2), // First 2 for debug
-  });
+  // Debug logging removed to reduce console noise
 
   // Show loading state
   if (employeesLoading || payrollLoading) {
