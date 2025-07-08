@@ -217,13 +217,7 @@ const EmployeePortal = () => {
     }
   };
 
-  // Simple debug logging to avoid crashes
-  console.log(
-    "🔍 Employee Portal - User:",
-    user?.name,
-    "Employee:",
-    currentEmployee?.name,
-  );
+  // Debug logging removed to reduce console noise
 
   // Calculate vacation eligibility for later use
   const vacationInfo = currentEmployee?.startDate
