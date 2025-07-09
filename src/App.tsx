@@ -2,6 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+// Import immediate fix functions synchronously
+import "@/utils/immediateUserFix";
 // Load recreation utilities for development
 if (import.meta.env.DEV) {
   // Load auth debugging utilities immediately
