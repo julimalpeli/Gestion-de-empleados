@@ -399,7 +399,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
       }
 
-      // User will be set by onAuthStateChange
+      // Set session and load user profile directly
+      if (data.session) {
+        console.log("🔑 Setting session and loading user profile directly");
+        setSession(data.session);
+        await loadUserProfile(data.user);
+      }
+
       // Debug: Check if user was set immediately
       setTimeout(() => {
         console.log("🔍 Debug check after login:", {
