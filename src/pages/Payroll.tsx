@@ -143,7 +143,7 @@ const Payroll = () => {
     try {
       const record = payrollRecords.find((r) => r.id === recordId);
       if (!record) {
-        alert("No se encontró la liquidaci��n");
+        alert("No se encontró la liquidación");
         return;
       }
 
@@ -341,16 +341,20 @@ const Payroll = () => {
     let bestSalary = employee.whiteWage + employee.informalWage; // Fallback por si no hay históricos
 
     if (employeePayrolls.length > 0) {
-      // Calcular el mejor sueldo de los históricos
-      // Partir del total neto y excluir solo presentismo y bonos
-      // El total neto ya incluye: base + informal + horas extras + feriados - adelantos - descuentos
+      // Calcular el mejor sueldo de los históricos usando componentes individuales
+      // Fórmula: deposito + informal + feriados + horas extras - adelantos - descuentos
+      // NO incluir: presentismo, bono, aguinaldo
       const salaryCalculations = employeePayrolls.map((payroll) => {
-        const netTotal = payroll.netTotal || 0;
-        const presentismoToExclude = payroll.presentismoAmount || 0;
-        const bonusToExclude = payroll.bonusAmount || 0;
+        const deposito = payroll.baseAmount || 0; // Sueldo base (depósito)
+        const informal = payroll.informalAmount || 0;
+        const feriados = payroll.holidayBonus || 0;
+        const horasExtras = payroll.overtimeAmount || 0;
+        const adelantos = payroll.advances || 0;
+        const descuentos = payroll.discounts || 0;
 
-        // Quitar presentismo y bonos del total neto para obtener el sueldo para aguinaldo
-        return netTotal - presentismoToExclude - bonusToExclude;
+        return (
+          deposito + informal + feriados + horasExtras - adelantos - descuentos
+        );
       });
 
       // Tomar el mejor sueldo de todos los períodos
