@@ -117,6 +117,9 @@ if (import.meta.env.DEV) {
         console.log("   - silentMode() - Turn off console noise");
         console.log("   - debugModeProduction() - Only errors");
         console.log("   - showDebugStatus() - Current debug settings");
+        console.log("   🔧 USER FIXES:");
+        console.log("   - fixUser35940844() - Fix DNI 35940844 user");
+        console.log("   - testUser35940844Login() - Test DNI 35940844 login");
       },
     )
     .catch((error) => {
