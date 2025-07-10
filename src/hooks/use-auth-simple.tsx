@@ -400,6 +400,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // User will be set by onAuthStateChange
+      // Debug: Check if user was set immediately
+      setTimeout(() => {
+        console.log("🔍 Debug check after login:", {
+          user: data.user?.email,
+          sessionState: session?.user?.email,
+          userState: user?.email,
+          isAuthenticated,
+        });
+      }, 1000);
     } catch (error) {
       console.error("Login error details:", error);
 
