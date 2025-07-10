@@ -341,20 +341,13 @@ const Payroll = () => {
     let bestSalary = employee.whiteWage + employee.informalWage; // Fallback por si no hay históricos
 
     if (employeePayrolls.length > 0) {
-      // Calcular el mejor sueldo de los históricos usando componentes individuales
-      // Fórmula: deposito + informal + feriados + horas extras - adelantos - descuentos
-      // NO incluir: presentismo, bono, aguinaldo
+      // Calcular el mejor sueldo de los históricos
+      // Fórmula: Total Neto - Aguinaldos
       const salaryCalculations = employeePayrolls.map((payroll) => {
-        const deposito = payroll.baseAmount || 0; // Sueldo base (depósito)
-        const informal = payroll.informalAmount || 0;
-        const feriados = payroll.holidayBonus || 0;
-        const horasExtras = payroll.overtimeAmount || 0;
-        const adelantos = payroll.advances || 0;
-        const descuentos = payroll.discounts || 0;
+        const netTotal = payroll.netTotal || 0;
+        const aguinaldoToExclude = payroll.aguinaldo || 0;
 
-        return (
-          deposito + informal + feriados + horasExtras - adelantos - descuentos
-        );
+        return netTotal - aguinaldoToExclude;
       });
 
       // Tomar el mejor sueldo de todos los períodos
