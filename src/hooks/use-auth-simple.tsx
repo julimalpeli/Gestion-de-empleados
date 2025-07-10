@@ -123,6 +123,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("🔄 Auth state change:", event, session?.user?.email);
+
       if (event === "SIGNED_OUT") {
         setSession(null);
         setUser(null);
@@ -130,6 +132,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (event === "SIGNED_IN" && session?.user) {
+        console.log("🔑 User signed in, loading profile...");
         setSession(session);
         await loadUserProfile(session.user);
         return;
