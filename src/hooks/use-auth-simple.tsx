@@ -248,7 +248,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         "✅ User found in database:",
         userProfile.name,
         userProfile.role,
+        "Active:",
+        userProfile.is_active,
       );
+
+      // 🚫 CRITICAL: Check if user is active before proceeding
+      if (!userProfile.is_active) {
+        console.log("🚫 USER IS INACTIVE - Blocking access");
+
+        // Sign out immediately
+        await supabase.auth.signOut();
+
+        // Clear any stored state
+        setUser(null);
+        setSession(null);
+
+        throw new Error(
+          "Tu cuenta ha sido desactivada. Contacta al administrador.",
+        );
+      }
 
       const userData: User = {
         id: userProfile.id,
@@ -305,6 +323,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) throw error;
+
+      // Additional check: Verify user is active in database before allowing login
+      if (data.user) {
+        const { data: userCheck, error: userCheckError } = await supabase
+          .from("users")
+          .select("is_active, name")
+          .eq("email", email.trim())
+          .single();
+
+        if (userCheckError) {
+          console.warn("Could not verify user status:", userCheckError);
+          // Continue with normal flow - will be caught later
+        } else if (userCheck && !userCheck.is_active) {
+          // User exists but is inactive - force logout
+          await supabase.auth.signOut();
+          throw new Error(
+            "Tu cuenta ha sido desactivada. Contacta al administrador.",
+          );
+        }
+      }
+
       // User will be set by onAuthStateChange
     } catch (error) {
       console.error("Login error details:", error);
