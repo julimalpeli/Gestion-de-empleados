@@ -522,7 +522,7 @@ const UserManagement = () => {
                       Empleado Asociado (opcional)
                     </Label>
                     <Select
-                      value={newUser.employeeId}
+                      value={newUser.employeeId || "none"}
                       onValueChange={(value) =>
                         setNewUser({
                           ...newUser,
