@@ -23,6 +23,7 @@ if (import.meta.env.DEV) {
     import("@/utils/diagnoseDatabase"),
     import("@/utils/debugControl"),
     import("@/utils/fixUser35940844"),
+    import("@/utils/debugUserStatus"),
   ])
     .then(
       ([
@@ -39,6 +40,7 @@ if (import.meta.env.DEV) {
         diagnoseModule,
         debugControlModule,
         fixUserModule,
+        userDebugModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -77,6 +79,8 @@ if (import.meta.env.DEV) {
         (window as any).fixUser35940844 = fixUserModule.fixUser35940844;
         (window as any).testUser35940844Login =
           fixUserModule.testUser35940844Login;
+
+        // User debugging functions are auto-exposed by the module
 
         // Debug control functions are auto-exposed by the module
 
@@ -121,6 +125,11 @@ if (import.meta.env.DEV) {
         console.log("   🔧 USER FIXES:");
         console.log("   - fixUser35940844() - Fix DNI 35940844 user");
         console.log("   - testUser35940844Login() - Test DNI 35940844 login");
+        console.log("   🔍 USER DEBUGGING:");
+        console.log("   - checkUserStatus('email') - Check user active status");
+        console.log("   - activateUser('email') - Activate inactive user");
+        console.log("   - listAllUsers() - List all users with status");
+        console.log("   - fixUserLoginIssue('email') - Auto-fix login issue");
       },
     )
     .catch((error) => {
