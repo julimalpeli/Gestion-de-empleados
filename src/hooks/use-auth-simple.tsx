@@ -202,6 +202,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      // Skip database query for admin user entirely
+      if (supabaseUser.email === "julimalpeli@gmail.com") {
+        console.log("🔓 Admin detected, using admin fallback");
+        const adminUser: User = {
+          id: supabaseUser.id,
+          username: "admin",
+          name: "Julian Malpeli (Admin)",
+          role: "admin",
+          email: supabaseUser.email,
+          employeeId: undefined,
+          permissions: ["all"],
+          loginTime: new Date().toISOString(),
+          needsPasswordChange: false,
+          isActive: true,
+          supabaseUser,
+        };
+        setUser(adminUser);
+        return;
+      }
+
       // Try to load from database with timeout
       console.log("🔄 Querying database for user profile...");
 
