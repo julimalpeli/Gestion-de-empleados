@@ -75,29 +75,98 @@ export const useUsers = () => {
   // Crear usuario
   const createUser = async (userRequest: CreateUserRequest) => {
     try {
-      // Simular hash de contraseña (en producción usarías bcrypt)
-      const passwordHash = btoa(userRequest.password); // Base64 simple para demo
+      console.log("🔄 Creating user in Supabase Auth...", userRequest.email);
+
+      // Step 1: Create user in Supabase Auth first
+      const { data: authUser, error: authError } = await supabase.auth.signUp({
+        email: userRequest.email,
+        password: userRequest.password,
+        options: {
+          data: {
+            name: userRequest.name,
+            role: userRequest.role,
+            username: userRequest.username,
+          },
+        },
+      });
+
+      if (authError) {
+        console.error("❌ Auth creation failed:", authError.message);
+
+        // Check if user already exists in auth
+        if (authError.message.includes("already registered")) {
+          console.log("ℹ️ User already exists in auth, trying to sign in...");
+
+          const { data: signInData, error: signInError } =
+            await supabase.auth.signInWithPassword({
+              email: userRequest.email,
+              password: userRequest.password,
+            });
+
+          if (!signInError && signInData.user) {
+            console.log("✅ User exists in auth, using existing user");
+            authUser.user = signInData.user;
+            await supabase.auth.signOut();
+          } else {
+            throw new Error(`Auth error: ${authError.message}`);
+          }
+        } else {
+          throw new Error(`Auth error: ${authError.message}`);
+        }
+      }
+
+      if (!authUser.user) {
+        throw new Error("No user returned from auth signup");
+      }
+
+      console.log("✅ Auth user created/found:", authUser.user.email);
+
+      // Step 2: Create user in database
+      const passwordHash = btoa(userRequest.password);
 
       const { data, error } = await supabase
         .from("users")
         .insert({
+          id: authUser.user.id, // Use the Auth user ID
           username: userRequest.username,
           email: userRequest.email,
           name: userRequest.name,
           role: userRequest.role,
-          employee_id: userRequest.employeeId,
+          employee_id: userRequest.employeeId || null,
           is_active: true,
           password_hash: passwordHash,
           needs_password_change: userRequest.needsPasswordChange || false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         })
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Database creation failed:", error);
+
+        // Try to clean up auth user if database creation fails
+        try {
+          await supabase.auth.admin.deleteUser(authUser.user.id);
+          console.log("🧹 Cleaned up auth user due to database error");
+        } catch (cleanupError) {
+          console.warn("⚠️ Could not clean up auth user:", cleanupError);
+        }
+
+        throw error;
+      }
+
+      console.log("✅ Database user created successfully");
+      console.log("🎉 Complete user created:", {
+        email: userRequest.email,
+        username: userRequest.username,
+        role: userRequest.role,
+      });
 
       await fetchUsers();
       return data;
     } catch (err) {
+      console.error("❌ Complete user creation failed:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error creating user",
       );
