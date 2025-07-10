@@ -198,13 +198,41 @@ const Reports = () => {
         const netTotal = payroll.netTotal || 0;
         const presentismoToExclude = payroll.presentismoAmount || 0;
         const bonusToExclude = payroll.bonusAmount || 0;
+        const result = netTotal - presentismoToExclude - bonusToExclude;
 
-        // Quitar presentismo y bonos del total neto para obtener el sueldo para aguinaldo
-        return netTotal - presentismoToExclude - bonusToExclude;
+        // Debug log para DNI específico
+        if (
+          employee.name?.includes("Daiana") ||
+          employee.name?.includes("Porras")
+        ) {
+          console.log(`🔍 Aguinaldo debug para ${employee.name}:`, {
+            period: payroll.period,
+            netTotal,
+            presentismoToExclude,
+            bonusToExclude,
+            resultForAguinaldo: result,
+          });
+        }
+
+        return result;
       });
 
       // Tomar el mejor sueldo de todos los períodos
       bestSalary = Math.max(...salaryCalculations, bestSalary);
+
+      // Debug final
+      if (
+        employee.name?.includes("Daiana") ||
+        employee.name?.includes("Porras")
+      ) {
+        console.log(
+          `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
+          {
+            calculations: salaryCalculations,
+            fallback: employee.whiteWage + employee.informalWage,
+          },
+        );
+      }
     }
 
     // Calcular aguinaldo
