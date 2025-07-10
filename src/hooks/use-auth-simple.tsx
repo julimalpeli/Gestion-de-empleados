@@ -406,7 +406,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           user: data.user?.email,
           sessionState: session?.user?.email,
           userState: user?.email,
-          isAuthenticated,
+          hasUser: !!user,
         });
       }, 1000);
     } catch (error) {
