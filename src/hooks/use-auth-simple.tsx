@@ -405,16 +405,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(data.session);
         await loadUserProfile(data.user);
       }
-
-      // Debug: Check if user was set immediately
-      setTimeout(() => {
-        console.log("🔍 Debug check after login:", {
-          user: data.user?.email,
-          sessionState: session?.user?.email,
-          userState: user?.email,
-          hasUser: !!user,
-        });
-      }, 1000);
     } catch (error) {
       console.error("Login error details:", error);
 
