@@ -332,8 +332,33 @@ const Payroll = () => {
           (1000 * 60 * 60 * 24),
       ) + 1;
 
-    // Mejor remuneración del semestre (sueldo blanco + informal, sin presentismo)
-    const bestSalary = employee.whiteWage + employee.informalWage;
+    // Calcular mejor sueldo basado en históricos de liquidaciones
+    // Buscar liquidaciones del empleado para el cálculo del mejor sueldo
+    const employeePayrolls = payrolls.filter(
+      (p) => p.employeeId === employee.id,
+    );
+
+    let bestSalary = employee.whiteWage + employee.informalWage; // Fallback por si no hay históricos
+
+    if (employeePayrolls.length > 0) {
+      // Calcular el mejor sueldo de los históricos
+      // Incluir: sueldo base + informal + horas extras + feriados
+      // Excluir: presentismo + bono (bonus_amount)
+      // Restar: adelantos + descuentos
+      const salaryCalculations = employeePayrolls.map((payroll) => {
+        const baseSalary =
+          (payroll.baseAmount || 0) + (payroll.informalAmount || 0);
+        const extras =
+          (payroll.overtimeAmount || 0) + (payroll.holidayBonus || 0);
+        const deductions = (payroll.advances || 0) + (payroll.discounts || 0);
+
+        // No incluir presentismo ni bonos según la nueva especificación
+        return baseSalary + extras - deductions;
+      });
+
+      // Tomar el mejor sueldo de todos los períodos
+      bestSalary = Math.max(...salaryCalculations, bestSalary);
+    }
 
     // Calcular aguinaldo
     const fullAguinaldo = (bestSalary / 12) * 6; // 6 meses
