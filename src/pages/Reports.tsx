@@ -192,18 +192,15 @@ const Reports = () => {
 
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
-      // Incluir: sueldo base + informal + horas extras + feriados
-      // Excluir: presentismo + bono (bonus_amount)
-      // Restar: adelantos + descuentos
+      // Partir del total neto y excluir solo presentismo y bonos
+      // El total neto ya incluye: base + informal + horas extras + feriados - adelantos - descuentos
       const salaryCalculations = employeePayrolls.map((payroll) => {
-        const baseSalary =
-          (payroll.baseAmount || 0) + (payroll.informalAmount || 0);
-        const extras =
-          (payroll.overtimeAmount || 0) + (payroll.holidayBonus || 0);
-        const deductions = (payroll.advances || 0) + (payroll.discounts || 0);
+        const netTotal = payroll.netTotal || 0;
+        const presentismoToExclude = payroll.presentismoAmount || 0;
+        const bonusToExclude = payroll.bonusAmount || 0;
 
-        // No incluir presentismo ni bonos según la nueva especificación
-        return baseSalary + extras - deductions;
+        // Quitar presentismo y bonos del total neto para obtener el sueldo para aguinaldo
+        return netTotal - presentismoToExclude - bonusToExclude;
       });
 
       // Tomar el mejor sueldo de todos los períodos
