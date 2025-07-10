@@ -59,7 +59,10 @@ const EmployeePortal = () => {
 
   const loadAllDocuments = async () => {
     const employeeId = currentEmployee?.id || user?.employeeId;
-    if (!employeeId) return;
+    if (!employeeId) {
+      setDocumentsError("No se pudo identificar al empleado");
+      return;
+    }
 
     try {
       setDocumentsLoading(true);
@@ -69,15 +72,50 @@ const EmployeePortal = () => {
 
       let employeeDocuments = [];
       let payrollDocuments = [];
+      let hasAnySuccess = false;
 
       // Try to load employee documents with graceful error handling
       try {
         employeeDocuments =
           await documentService.getEmployeeDocuments(employeeId);
-        console.log("Employee documents:", employeeDocuments.length);
+        console.log("Employee documents loaded:", employeeDocuments.length);
+        hasAnySuccess = true;
       } catch (error) {
         console.warn("Could not load employee documents:", error.message);
-        // Continue without employee documents
+
+        // Try alternative method using files table
+        try {
+          const { data: filesData, error: filesError } = await supabase
+            .from("files")
+            .select("*")
+            .eq("entity_type", "employee")
+            .eq("entity_id", employeeId);
+
+          if (!filesError && filesData) {
+            employeeDocuments = filesData.map((file) => ({
+              id: file.id,
+              employeeId: employeeId,
+              fileName: file.name,
+              originalFileName: file.name,
+              fileType: file.type,
+              fileSize: file.size || 0,
+              category: "documentos",
+              uploadedAt: file.upload_date || file.created_at,
+              uploadedBy: "Sistema",
+              fileUrl: file.url || "#",
+            }));
+            console.log(
+              "Employee documents from files table:",
+              employeeDocuments.length,
+            );
+            hasAnySuccess = true;
+          }
+        } catch (fallbackError) {
+          console.warn(
+            "Fallback files query also failed:",
+            fallbackError.message,
+          );
+        }
       }
 
       // Try to load payroll documents for this employee
@@ -85,37 +123,83 @@ const EmployeePortal = () => {
         (record) => record.employeeId === employeeId,
       );
 
-      for (const record of employeePayrollRecords) {
-        try {
-          const docs = await documentService.getPayrollDocuments(record.id);
-          payrollDocuments.push(...docs);
-        } catch (error) {
-          console.warn(
-            "Could not load payroll documents for record:",
-            record.id,
-          );
-          // Continue with other records
+      if (employeePayrollRecords.length > 0) {
+        console.log(
+          "Loading payroll documents for",
+          employeePayrollRecords.length,
+          "payroll records",
+        );
+
+        for (const record of employeePayrollRecords) {
+          try {
+            const docs = await documentService.getPayrollDocuments(record.id);
+            payrollDocuments.push(...docs);
+            hasAnySuccess = true;
+          } catch (error) {
+            console.warn(
+              "Could not load payroll documents for record:",
+              record.id,
+            );
+
+            // Try alternative method for payroll documents
+            try {
+              const { data: payrollFiles, error: payrollFilesError } =
+                await supabase
+                  .from("files")
+                  .select("*")
+                  .eq("entity_type", "payroll")
+                  .eq("entity_id", record.id);
+
+              if (!payrollFilesError && payrollFiles) {
+                const payrollDocs = payrollFiles.map((file) => ({
+                  id: file.id,
+                  employeeId: employeeId,
+                  payrollId: record.id,
+                  fileName: file.name,
+                  originalFileName: file.name,
+                  fileType: file.type,
+                  fileSize: file.size || 0,
+                  category: "recibo_sueldo",
+                  uploadedAt: file.upload_date || file.created_at,
+                  uploadedBy: "Sistema",
+                  fileUrl: file.url || "#",
+                }));
+                payrollDocuments.push(...payrollDocs);
+                hasAnySuccess = true;
+              }
+            } catch (fallbackError) {
+              console.warn(
+                "Fallback payroll files query failed:",
+                fallbackError.message,
+              );
+            }
+          }
         }
       }
 
-      console.log("Payroll documents:", payrollDocuments.length);
+      console.log(
+        "Total documents loaded - Employee:",
+        employeeDocuments.length,
+        "Payroll:",
+        payrollDocuments.length,
+      );
 
-      // Combine all documents (even if some failed to load)
+      // Combine all documents
       const combinedDocuments = [...employeeDocuments, ...payrollDocuments];
-
       setAllDocuments(combinedDocuments);
 
-      // Set a friendly error message if no documents could be loaded due to connection issues
-      if (combinedDocuments.length === 0) {
+      // Only show error if no documents could be loaded and no service worked
+      if (combinedDocuments.length === 0 && !hasAnySuccess) {
         setDocumentsError(
-          "Los documentos no están disponibles en este momento debido a problemas de conexión.",
+          "No se encontraron documentos para este empleado. Es posible que aún no se hayan cargado documentos en el sistema.",
         );
+      } else if (combinedDocuments.length === 0 && hasAnySuccess) {
+        setDocumentsError(null); // Services work but no documents exist
       }
     } catch (error) {
       console.error("Error loading documents:", error);
-
       setDocumentsError(
-        "Los documentos no están disponibles en este momento. Intente nuevamente más tarde.",
+        "Error al cargar documentos. Verifique su conexión e intente nuevamente.",
       );
       // Set empty array so the portal still works
       setAllDocuments([]);
