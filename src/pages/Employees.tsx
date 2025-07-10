@@ -1235,9 +1235,9 @@ const Employees = () => {
                 <Label>Fecha de Ingreso</Label>
                 <p className="text-lg">
                   {viewingEmployee.startDate
-                    ? new Date(viewingEmployee.startDate).toLocaleDateString(
-                        "es-AR",
-                      )
+                    ? new Date(
+                        viewingEmployee.startDate + "T00:00:00",
+                      ).toLocaleDateString("es-AR")
                     : "No registrada"}
                 </p>
               </div>
