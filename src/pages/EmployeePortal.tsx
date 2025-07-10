@@ -40,6 +40,7 @@ import {
   generatePayrollReceiptPDF,
   generatePayrollReceiptExcel,
 } from "@/utils/receiptGenerator";
+import { supabase } from "@/lib/supabase";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
