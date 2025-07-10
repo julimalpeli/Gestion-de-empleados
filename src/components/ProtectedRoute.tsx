@@ -36,15 +36,9 @@ const ProtectedRoute = ({
     // Check if user is active
     if (user && user.isActive === false) {
       console.log(
-        "🚫 SECURITY: User is inactive, blocking access and logging out",
+        "🚫 SECURITY: User is inactive, redirecting to inactive page",
       );
-
-      // Force logout for inactive users
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 100);
-
-      return <Navigate to="/login" replace />;
+      return <Navigate to="/inactive" replace />;
     }
 
     // Check specific role requirement

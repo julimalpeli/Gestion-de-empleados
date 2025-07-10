@@ -137,6 +137,7 @@ import UserManagement from "./pages/UserManagement";
 import EmployeePortal from "./pages/EmployeePortal";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
+import InactiveUser from "./pages/InactiveUser";
 import NotFound from "./pages/NotFound";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
@@ -362,6 +363,7 @@ const App = () => (
             {/* Public routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/inactive" element={<InactiveUser />} />
 
             {/* Employee portal */}
             <Route
