@@ -524,7 +524,10 @@ const UserManagement = () => {
                     <Select
                       value={newUser.employeeId}
                       onValueChange={(value) =>
-                        setNewUser({ ...newUser, employeeId: value })
+                        setNewUser({
+                          ...newUser,
+                          employeeId: value === "none" ? "" : value,
+                        })
                       }
                     >
                       <SelectTrigger>
