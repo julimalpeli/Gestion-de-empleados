@@ -341,12 +341,16 @@ const Payroll = () => {
 
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
-      // Fórmula: Total Neto - Aguinaldos
+      // Fórmula: Total Neto - Aguinaldos - Bono - Presentismo
       const salaryCalculations = employeePayrolls.map((payroll) => {
         const netTotal = payroll.netTotal || 0;
         const aguinaldoToExclude = payroll.aguinaldo || 0;
+        const bonusToExclude = payroll.bonusAmount || 0;
+        const presentismoToExclude = payroll.presentismoAmount || 0;
 
-        return netTotal - aguinaldoToExclude;
+        return (
+          netTotal - aguinaldoToExclude - bonusToExclude - presentismoToExclude
+        );
       });
 
       // Tomar el mejor sueldo de todos los períodos
