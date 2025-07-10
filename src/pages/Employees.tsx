@@ -784,9 +784,9 @@ const Employees = () => {
                     <TableCell>{formatPosition(employee.position)}</TableCell>
                     <TableCell>
                       {employee.startDate
-                        ? new Date(employee.startDate).toLocaleDateString(
-                            "es-AR",
-                          )
+                        ? new Date(
+                            employee.startDate + "T00:00:00",
+                          ).toLocaleDateString("es-AR")
                         : "No registrada"}
                     </TableCell>
                     <TableCell className="font-semibold">
