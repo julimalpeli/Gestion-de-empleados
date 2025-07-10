@@ -129,7 +129,7 @@ const Reports = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-AR");
+    return new Date(dateString + "T00:00:00").toLocaleDateString("es-AR");
   };
 
   const calculateAguinaldo = (employee: any, period: string) => {
@@ -352,7 +352,7 @@ const Reports = () => {
                 Calculadora de Aguinaldos (SAC)
               </CardTitle>
               <CardDescription>
-                Cálculo automático del Sueldo Anual Complementario por período
+                Cálculo automático del Sueldo Anual Complementario por per��odo
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
