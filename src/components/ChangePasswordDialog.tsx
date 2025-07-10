@@ -71,7 +71,7 @@ export const ChangePasswordDialog = () => {
           Cambiar Mi Contraseña
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Cambiar Mi Contraseña</DialogTitle>
           <DialogDescription>
