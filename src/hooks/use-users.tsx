@@ -82,6 +82,7 @@ export const useUsers = () => {
         email: userRequest.email,
         password: userRequest.password,
         options: {
+          emailRedirectTo: undefined, // Skip email confirmation
           data: {
             name: userRequest.name,
             role: userRequest.role,
