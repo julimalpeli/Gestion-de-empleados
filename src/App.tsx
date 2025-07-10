@@ -26,6 +26,7 @@ if (import.meta.env.DEV) {
     import("@/utils/createEmployeeUsers"),
     import("@/utils/diagnoseDatabase"),
     import("@/utils/debugControl"),
+    import("@/utils/fixUser35940844"),
   ])
     .then(
       ([
@@ -41,6 +42,7 @@ if (import.meta.env.DEV) {
         createUsersModule,
         diagnoseModule,
         debugControlModule,
+        fixUserModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
@@ -76,6 +78,9 @@ if (import.meta.env.DEV) {
           diagnoseModule.diagnoseEmployeesTable;
         (window as any).fixEmployeeUsersQuery =
           diagnoseModule.fixEmployeeUsersQuery;
+        (window as any).fixUser35940844 = fixUserModule.fixUser35940844;
+        (window as any).testUser35940844Login =
+          fixUserModule.testUser35940844Login;
 
         // Debug control functions are auto-exposed by the module
 
