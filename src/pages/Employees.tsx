@@ -468,7 +468,7 @@ const Employees = () => {
                 Nuevo Empleado
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Agregar Nuevo Empleado</DialogTitle>
                 <DialogDescription>
@@ -949,7 +949,7 @@ const Employees = () => {
 
       {/* Edit Employee Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Editar Empleado</DialogTitle>
             <DialogDescription>
@@ -1205,7 +1205,7 @@ const Employees = () => {
 
       {/* Employee View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Información del Empleado</DialogTitle>
             <DialogDescription>Datos completos del empleado</DialogDescription>
