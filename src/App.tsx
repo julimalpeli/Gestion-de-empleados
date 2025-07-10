@@ -3,6 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+
+// Load immediate auth fix
+if (typeof window !== "undefined") {
+  import("@/utils/immediateAuthFix.js").catch(() => {
+    console.log("Auth fix script not loaded");
+  });
+}
 // Load recreation utilities for development
 if (import.meta.env.DEV) {
   // Load auth debugging utilities immediately
