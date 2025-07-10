@@ -282,7 +282,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // 🚫 CRITICAL: Check if user is active before proceeding
       if (!userProfile.is_active) {
-        console.log("🚫 USER IS INACTIVE - Blocking access");
+        console.log("🚫 USER IS INACTIVE - Redirecting to inactive page");
 
         // Sign out immediately
         await supabase.auth.signOut();
@@ -291,9 +291,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(null);
         setSession(null);
 
-        throw new Error(
-          "Tu cuenta ha sido desactivada. Contacta al administrador.",
-        );
+        // Redirect to inactive page
+        window.location.href = "/inactive";
+        return;
       }
 
       const userData: User = {
@@ -364,11 +364,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.warn("Could not verify user status:", userCheckError);
           // Continue with normal flow - will be caught later
         } else if (userCheck && !userCheck.is_active) {
-          // User exists but is inactive - force logout
+          // User exists but is inactive - force logout and redirect
           await supabase.auth.signOut();
-          throw new Error(
-            "Tu cuenta ha sido desactivada. Contacta al administrador.",
-          );
+          window.location.href = "/inactive";
+          return;
         }
       }
 
