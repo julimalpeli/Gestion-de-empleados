@@ -234,6 +234,7 @@ console.log("  - testCredentials(email, password) - Test specific credentials");
 window.fixAuthImmediately = fixAuthImmediately;
 window.testCredentials = testCredentials;
 
-// Auto-run the fix
-console.log("🔄 Auto-running auth fix...");
-fixAuthImmediately();
+// Auto-run disabled to prevent fetch errors
+// Run manually if needed: fixAuthImmediately()
+console.log("🔧 Auth fix functions available (manual execution only)");
+// fixAuthImmediately();

@@ -4,12 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 
-// Load immediate auth fix
-if (typeof window !== "undefined") {
-  import("@/utils/immediateAuthFix.js").catch(() => {
-    console.log("Auth fix script not loaded");
-  });
-}
+// Disabled automatic auth fix scripts to prevent fetch errors
+// Use manual methods in Gestión de Usuarios instead
 // Load recreation utilities for development
 if (import.meta.env.DEV) {
   // Load auth debugging utilities immediately
