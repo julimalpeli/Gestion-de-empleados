@@ -210,6 +210,8 @@ const Reports = () => {
             period: payroll.period,
             netTotal,
             aguinaldoToExclude,
+            bonusToExclude,
+            presentismoToExclude,
             resultForAguinaldo: result,
           });
         }
