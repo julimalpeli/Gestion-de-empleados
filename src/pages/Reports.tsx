@@ -184,7 +184,7 @@ const Reports = () => {
 
     // Calcular mejor sueldo basado en históricos de liquidaciones
     // Buscar liquidaciones del empleado para el cálculo del mejor sueldo
-    const employeePayrolls = payrolls.filter(
+    const employeePayrolls = payrollRecords.filter(
       (p) => p.employeeId === employee.id,
     );
 
