@@ -41,6 +41,7 @@ import {
   generatePayrollReceiptExcel,
 } from "@/utils/receiptGenerator";
 import { supabase } from "@/lib/supabase";
+import { getDocumentSystemStatus } from "@/utils/documentSystemChecker";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
@@ -70,6 +71,16 @@ const EmployeePortal = () => {
       setDocumentsError(null);
 
       console.log("Loading documents for employee:", employeeId);
+
+      // Check document system availability first
+      const systemStatus = await getDocumentSystemStatus();
+      console.log("Document system status:", systemStatus);
+
+      if (!systemStatus.canShowDocuments) {
+        setDocumentsError(systemStatus.message);
+        setDocumentsLoading(false);
+        return;
+      }
 
       let employeeDocuments = [];
       let payrollDocuments = [];
