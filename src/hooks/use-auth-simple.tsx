@@ -393,6 +393,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         );
       }
 
+      // Handle inactive user error
+      if (
+        error.message?.includes("desactivada") ||
+        error.message?.includes("inactive")
+      ) {
+        throw new Error(
+          "Tu cuenta ha sido desactivada. Contacta al administrador.",
+        );
+      }
+
       // Default error message
       throw new Error(
         error.message || "Error al iniciar sesión. Intente nuevamente.",
