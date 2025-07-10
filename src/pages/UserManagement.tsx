@@ -531,7 +531,7 @@ const UserManagement = () => {
                         <SelectValue placeholder="Seleccionar empleado" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Sin asociar</SelectItem>
+                        <SelectItem value="none">Sin asociar</SelectItem>
                         {employees.map((employee) => (
                           <SelectItem
                             key={employee.id}
