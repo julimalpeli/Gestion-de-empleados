@@ -354,20 +354,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Additional check: Verify user is active in database before allowing login
       if (data.user) {
-        const { data: userCheck, error: userCheckError } = await supabase
-          .from("users")
-          .select("is_active, name")
-          .eq("email", email.trim())
-          .single();
+        // Skip database check for admin user to avoid issues
+        if (email.trim() === "julimalpeli@gmail.com") {
+          console.log("🔓 Admin user, skipping database check");
+        } else {
+          const { data: userCheck, error: userCheckError } = await supabase
+            .from("users")
+            .select("is_active, name")
+            .eq("email", email.trim())
+            .single();
 
-        if (userCheckError) {
-          console.warn("Could not verify user status:", userCheckError);
-          // Continue with normal flow - will be caught later
-        } else if (userCheck && !userCheck.is_active) {
-          // User exists but is inactive - force logout and redirect
-          await supabase.auth.signOut();
-          window.location.href = "/inactive";
-          return;
+          if (userCheckError) {
+            console.warn("Could not verify user status:", userCheckError);
+            // Continue with normal flow - will be caught later
+          } else if (userCheck && !userCheck.is_active) {
+            // User exists but is inactive - force logout and redirect
+            await supabase.auth.signOut();
+            window.location.href = "/inactive";
+            return;
+          }
         }
       }
 
@@ -560,7 +565,7 @@ if (typeof window !== "undefined") {
   (window as any).checkAuthContext = checkAuthContext;
   (window as any).checkSession = checkSession;
   (window as any).authDebug = { checkAuthContext, checkSession };
-  console.log("🔧 Auth debug functions loaded:");
+  console.log("��� Auth debug functions loaded:");
   console.log("   - checkAuthContext()");
   console.log("   - checkSession()");
   console.log("   - authDebug.checkAuthContext()");
