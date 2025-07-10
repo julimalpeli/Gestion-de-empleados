@@ -326,11 +326,10 @@ const Payroll = () => {
           (1000 * 60 * 60 * 24),
       ) + 1;
 
-    const daysWorked =
-      Math.ceil(
-        (semesterEnd.getTime() - effectiveStart.getTime()) /
-          (1000 * 60 * 60 * 24),
-      ) + 1;
+    const daysWorked = Math.ceil(
+      (semesterEnd.getTime() - effectiveStart.getTime()) /
+        (1000 * 60 * 60 * 24),
+    );
 
     // Calcular mejor sueldo basado en históricos de liquidaciones
     // Buscar liquidaciones del empleado para el cálculo del mejor sueldo
