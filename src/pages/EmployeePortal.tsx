@@ -1023,16 +1023,27 @@ const EmployeePortal = () => {
               </CardHeader>
               <CardContent>
                 {documentsError ? (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div className="flex items-center gap-2 text-yellow-800">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 text-blue-800">
                       <FileText className="h-5 w-5" />
                       <div>
-                        <p className="font-medium">Error cargando documentos</p>
-                        <p className="text-sm mt-1">
-                          {documentsError.includes("does not exist")
-                            ? "El sistema de documentos no está configurado aún."
-                            : "No se pudieron cargar los documentos en este momento."}
+                        <p className="font-medium">Documentos</p>
+                        <p className="text-sm mt-1 text-blue-700">
+                          {documentsError.includes("does not exist") ||
+                          documentsError.includes("configurado")
+                            ? "El sistema de documentos será configurado próximamente."
+                            : documentsError.includes("encontraron") ||
+                                documentsError.includes("No se encontraron")
+                              ? "Aún no hay documentos disponibles para tu cuenta."
+                              : "No hay documentos disponibles en este momento."}
                         </p>
+                        {!documentsError.includes("encontraron") &&
+                          !documentsError.includes("No se encontraron") && (
+                            <p className="text-xs mt-2 text-blue-600">
+                              Si esperas ver documentos aquí, contacta al
+                              administrador.
+                            </p>
+                          )}
                       </div>
                     </div>
                   </div>
