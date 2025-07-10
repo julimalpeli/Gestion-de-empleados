@@ -79,6 +79,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    // Set up periodic user status check for logged-in users
+    const checkUserStatus = async () => {
+      if (user && user.email && user.isActive !== false) {
+        try {
+          const { data: userCheck, error } = await supabase
+            .from("users")
+            .select("is_active")
+            .eq("email", user.email)
+            .single();
+
+          if (!error && userCheck && !userCheck.is_active) {
+            console.log("🚫 User became inactive, logging out");
+            await logout();
+            window.location.href = "/inactive";
+          }
+        } catch (error) {
+          console.warn("Could not check user status:", error);
+        }
+      }
+    };
+
+    // Check user status every 5 minutes for active sessions
+    const statusCheckInterval = setInterval(checkUserStatus, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(statusCheckInterval);
+    };
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       // Only load session if it's valid and not from a recent logout
