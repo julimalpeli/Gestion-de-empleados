@@ -750,6 +750,7 @@ const EmployeePortal = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Período</TableHead>
+                        <TableHead>Sueldo</TableHead>
                         <TableHead>Días</TableHead>
                         <TableHead>Adelantos</TableHead>
                         <TableHead>Descuentos</TableHead>
