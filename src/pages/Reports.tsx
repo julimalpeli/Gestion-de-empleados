@@ -191,15 +191,20 @@ const Reports = () => {
 
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
-      // Fórmula: Total Neto - Aguinaldos - Bono - Presentismo
+      // Fórmula: Total Neto - Aguinaldos - Bono - Presentismo + Adelantos
       const salaryCalculations = employeePayrolls.map((payroll) => {
         const netTotal = payroll.netTotal || 0;
         const aguinaldoToExclude = payroll.aguinaldo || 0;
         const bonusToExclude = payroll.bonusAmount || 0;
         const presentismoToExclude = payroll.presentismoAmount || 0;
+        const adelantosToAdd = payroll.advances || 0; // Sumar adelantos porque son parte del sueldo remunerativo
 
         const result =
-          netTotal - aguinaldoToExclude - bonusToExclude - presentismoToExclude;
+          netTotal -
+          aguinaldoToExclude -
+          bonusToExclude -
+          presentismoToExclude +
+          adelantosToAdd;
 
         // Debug log para DNI específico
         if (
@@ -212,6 +217,7 @@ const Reports = () => {
             aguinaldoToExclude,
             bonusToExclude,
             presentismoToExclude,
+            adelantosToAdd,
             resultForAguinaldo: result,
           });
         }
