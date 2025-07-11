@@ -146,13 +146,12 @@ export const useUsers = () => {
       if (error) {
         console.error("❌ Database creation failed:", error);
 
-        // Try to clean up auth user if database creation fails
-        try {
-          await supabase.auth.admin.deleteUser(authUser.user.id);
-          console.log("🧹 Cleaned up auth user due to database error");
-        } catch (cleanupError) {
-          console.warn("⚠️ Could not clean up auth user:", cleanupError);
-        }
+        // Note: Cannot cleanup auth user from client (requires admin API)
+        console.warn("⚠️ Auth user created but database insertion failed");
+        console.warn(
+          "⚠️ Manual cleanup may be required for:",
+          authUser.user.email,
+        );
 
         throw error;
       }
