@@ -26,6 +26,27 @@ export const useEmployees = () => {
     } catch (err) {
       console.error("❌ Error cargando empleados:", err);
 
+      // Intentar usar datos de fallback si hay error de conectividad
+      if (err instanceof Error && err.message.includes("Failed to fetch")) {
+        console.log("🔄 Usando datos de fallback para empleados...");
+        try {
+          const { getFallbackEmployeeData } = await import(
+            "@/utils/offlineFallback"
+          );
+          const fallbackData = getFallbackEmployeeData();
+          if (fallbackData) {
+            setEmployees([fallbackData]);
+            console.log("✅ Datos de fallback cargados");
+            return;
+          }
+        } catch (fallbackError) {
+          console.warn(
+            "⚠️ No se pudieron cargar datos de fallback:",
+            fallbackError,
+          );
+        }
+      }
+
       setError(err instanceof Error ? err.message : "Error loading employees");
     } finally {
       setLoading(false);
