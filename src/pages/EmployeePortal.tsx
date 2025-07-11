@@ -750,7 +750,6 @@ const EmployeePortal = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Período</TableHead>
-                        <TableHead>Sueldo</TableHead>
                         <TableHead>Días</TableHead>
                         <TableHead>Adelantos</TableHead>
                         <TableHead>Descuentos</TableHead>
@@ -759,6 +758,7 @@ const EmployeePortal = () => {
                         <TableHead>Bono</TableHead>
                         <TableHead>Aguinaldo</TableHead>
                         <TableHead>Presentismo</TableHead>
+                        <TableHead>Sueldo</TableHead>
                         <TableHead>Total Neto</TableHead>
                         <TableHead>Estado</TableHead>
                         <TableHead className="text-right">Recibo</TableHead>
