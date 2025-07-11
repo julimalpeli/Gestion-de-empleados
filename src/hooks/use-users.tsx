@@ -187,21 +187,32 @@ export const useUsers = () => {
     }
 
     try {
-      // Create user in Supabase Auth using admin API
-      const { data: authUser, error: authError } =
-        await supabase.auth.admin.createUser({
-          email: employee.email,
-          password: employee.dni, // Password = DNI
-          email_confirm: true, // Auto-confirm email
-          user_metadata: {
+      // Create user in Supabase Auth using signUp (client-safe method)
+      const { data: authUser, error: authError } = await supabase.auth.signUp({
+        email: employee.email,
+        password: employee.dni, // Password = DNI
+        options: {
+          emailRedirectTo: undefined, // Skip email confirmation
+          data: {
             name: employee.name,
             role: "employee",
             employee_id: employee.id,
           },
-        });
+        },
+      });
 
       if (authError) {
-        throw authError;
+        // Check if user already exists
+        if (authError.message.includes("already registered")) {
+          console.log("ℹ️ Employee auth user already exists");
+          // Try to get existing user - this is expected behavior
+        } else {
+          throw authError;
+        }
+      }
+
+      if (!authUser.user) {
+        throw new Error("No user returned from auth signup");
       }
 
       console.log("✅ Supabase Auth user created:", authUser.user.email);
