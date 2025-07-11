@@ -829,7 +829,7 @@ const EmployeePortal = () => {
                             </TableCell>
                             <TableCell className="font-medium text-green-600">
                               {formatCurrency(
-                                (record.whiteAmount || record.baseAmount || 0) +
+                                (record.whiteAmount || 0) +
                                   (record.informalAmount || 0),
                               )}
                             </TableCell>
