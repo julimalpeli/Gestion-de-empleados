@@ -50,6 +50,9 @@ if (import.meta.env.DEV) {
         (window as any).recreateEmployee44586777 =
           quickFixModule.recreateEmployee44586777;
         (window as any).testConnection = connectionModule.testConnection;
+        (window as any).repairEmployeeUser = repairModule.repairEmployeeUser;
+        (window as any).diagnoseEmployeeUser =
+          repairModule.diagnoseEmployeeUser;
         (window as any).syncVacationsTaken = syncModule.syncVacationsTaken;
         (window as any).manualSyncVacations = syncModule.manualSyncVacations;
         (window as any).debugRLSPermissions = debugModule.debugRLSPermissions;
@@ -98,6 +101,8 @@ if (import.meta.env.DEV) {
         console.log("   - listAuthUsers()");
         console.log("   - emergencyAdminLogin() [EMERGENCY ONLY]");
         console.log("   - recreateEmployee44586777()");
+        console.log("   - repairEmployeeUser('email@example.com')");
+        console.log("   - diagnoseEmployeeUser('email@example.com')");
         console.log("   🚨 EMERGENCY AUTH REPAIR:");
         console.log("   - emergencyAuthRepair() - Complete auth diagnosis");
         console.log("   - fixSupabaseAuthSettings() - Configuration guide");
@@ -133,7 +138,7 @@ if (import.meta.env.DEV) {
       },
     )
     .catch((error) => {
-      console.error("❌ Failed to load dev tools:", error);
+      console.error("�� Failed to load dev tools:", error);
     });
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
