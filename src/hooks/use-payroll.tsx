@@ -60,6 +60,25 @@ export const usePayroll = () => {
     } catch (err) {
       console.error("❌ Error loading payroll records:", err);
 
+      // Intentar usar datos de fallback si hay error de conectividad
+      if (err instanceof Error && err.message.includes("Failed to fetch")) {
+        console.log("🔄 Usando datos de fallback para payroll...");
+        try {
+          const { getFallbackPayrollData } = await import(
+            "@/utils/offlineFallback"
+          );
+          const fallbackData = getFallbackPayrollData();
+          setPayrollRecords(fallbackData);
+          console.log("✅ Datos de fallback de payroll cargados");
+          return;
+        } catch (fallbackError) {
+          console.warn(
+            "⚠️ No se pudieron cargar datos de fallback de payroll:",
+            fallbackError,
+          );
+        }
+      }
+
       setError(
         err instanceof Error ? err.message : "Error loading payroll records",
       );
