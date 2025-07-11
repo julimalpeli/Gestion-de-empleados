@@ -233,8 +233,9 @@ export const useUsers = () => {
       });
 
       if (dbError) {
-        // If public.users creation fails, cleanup auth user
-        await supabase.auth.admin.deleteUser(authUser.user.id);
+        console.error("❌ Database user creation failed:", dbError.message);
+        // Note: Cannot cleanup auth user from client (requires admin API)
+        // The auth user will remain but won't have database entry
         throw dbError;
       }
 
