@@ -132,6 +132,11 @@ export const isOfflineMode = () => {
   return !navigator.onLine;
 };
 
+// Get fallback payroll data
+export const getFallbackPayrollData = () => {
+  return fallbackPayrollData;
+};
+
 // Get fallback data for the current employee
 export const getFallbackEmployeeData = (email: string) => {
   if (email === "daianaayelen0220@gmail.com") {
