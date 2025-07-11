@@ -827,6 +827,12 @@ const EmployeePortal = () => {
                                 <span className="text-red-600">Perdido</span>
                               )}
                             </TableCell>
+                            <TableCell className="font-medium text-green-600">
+                              {formatCurrency(
+                                (record.whiteAmount || record.baseAmount || 0) +
+                                  (record.informalAmount || 0),
+                              )}
+                            </TableCell>
                             <TableCell className="font-bold">
                               {formatCurrency(record.netTotal)}
                             </TableCell>
