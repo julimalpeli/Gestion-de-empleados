@@ -771,6 +771,12 @@ const EmployeePortal = () => {
                             <TableCell className="font-medium">
                               {formatPeriod(record.period)}
                             </TableCell>
+                            <TableCell className="font-medium text-blue-600">
+                              {formatCurrency(
+                                (record.baseAmount || 0) +
+                                  (record.informalAmount || 0),
+                              )}
+                            </TableCell>
                             <TableCell>
                               <div className="text-center">
                                 <div className="font-medium">
