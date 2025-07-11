@@ -829,24 +829,42 @@ const EmployeePortal = () => {
                             </TableCell>
                             <TableCell className="font-medium text-green-600">
                               {(() => {
-                                const whiteAmt = record.whiteAmount || 0;
-                                const informalAmt = record.informalAmount || 0;
-                                const baseAmt = record.baseAmount || 0;
-                                const total = whiteAmt + informalAmt;
+                                // Intentar múltiples fuentes para el sueldo
+                                const whiteAmount =
+                                  record.whiteAmount ||
+                                  record.white_amount ||
+                                  0;
+                                const informalAmount =
+                                  record.informalAmount ||
+                                  record.informal_amount ||
+                                  0;
+                                const baseAmount =
+                                  record.baseAmount || record.base_amount || 0;
 
-                                // Debug temporal - remover después
-                                if (total === 0) {
-                                  console.log("Debug Sueldo:", {
-                                    period: record.period,
-                                    whiteAmount: whiteAmt,
-                                    informalAmount: informalAmt,
-                                    baseAmount: baseAmt,
-                                    netTotal: record.netTotal,
-                                    allFields: Object.keys(record),
-                                  });
+                                // Si tenemos white + informal, usar eso
+                                if (whiteAmount > 0 || informalAmount > 0) {
+                                  return formatCurrency(
+                                    whiteAmount + informalAmount,
+                                  );
                                 }
 
-                                return formatCurrency(total);
+                                // Si no, usar baseAmount como fallback
+                                if (baseAmount > 0) {
+                                  return formatCurrency(baseAmount);
+                                }
+
+                                // Si nada funciona, calcular desde empleado actual
+                                if (
+                                  currentEmployee?.whiteWage ||
+                                  currentEmployee?.informalWage
+                                ) {
+                                  return formatCurrency(
+                                    (currentEmployee.whiteWage || 0) +
+                                      (currentEmployee.informalWage || 0),
+                                  );
+                                }
+
+                                return "-";
                               })()}
                             </TableCell>
                             <TableCell className="font-bold">
