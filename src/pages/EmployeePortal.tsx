@@ -828,10 +828,26 @@ const EmployeePortal = () => {
                               )}
                             </TableCell>
                             <TableCell className="font-medium text-green-600">
-                              {formatCurrency(
-                                (record.whiteAmount || 0) +
-                                  (record.informalAmount || 0),
-                              )}
+                              {(() => {
+                                const whiteAmt = record.whiteAmount || 0;
+                                const informalAmt = record.informalAmount || 0;
+                                const baseAmt = record.baseAmount || 0;
+                                const total = whiteAmt + informalAmt;
+
+                                // Debug temporal - remover después
+                                if (total === 0) {
+                                  console.log("Debug Sueldo:", {
+                                    period: record.period,
+                                    whiteAmount: whiteAmt,
+                                    informalAmount: informalAmt,
+                                    baseAmount: baseAmt,
+                                    netTotal: record.netTotal,
+                                    allFields: Object.keys(record),
+                                  });
+                                }
+
+                                return formatCurrency(total);
+                              })()}
                             </TableCell>
                             <TableCell className="font-bold">
                               {formatCurrency(record.netTotal)}
