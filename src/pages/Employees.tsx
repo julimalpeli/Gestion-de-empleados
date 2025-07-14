@@ -722,15 +722,14 @@ const Employees = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="presentismo">Presentismo</Label>
-                  <Input
+                  <CurrencyInput
                     id="presentismo"
-                    type="number"
-                    placeholder="0"
+                    placeholder="$ 0"
                     value={newEmployee.presentismo}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setNewEmployee({
                         ...newEmployee,
-                        presentismo: e.target.value,
+                        presentismo: value,
                       })
                     }
                   />
