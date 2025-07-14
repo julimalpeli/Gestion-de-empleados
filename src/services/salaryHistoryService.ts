@@ -79,6 +79,12 @@ class SalaryHistoryService {
         `🔍 Getting salary for employee ${employeeId}, period ${period}`,
       );
 
+      // TEMPORAL: Deshabilitamos la función RPC para usar la lógica corregida del fallback
+      console.log("🚫 Skipping RPC, using corrected fallback method");
+      return this.getSalaryForPeriodFallback(employeeId, period);
+
+      // TODO: Reactivar cuando la función SQL sea corregida
+      /*
       // Primero intentar usar la función SQL
       const { data, error } = await supabase.rpc("get_salary_for_period", {
         emp_id: employeeId,
@@ -106,6 +112,7 @@ class SalaryHistoryService {
 
       // Si no hay datos, usar fallback
       return this.getSalaryForPeriodFallback(employeeId, period);
+      */
     } catch (error) {
       console.error("Error getting salary for period:", error);
       return this.getSalaryForPeriodFallback(employeeId, period);
