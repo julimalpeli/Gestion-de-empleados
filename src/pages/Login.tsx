@@ -86,18 +86,25 @@ const Login = () => {
       isAuthenticated,
       user: user?.name,
       role: user?.role,
+      loading,
     });
 
+    // Don't redirect if still loading
+    if (loading) return;
+
     if (isAuthenticated && user) {
-      if (user.role === "employee") {
-        console.log("👤 Redirecting employee to portal");
-        window.location.href = "/portal-empleado";
-      } else {
-        console.log("👑 Redirecting admin/manager to dashboard");
-        window.location.href = "/";
-      }
+      // Add small delay to ensure state is stable
+      setTimeout(() => {
+        if (user.role === "employee") {
+          console.log("👤 Redirecting employee to portal");
+          navigate("/portal-empleado", { replace: true });
+        } else {
+          console.log("👑 Redirecting admin/manager to dashboard");
+          navigate("/", { replace: true });
+        }
+      }, 100);
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, loading, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
