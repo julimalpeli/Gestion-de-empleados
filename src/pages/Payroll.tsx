@@ -444,6 +444,7 @@ const Payroll = () => {
       setOvertimeEnabled(false);
       setOvertimeHours("");
       setBonusAmount("");
+      setHistoricalSalary(null);
       setIsNewPayrollOpen(false);
 
       setSuccessMessage("Liquidación creada exitosamente");
