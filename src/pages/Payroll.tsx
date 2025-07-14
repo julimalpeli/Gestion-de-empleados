@@ -467,7 +467,6 @@ const Payroll = () => {
 
     // Obtener el sueldo histórico correcto para el período de la liquidación
     try {
-      const salaryHistoryService = new SalaryHistoryService();
       const historicalSalary = await salaryHistoryService.getSalaryForPeriod(
         record.employeeId.toString(),
         record.period,
