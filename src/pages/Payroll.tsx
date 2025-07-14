@@ -977,6 +977,7 @@ const Payroll = () => {
                     placeholder="0"
                     value={advances}
                     onChange={(e) => setAdvances(e.target.value)}
+                    disabled={editingRecord && !isEditMode}
                   />
                 </div>
 
