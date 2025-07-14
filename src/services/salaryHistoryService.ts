@@ -131,10 +131,9 @@ class SalaryHistoryService {
 
       // Convertir período a fecha para comparación
       const targetDate = new Date(`${period}-01`);
+      const targetDateStr = targetDate.toISOString().split("T")[0];
 
-      console.log(
-        `🎯 Target date for period ${period}: ${targetDate.toISOString().split("T")[0]}`,
-      );
+      console.log(`🎯 Target date for period ${period}: ${targetDateStr}`);
 
       // 1. Buscar cambios que sean efectivos en o antes del período objetivo
       const { data: historyData, error: historyError } = await supabase
