@@ -26,13 +26,7 @@ export const CurrencyInput = React.forwardRef<
     // Función para formatear número a moneda argentina
     const formatCurrency = (num: number): string => {
       if (isNaN(num)) return "";
-
-      return new Intl.NumberFormat("es-AR", {
-        style: "currency",
-        currency: "ARS",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }).format(num);
+      return formatCurrencyUtil(num);
     };
 
     // Función para limpiar el valor y obtener solo números
