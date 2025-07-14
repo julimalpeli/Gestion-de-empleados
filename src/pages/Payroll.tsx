@@ -1001,6 +1001,7 @@ const Payroll = () => {
                     placeholder="0"
                     value={whiteWage}
                     onChange={(e) => setWhiteWage(e.target.value)}
+                    disabled={editingRecord && !isEditMode}
                   />
                   <p className="text-xs text-muted-foreground">
                     El resto se calculará como sueldo en efectivo
