@@ -1225,7 +1225,8 @@ const Payroll = () => {
           <div>
             <CardTitle>Liquidaciones</CardTitle>
             <CardDescription>
-              Gestión de todas las liquidaciones del sistema
+              Gestión de todas las liquidaciones del sistema (
+              {filteredRecords.length} de {payrollRecords.length} mostradas)
             </CardDescription>
           </div>
         </CardHeader>
@@ -1236,7 +1237,7 @@ const Payroll = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar liquidaciones por empleado, período, posici��n o DNI..."
+                  placeholder="Buscar liquidaciones por empleado, período, posición o DNI..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
