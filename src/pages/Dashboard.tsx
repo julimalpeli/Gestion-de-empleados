@@ -441,6 +441,15 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Sistema de auditoría - Solo para admins */}
+      {isAdmin && (
+        <div className="grid gap-4 md:grid-cols-1">
+          <div className="flex justify-center">
+            <AuditStatus />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
