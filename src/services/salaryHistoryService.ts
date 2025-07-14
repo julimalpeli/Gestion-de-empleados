@@ -197,12 +197,16 @@ class SalaryHistoryService {
           `📅 Found future change, using previous values:`,
           futureRecord,
         );
+        console.log(
+          `🕐 Period ${period} was BEFORE change effective on ${futureRecord.effective_date}`,
+        );
 
         // Si el cambio futuro tiene valores "previous_*", usarlos
         if (
           futureRecord.previous_presentismo !== null &&
           futureRecord.previous_presentismo !== undefined
         ) {
+          console.log(`📊 Using PREVIOUS values from future change`);
           return {
             white_wage: futureRecord.previous_white_wage || 0,
             informal_wage: futureRecord.previous_informal_wage || 0,
