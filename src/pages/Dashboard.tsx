@@ -393,70 +393,95 @@ const Dashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle>Actividad Reciente</CardTitle>
-            <CardDescription>Últimas liquidaciones procesadas</CardDescription>
+            <CardDescription>
+              Últimas liquidaciones de empleados activos
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {payrollRecords.length === 0 ? (
-              <div className="text-center py-6">
-                <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                <p className="text-sm font-medium">
-                  No hay liquidaciones registradas
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Las liquidaciones aparecerán aquí cuando se creen
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {payrollRecords
-                  .sort(
-                    (a, b) =>
-                      new Date(b.period).getTime() -
-                      new Date(a.period).getTime(),
-                  )
-                  .slice(0, 5)
-                  .map((record) => (
-                    <div
-                      key={record.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">
-                          {record.employeeName}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {formatPeriod(record.period)} •{" "}
-                          {formatCurrency(record.netTotal)}
-                        </p>
-                      </div>
-                      <Badge
-                        variant="outline"
-                        className={
-                          record.status === "paid"
-                            ? "border-green-200 text-green-700"
-                            : record.status === "processed"
-                              ? "border-purple-200 text-purple-700"
-                              : record.status === "approved"
-                                ? "border-blue-200 text-blue-700"
-                                : record.status === "pending"
-                                  ? "border-yellow-200 text-yellow-700"
-                                  : "border-gray-200 text-gray-700"
-                        }
-                      >
-                        {record.status === "paid"
-                          ? "Pagada"
-                          : record.status === "processed"
-                            ? "Procesada"
-                            : record.status === "approved"
-                              ? "Aprobada"
-                              : record.status === "pending"
-                                ? "Pendiente"
-                                : "Borrador"}
-                      </Badge>
-                    </div>
-                  ))}
-              </div>
-            )}
+            {(() => {
+              // Filter payroll records to show only active employees
+              const activeEmployeeIds = activeEmployees.map((emp) => emp.id);
+              const filteredPayrollRecords = payrollRecords.filter((record) =>
+                activeEmployeeIds.includes(record.employeeId),
+              );
+
+              if (filteredPayrollRecords.length === 0) {
+                return (
+                  <div className="text-center py-6">
+                    <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm font-medium">
+                      No hay liquidaciones de empleados activos
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Las liquidaciones aparecerán aquí cuando se creen
+                    </p>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="space-y-3">
+                  {filteredPayrollRecords
+                    .sort(
+                      (a, b) =>
+                        new Date(b.period).getTime() -
+                        new Date(a.period).getTime(),
+                    )
+                    .slice(0, 5)
+                    .map((record) => {
+                      // Find the employee to get accurate name
+                      const employee = activeEmployees.find(
+                        (emp) => emp.id === record.employeeId,
+                      );
+                      const employeeName =
+                        employee?.name ||
+                        record.employeeName ||
+                        "Empleado no encontrado";
+
+                      return (
+                        <div
+                          key={record.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">
+                              {employeeName}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatPeriod(record.period)} •{" "}
+                              {formatCurrency(record.netTotal)}
+                            </p>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className={
+                              record.status === "paid"
+                                ? "border-green-200 text-green-700"
+                                : record.status === "processed"
+                                  ? "border-purple-200 text-purple-700"
+                                  : record.status === "approved"
+                                    ? "border-blue-200 text-blue-700"
+                                    : record.status === "pending"
+                                      ? "border-yellow-200 text-yellow-700"
+                                      : "border-gray-200 text-gray-700"
+                            }
+                          >
+                            {record.status === "paid"
+                              ? "Pagada"
+                              : record.status === "processed"
+                                ? "Procesada"
+                                : record.status === "approved"
+                                  ? "Aprobada"
+                                  : record.status === "pending"
+                                    ? "Pendiente"
+                                    : "Borrador"}
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                </div>
+              );
+            })()}
           </CardContent>
         </Card>
       </div>
