@@ -887,6 +887,7 @@ const Payroll = () => {
                     placeholder="0"
                     value={holidayDays}
                     onChange={(e) => setHolidayDays(e.target.value)}
+                    disabled={editingRecord && !isEditMode}
                   />
                 </div>
 
