@@ -451,6 +451,25 @@ const Payroll = () => {
     }
   };
 
+  // Función para ver detalles sin edición (solo lectura)
+  const handleViewRecord = (record) => {
+    setEditingRecord(record);
+    setSelectedEmployee(record.employeeId.toString());
+    setSelectedPeriod(record.period);
+    setWorkDays(record.baseDays.toString());
+    setHolidayDays(record.holidayDays?.toString() || "");
+    setAdvances(record.advances?.toString() || "0");
+    setDiscounts(record.discounts?.toString() || "0");
+    setWhiteWage(record.whiteAmount?.toString() || "0");
+    setBonusAmount(record.bonusAmount?.toString() || "0");
+    setOvertimeHours(record.overtimeHours?.toString() || "0");
+    setOvertimeEnabled(record.overtimeHours > 0);
+    setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
+
+    setIsEditMode(false); // Solo lectura
+    setIsNewPayrollOpen(true);
+  };
+
   // Función para editar registro
   const handleEditRecord = async (record) => {
     setEditingRecord(record);
