@@ -124,6 +124,53 @@ const Payroll = () => {
   // Estado para valores históricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
 
+  // Función temporal para corregir datos de historial mezclados
+  const fixSalaryHistoryData = async () => {
+    try {
+      console.log("🔧 Fixing salary history data...");
+
+      const employee = employees.find((e) => e.dni === "44586777");
+      if (!employee) {
+        console.log("❌ Employee not found");
+        return;
+      }
+
+      // Los valores correctos del aumento de julio deberían ser:
+      const correctJulyData = {
+        employee_id: employee.id.toString(),
+        effective_date: "2025-07-01",
+        impact_period: "2025-07",
+        white_wage: employee.whiteWage || employee.white_wage || 0, // Valor actual (julio)
+        informal_wage: employee.informalWage || employee.informal_wage || 0, // Valor actual (julio)
+        presentismo: 70000, // Valor actual (julio)
+        previous_white_wage: 425546, // Valor anterior (abril-junio)
+        previous_informal_wage: 399454, // Valor anterior (abril-junio)
+        previous_presentismo: 50000, // Valor anterior (abril-junio)
+        change_type: "aumento" as const,
+        reason: "Aumento salarial julio 2025 (datos corregidos)",
+      };
+
+      console.log("📝 Correct July data should be:", correctJulyData);
+      console.log(
+        "🧮 Correct July dailyWage should be:",
+        Math.round(
+          (correctJulyData.white_wage + correctJulyData.informal_wage) / 30,
+        ),
+      );
+
+      // Crear nuevo registro corregido
+      const result =
+        await salaryHistoryService.createSalaryHistory(correctJulyData);
+      console.log("✅ Corrected salary history created:", result);
+
+      setSuccessMessage("Datos de historial corregidos exitosamente");
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch (error) {
+      console.error("❌ Error fixing salary history:", error);
+      alert(`Error corrigiendo historial: ${error.message}`);
+    }
+  };
+
   // Usar hooks de Supabase
   const {
     payrollRecords,
