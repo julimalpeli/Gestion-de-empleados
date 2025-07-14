@@ -617,7 +617,7 @@ const Payroll = () => {
     }).format(amount);
   };
 
-  // Función para formatear per��odo
+  // Función para formatear período
   const formatPeriod = (period) => {
     const [year, month] = period.split("-");
     const months = [
@@ -653,6 +653,25 @@ const Payroll = () => {
 
     // Filtro por período
     if (periodFilter !== "all" && record.period !== periodFilter) return false;
+
+    // Filtro de búsqueda
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      const matchesName = record.employeeName
+        ?.toLowerCase()
+        .includes(searchLower);
+      const matchesPeriod = formatPeriod(record.period)
+        .toLowerCase()
+        .includes(searchLower);
+      const matchesPosition = employee?.position
+        ?.toLowerCase()
+        .includes(searchLower);
+      const matchesDni = employee?.dni?.toLowerCase().includes(searchLower);
+
+      if (!matchesName && !matchesPeriod && !matchesPosition && !matchesDni) {
+        return false;
+      }
+    }
 
     return true;
   });
@@ -1096,7 +1115,7 @@ const Payroll = () => {
                 ),
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Este período</p>
+            <p className="text-xs text-muted-foreground">Este per��odo</p>
           </CardContent>
         </Card>
 
