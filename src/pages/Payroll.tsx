@@ -127,33 +127,24 @@ const Payroll = () => {
   // Función de debug para verificar datos históricos
   const debugSalaryHistory = async (employeeId, period) => {
     try {
-      console.log(
-        `🔍 DEBUG: Checking salary history for employee ${employeeId}, period ${period}`,
-      );
+      console.log(`🔍 DEBUG: Checking salary history for employee ${employeeId}, period ${period}`);
 
       // Verificar si existe la tabla y datos
-      const { data: historyData, error } =
-        await salaryHistoryService.getEmployeeSalaryHistory(employeeId);
+      const { data: historyData, error } = await salaryHistoryService.getEmployeeSalaryHistory(employeeId);
 
       if (error) {
         console.log(`❌ DEBUG: Error getting history:`, error);
       } else {
-        console.log(
-          `📚 DEBUG: Found ${historyData?.length || 0} historical records:`,
-          historyData,
-        );
+        console.log(`📚 DEBUG: Found ${historyData?.length || 0} historical records:`, historyData);
       }
 
       // También verificar datos del empleado actual
-      const currentEmployee = employees.find(
-        (e) => e.id.toString() === employeeId.toString(),
-      );
+      const currentEmployee = employees.find(e => e.id.toString() === employeeId.toString());
       if (currentEmployee) {
         console.log(`👤 DEBUG: Current employee data:`, {
           presentismo: currentEmployee.presentismo,
           whiteWage: currentEmployee.whiteWage || currentEmployee.white_wage,
-          informalWage:
-            currentEmployee.informalWage || currentEmployee.informal_wage,
+          informalWage: currentEmployee.informalWage || currentEmployee.informal_wage
         });
       }
     } catch (error) {
@@ -167,7 +158,7 @@ const Payroll = () => {
       console.log("🔄 Starting salary history migration...");
 
       // Ejemplo: migrar el aumento de julio para el empleado con DNI 44586777
-      const employee = employees.find((e) => e.dni === "44586777");
+      const employee = employees.find(e => e.dni === "44586777");
       if (!employee) {
         console.log("❌ Employee with DNI 44586777 not found");
         return;
@@ -185,21 +176,20 @@ const Payroll = () => {
         informal_wage: employee.informalWage || employee.informal_wage || 0,
         presentismo: 70000, // Valor nuevo (julio)
         previous_white_wage: employee.whiteWage || employee.white_wage || 0,
-        previous_informal_wage:
-          employee.informalWage || employee.informal_wage || 0,
+        previous_informal_wage: employee.informalWage || employee.informal_wage || 0,
         previous_presentismo: 50000, // Valor anterior (abril-junio)
         change_type: "aumento" as const,
-        reason: "Aumento salarial julio 2025 (migración automática)",
+        reason: "Aumento salarial julio 2025 (migración automática)"
       };
 
       console.log("📝 Creating salary history record:", migrationData);
 
-      const result =
-        await salaryHistoryService.createSalaryHistory(migrationData);
+      const result = await salaryHistoryService.createSalaryHistory(migrationData);
       console.log("✅ Salary history created:", result);
 
       setSuccessMessage("Historial salarial migrado exitosamente");
       setTimeout(() => setSuccessMessage(""), 5000);
+
     } catch (error) {
       console.error("❌ Error migrating salary history:", error);
       alert(`Error migrando historial: ${error.message}`);
@@ -553,18 +543,15 @@ const Payroll = () => {
 
     // Obtener el sueldo histórico correcto para el período de la liquidación (igual que en edición)
     try {
-      console.log(
-        `🚀 VIEW - Getting historical salary for employee ${record.employeeId}, period ${record.period}`,
-      );
+      console.log(`🚀 VIEW - Getting historical salary for employee ${record.employeeId}, period ${record.period}`);
 
       // Debug: verificar qué datos históricos tenemos
       await debugSalaryHistory(record.employeeId, record.period);
 
-      const historicalSalaryData =
-        await salaryHistoryService.getSalaryForPeriod(
-          record.employeeId.toString(),
-          record.period,
-        );
+      const historicalSalaryData = await salaryHistoryService.getSalaryForPeriod(
+        record.employeeId.toString(),
+        record.period,
+      );
 
       console.log(
         `🔍 Historical salary for VIEW period ${record.period}:`,
@@ -572,21 +559,13 @@ const Payroll = () => {
       );
 
       // Verificar si realmente es diferente al valor actual
-      const currentEmployee = employees.find(
-        (e) => e.id.toString() === record.employeeId.toString(),
-      );
+      const currentEmployee = employees.find(e => e.id.toString() === record.employeeId.toString());
       if (currentEmployee) {
         console.log(`📊 COMPARISON for period ${record.period}:`);
-        console.log(
-          `   Historical presentismo: ${historicalSalaryData.presentismo}`,
-        );
+        console.log(`   Historical presentismo: ${historicalSalaryData.presentismo}`);
         console.log(`   Current presentismo: ${currentEmployee.presentismo}`);
-        console.log(
-          `   Historical white_wage: ${historicalSalaryData.white_wage}`,
-        );
-        console.log(
-          `   Current white_wage: ${currentEmployee.whiteWage || currentEmployee.white_wage}`,
-        );
+        console.log(`   Historical white_wage: ${historicalSalaryData.white_wage}`);
+        console.log(`   Current white_wage: ${currentEmployee.whiteWage || currentEmployee.white_wage}`);
         console.log(`   Record stored white_wage: ${record.whiteAmount}`);
       }
 
@@ -766,9 +745,7 @@ const Payroll = () => {
     // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
     if (historicalSalary && historicalSalary.presentismo !== undefined) {
       presentismoToUse = historicalSalary.presentismo;
-      console.log(
-        `💡 Using historical presentismo: ${presentismoToUse} instead of current: ${employee?.presentismo}`,
-      );
+      console.log(`💡 Using historical presentismo: ${presentismoToUse} instead of current: ${employee?.presentismo}`);
     }
 
     // En modo edición, el presentismo podría ser diferente al actual
@@ -935,20 +912,6 @@ const Payroll = () => {
             </Button>
           </DialogTrigger>
         </Dialog>
-
-        {/* Botón temporal para migrar historial */}
-        <Button
-          variant="outline"
-          onClick={migrateSalaryHistory}
-          className="bg-yellow-50 border-yellow-200 text-yellow-800"
-        >
-          🔄 Migrar Historial Salarial
-        </Button>
-
-        <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
-          <DialogTrigger asChild>
-            <div style={{ display: "none" }}></div>
-          </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
