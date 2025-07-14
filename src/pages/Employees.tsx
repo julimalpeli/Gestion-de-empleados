@@ -70,6 +70,7 @@ import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
 import DocumentManager from "@/components/DocumentManager";
 import SalaryHistoryTable from "@/components/SalaryHistoryTable";
+import SalaryChangeDialog from "@/components/SalaryChangeDialog";
 import { useEmployees } from "@/hooks/use-employees";
 import { useUsers } from "@/hooks/use-users";
 import { useSalaryHistory } from "@/hooks/use-salary-history";
