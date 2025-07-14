@@ -322,7 +322,7 @@ const Payroll = () => {
     const effectiveStart =
       effectiveStartDate > semesterStart ? effectiveStartDate : semesterStart;
 
-    // Calcular días trabajados
+    // Calcular d��as trabajados
     const totalSemesterDays =
       Math.ceil(
         (semesterEnd.getTime() - semesterStart.getTime()) /
@@ -899,6 +899,7 @@ const Payroll = () => {
                       checked={overtimeEnabled}
                       onChange={(e) => setOvertimeEnabled(e.target.checked)}
                       className="rounded border-gray-300"
+                      disabled={editingRecord && !isEditMode}
                     />
                     <Label htmlFor="overtimeToggle">Horas Extra</Label>
                   </div>
