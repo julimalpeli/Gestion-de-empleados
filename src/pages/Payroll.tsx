@@ -924,6 +924,15 @@ const Payroll = () => {
           🔧 Corregir Datos Históricos
         </Button>
 
+        {/* Botón de diagnóstico de conectividad */}
+        <Button
+          variant="outline"
+          onClick={diagnoseConnectivity}
+          className="bg-blue-50 border-blue-200 text-blue-800"
+        >
+          🔍 Diagnosticar Conectividad
+        </Button>
+
         <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
           <DialogTrigger asChild>
             <div style={{ display: "none" }}></div>
