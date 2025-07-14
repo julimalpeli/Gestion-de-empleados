@@ -1156,15 +1156,14 @@ const Employees = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="edit-whiteWage">Sueldo en Blanco</Label>
-                <Input
+                <CurrencyInput
                   id="edit-whiteWage"
-                  type="number"
-                  placeholder="0"
+                  placeholder="$ 0"
                   value={editingEmployee.whiteWage}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setEditingEmployee({
                       ...editingEmployee,
-                      whiteWage: e.target.value,
+                      whiteWage: value,
                     })
                   }
                 />
@@ -1172,15 +1171,14 @@ const Employees = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="edit-informalWage">Sueldo Informal</Label>
-                <Input
+                <CurrencyInput
                   id="edit-informalWage"
-                  type="number"
-                  placeholder="0"
+                  placeholder="$ 0"
                   value={editingEmployee.informalWage}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setEditingEmployee({
                       ...editingEmployee,
-                      informalWage: e.target.value,
+                      informalWage: value,
                     })
                   }
                 />
@@ -1188,15 +1186,14 @@ const Employees = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="edit-presentismo">Presentismo</Label>
-                <Input
+                <CurrencyInput
                   id="edit-presentismo"
-                  type="number"
-                  placeholder="0"
+                  placeholder="$ 0"
                   value={editingEmployee.presentismo}
-                  onChange={(e) =>
+                  onChange={(value) =>
                     setEditingEmployee({
                       ...editingEmployee,
-                      presentismo: e.target.value,
+                      presentismo: value,
                     })
                   }
                 />
