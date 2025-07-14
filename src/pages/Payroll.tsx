@@ -107,6 +107,7 @@ const Payroll = () => {
   const [bonusAmount, setBonusAmount] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [searchTerm, setSearchTerm] = useState(""); // Campo de búsqueda
   const [employeeFilter, setEmployeeFilter] = useState("active"); // Por defecto solo activos
   const [statusFilter, setStatusFilter] = useState("all");
   const [periodFilter, setPeriodFilter] = useState("all");
