@@ -1158,7 +1158,7 @@ const Employees = () => {
                 <Label htmlFor="edit-whiteWage">Sueldo en Blanco</Label>
                 <CurrencyInput
                   id="edit-whiteWage"
-                  placeholder="$ 0"
+                  placeholder="$ 0,00"
                   value={editingEmployee.whiteWage}
                   onChange={(value) =>
                     setEditingEmployee({
@@ -1173,7 +1173,7 @@ const Employees = () => {
                 <Label htmlFor="edit-informalWage">Sueldo Informal</Label>
                 <CurrencyInput
                   id="edit-informalWage"
-                  placeholder="$ 0"
+                  placeholder="$ 0,00"
                   value={editingEmployee.informalWage}
                   onChange={(value) =>
                     setEditingEmployee({
@@ -1188,7 +1188,7 @@ const Employees = () => {
                 <Label htmlFor="edit-presentismo">Presentismo</Label>
                 <CurrencyInput
                   id="edit-presentismo"
-                  placeholder="$ 0"
+                  placeholder="$ 0,00"
                   value={editingEmployee.presentismo}
                   onChange={(value) =>
                     setEditingEmployee({
