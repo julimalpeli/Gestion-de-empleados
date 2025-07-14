@@ -1728,7 +1728,7 @@ const Payroll = () => {
                                         variant="ghost"
                                         size="sm"
                                         className="h-6 w-6 p-0 text-gray-500"
-                                        onClick={() => handleEditRecord(record)}
+                                        onClick={() => handleViewRecord(record)}
                                       >
                                         <Eye className="h-3 w-3" />
                                       </Button>
