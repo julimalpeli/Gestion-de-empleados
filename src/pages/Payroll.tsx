@@ -214,7 +214,7 @@ const Payroll = () => {
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Error al actualizar el estado de la liquidación");
+      alert("Error al actualizar el estado de la liquidaci��n");
     }
   };
 
@@ -843,7 +843,7 @@ const Payroll = () => {
                     type="month"
                     value={selectedPeriod}
                     onChange={(e) => setSelectedPeriod(e.target.value)}
-                    disabled={isEditMode}
+                    disabled={isEditMode || (editingRecord && !isEditMode)}
                   />
                   {selectedPeriod && isAguinaldoPeriod(selectedPeriod) && (
                     <p className="text-xs text-green-600">
@@ -1402,7 +1402,7 @@ const Payroll = () => {
                             {formatPeriod(record.period)}
                             {isAguinaldoPeriod(record.period) && (
                               <div className="text-xs text-green-600">
-                                Per��odo con aguinaldo
+                                Período con aguinaldo
                               </div>
                             )}
                           </div>
@@ -1879,7 +1879,7 @@ const Payroll = () => {
                                   }}
                                 >
                                   <div className="h-4 w-4 mr-2 text-center">
-                                    ���
+                                    📊
                                   </div>
                                   Generar Excel
                                 </DropdownMenuItem>
