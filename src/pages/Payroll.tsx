@@ -879,14 +879,34 @@ const Payroll = () => {
     );
   }
 
-  // Mostrar error
+  // Mostrar error con botón de diagnóstico
   if (payrollError || employeesError) {
     return (
       <div className="flex flex-col gap-6 p-6">
-        <div className="flex items-center justify-center h-32">
-          <p className="text-red-500">
-            Error: {payrollError || employeesError}
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+          <p className="text-red-500 text-center max-w-md">
+            ❌ Error de conectividad: {payrollError || employeesError}
           </p>
+          <p className="text-gray-600 text-sm text-center">
+            No se puede conectar con la base de datos. Esto puede ser un
+            problema temporal.
+          </p>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={diagnoseConnectivity}
+              className="bg-blue-50 border-blue-200 text-blue-800"
+            >
+              🔍 Diagnosticar Conectividad
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => window.location.reload()}
+              className="bg-gray-50 border-gray-200 text-gray-800"
+            >
+              🔄 Recargar Página
+            </Button>
+          </div>
         </div>
       </div>
     );
