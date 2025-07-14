@@ -319,7 +319,7 @@ const Employees = () => {
         editingEmployee.documentType === "dni" &&
         !/^\d{1,8}$/.test(editingEmployee.dni.trim())
       ) {
-        alert("El DNI debe ser un número de máximo 8 dígitos");
+        alert("El DNI debe ser un número de máximo 8 d��gitos");
         return;
       }
       if (
@@ -345,26 +345,54 @@ const Employees = () => {
         return;
       }
 
-      const employeeData = {
-        name: editingEmployee.name.trim(),
-        dni: editingEmployee.dni.trim(),
-        documentType: editingEmployee.documentType,
-        position: editingEmployee.position.trim(),
-        whiteWage: parseFloat(editingEmployee.whiteWage) || 0,
-        informalWage: parseFloat(editingEmployee.informalWage) || 0,
-        presentismo: parseFloat(editingEmployee.presentismo) || 0,
-        startDate: editingEmployee.startDate,
-        address: editingEmployee.address.trim(),
-        email: editingEmployee.email.trim(),
-      };
-
-      await updateEmployee(editingEmployee.id, employeeData);
-
-      showSuccessMessage(
-        `Empleado ${employeeData.name} actualizado exitosamente`,
+      // Detectar cambios salariales
+      const salaryChanges = detectSalaryChanges(
+        originalEmployee,
+        editingEmployee,
       );
-      setIsEditDialogOpen(false);
-      setEditingEmployee(null);
+
+      if (salaryChanges.length > 0) {
+        // Hay cambios salariales, mostrar modal de confirmación
+        setPendingSalaryChanges({
+          employeeData: {
+            name: editingEmployee.name.trim(),
+            dni: editingEmployee.dni.trim(),
+            documentType: editingEmployee.documentType,
+            position: editingEmployee.position.trim(),
+            whiteWage: parseFloat(editingEmployee.whiteWage) || 0,
+            informalWage: parseFloat(editingEmployee.informalWage) || 0,
+            presentismo: parseFloat(editingEmployee.presentismo) || 0,
+            startDate: editingEmployee.startDate,
+            address: editingEmployee.address.trim(),
+            email: editingEmployee.email.trim(),
+          },
+          changes: salaryChanges,
+        });
+        setSalaryChangeDialogOpen(true);
+      } else {
+        // No hay cambios salariales, actualizar normalmente
+        const employeeData = {
+          name: editingEmployee.name.trim(),
+          dni: editingEmployee.dni.trim(),
+          documentType: editingEmployee.documentType,
+          position: editingEmployee.position.trim(),
+          whiteWage: parseFloat(editingEmployee.whiteWage) || 0,
+          informalWage: parseFloat(editingEmployee.informalWage) || 0,
+          presentismo: parseFloat(editingEmployee.presentismo) || 0,
+          startDate: editingEmployee.startDate,
+          address: editingEmployee.address.trim(),
+          email: editingEmployee.email.trim(),
+        };
+
+        await updateEmployee(editingEmployee.id, employeeData);
+
+        showSuccessMessage(
+          `Empleado ${employeeData.name} actualizado exitosamente`,
+        );
+        setIsEditDialogOpen(false);
+        setEditingEmployee(null);
+        setOriginalEmployee(null);
+      }
     } catch (error) {
       console.error("Error updating employee:", error);
       alert(
