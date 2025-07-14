@@ -653,9 +653,6 @@ const Payroll = () => {
       dailyWageToUse = Math.round(
         (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
       );
-      console.log(
-        `💰 Using historical dailyWage: ${dailyWageToUse} instead of current: ${employee.dailyWage}`,
-      );
     }
 
     const basePay = dailyWageToUse * workDaysNum;
