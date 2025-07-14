@@ -85,6 +85,15 @@ export const CurrencyInput = React.forwardRef<
       // Parsear el valor ingresado
       const numericValue = parseValue(inputValue);
 
+      // Debug logging para valores grandes
+      if (numericValue > 10000) {
+        console.log("CurrencyInput - Large value:", {
+          input: inputValue,
+          parsed: numericValue,
+          formatted: formatCurrency(numericValue),
+        });
+      }
+
       // Formatear para display
       const formatted = formatCurrency(numericValue);
       setDisplayValue(formatted);
