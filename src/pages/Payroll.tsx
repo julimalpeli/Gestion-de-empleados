@@ -57,6 +57,7 @@ import {
   Clock,
   Check,
   Settings,
+  Search,
   CircleDollarSign,
   Eye,
   Send,
@@ -616,7 +617,7 @@ const Payroll = () => {
     }).format(amount);
   };
 
-  // Función para formatear período
+  // Función para formatear per��odo
   const formatPeriod = (period) => {
     const [year, month] = period.split("-");
     const months = [
