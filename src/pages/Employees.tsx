@@ -724,7 +724,7 @@ const Employees = () => {
                   <Label htmlFor="presentismo">Presentismo</Label>
                   <CurrencyInput
                     id="presentismo"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={newEmployee.presentismo}
                     onChange={(value) =>
                       setNewEmployee({
