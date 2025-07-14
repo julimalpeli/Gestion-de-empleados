@@ -820,7 +820,7 @@ const Payroll = () => {
               onClick={diagnoseConnectivity}
               className="bg-blue-50 border-blue-200 text-blue-800"
             >
-              ��� Diagnosticar Conectividad
+              🔍 Diagnosticar Conectividad
             </Button>
             <Button
               variant="outline"
@@ -926,7 +926,7 @@ const Payroll = () => {
                   />
                   {selectedPeriod && isAguinaldoPeriod(selectedPeriod) && (
                     <p className="text-xs text-green-600">
-                      ��� Período con aguinaldo (SAC)
+                      ✨ Período con aguinaldo (SAC)
                     </p>
                   )}
                 </div>
@@ -1049,12 +1049,11 @@ const Payroll = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="advances">Adelantos</Label>
-                  <Input
+                  <CurrencyInput
                     id="advances"
-                    type="number"
-                    placeholder="0"
+                    placeholder="$ 0"
                     value={advances}
-                    onChange={(e) => setAdvances(e.target.value)}
+                    onChange={(value) => setAdvances(value)}
                     disabled={editingRecord && !isEditMode}
                   />
                 </div>
