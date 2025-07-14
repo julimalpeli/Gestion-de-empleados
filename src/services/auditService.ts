@@ -28,6 +28,13 @@ class AuditService {
     try {
       console.log("📝 Creating audit log entry:", request);
 
+      // Verificar si la tabla audit_log existe
+      const { data: tableCheck } = await supabase
+        .from("audit_log")
+        .select("count", { count: "exact", head: true })
+        .limit(1);
+
+      // Si la tabla no existe o hay problemas de esquema, log y continuar
       const { data, error } = await supabase
         .from("audit_log")
         .insert({
@@ -43,6 +50,20 @@ class AuditService {
 
       if (error) {
         console.error("Error creating audit log:", error);
+
+        // Si es un error de esquema, logearlo pero no fallar
+        if (
+          error.message?.includes("schema cache") ||
+          error.message?.includes("column") ||
+          error.message?.includes("relationship")
+        ) {
+          console.warn(
+            "🔧 Schema issue detected - audit log table needs to be created/updated",
+          );
+          console.warn("💡 Run database/fix_audit_log_schema.sql to fix this");
+          return {} as AuditLogEntry;
+        }
+
         throw new Error(`Failed to create audit log: ${error.message}`);
       }
 
@@ -50,6 +71,19 @@ class AuditService {
       return data;
     } catch (error) {
       console.error("Audit service error:", error);
+
+      // Log schema issues specifically
+      if (
+        error.message?.includes("schema cache") ||
+        error.message?.includes("column") ||
+        error.message?.includes("relationship")
+      ) {
+        console.warn(
+          "🔧 Database schema issue - audit logging temporarily disabled",
+        );
+        console.warn("💡 Please run: database/fix_audit_log_schema.sql");
+      }
+
       // No lanzar error para evitar que falle la operación principal
       console.warn("⚠️ Audit log failed, but continuing with main operation");
       return {} as AuditLogEntry;
@@ -226,7 +260,7 @@ class AuditService {
     });
   }
 
-  // Obtener estad��sticas de auditoría
+  // Obtener estadísticas de auditoría
   async getAuditStats(filters?: {
     start_date?: string;
     end_date?: string;
