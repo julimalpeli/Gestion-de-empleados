@@ -75,10 +75,6 @@ class SalaryHistoryService {
     period: string,
   ): Promise<SalaryForPeriod> {
     try {
-      console.log(
-        `🔍 Getting salary for employee ${employeeId}, period ${period}`,
-      );
-
       // Primero intentar usar la función SQL
       const { data, error } = await supabase.rpc("get_salary_for_period", {
         emp_id: employeeId,
