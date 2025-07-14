@@ -1174,6 +1174,7 @@ const Payroll = () => {
                   setIsNewPayrollOpen(false);
                   setIsEditMode(false);
                   setEditingRecord(null);
+                  setHistoricalSalary(null);
                 }}
                 className="flex-1"
               >
