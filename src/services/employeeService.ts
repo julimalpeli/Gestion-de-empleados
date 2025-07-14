@@ -337,7 +337,40 @@ export class SupabaseEmployeeService implements IEmployeeService {
         console.warn(`Multiple employees found with ID ${id}, using first one`);
       }
 
-      return this.mapFromSupabase(data[0]);
+      const updatedEmployee = this.mapFromSupabase(data[0]);
+
+      // Auditar actualización de empleado
+      try {
+        const oldValues = await this.getEmployeeById(id);
+        await auditService.auditEmployee(
+          "UPDATE",
+          id,
+          oldValues
+            ? {
+                name: oldValues.name,
+                dni: oldValues.dni,
+                position: oldValues.position,
+                whiteWage: oldValues.whiteWage,
+                informalWage: oldValues.informalWage,
+                presentismo: oldValues.presentismo,
+                status: oldValues.status,
+              }
+            : null,
+          {
+            name: updatedEmployee.name,
+            dni: updatedEmployee.dni,
+            position: updatedEmployee.position,
+            whiteWage: updatedEmployee.whiteWage,
+            informalWage: updatedEmployee.informalWage,
+            presentismo: updatedEmployee.presentismo,
+            status: updatedEmployee.status,
+          },
+        );
+      } catch (auditError) {
+        console.error("Error auditing employee update:", auditError);
+      }
+
+      return updatedEmployee;
     } catch (error) {
       console.error("Error updating employee:", error);
       if (error && typeof error === "object" && "message" in error) {
