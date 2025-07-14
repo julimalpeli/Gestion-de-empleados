@@ -6,8 +6,10 @@ CREATE TABLE IF NOT EXISTS salary_history (
   impact_period VARCHAR(7) NOT NULL, -- "2025-02" formato año-mes
   white_wage DECIMAL(12,2) NOT NULL,
   informal_wage DECIMAL(12,2) NOT NULL,
+  presentismo DECIMAL(12,2) NOT NULL DEFAULT 0,
   previous_white_wage DECIMAL(12,2),
   previous_informal_wage DECIMAL(12,2),
+  previous_presentismo DECIMAL(12,2),
   change_type VARCHAR(20) NOT NULL CHECK (change_type IN ('aumento', 'correccion')),
   reason TEXT,
   applied_by UUID REFERENCES users(id),
