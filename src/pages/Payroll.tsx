@@ -161,6 +161,51 @@ const Payroll = () => {
     }
   };
 
+  // Función para migrar aumentos existentes al historial
+  const migrateSalaryHistory = async () => {
+    try {
+      console.log("🔄 Starting salary history migration...");
+
+      // Ejemplo: migrar el aumento de julio para el empleado con DNI 44586777
+      const employee = employees.find((e) => e.dni === "44586777");
+      if (!employee) {
+        console.log("❌ Employee with DNI 44586777 not found");
+        return;
+      }
+
+      console.log(`👤 Found employee: ${employee.name} (ID: ${employee.id})`);
+
+      // Crear registro histórico para el aumento de julio
+      // Asumiendo que antes del aumento tenía presentismo de 50000
+      const migrationData = {
+        employee_id: employee.id.toString(),
+        effective_date: "2025-07-01", // Fecha efectiva del aumento
+        impact_period: "2025-07", // Período de impacto
+        white_wage: employee.whiteWage || employee.white_wage || 0,
+        informal_wage: employee.informalWage || employee.informal_wage || 0,
+        presentismo: 70000, // Valor nuevo (julio)
+        previous_white_wage: employee.whiteWage || employee.white_wage || 0,
+        previous_informal_wage:
+          employee.informalWage || employee.informal_wage || 0,
+        previous_presentismo: 50000, // Valor anterior (abril-junio)
+        change_type: "aumento" as const,
+        reason: "Aumento salarial julio 2025 (migración automática)",
+      };
+
+      console.log("📝 Creating salary history record:", migrationData);
+
+      const result =
+        await salaryHistoryService.createSalaryHistory(migrationData);
+      console.log("✅ Salary history created:", result);
+
+      setSuccessMessage("Historial salarial migrado exitosamente");
+      setTimeout(() => setSuccessMessage(""), 5000);
+    } catch (error) {
+      console.error("❌ Error migrating salary history:", error);
+      alert(`Error migrando historial: ${error.message}`);
+    }
+  };
+
   // Usar hooks de Supabase
   const {
     payrollRecords,
@@ -548,7 +593,7 @@ const Payroll = () => {
       // Guardar los valores históricos para usar en cálculos de vista previa
       setHistoricalSalary(historicalSalaryData);
 
-      // Usar el sueldo blanco hist��rico para mostrar en vista previa
+      // Usar el sueldo blanco histórico para mostrar en vista previa
       setWhiteWage(historicalSalaryData.white_wage.toString());
 
       console.log(
