@@ -1125,13 +1125,18 @@ const Payroll = () => {
             </div>
 
             <div className="flex gap-2 pt-4">
-              <Button
-                onClick={isEditMode ? handleUpdatePayroll : handleCreatePayroll}
-                disabled={!selectedEmployee || !selectedPeriod}
-                className="flex-1"
-              >
-                {isEditMode ? "Actualizar Liquidación" : "Crear Liquidación"}
-              </Button>
+              {/* Solo mostrar botón de guardar si no es solo lectura */}
+              {(isEditMode || !editingRecord) && (
+                <Button
+                  onClick={
+                    isEditMode ? handleUpdatePayroll : handleCreatePayroll
+                  }
+                  disabled={!selectedEmployee || !selectedPeriod}
+                  className="flex-1"
+                >
+                  {isEditMode ? "Actualizar Liquidación" : "Crear Liquidación"}
+                </Button>
+              )}
               <Button
                 variant="outline"
                 onClick={() => {
@@ -1141,7 +1146,7 @@ const Payroll = () => {
                 }}
                 className="flex-1"
               >
-                Cancelar
+                {isEditMode || !editingRecord ? "Cancelar" : "Cerrar"}
               </Button>
             </div>
           </DialogContent>
