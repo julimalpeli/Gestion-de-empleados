@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { auditService } from "@/services/auditService";
 import type {
   IEmployeeService,
   Employee,
