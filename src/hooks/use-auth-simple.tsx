@@ -405,6 +405,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.log("🔑 Setting session and loading user profile directly");
         setSession(data.session);
         await loadUserProfile(data.user);
+
+        // Auditar login exitoso
+        try {
+          await auditService.auditLogin("LOGIN", data.user.id, {
+            ip_address: "unknown", // Podríamos obtener la IP si es necesario
+            user_agent: navigator.userAgent,
+          });
+        } catch (auditError) {
+          console.error("Error auditing login:", auditError);
+        }
       }
     } catch (error) {
       console.error("Login error details:", error);
