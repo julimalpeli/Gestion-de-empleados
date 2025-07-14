@@ -1232,6 +1232,17 @@ const Payroll = () => {
         <CardContent>
           {/* Filtros */}
           <div className="mb-4 flex gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar liquidaciones por empleado, período, posici��n o DNI..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
             <Select value={employeeFilter} onValueChange={setEmployeeFilter}>
               <SelectTrigger className="w-64">
                 <SelectValue />
