@@ -91,13 +91,13 @@ const Login = () => {
     if (isAuthenticated && user) {
       if (user.role === "employee") {
         console.log("👤 Redirecting employee to portal");
-        navigate("/portal-empleado", { replace: true });
+        window.location.href = "/portal-empleado";
       } else {
         console.log("👑 Redirecting admin/manager to dashboard");
-        navigate("/", { replace: true });
+        window.location.href = "/";
       }
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
