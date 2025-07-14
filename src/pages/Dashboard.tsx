@@ -118,8 +118,6 @@ const Dashboard = () => {
     return sum + (record.overtimeHours || 0);
   }, 0);
 
-  // Debug logging removed to reduce console noise
-
   // Show loading state
   if (employeesLoading || payrollLoading) {
     return (
@@ -132,7 +130,31 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="flex items-center justify-center h-32">
-          <p>Cargando estadísticas...</p>
+          <p>Cargando estadísticas del sistema...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (employeesError || payrollError) {
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="flex items-center gap-4 border-b border-border pb-4">
+          <SidebarTrigger />
+          <div>
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+            <p className="text-muted-foreground">Error de conexión</p>
+          </div>
+        </div>
+        <div className="flex items-center justify-center h-32">
+          <div className="text-center">
+            <AlertTriangle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+            <p className="text-red-600">Error al cargar datos del sistema</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {employeesError || payrollError}
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -145,28 +167,14 @@ const Dashboard = () => {
         <SidebarTrigger />
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground">Resumen de {currentMonth}</p>
-
-          {/* Always show debug info */}
-          <div className="mt-2 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-            <div>
-              <strong>Estado actual:</strong>
-            </div>
-            <div>
-              • Empleados: {employees.length} (Activos: {activeEmployees.length}
-              )
-            </div>
-            <div>• Liquidaciones: {payrollRecords.length}</div>
-            <div>• Período actual: {currentPeriod}</div>
-            <div>• Liquidaciones mes: {currentMonthPayrolls.length}</div>
-            <div>• Total a pagar: {formatCurrency(totalToPay)}</div>
-            {hasError && (
-              <div className="text-red-600">• Error en hooks detectado</div>
-            )}
-            {(employeesLoading || payrollLoading) && (
-              <div className="text-orange-600">• Cargando datos...</div>
-            )}
-          </div>
+          <p className="text-muted-foreground">
+            Resumen de {currentMonth} • {activeEmployees.length} empleados
+            activos
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="text-sm text-muted-foreground">Período actual</p>
+          <p className="text-lg font-semibold">{currentPeriod}</p>
         </div>
       </div>
 
