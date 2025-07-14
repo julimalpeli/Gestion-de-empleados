@@ -932,6 +932,7 @@ const Payroll = () => {
                   <Select
                     value={presentismoStatus}
                     onValueChange={setPresentismoStatus}
+                    disabled={editingRecord && !isEditMode}
                   >
                     <SelectTrigger>
                       <SelectValue />
