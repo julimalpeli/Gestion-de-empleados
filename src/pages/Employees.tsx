@@ -1478,6 +1478,63 @@ const Employees = () => {
         employee={selectedEmployeeForVacations}
       />
 
+      {/* Salary Change Confirmation Dialog */}
+      <SalaryChangeDialog
+        isOpen={salaryChangeDialogOpen}
+        onClose={() => {
+          setSalaryChangeDialogOpen(false);
+          setPendingSalaryChanges(null);
+        }}
+        employee={editingEmployee}
+        changes={pendingSalaryChanges?.changes || []}
+        onConfirm={async (changeType, effectiveDate, reason) => {
+          try {
+            if (!pendingSalaryChanges) return;
+
+            const { employeeData } = pendingSalaryChanges;
+
+            // Si es aumento, crear historial; si es corrección, solo actualizar
+            if (changeType === "aumento") {
+              const today = new Date();
+              const currentPeriod = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+
+              await updateEmployeeSalaryWithHistory(
+                editingEmployee.id,
+                {
+                  white_wage: employeeData.whiteWage,
+                  informal_wage: employeeData.informalWage,
+                  presentismo: employeeData.presentismo,
+                },
+                {
+                  change_type: changeType,
+                  effective_date: effectiveDate,
+                  impact_period: currentPeriod,
+                  reason: reason,
+                },
+              );
+            } else {
+              // Corrección: solo actualizar empleado sin historial
+              await updateEmployee(editingEmployee.id, employeeData);
+            }
+
+            showSuccessMessage(
+              `Empleado ${employeeData.name} actualizado exitosamente`,
+            );
+            setIsEditDialogOpen(false);
+            setEditingEmployee(null);
+            setOriginalEmployee(null);
+            setSalaryChangeDialogOpen(false);
+            setPendingSalaryChanges(null);
+          } catch (error) {
+            console.error(
+              "Error updating employee with salary history:",
+              error,
+            );
+            alert(`Error al actualizar empleado: ${error.message}`);
+          }
+        }}
+      />
+
       {/* Document Manager */}
       <DocumentManager
         isOpen={isDocumentManagerOpen}
