@@ -140,14 +140,16 @@ const Payroll = () => {
         employee_id: employee.id.toString(),
         effective_date: "2025-07-01",
         impact_period: "2025-07",
-        white_wage: employee.whiteWage || employee.white_wage || 0, // Valor actual (julio)
-        informal_wage: employee.informalWage || employee.informal_wage || 0, // Valor actual (julio)
-        presentismo: 70000, // Valor actual (julio)
-        previous_white_wage: 425546, // Valor anterior (abril-junio)
-        previous_informal_wage: 399454, // Valor anterior (abril-junio)
-        previous_presentismo: 50000, // Valor anterior (abril-junio)
+        // TODOS los valores del aumento (actuales del empleado)
+        white_wage: employee.whiteWage || employee.white_wage || 0,
+        informal_wage: employee.informalWage || employee.informal_wage || 0,
+        presentismo: employee.presentismo || 70000, // Usar valor actual del empleado
+        // Valores anteriores al aumento (abril-junio)
+        previous_white_wage: 425546,
+        previous_informal_wage: 399454,
+        previous_presentismo: 50000,
         change_type: "aumento" as const,
-        reason: "Aumento salarial julio 2025 (datos corregidos)",
+        reason: "Aumento salarial julio 2025 (valores actuales corregidos)",
       };
 
       console.log("📝 Correct July data should be:", correctJulyData);
@@ -2001,7 +2003,7 @@ const Payroll = () => {
                                         company: {
                                           name: "Cadiz Bar",
                                           address: "Dirección del Local",
-                                          phone: "Tel��fono de Contacto",
+                                          phone: "Teléfono de Contacto",
                                         },
                                       });
                                     } else {
