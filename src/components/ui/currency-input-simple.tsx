@@ -88,10 +88,14 @@ export const CurrencyInputSimple = React.forwardRef<
 
     const handleFocus = () => {
       setIsFocused(true);
-      // Mostrar valor sin formato para edición
-      if (localValue) {
+      // Mostrar valor sin formato para edición, manteniendo comas argentinas
+      if (localValue && localValue.includes("$")) {
         const num = parseInput(localValue);
-        setLocalValue(num > 0 ? num.toString().replace(".", ",") : "");
+        if (num > 0) {
+          // Convertir a formato argentino para edición (punto a coma)
+          const argFormat = num.toString().replace(".", ",");
+          setLocalValue(argFormat);
+        }
       }
     };
 
