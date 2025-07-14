@@ -295,12 +295,35 @@ export const usePayroll = () => {
   // Eliminar registro de liquidación
   const deletePayrollRecord = async (id: string) => {
     try {
+      // Obtener datos del registro antes de eliminarlo para auditoría
+      const recordToDelete = payrollRecords.find((record) => record.id === id);
+
       const { error } = await supabase
         .from("payroll_records")
         .delete()
         .eq("id", id);
 
       if (error) throw error;
+
+      // Auditar eliminación de liquidación
+      try {
+        await auditPayroll(
+          "DELETE",
+          id,
+          recordToDelete
+            ? {
+                employeeId: recordToDelete.employeeId,
+                employeeName: recordToDelete.employeeName,
+                period: recordToDelete.period,
+                netTotal: recordToDelete.netTotal,
+                status: recordToDelete.status,
+              }
+            : null,
+          null, // No hay valores nuevos en DELETE
+        );
+      } catch (auditError) {
+        console.error("Error auditing payroll deletion:", auditError);
+      }
 
       await fetchPayrollRecords();
     } catch (err) {
