@@ -292,6 +292,13 @@ const Employees = () => {
   };
 
   const handleEditEmployee = (employee) => {
+    // Guardar valores originales para detectar cambios salariales
+    setOriginalEmployee({
+      whiteWage: employee.whiteWage?.toString() || "",
+      informalWage: employee.informalWage?.toString() || "",
+      presentismo: employee.presentismo?.toString() || "",
+    });
+
     setEditingEmployee({
       ...employee,
       documentType: employee.documentType || "dni",
