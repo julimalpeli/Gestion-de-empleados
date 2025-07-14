@@ -162,6 +162,26 @@ export const usePayroll = () => {
         );
       }
 
+      // Auditar creación de liquidación
+      try {
+        await auditPayroll(
+          "INSERT",
+          data.id,
+          null, // No hay valores anteriores
+          {
+            employeeId: payroll.employeeId,
+            employeeName: payroll.employeeName,
+            period: payroll.period,
+            netTotal: payroll.netTotal,
+            status: payroll.status,
+            whiteAmount: payroll.whiteAmount,
+            informalAmount: payroll.informalAmount,
+          },
+        );
+      } catch (auditError) {
+        console.error("Error auditing payroll creation:", auditError);
+      }
+
       await fetchPayrollRecords();
       return data;
     } catch (err) {
