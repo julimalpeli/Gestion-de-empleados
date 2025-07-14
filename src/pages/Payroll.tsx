@@ -124,6 +124,43 @@ const Payroll = () => {
   // Estado para valores históricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
 
+  // Función de debug para verificar datos históricos
+  const debugSalaryHistory = async (employeeId, period) => {
+    try {
+      console.log(
+        `🔍 DEBUG: Checking salary history for employee ${employeeId}, period ${period}`,
+      );
+
+      // Verificar si existe la tabla y datos
+      const { data: historyData, error } =
+        await salaryHistoryService.getEmployeeSalaryHistory(employeeId);
+
+      if (error) {
+        console.log(`❌ DEBUG: Error getting history:`, error);
+      } else {
+        console.log(
+          `📚 DEBUG: Found ${historyData?.length || 0} historical records:`,
+          historyData,
+        );
+      }
+
+      // También verificar datos del empleado actual
+      const currentEmployee = employees.find(
+        (e) => e.id.toString() === employeeId.toString(),
+      );
+      if (currentEmployee) {
+        console.log(`👤 DEBUG: Current employee data:`, {
+          presentismo: currentEmployee.presentismo,
+          whiteWage: currentEmployee.whiteWage || currentEmployee.white_wage,
+          informalWage:
+            currentEmployee.informalWage || currentEmployee.informal_wage,
+        });
+      }
+    } catch (error) {
+      console.error(`❌ DEBUG: Failed to check salary history:`, error);
+    }
+  };
+
   // Usar hooks de Supabase
   const {
     payrollRecords,
