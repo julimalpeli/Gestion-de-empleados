@@ -137,6 +137,48 @@ const Employees = () => {
     setSuccessMessage(message);
   };
 
+  // Detectar cambios salariales
+  const detectSalaryChanges = (original, edited) => {
+    const changes = [];
+
+    if (
+      parseFloat(original.whiteWage || 0) !== parseFloat(edited.whiteWage || 0)
+    ) {
+      changes.push({
+        field: "whiteWage",
+        oldValue: parseFloat(original.whiteWage || 0),
+        newValue: parseFloat(edited.whiteWage || 0),
+        label: "Sueldo Blanco",
+      });
+    }
+
+    if (
+      parseFloat(original.informalWage || 0) !==
+      parseFloat(edited.informalWage || 0)
+    ) {
+      changes.push({
+        field: "informalWage",
+        oldValue: parseFloat(original.informalWage || 0),
+        newValue: parseFloat(edited.informalWage || 0),
+        label: "Sueldo Informal",
+      });
+    }
+
+    if (
+      parseFloat(original.presentismo || 0) !==
+      parseFloat(edited.presentismo || 0)
+    ) {
+      changes.push({
+        field: "presentismo",
+        oldValue: parseFloat(original.presentismo || 0),
+        newValue: parseFloat(edited.presentismo || 0),
+        label: "Presentismo",
+      });
+    }
+
+    return changes;
+  };
+
   const syncEmployeeUserEmail = async (employeeId, email) => {
     try {
       await updateUserEmail(employeeId, email);
