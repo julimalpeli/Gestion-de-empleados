@@ -91,7 +91,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SalaryHistoryService } from "@/services/salaryHistoryService";
+import { salaryHistoryService } from "@/services/salaryHistoryService";
 
 // Data is now loaded from Supabase via hooks
 
