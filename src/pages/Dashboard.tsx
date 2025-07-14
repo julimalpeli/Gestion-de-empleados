@@ -51,6 +51,26 @@ const Dashboard = () => {
     }).format(amount);
   };
 
+  // Format period
+  const formatPeriod = (period) => {
+    const [year, month] = period.split("-");
+    const months = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    return `${months[parseInt(month) - 1]} ${year}`;
+  };
+
   // Calculate real statistics
   const activeEmployees = employees.filter((emp) => emp.status === "active");
   const inactiveEmployees = employees.filter(
@@ -68,41 +88,43 @@ const Dashboard = () => {
 
   // Payroll statistics - By status
   const paidPayrolls = payrollRecords.filter((r) => r.status === "paid");
-  const processedPayrolls = payrollRecords.filter((r) => r.status === "processed");
-  const approvedPayrolls = payrollRecords.filter((r) => r.status === "approved");
+  const processedPayrolls = payrollRecords.filter(
+    (r) => r.status === "processed",
+  );
+  const approvedPayrolls = payrollRecords.filter(
+    (r) => r.status === "approved",
+  );
   const pendingPayrolls = payrollRecords.filter((r) => r.status === "pending");
   const draftPayrolls = payrollRecords.filter((r) => r.status === "draft");
 
   // Financial calculations
-  const totalToPay = currentMonthPayrolls.reduce(
-    (sum, record) => sum + (record.netTotal || 0), 0
+  const totalCurrentMonth = currentMonthPayrolls.reduce(
+    (sum, record) => sum + (record.netTotal || 0),
+    0,
   );
 
   const totalPaid = paidPayrolls.reduce(
-    (sum, record) => sum + (record.netTotal || 0), 0
+    (sum, record) => sum + (record.netTotal || 0),
+    0,
   );
 
-  const totalPending = [...pendingPayrolls, ...approvedPayrolls, ...processedPayrolls]
-    .reduce((sum, record) => sum + (record.netTotal || 0), 0);
+  const totalPending = [
+    ...pendingPayrolls,
+    ...approvedPayrolls,
+    ...processedPayrolls,
+  ].reduce((sum, record) => sum + (record.netTotal || 0), 0);
 
   // Completion percentage for current month
-  const completionPercentage = activeEmployees.length > 0
-    ? Math.round((currentMonthPayrolls.length / activeEmployees.length) * 100)
-    : 0;
+  const completionPercentage =
+    activeEmployees.length > 0
+      ? Math.round((currentMonthPayrolls.length / activeEmployees.length) * 100)
+      : 0;
 
   // Average salary calculation
-  const averageSalary = currentMonthPayrolls.length > 0
-    ? currentMonthPayrolls.reduce((sum, record) => sum + (record.netTotal || 0), 0) / currentMonthPayrolls.length
-    : 0;
-
-  // Hours statistics
-  const totalHoursWorked = currentMonthPayrolls.reduce((sum, record) => {
-    return sum + (record.baseDays || 0) * 8 + (record.overtimeHours || 0);
-  }, 0);
-
-  const totalOvertimeHours = currentMonthPayrolls.reduce((sum, record) => {
-    return sum + (record.overtimeHours || 0);
-  }, 0);
+  const averageSalary =
+    currentMonthPayrolls.length > 0
+      ? totalCurrentMonth / currentMonthPayrolls.length
+      : 0;
 
   // Show loading state
   if (employeesLoading || payrollLoading) {
@@ -154,12 +176,13 @@ const Dashboard = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
-            Resumen de {currentMonth} • {activeEmployees.length} empleados activos
+            Resumen de {currentMonth} • {activeEmployees.length} empleados
+            activos
           </p>
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Período actual</p>
-          <p className="text-lg font-semibold">{currentPeriod}</p>
+          <p className="text-lg font-semibold">{formatPeriod(currentPeriod)}</p>
         </div>
       </div>
 
@@ -177,7 +200,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               {inactiveEmployees.length > 0
                 ? `${inactiveEmployees.length} inactivos`
-                : 'Todos activos'}
+                : "Todos activos"}
             </p>
           </CardContent>
         </Card>
@@ -190,26 +213,31 @@ const Dashboard = () => {
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{currentMonthPayrolls.length}</div>
+            <div className="text-2xl font-bold">
+              {currentMonthPayrolls.length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {completionPercentage}% completado
+              {completionPercentage}% completado ({activeEmployees.length}{" "}
+              empleados)
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Mes</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Mes Actual
+            </CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatCurrency(totalToPay)}
+              {formatCurrency(totalCurrentMonth)}
             </div>
             <p className="text-xs text-muted-foreground">
               {averageSalary > 0
                 ? `Promedio: ${formatCurrency(averageSalary)}`
-                : 'Sin liquidaciones'}
+                : "Sin liquidaciones este mes"}
             </p>
           </CardContent>
         </Card>
@@ -217,30 +245,17 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Estado General
-            </CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">
-              {paidPayrolls.length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Liquidaciones pagadas
-            </p>
-          </CardContent>
-        </Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Horas Trabajadas
+              Total Histórico
             </CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {totalHoursWorked.toLocaleString()}
+              {formatCurrency(totalPaid)}
             </div>
-            <p className="text-xs text-muted-foreground">Este mes</p>
+            <p className="text-xs text-muted-foreground">
+              {paidPayrolls.length} liquidaciones pagadas
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -253,7 +268,10 @@ const Dashboard = () => {
             <Edit3 className="h-4 w-4 text-gray-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-gray-600">{draftCount}</div>
+            <div className="text-2xl font-bold text-gray-600">
+              {draftPayrolls.length}
+            </div>
+            <p className="text-xs text-muted-foreground">Por completar</p>
           </CardContent>
         </Card>
 
@@ -264,8 +282,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {pendingCount}
+              {pendingPayrolls.length}
             </div>
+            <p className="text-xs text-muted-foreground">Para revisar</p>
           </CardContent>
         </Card>
 
@@ -276,8 +295,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">
-              {approvedCount}
+              {approvedPayrolls.length}
             </div>
+            <p className="text-xs text-muted-foreground">Listas para pagar</p>
           </CardContent>
         </Card>
 
@@ -288,8 +308,9 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {processedCount}
+              {processedPayrolls.length}
             </div>
+            <p className="text-xs text-muted-foreground">En proceso</p>
           </CardContent>
         </Card>
 
@@ -299,124 +320,129 @@ const Dashboard = () => {
             <DollarSign className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">{paidCount}</div>
+            <div className="text-2xl font-bold text-green-600">
+              {paidPayrolls.length}
+            </div>
+            <p className="text-xs text-muted-foreground">Completadas</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Quick Actions & Recent Activity */}
+      {/* Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Current Status Summary */}
+        {/* Current Status */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5" />
               Estado Actual
             </CardTitle>
-            <CardDescription>
-              Resumen de liquidaciones y empleados
-            </CardDescription>
+            <CardDescription>Resumen del mes en curso</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {pendingPayrolls.length > 0 && (
-              <div className="flex items-start gap-3">
-                <AlertTriangle className="h-4 w-4 text-yellow-500 mt-0.5" />
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">
-                    {pendingPayrolls.length} liquidaciones por procesar
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Revisar y aprobar para pago
-                  </p>
-                </div>
-                <Badge variant="secondary">Acción Requerida</Badge>
-              </div>
-            )}
-
-            {currentMonthPayrolls.length > 0 && (
-              <div className="flex items-start gap-3">
-                <DollarSign className="h-4 w-4 text-green-500 mt-0.5" />
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">
-                    {currentMonthPayrolls.length} liquidaciones del mes actual
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Total: {formatCurrency(totalToPay)}
-                  </p>
-                </div>
-                <Badge variant="outline">En Progreso</Badge>
-              </div>
-            )}
-
-            <div className="flex items-start gap-3">
-              <Users className="h-4 w-4 text-blue-500 mt-0.5" />
-              <div className="flex-1 space-y-1">
+            {currentMonthPayrolls.length === 0 ? (
+              <div className="text-center py-6">
+                <AlertTriangle className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                 <p className="text-sm font-medium">
-                  {activeEmployees.length} empleados activos
+                  No hay liquidaciones para {formatPeriod(currentPeriod)}
                 </p>
-                <p className="text-xs text-muted-foreground">
-                  {employees.length} empleados en total
+                <p className="text-xs text-muted-foreground mt-1">
+                  Crear liquidaciones para {activeEmployees.length} empleados
+                  activos
                 </p>
               </div>
-              <Badge variant="default">Activo</Badge>
-            </div>
-
-            {paidCount > 0 && (
-              <div className="flex items-start gap-3">
-                <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
-                <div className="flex-1 space-y-1">
-                  <p className="text-sm font-medium">
-                    {paidCount} liquidaciones pagadas
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Registros completados
-                  </p>
+            ) : (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Progreso del mes:</span>
+                  <Badge variant="outline">{completionPercentage}%</Badge>
                 </div>
-                <Badge className="bg-green-100 text-green-800">
-                  Completado
-                </Badge>
-              </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">Total calculado:</span>
+                  <span className="font-bold">
+                    {formatCurrency(totalCurrentMonth)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium">
+                    Promedio por empleado:
+                  </span>
+                  <span className="font-bold">
+                    {formatCurrency(averageSalary)}
+                  </span>
+                </div>
+
+                {totalPending > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">
+                      Pendiente de pago:
+                    </span>
+                    <span className="font-bold text-yellow-600">
+                      {formatCurrency(totalPending)}
+                    </span>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
 
-        {/* Recent Payroll Activity */}
+        {/* Recent Activity */}
         <Card>
           <CardHeader>
-            <CardTitle>Liquidaciones Recientes</CardTitle>
+            <CardTitle>Actividad Reciente</CardTitle>
             <CardDescription>Últimas liquidaciones procesadas</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             {payrollRecords.length === 0 ? (
-              <div className="flex items-center justify-center py-8 text-muted-foreground">
-                <p className="text-sm">No hay liquidaciones registradas</p>
+              <div className="text-center py-6">
+                <Clock className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                <p className="text-sm font-medium">
+                  No hay liquidaciones registradas
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Las liquidaciones aparecerán aquí cuando se creen
+                </p>
               </div>
             ) : (
-              payrollRecords
-                .sort(
-                  (a, b) =>
-                    new Date(b.createdAt || 0).getTime() -
-                    new Date(a.createdAt || 0).getTime(),
-                )
-                .slice(0, 5)
-                .map((record, index) => (
-                  <div key={record.id} className="flex items-start gap-3">
+              <div className="space-y-3">
+                {payrollRecords
+                  .sort(
+                    (a, b) =>
+                      new Date(b.period).getTime() -
+                      new Date(a.period).getTime(),
+                  )
+                  .slice(0, 5)
+                  .map((record) => (
                     <div
-                      className={`w-2 h-2 rounded-full mt-2 ${
-                        record.status === "paid"
-                          ? "bg-green-500"
-                          : record.status === "processed"
-                            ? "bg-purple-500"
-                            : record.status === "approved"
-                              ? "bg-blue-500"
-                              : record.status === "pending"
-                                ? "bg-yellow-500"
-                                : "bg-gray-500"
-                      }`}
-                    ></div>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm">
-                        Liquidación de {record.employeeName} -{" "}
+                      key={record.id}
+                      className="flex items-center justify-between"
+                    >
+                      <div className="flex-1">
+                        <p className="text-sm font-medium">
+                          {record.employeeName}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatPeriod(record.period)} •{" "}
+                          {formatCurrency(record.netTotal)}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className={
+                          record.status === "paid"
+                            ? "border-green-200 text-green-700"
+                            : record.status === "processed"
+                              ? "border-purple-200 text-purple-700"
+                              : record.status === "approved"
+                                ? "border-blue-200 text-blue-700"
+                                : record.status === "pending"
+                                  ? "border-yellow-200 text-yellow-700"
+                                  : "border-gray-200 text-gray-700"
+                        }
+                      >
                         {record.status === "paid"
                           ? "Pagada"
                           : record.status === "processed"
@@ -426,56 +452,16 @@ const Dashboard = () => {
                               : record.status === "pending"
                                 ? "Pendiente"
                                 : "Borrador"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatCurrency(record.netTotal)} •{" "}
-                        {new Date(record.period).toLocaleDateString("es-AR", {
-                          month: "long",
-                          year: "numeric",
-                        })}
-                      </p>
+                      </Badge>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={
-                        record.status === "paid"
-                          ? "border-green-200 text-green-700"
-                          : record.status === "processed"
-                            ? "border-purple-200 text-purple-700"
-                            : record.status === "approved"
-                              ? "border-blue-200 text-blue-700"
-                              : record.status === "pending"
-                                ? "border-yellow-200 text-yellow-700"
-                                : "border-gray-200 text-gray-700"
-                      }
-                    >
-                      {record.status === "paid"
-                        ? "Pagada"
-                        : record.status === "processed"
-                          ? "Procesada"
-                          : record.status === "approved"
-                            ? "Aprobada"
-                            : record.status === "pending"
-                              ? "Pendiente"
-                              : "Borrador"}
-                    </Badge>
-                  </div>
-                ))
-            )}
-
-            {employees.length > 0 && payrollRecords.length === 0 && (
-              <div className="text-center py-4">
-                <p className="text-sm text-muted-foreground">
-                  {employees.length} empleados registrados, listo para crear
-                  liquidaciones
-                </p>
+                  ))}
               </div>
             )}
           </CardContent>
         </Card>
       </div>
 
-      {/* Sistema de auditoría - Solo para admins */}
+      {/* Admin Panel */}
       {isAdmin && (
         <div className="grid gap-4 md:grid-cols-1">
           <div className="flex justify-center">
