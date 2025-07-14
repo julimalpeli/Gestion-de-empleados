@@ -885,6 +885,21 @@ const Payroll = () => {
               Nueva Liquidación
             </Button>
           </DialogTrigger>
+        </Dialog>
+
+        {/* Botón temporal para corregir datos históricos */}
+        <Button
+          variant="outline"
+          onClick={fixSalaryHistoryData}
+          className="bg-red-50 border-red-200 text-red-800"
+        >
+          🔧 Corregir Datos Históricos
+        </Button>
+
+        <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
+          <DialogTrigger asChild>
+            <div style={{ display: "none" }}></div>
+          </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
@@ -1986,7 +2001,7 @@ const Payroll = () => {
                                         company: {
                                           name: "Cadiz Bar",
                                           address: "Dirección del Local",
-                                          phone: "Teléfono de Contacto",
+                                          phone: "Tel��fono de Contacto",
                                         },
                                       });
                                     } else {
