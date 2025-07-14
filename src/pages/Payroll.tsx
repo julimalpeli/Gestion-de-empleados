@@ -92,7 +92,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { salaryHistoryService } from "@/services/salaryHistoryService";
-import { testSupabaseConnection } from "@/lib/supabase";
 
 // Data is now loaded from Supabase via hooks
 
@@ -526,7 +525,7 @@ const Payroll = () => {
         );
 
       console.log(
-        `���� Historical salary for period ${record.period}:`,
+        `🔍 Historical salary for period ${record.period}:`,
         historicalSalaryData,
       );
 
