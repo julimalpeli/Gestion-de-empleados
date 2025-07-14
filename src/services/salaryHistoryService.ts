@@ -149,20 +149,23 @@ class SalaryHistoryService {
 
       if (!historyError && historyData && historyData.length > 0) {
         const record = historyData[0];
-        const recordDate = new Date(record.effective_date);
+        const recordDateStr = record.effective_date;
 
         console.log(
           `✅ Found historical salary (on or before target):`,
           record,
         );
         console.log(
-          `📅 Comparing dates - Target: ${targetDate.toISOString().split("T")[0]}, Record: ${record.effective_date}`,
+          `📅 Comparing dates - Target: ${targetDateStr}, Record: ${recordDateStr}`,
         );
 
-        // Si el registro es exactamente del período objetivo o posterior, usar valores nuevos
-        if (recordDate.getTime() <= targetDate.getTime()) {
+        // Si el cambio es efectivo en el mismo mes o antes, usar valores NUEVOS del cambio
+        const recordYearMonth = recordDateStr.substring(0, 7); // "2025-07"
+        const targetYearMonth = period; // "2025-07"
+
+        if (recordYearMonth <= targetYearMonth) {
           console.log(
-            `🎯 Using NEW values for period ${period} (change was effective on/before this period)`,
+            `🎯 Using NEW values for period ${period} (change effective in ${recordYearMonth})`,
           );
           return {
             white_wage: record.white_wage,
