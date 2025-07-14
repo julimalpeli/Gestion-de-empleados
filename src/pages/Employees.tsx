@@ -1207,138 +1207,171 @@ const Employees = () => {
 
       {/* Employee View Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Información del Empleado</DialogTitle>
-            <DialogDescription>Datos completos del empleado</DialogDescription>
+            <DialogTitle>{viewingEmployee?.name || "Empleado"}</DialogTitle>
+            <DialogDescription>
+              Información completa y historial salarial
+            </DialogDescription>
           </DialogHeader>
+
           {viewingEmployee && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Nombre Completo</Label>
-                <p className="text-lg font-medium">{viewingEmployee.name}</p>
-              </div>
+            <Tabs defaultValue="info" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="info">📋 Información</TabsTrigger>
+                <TabsTrigger value="salary-history">
+                  💰 Historial Sueldo
+                </TabsTrigger>
+                <TabsTrigger value="documents">📄 Documentos</TabsTrigger>
+              </TabsList>
 
-              <div className="space-y-2">
-                <Label>
-                  {viewingEmployee.documentType?.toUpperCase() || "DNI"}
-                </Label>
-                <p className="text-lg font-mono">{viewingEmployee.dni}</p>
-              </div>
+              <TabsContent value="info" className="mt-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Nombre Completo</Label>
+                    <p className="text-lg font-medium">
+                      {viewingEmployee.name}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Puesto</Label>
-                <p className="text-lg">
-                  {formatPosition(viewingEmployee.position)}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>
+                      {viewingEmployee.documentType?.toUpperCase() || "DNI"}
+                    </Label>
+                    <p className="text-lg font-mono">{viewingEmployee.dni}</p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Fecha de Ingreso</Label>
-                <p className="text-lg">
-                  {viewingEmployee.startDate
-                    ? new Date(
-                        viewingEmployee.startDate + "T00:00:00",
-                      ).toLocaleDateString("es-AR")
-                    : "No registrada"}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Puesto</Label>
+                    <p className="text-lg">
+                      {formatPosition(viewingEmployee.position)}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Antigüedad</Label>
-                <p className="text-lg">
-                  {viewingEmployee.startDate
-                    ? (() => {
-                        const vacationInfo =
-                          employeeService.calculateVacationDays(
-                            viewingEmployee.startDate,
-                          );
-                        const years = vacationInfo.years;
-                        const months = vacationInfo.totalMonths % 12;
-                        if (years > 0) {
-                          return `${years} año${years > 1 ? "s" : ""}${months > 0 ? ` y ${months} mes${months > 1 ? "es" : ""}` : ""}`;
-                        } else {
-                          return `${months} mes${months > 1 ? "es" : ""}`;
-                        }
-                      })()
-                    : "No calculada"}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Fecha de Ingreso</Label>
+                    <p className="text-lg">
+                      {viewingEmployee.startDate
+                        ? new Date(
+                            viewingEmployee.startDate + "T00:00:00",
+                          ).toLocaleDateString("es-AR")
+                        : "No registrada"}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Sueldo Diario</Label>
-                <p className="text-lg font-semibold text-green-600">
-                  {formatCurrency(viewingEmployee.dailyWage || 0)}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Antigüedad</Label>
+                    <p className="text-lg">
+                      {viewingEmployee.startDate
+                        ? (() => {
+                            const vacationInfo =
+                              employeeService.calculateVacationDays(
+                                viewingEmployee.startDate,
+                              );
+                            const years = vacationInfo.years;
+                            const months = vacationInfo.totalMonths % 12;
+                            if (years > 0) {
+                              return `${years} año${years > 1 ? "s" : ""}${months > 0 ? ` y ${months} mes${months > 1 ? "es" : ""}` : ""}`;
+                            } else {
+                              return `${months} mes${months > 1 ? "es" : ""}`;
+                            }
+                          })()
+                        : "No calculada"}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Sueldo Mensual Blanco</Label>
-                <p className="text-lg">
-                  {formatCurrency(viewingEmployee.whiteWage || 0)}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Sueldo Diario</Label>
+                    <p className="text-lg font-semibold text-green-600">
+                      {formatCurrency(viewingEmployee.dailyWage || 0)}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Sueldo Mensual Informal</Label>
-                <p className="text-lg">
-                  {formatCurrency(viewingEmployee.informalWage || 0)}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Sueldo Mensual Blanco</Label>
+                    <p className="text-lg">
+                      {formatCurrency(viewingEmployee.whiteWage || 0)}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Presentismo</Label>
-                <p className="text-lg">
-                  {formatCurrency(viewingEmployee.presentismo || 0)}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Sueldo Mensual Informal</Label>
+                    <p className="text-lg">
+                      {formatCurrency(viewingEmployee.informalWage || 0)}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <p className="text-lg">
-                  {viewingEmployee.email || "No registrado"}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Presentismo</Label>
+                    <p className="text-lg">
+                      {formatCurrency(viewingEmployee.presentismo || 0)}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Dirección</Label>
-                <p className="text-lg">
-                  {viewingEmployee.address || "No registrada"}
-                </p>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Email</Label>
+                    <p className="text-lg">
+                      {viewingEmployee.email || "No registrado"}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Estado</Label>
-                <Badge
-                  variant={
-                    viewingEmployee.status === "active"
-                      ? "default"
-                      : "secondary"
-                  }
-                >
-                  {viewingEmployee.status === "active" ? "Activo" : "Inactivo"}
-                </Badge>
-              </div>
+                  <div className="space-y-2">
+                    <Label>Dirección</Label>
+                    <p className="text-lg">
+                      {viewingEmployee.address || "No registrada"}
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label>Días de Vacaciones</Label>
-                <p className="text-lg">
-                  {viewingEmployee.startDate
-                    ? (() => {
-                        const vacationInfo =
-                          employeeService.calculateVacationDays(
-                            viewingEmployee.startDate,
-                          );
-                        if (vacationInfo.eligibleForVacations) {
-                          return `${vacationInfo.vacationDays} días anuales`;
-                        } else {
-                          return `0 días (requiere 6 meses de antigüedad)`;
-                        }
-                      })()
-                    : "No calculado"}
-                </p>
-              </div>
-            </div>
+                  <div className="space-y-2">
+                    <Label>Estado</Label>
+                    <Badge
+                      variant={
+                        viewingEmployee.status === "active"
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {viewingEmployee.status === "active"
+                        ? "Activo"
+                        : "Inactivo"}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Días de Vacaciones</Label>
+                    <p className="text-lg">
+                      {viewingEmployee.startDate
+                        ? (() => {
+                            const vacationInfo =
+                              employeeService.calculateVacationDays(
+                                viewingEmployee.startDate,
+                              );
+                            if (vacationInfo.eligibleForVacations) {
+                              return `${vacationInfo.vacationDays} días anuales`;
+                            } else {
+                              return `0 días (requiere 6 meses de antigüedad)`;
+                            }
+                          })()
+                        : "No calculado"}
+                    </p>
+                  </div>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="salary-history" className="mt-6">
+                <SalaryHistoryTable
+                  employeeId={viewingEmployee.id}
+                  employeeName={viewingEmployee.name}
+                />
+              </TabsContent>
+
+              <TabsContent value="documents" className="mt-6">
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Gestión de documentos del empleado</p>
+                  <p className="text-sm">Próximamente disponible</p>
+                </div>
+              </TabsContent>
+            </Tabs>
           )}
 
           <div className="flex justify-end pt-4">
