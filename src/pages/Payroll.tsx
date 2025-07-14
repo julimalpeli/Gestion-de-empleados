@@ -780,12 +780,18 @@ const Payroll = () => {
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {isEditMode ? "Editar Liquidación" : "Nueva Liquidación"}
+                {editingRecord && !isEditMode
+                  ? "Ver Liquidación"
+                  : isEditMode
+                    ? "Editar Liquidación"
+                    : "Nueva Liquidación"}
               </DialogTitle>
               <DialogDescription>
-                {isEditMode
-                  ? "Modifica los datos de la liquidación existente"
-                  : "Completa los datos para crear una nueva liquidación"}
+                {editingRecord && !isEditMode
+                  ? "Detalles de la liquidación (solo lectura)"
+                  : isEditMode
+                    ? "Modifica los datos de la liquidación existente"
+                    : "Completa los datos para crear una nueva liquidación"}
               </DialogDescription>
             </DialogHeader>
 
