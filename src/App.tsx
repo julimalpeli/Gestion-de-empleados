@@ -142,7 +142,7 @@ if (import.meta.env.DEV) {
     });
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
 import Payroll from "./pages/Payroll";
 import Reports from "./pages/Reports";
