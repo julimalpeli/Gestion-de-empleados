@@ -94,11 +94,8 @@ export const CurrencyInput = React.forwardRef<
     };
 
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-      // Al hacer focus, mostrar solo el número para facilitar edición
-      const numValue = parseValue(displayValue);
-      if (numValue > 0) {
-        e.target.select();
-      }
+      // Al hacer focus, seleccionar todo el texto para facilitar edición
+      e.target.select();
     };
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
