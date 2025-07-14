@@ -71,11 +71,21 @@ const Dashboard = () => {
     return `${months[parseInt(month) - 1]} ${year}`;
   };
 
+  // Debug logs to identify data source
+  console.log("🔍 Dashboard Debug Info:");
+  console.log("- Total employees loaded:", employees.length);
+  console.log("- Employees data:", employees);
+  console.log("- Payroll records loaded:", payrollRecords.length);
+  console.log("- Payroll data sample:", payrollRecords.slice(0, 3));
+
   // Calculate real statistics
   const activeEmployees = employees.filter((emp) => emp.status === "active");
   const inactiveEmployees = employees.filter(
     (emp) => emp.status === "inactive",
   );
+
+  console.log("- Active employees:", activeEmployees.length);
+  console.log("- Inactive employees:", inactiveEmployees.length);
 
   // Current month period
   const currentDate = new Date();
