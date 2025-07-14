@@ -31,13 +31,32 @@ export const CurrencyInput = React.forwardRef<
 
     // Función para limpiar el valor y obtener solo números
     const parseValue = (str: string): number => {
-      // Remover todo excepto números, comas y puntos
-      const cleaned = str.replace(/[^\d,.-]/g, "");
+      // Remover símbolo de moneda y espacios
+      let cleaned = str.replace(/[$\s]/g, "");
 
-      // Reemplazar coma por punto para parsing
-      const normalized = cleaned.replace(",", ".");
+      // Si está vacío, retornar 0
+      if (!cleaned) return 0;
 
-      const parsed = parseFloat(normalized);
+      // Manejar formato argentino: 123.456,78
+      // Los puntos son separadores de miles, la última coma son decimales
+      const parts = cleaned.split(",");
+
+      if (parts.length > 2) {
+        // Múltiples comas, tomar solo la última como decimal
+        const decimals = parts.pop();
+        const integerPart = parts.join("").replace(/\./g, "");
+        cleaned = integerPart + "." + decimals;
+      } else if (parts.length === 2) {
+        // Una coma, podría ser decimal
+        const integerPart = parts[0].replace(/\./g, "");
+        const decimalPart = parts[1];
+        cleaned = integerPart + "." + decimalPart;
+      } else {
+        // Sin comas, solo remover puntos (separadores de miles)
+        cleaned = cleaned.replace(/\./g, "");
+      }
+
+      const parsed = parseFloat(cleaned);
       return isNaN(parsed) ? 0 : parsed;
     };
 
