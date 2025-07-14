@@ -157,7 +157,30 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       if (error) throw error;
 
-      return this.mapFromSupabase(data);
+      const mappedEmployee = this.mapFromSupabase(data);
+
+      // Auditar creación de empleado
+      try {
+        await auditService.auditEmployee(
+          "INSERT",
+          data.id,
+          null, // No hay valores anteriores
+          {
+            name: mappedEmployee.name,
+            dni: mappedEmployee.dni,
+            position: mappedEmployee.position,
+            whiteWage: mappedEmployee.whiteWage,
+            informalWage: mappedEmployee.informalWage,
+            presentismo: mappedEmployee.presentismo,
+            status: mappedEmployee.status,
+            startDate: mappedEmployee.startDate,
+          },
+        );
+      } catch (auditError) {
+        console.error("Error auditing employee creation:", auditError);
+      }
+
+      return mappedEmployee;
     } catch (error) {
       console.error("Error creating employee:", error);
       if (error && typeof error === "object" && "message" in error) {
