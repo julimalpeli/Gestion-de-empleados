@@ -142,7 +142,7 @@ class SalaryHistoryService {
           "white_wage, informal_wage, presentismo, effective_date, previous_white_wage, previous_informal_wage, previous_presentismo",
         )
         .eq("employee_id", employeeId)
-        .lte("effective_date", targetDate.toISOString().split("T")[0])
+        .lte("effective_date", targetDateStr)
         .order("effective_date", { ascending: false })
         .order("created_at", { ascending: false })
         .limit(1);
