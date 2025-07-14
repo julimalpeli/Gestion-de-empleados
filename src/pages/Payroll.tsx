@@ -641,15 +641,30 @@ const Payroll = () => {
     const advancesNum = parseFloat(advances) || 0;
     const discountsNum = parseFloat(discounts) || 0;
 
-    // Sueldo base - usar dailyWage actual del empleado
-    // (El cálculo de base pay usa dailyWage que es independiente del whiteWage)
-    const basePay = employee.dailyWage * workDaysNum;
+    // Sueldo base - usar dailyWage histórico si está disponible, sino el actual
+    let dailyWageToUse = employee.dailyWage;
+
+    // Si tenemos salario histórico, calcular el dailyWage histórico
+    if (
+      historicalSalary &&
+      historicalSalary.white_wage !== undefined &&
+      historicalSalary.informal_wage !== undefined
+    ) {
+      dailyWageToUse = Math.round(
+        (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+      );
+      console.log(
+        `💰 Using historical dailyWage: ${dailyWageToUse} instead of current: ${employee.dailyWage}`,
+      );
+    }
+
+    const basePay = dailyWageToUse * workDaysNum;
 
     // Pago por feriados (doble)
-    const holidayPay = employee.dailyWage * holidayDaysNum;
+    const holidayPay = dailyWageToUse * holidayDaysNum;
 
     // Horas extra (50% adicional)
-    const hourlyRate = employee.dailyWage / 8;
+    const hourlyRate = dailyWageToUse / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
     // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
