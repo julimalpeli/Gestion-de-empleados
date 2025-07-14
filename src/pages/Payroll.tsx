@@ -121,7 +121,7 @@ const Payroll = () => {
   const [selectedPayrollRecord, setSelectedPayrollRecord] = useState(null);
   const [selectedEmployeeForDocs, setSelectedEmployeeForDocs] = useState(null);
 
-  // Estado para valores hist��ricos (cuando editamos liquidaciones pasadas)
+  // Estado para valores históricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
 
   // Usar hooks de Supabase
@@ -471,11 +471,20 @@ const Payroll = () => {
 
     // Obtener el sueldo histórico correcto para el período de la liquidación
     try {
+      console.log(
+        `🔍 [DEBUG] Getting historical salary for employee ${record.employeeId}, period ${record.period}`,
+      );
+
       const historicalSalaryData =
         await salaryHistoryService.getSalaryForPeriod(
           record.employeeId.toString(),
           record.period,
         );
+
+      console.log(`📊 [DEBUG] Historical data received:`, historicalSalaryData);
+      console.log(
+        `💰 [DEBUG] Setting whiteWage to: ${historicalSalaryData.white_wage} (from ${historicalSalaryData.source})`,
+      );
 
       // Guardar los valores históricos para usar en cálculos de vista previa
       setHistoricalSalary(historicalSalaryData);
