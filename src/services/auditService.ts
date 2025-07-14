@@ -101,14 +101,10 @@ class AuditService {
     limit?: number;
   }): Promise<AuditLogEntry[]> {
     try {
+      // Primero intentar consulta simple sin join para evitar errores de esquema
       let query = supabase
         .from("audit_log")
-        .select(
-          `
-          *,
-          user:users!changed_by(name, email)
-        `,
-        )
+        .select("*")
         .order("changed_at", { ascending: false });
 
       // Aplicar filtros si existen
