@@ -471,6 +471,10 @@ const Payroll = () => {
 
     // Obtener el sueldo histórico correcto para el período de la liquidación (igual que en edición)
     try {
+      console.log(
+        `🚀 VIEW - Getting historical salary for employee ${record.employeeId}, period ${record.period}`,
+      );
+
       const historicalSalaryData =
         await salaryHistoryService.getSalaryForPeriod(
           record.employeeId.toString(),
@@ -479,8 +483,27 @@ const Payroll = () => {
 
       console.log(
         `🔍 Historical salary for VIEW period ${record.period}:`,
-        historicalSalaryData,
+        JSON.stringify(historicalSalaryData, null, 2),
       );
+
+      // Verificar si realmente es diferente al valor actual
+      const currentEmployee = employees.find(
+        (e) => e.id.toString() === record.employeeId.toString(),
+      );
+      if (currentEmployee) {
+        console.log(`📊 COMPARISON for period ${record.period}:`);
+        console.log(
+          `   Historical presentismo: ${historicalSalaryData.presentismo}`,
+        );
+        console.log(`   Current presentismo: ${currentEmployee.presentismo}`);
+        console.log(
+          `   Historical white_wage: ${historicalSalaryData.white_wage}`,
+        );
+        console.log(
+          `   Current white_wage: ${currentEmployee.whiteWage || currentEmployee.white_wage}`,
+        );
+        console.log(`   Record stored white_wage: ${record.whiteAmount}`);
+      }
 
       // Guardar los valores históricos para usar en cálculos de vista previa
       setHistoricalSalary(historicalSalaryData);
