@@ -130,7 +130,7 @@ const Payroll = () => {
     try {
       console.log("🔧 Fixing salary history data...");
 
-      const employee = employees.find((e) => e.dni === "44586777");
+      const employee = employees.find(e => e.dni === "44586777");
       if (!employee) {
         console.log("❌ Employee not found");
         return;
@@ -150,24 +150,19 @@ const Payroll = () => {
         previous_informal_wage: 399454,
         previous_presentismo: 50000,
         change_type: "aumento" as const,
-        reason: "Aumento salarial julio 2025 (valores actuales corregidos)",
+        reason: "Aumento salarial julio 2025 (valores actuales corregidos)"
       };
 
       console.log("📝 Correct July data should be:", correctJulyData);
-      console.log(
-        "🧮 Correct July dailyWage should be:",
-        Math.round(
-          (correctJulyData.white_wage + correctJulyData.informal_wage) / 30,
-        ),
-      );
+      console.log("🧮 Correct July dailyWage should be:", Math.round((correctJulyData.white_wage + correctJulyData.informal_wage) / 30));
 
       // Crear nuevo registro corregido
-      const result =
-        await salaryHistoryService.createSalaryHistory(correctJulyData);
+      const result = await salaryHistoryService.createSalaryHistory(correctJulyData);
       console.log("✅ Corrected salary history created:", result);
 
       setSuccessMessage("Datos de historial corregidos exitosamente");
       setTimeout(() => setSuccessMessage(""), 5000);
+
     } catch (error) {
       console.error("❌ Error fixing salary history:", error);
       alert(`Error corrigiendo historial: ${error.message}`);
@@ -189,10 +184,9 @@ const Payroll = () => {
         console.log("🔄 Attempting to reload data...");
         window.location.reload();
       } else {
-        alert(
-          "❌ No se puede conectar a Supabase. Revisa la consola para más detalles.",
-        );
+        alert("❌ No se puede conectar a Supabase. Revisa la consola para más detalles.");
       }
+
     } catch (error) {
       console.error("❌ Diagnosis failed:", error);
       alert(`Error en diagnóstico: ${error.message}`);
@@ -720,17 +714,9 @@ const Payroll = () => {
     let dailyWageToUse = employee.dailyWage;
 
     // Si tenemos salario histórico, calcular el dailyWage histórico
-    if (
-      historicalSalary &&
-      historicalSalary.white_wage !== undefined &&
-      historicalSalary.informal_wage !== undefined
-    ) {
-      dailyWageToUse = Math.round(
-        (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
-      );
-      console.log(
-        `💰 Using historical dailyWage: ${dailyWageToUse} instead of current: ${employee.dailyWage}`,
-      );
+    if (historicalSalary && historicalSalary.white_wage !== undefined && historicalSalary.informal_wage !== undefined) {
+      dailyWageToUse = Math.round((historicalSalary.white_wage + historicalSalary.informal_wage) / 30);
+      console.log(`💰 Using historical dailyWage: ${dailyWageToUse} instead of current: ${employee.dailyWage}`);
     }
 
     const basePay = dailyWageToUse * workDaysNum;
@@ -888,8 +874,7 @@ const Payroll = () => {
             ❌ Error de conectividad: {payrollError || employeesError}
           </p>
           <p className="text-gray-600 text-sm text-center">
-            No se puede conectar con la base de datos. Esto puede ser un
-            problema temporal.
+            No se puede conectar con la base de datos. Esto puede ser un problema temporal.
           </p>
           <div className="flex gap-2">
             <Button
@@ -934,29 +919,6 @@ const Payroll = () => {
             </Button>
           </DialogTrigger>
         </Dialog>
-
-        {/* Botón temporal para corregir datos históricos */}
-        <Button
-          variant="outline"
-          onClick={fixSalaryHistoryData}
-          className="bg-red-50 border-red-200 text-red-800"
-        >
-          🔧 Corregir Datos Históricos
-        </Button>
-
-        {/* Botón de diagnóstico de conectividad */}
-        <Button
-          variant="outline"
-          onClick={diagnoseConnectivity}
-          className="bg-blue-50 border-blue-200 text-blue-800"
-        >
-          🔍 Diagnosticar Conectividad
-        </Button>
-
-        <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
-          <DialogTrigger asChild>
-            <div style={{ display: "none" }}></div>
-          </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
