@@ -204,6 +204,11 @@ export const getFallbackPayrollData = () => {
   return fallbackPayrollData;
 };
 
+// Get all fallback employees data
+export const getFallbackEmployeesData = () => {
+  return fallbackEmployeesData;
+};
+
 // Get fallback data for the current employee
 export const getFallbackEmployeeData = (email: string) => {
   if (email === "daianaayelen0220@gmail.com") {
