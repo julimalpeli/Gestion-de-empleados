@@ -41,6 +41,7 @@ CREATE OR REPLACE FUNCTION get_salary_for_period(
 RETURNS TABLE(
     white_wage DECIMAL(12,2),
     informal_wage DECIMAL(12,2),
+    presentismo DECIMAL(12,2),
     source VARCHAR(20)
 ) AS $$
 DECLARE
@@ -50,29 +51,29 @@ DECLARE
 BEGIN
     -- Convertir período a fecha (primer día del mes)
     target_date := (target_period || '-01')::DATE;
-    
+
     -- Buscar el último cambio antes o igual al período objetivo
     SELECT * INTO history_record
-    FROM salary_history 
-    WHERE employee_id = emp_id 
+    FROM salary_history
+    WHERE employee_id = emp_id
       AND effective_date <= target_date
     ORDER BY effective_date DESC, created_at DESC
     LIMIT 1;
-    
+
     -- Si encontramos historial, usar esos valores
     IF FOUND THEN
-        RETURN QUERY SELECT history_record.white_wage, history_record.informal_wage, 'history'::VARCHAR(20);
+        RETURN QUERY SELECT history_record.white_wage, history_record.informal_wage, history_record.presentismo, 'history'::VARCHAR(20);
     ELSE
         -- Si no hay historial, usar valores actuales del empleado
-        SELECT e.white_wage, e.informal_wage INTO employee_record
+        SELECT e.white_wage, e.informal_wage, e.presentismo INTO employee_record
         FROM employees e
         WHERE e.id = emp_id;
-        
+
         IF FOUND THEN
-            RETURN QUERY SELECT employee_record.white_wage, employee_record.informal_wage, 'current'::VARCHAR(20);
+            RETURN QUERY SELECT employee_record.white_wage, employee_record.informal_wage, employee_record.presentismo, 'current'::VARCHAR(20);
         ELSE
             -- Empleado no encontrado
-            RETURN QUERY SELECT 0::DECIMAL(12,2), 0::DECIMAL(12,2), 'not_found'::VARCHAR(20);
+            RETURN QUERY SELECT 0::DECIMAL(12,2), 0::DECIMAL(12,2), 0::DECIMAL(12,2), 'not_found'::VARCHAR(20);
         END IF;
     END IF;
 END;
@@ -89,8 +90,8 @@ CREATE POLICY "salary_history_view_policy" ON salary_history
 CREATE POLICY "salary_history_insert_policy" ON salary_history
     FOR INSERT WITH CHECK (
         EXISTS (
-            SELECT 1 FROM users 
-            WHERE users.id = auth.uid() 
+            SELECT 1 FROM users
+            WHERE users.id = auth.uid()
             AND users.role IN ('admin', 'manager')
             AND users.is_active = true
         )
@@ -100,8 +101,8 @@ CREATE POLICY "salary_history_insert_policy" ON salary_history
 CREATE POLICY "salary_history_update_policy" ON salary_history
     FOR UPDATE USING (
         EXISTS (
-            SELECT 1 FROM users 
-            WHERE users.id = auth.uid() 
+            SELECT 1 FROM users
+            WHERE users.id = auth.uid()
             AND users.role = 'admin'
             AND users.is_active = true
         )
