@@ -150,16 +150,28 @@ class SalaryHistoryService {
 
       if (!historyError && historyData && historyData.length > 0) {
         const record = historyData[0];
+        const recordDate = new Date(record.effective_date);
+
         console.log(
           `✅ Found historical salary (on or before target):`,
           record,
         );
-        return {
-          white_wage: record.white_wage,
-          informal_wage: record.informal_wage,
-          presentismo: record.presentismo,
-          source: "history",
-        };
+        console.log(
+          `📅 Comparing dates - Target: ${targetDate.toISOString().split("T")[0]}, Record: ${record.effective_date}`,
+        );
+
+        // Si el registro es exactamente del período objetivo o posterior, usar valores nuevos
+        if (recordDate.getTime() <= targetDate.getTime()) {
+          console.log(
+            `🎯 Using NEW values for period ${period} (change was effective on/before this period)`,
+          );
+          return {
+            white_wage: record.white_wage,
+            informal_wage: record.informal_wage,
+            presentismo: record.presentismo,
+            source: "history_new",
+          };
+        }
       }
 
       console.log(
