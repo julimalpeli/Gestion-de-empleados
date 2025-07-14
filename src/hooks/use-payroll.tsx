@@ -256,6 +256,33 @@ export const usePayroll = () => {
         throw new Error(error.message || "Database update error");
       }
 
+      // Auditar actualización de liquidación
+      try {
+        const oldRecord = payrollRecords.find((record) => record.id === id);
+        await auditPayroll(
+          "UPDATE",
+          id,
+          oldRecord
+            ? {
+                status: oldRecord.status,
+                netTotal: oldRecord.netTotal,
+                whiteAmount: oldRecord.whiteAmount,
+                informalAmount: oldRecord.informalAmount,
+                baseDays: oldRecord.baseDays,
+              }
+            : null,
+          {
+            status: updates.status,
+            netTotal: updates.netTotal,
+            whiteAmount: updates.whiteAmount,
+            informalAmount: updates.informalAmount,
+            baseDays: updates.baseDays,
+          },
+        );
+      } catch (auditError) {
+        console.error("Error auditing payroll update:", auditError);
+      }
+
       await fetchPayrollRecords();
     } catch (err) {
       console.error("Update error details:", err);
