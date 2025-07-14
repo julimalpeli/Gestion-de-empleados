@@ -469,6 +469,9 @@ const Payroll = () => {
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
 
+    // Limpiar salario histórico para modo solo lectura
+    setHistoricalSalary(null);
+
     setIsEditMode(false); // Solo lectura
     setIsNewPayrollOpen(true);
   };
