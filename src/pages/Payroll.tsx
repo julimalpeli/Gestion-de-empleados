@@ -174,6 +174,31 @@ const Payroll = () => {
     }
   };
 
+  // Función de diagnóstico para problemas de conectividad
+  const diagnoseConnectivity = async () => {
+    try {
+      console.log("🔍 Starting connectivity diagnosis...");
+
+      // Test basic Supabase connection
+      const isConnected = await testSupabaseConnection();
+
+      if (isConnected) {
+        setSuccessMessage("✅ Conexión a Supabase OK");
+
+        // Try to reload data
+        console.log("🔄 Attempting to reload data...");
+        window.location.reload();
+      } else {
+        alert(
+          "❌ No se puede conectar a Supabase. Revisa la consola para más detalles.",
+        );
+      }
+    } catch (error) {
+      console.error("❌ Diagnosis failed:", error);
+      alert(`Error en diagnóstico: ${error.message}`);
+    }
+  };
+
   // Usar hooks de Supabase
   const {
     payrollRecords,
