@@ -121,6 +121,9 @@ const Payroll = () => {
   const [selectedPayrollRecord, setSelectedPayrollRecord] = useState(null);
   const [selectedEmployeeForDocs, setSelectedEmployeeForDocs] = useState(null);
 
+  // Estado para valores históricos (cuando editamos liquidaciones pasadas)
+  const [historicalSalary, setHistoricalSalary] = useState(null);
+
   // Usar hooks de Supabase
   const {
     payrollRecords,
