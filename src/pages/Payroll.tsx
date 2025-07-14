@@ -1267,7 +1267,7 @@ const Payroll = () => {
                 ),
               )}
             </div>
-            <p className="text-xs text-muted-foreground">Este per��odo</p>
+            <p className="text-xs text-muted-foreground">Este período</p>
           </CardContent>
         </Card>
 
