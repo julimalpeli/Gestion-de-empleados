@@ -934,6 +934,21 @@ const Payroll = () => {
               Nueva Liquidación
             </Button>
           </DialogTrigger>
+        </Dialog>
+
+        {/* Botón temporal para migrar historial */}
+        <Button
+          variant="outline"
+          onClick={migrateSalaryHistory}
+          className="bg-yellow-50 border-yellow-200 text-yellow-800"
+        >
+          🔄 Migrar Historial Salarial
+        </Button>
+
+        <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
+          <DialogTrigger asChild>
+            <div style={{ display: "none" }}></div>
+          </DialogTrigger>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
