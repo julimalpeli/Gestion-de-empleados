@@ -37,24 +37,36 @@ export const CurrencyInput = React.forwardRef<
       // Si está vacío, retornar 0
       if (!cleaned) return 0;
 
-      // Manejar formato argentino: 123.456,78
-      // Los puntos son separadores de miles, la última coma son decimales
-      const parts = cleaned.split(",");
+      // Manejar diferentes formatos de entrada
+      // Formato argentino: 123.456,78 (puntos = miles, coma = decimales)
+      // También permitir: 123456 o 123456.78 (formato de entrada directa)
 
-      if (parts.length > 2) {
-        // Múltiples comas, tomar solo la última como decimal
-        const decimals = parts.pop();
-        const integerPart = parts.join("").replace(/\./g, "");
-        cleaned = integerPart + "." + decimals;
-      } else if (parts.length === 2) {
-        // Una coma, podría ser decimal
-        const integerPart = parts[0].replace(/\./g, "");
-        const decimalPart = parts[1];
-        cleaned = integerPart + "." + decimalPart;
-      } else {
-        // Sin comas, solo remover puntos (separadores de miles)
-        cleaned = cleaned.replace(/\./g, "");
+      const hasComma = cleaned.includes(",");
+      const hasDot = cleaned.includes(".");
+
+      if (hasComma) {
+        // Formato argentino con coma decimal
+        const parts = cleaned.split(",");
+        if (parts.length === 2) {
+          const integerPart = parts[0].replace(/\./g, ""); // Remover separadores de miles
+          const decimalPart = parts[1].replace(/\./g, ""); // Solo conservar dígitos decimales
+          cleaned = integerPart + "." + decimalPart;
+        } else {
+          // Múltiples comas, usar solo números
+          cleaned = cleaned.replace(/[^0-9]/g, "");
+        }
+      } else if (hasDot) {
+        // Podría ser separador de miles o decimal
+        const parts = cleaned.split(".");
+        if (parts.length === 2 && parts[1].length <= 2) {
+          // Probablemente decimal (ej: 123.45)
+          cleaned = cleaned;
+        } else {
+          // Probablemente separadores de miles (ej: 123.456.789)
+          cleaned = cleaned.replace(/\./g, "");
+        }
       }
+      // Si no hay comas ni puntos, usar tal como está
 
       const parsed = parseFloat(cleaned);
       return isNaN(parsed) ? 0 : parsed;
