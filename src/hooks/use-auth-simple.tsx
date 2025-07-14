@@ -419,6 +419,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Login error details:", error);
 
+      // Auditar login fallido
+      try {
+        await auditService.auditLogin("LOGIN_FAILED", "unknown", {
+          error_message: error.message,
+          attempted_email: email,
+          user_agent: navigator.userAgent,
+        });
+      } catch (auditError) {
+        console.error("Error auditing failed login:", auditError);
+      }
+
       // Handle network connectivity errors
       if (
         error.message?.includes("Failed to fetch") ||
