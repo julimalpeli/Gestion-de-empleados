@@ -11,6 +11,7 @@ export const usePayroll = () => {
   const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { auditPayroll } = useAudit();
 
   // Cargar registros de liquidaciones
   const fetchPayrollRecords = async () => {
