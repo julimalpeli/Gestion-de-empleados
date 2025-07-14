@@ -42,8 +42,14 @@ const Dashboard = () => {
   } = usePayroll();
   const { isAdmin } = usePermissions();
 
-  // Check if we have connection errors
-  const hasConnectionError = employeesError || payrollError;
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("es-AR", {
+      style: "currency",
+      currency: "ARS",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  };
 
   // Calculate real statistics
   const activeEmployees = employees.filter((emp) => emp.status === "active");
@@ -55,47 +61,62 @@ const Dashboard = () => {
   const currentDate = new Date();
   const currentPeriod = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}`;
 
-  // Payroll statistics
+  // Payroll statistics - Current month
   const currentMonthPayrolls = payrollRecords.filter(
     (record) => record.period === currentPeriod,
   );
-  const pendingPayrolls = payrollRecords.filter(
-    (record) =>
-      record.status === "pending" ||
-      record.status === "approved" ||
-      record.status === "processed",
+
+  // Payroll statistics - By status
+  const paidPayrolls = payrollRecords.filter((r) => r.status === "paid");
+  const processedPayrolls = payrollRecords.filter(
+    (r) => r.status === "processed",
   );
+  const approvedPayrolls = payrollRecords.filter(
+    (r) => r.status === "approved",
+  );
+  const pendingPayrolls = payrollRecords.filter((r) => r.status === "pending");
+  const draftPayrolls = payrollRecords.filter((r) => r.status === "draft");
+
+  // Financial calculations
   const totalToPay = currentMonthPayrolls.reduce(
-    (sum, record) => sum + record.netTotal,
+    (sum, record) => sum + (record.netTotal || 0),
     0,
   );
 
-  // Status counts
-  const paidCount = payrollRecords.filter((r) => r.status === "paid").length;
-  const processedCount = payrollRecords.filter(
-    (r) => r.status === "processed",
-  ).length;
-  const approvedCount = payrollRecords.filter(
-    (r) => r.status === "approved",
-  ).length;
-  const pendingCount = payrollRecords.filter(
-    (r) => r.status === "pending",
-  ).length;
-  const draftCount = payrollRecords.filter((r) => r.status === "draft").length;
+  const totalPaid = paidPayrolls.reduce(
+    (sum, record) => sum + (record.netTotal || 0),
+    0,
+  );
 
-  // Calculate total hours worked (estimate based on payroll records)
+  const totalPending = [
+    ...pendingPayrolls,
+    ...approvedPayrolls,
+    ...processedPayrolls,
+  ].reduce((sum, record) => sum + (record.netTotal || 0), 0);
+
+  // Completion percentage for current month
+  const completionPercentage =
+    activeEmployees.length > 0
+      ? Math.round((currentMonthPayrolls.length / activeEmployees.length) * 100)
+      : 0;
+
+  // Average salary calculation
+  const averageSalary =
+    currentMonthPayrolls.length > 0
+      ? currentMonthPayrolls.reduce(
+          (sum, record) => sum + (record.netTotal || 0),
+          0,
+        ) / currentMonthPayrolls.length
+      : 0;
+
+  // Hours statistics
   const totalHoursWorked = currentMonthPayrolls.reduce((sum, record) => {
-    return sum + record.baseDays * 8 + (record.overtimeHours || 0);
+    return sum + (record.baseDays || 0) * 8 + (record.overtimeHours || 0);
   }, 0);
 
-  // Format currency
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("es-AR", {
-      style: "currency",
-      currency: "ARS",
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
+  const totalOvertimeHours = currentMonthPayrolls.reduce((sum, record) => {
+    return sum + (record.overtimeHours || 0);
+  }, 0);
 
   // Debug logging removed to reduce console noise
 
