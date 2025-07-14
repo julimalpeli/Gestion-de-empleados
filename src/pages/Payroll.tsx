@@ -863,6 +863,7 @@ const Payroll = () => {
                     max="31"
                     value={workDays}
                     onChange={(e) => setWorkDays(e.target.value)}
+                    disabled={editingRecord && !isEditMode}
                   />
                   {selectedEmployee && (
                     <p className="text-xs text-muted-foreground">
