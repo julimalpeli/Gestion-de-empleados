@@ -452,7 +452,7 @@ const Payroll = () => {
   };
 
   // Función para editar registro
-  const handleEditRecord = (record) => {
+  const handleEditRecord = async (record) => {
     setEditingRecord(record);
     setSelectedEmployee(record.employeeId.toString());
     setSelectedPeriod(record.period);
@@ -460,11 +460,43 @@ const Payroll = () => {
     setHolidayDays(record.holidayDays?.toString() || "");
     setAdvances(record.advances?.toString() || "0");
     setDiscounts(record.discounts?.toString() || "0");
-    setWhiteWage(record.whiteAmount?.toString() || "0");
     setBonusAmount(record.bonusAmount?.toString() || "0");
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
+
+    // Obtener el sueldo histórico correcto para el período de la liquidación
+    try {
+      const salaryHistoryService = new SalaryHistoryService();
+      const historicalSalary = await salaryHistoryService.getSalaryForPeriod(
+        record.employeeId.toString(),
+        record.period,
+      );
+
+      console.log(
+        `🔍 Historical salary for period ${record.period}:`,
+        historicalSalary,
+      );
+
+      // Usar el sueldo blanco histórico en lugar del almacenado en la liquidación
+      setWhiteWage(historicalSalary.white_wage.toString());
+
+      // También actualizar el presentismo histórico si es necesario
+      const employee = employees.find(
+        (e) => e.id.toString() === record.employeeId.toString(),
+      );
+      if (employee && historicalSalary.presentismo !== employee.presentismo) {
+        // El presentismo histórico es diferente al actual
+        console.log(
+          `📊 Using historical presentismo: ${historicalSalary.presentismo} vs current: ${employee.presentismo}`,
+        );
+      }
+    } catch (error) {
+      console.error("Error getting historical salary:", error);
+      // Fallback al valor almacenado en la liquidación
+      setWhiteWage(record.whiteAmount?.toString() || "0");
+    }
+
     setIsEditMode(true);
     setIsNewPayrollOpen(true);
   };
