@@ -6,6 +6,7 @@ import {
   ReactNode,
 } from "react";
 import { supabase } from "@/lib/supabase";
+import { auditService } from "@/services/auditService";
 import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import { checkEmergencyAuth } from "@/utils/emergencyAuth";
 
