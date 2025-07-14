@@ -692,15 +692,14 @@ const Employees = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="whiteWage">Sueldo en Blanco</Label>
-                  <Input
+                  <CurrencyInput
                     id="whiteWage"
-                    type="number"
-                    placeholder="0"
+                    placeholder="$ 0"
                     value={newEmployee.whiteWage}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setNewEmployee({
                         ...newEmployee,
-                        whiteWage: e.target.value,
+                        whiteWage: value,
                       })
                     }
                   />
