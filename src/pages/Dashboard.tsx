@@ -20,6 +20,8 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
+import AuditStatus from "@/components/AuditStatus";
+import usePermissions from "@/hooks/use-permissions";
 
 const Dashboard = () => {
   const currentMonth = new Date().toLocaleDateString("es-AR", {
