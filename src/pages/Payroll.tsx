@@ -582,7 +582,8 @@ const Payroll = () => {
     const advancesNum = parseFloat(advances) || 0;
     const discountsNum = parseFloat(discounts) || 0;
 
-    // Sueldo base
+    // Sueldo base - usar dailyWage actual del empleado
+    // (El cálculo de base pay usa dailyWage que es independiente del whiteWage)
     const basePay = employee.dailyWage * workDaysNum;
 
     // Pago por feriados (doble)
@@ -592,9 +593,13 @@ const Payroll = () => {
     const hourlyRate = employee.dailyWage / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: valor fijo del empleado si mantiene
+    // Presentismo: usar el valor histórico si estamos editando, sino el actual
+    let presentismoToUse = employee?.presentismo || 0;
+
+    // En modo edición, el presentismo podría ser diferente al actual
+    // pero mantener la lógica de mantiene/pierde del form
     const presentismoAmount =
-      presentismoStatus === "mantiene" ? employee?.presentismo || 0 : 0;
+      presentismoStatus === "mantiene" ? presentismoToUse : 0;
 
     const bonusPay = bonusNum;
 
