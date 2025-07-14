@@ -31,42 +31,43 @@ export const CurrencyInput = React.forwardRef<
 
     // Función para limpiar el valor y obtener solo números
     const parseValue = (str: string): number => {
+      if (!str) return 0;
+
       // Remover símbolo de moneda y espacios
       let cleaned = str.replace(/[$\s]/g, "");
 
-      // Si está vacío, retornar 0
+      // Si está vacío después de limpiar, retornar 0
       if (!cleaned) return 0;
 
-      // Manejar diferentes formatos de entrada
-      // Formato argentino: 123.456,78 (puntos = miles, coma = decimales)
-      // También permitir: 123456 o 123456.78 (formato de entrada directa)
+      // Manejar formato argentino: la última coma es decimal, los puntos son miles
+      const lastCommaIndex = cleaned.lastIndexOf(",");
 
-      const hasComma = cleaned.includes(",");
-      const hasDot = cleaned.includes(".");
+      if (lastCommaIndex !== -1) {
+        // Hay coma, asumir que es decimal
+        const integerPart = cleaned
+          .substring(0, lastCommaIndex)
+          .replace(/\./g, ""); // Remover puntos de miles
+        const decimalPart = cleaned.substring(lastCommaIndex + 1);
 
-      if (hasComma) {
-        // Formato argentino con coma decimal
-        const parts = cleaned.split(",");
-        if (parts.length === 2) {
-          const integerPart = parts[0].replace(/\./g, ""); // Remover separadores de miles
-          const decimalPart = parts[1].replace(/\./g, ""); // Solo conservar dígitos decimales
-          cleaned = integerPart + "." + decimalPart;
-        } else {
-          // Múltiples comas, usar solo números
-          cleaned = cleaned.replace(/[^0-9]/g, "");
-        }
-      } else if (hasDot) {
-        // Podría ser separador de miles o decimal
+        // Solo aceptar hasta 2 dígitos decimales
+        const limitedDecimals = decimalPart.slice(0, 2);
+
+        cleaned = integerPart + "." + limitedDecimals;
+      } else {
+        // Sin coma, los puntos podrían ser miles o decimal
         const parts = cleaned.split(".");
-        if (parts.length === 2 && parts[1].length <= 2) {
+        if (
+          parts.length === 2 &&
+          parts[1].length <= 2 &&
+          parts[0].length <= 3
+        ) {
           // Probablemente decimal (ej: 123.45)
           cleaned = cleaned;
         } else {
-          // Probablemente separadores de miles (ej: 123.456.789)
+          // Separadores de miles, remover puntos
           cleaned = cleaned.replace(/\./g, "");
         }
       }
-      // Si no hay comas ni puntos, usar tal como está
 
       const parsed = parseFloat(cleaned);
       return isNaN(parsed) ? 0 : parsed;
