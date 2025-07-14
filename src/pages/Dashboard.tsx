@@ -68,46 +68,32 @@ const Dashboard = () => {
 
   // Payroll statistics - By status
   const paidPayrolls = payrollRecords.filter((r) => r.status === "paid");
-  const processedPayrolls = payrollRecords.filter(
-    (r) => r.status === "processed",
-  );
-  const approvedPayrolls = payrollRecords.filter(
-    (r) => r.status === "approved",
-  );
+  const processedPayrolls = payrollRecords.filter((r) => r.status === "processed");
+  const approvedPayrolls = payrollRecords.filter((r) => r.status === "approved");
   const pendingPayrolls = payrollRecords.filter((r) => r.status === "pending");
   const draftPayrolls = payrollRecords.filter((r) => r.status === "draft");
 
   // Financial calculations
   const totalToPay = currentMonthPayrolls.reduce(
-    (sum, record) => sum + (record.netTotal || 0),
-    0,
+    (sum, record) => sum + (record.netTotal || 0), 0
   );
 
   const totalPaid = paidPayrolls.reduce(
-    (sum, record) => sum + (record.netTotal || 0),
-    0,
+    (sum, record) => sum + (record.netTotal || 0), 0
   );
 
-  const totalPending = [
-    ...pendingPayrolls,
-    ...approvedPayrolls,
-    ...processedPayrolls,
-  ].reduce((sum, record) => sum + (record.netTotal || 0), 0);
+  const totalPending = [...pendingPayrolls, ...approvedPayrolls, ...processedPayrolls]
+    .reduce((sum, record) => sum + (record.netTotal || 0), 0);
 
   // Completion percentage for current month
-  const completionPercentage =
-    activeEmployees.length > 0
-      ? Math.round((currentMonthPayrolls.length / activeEmployees.length) * 100)
-      : 0;
+  const completionPercentage = activeEmployees.length > 0
+    ? Math.round((currentMonthPayrolls.length / activeEmployees.length) * 100)
+    : 0;
 
   // Average salary calculation
-  const averageSalary =
-    currentMonthPayrolls.length > 0
-      ? currentMonthPayrolls.reduce(
-          (sum, record) => sum + (record.netTotal || 0),
-          0,
-        ) / currentMonthPayrolls.length
-      : 0;
+  const averageSalary = currentMonthPayrolls.length > 0
+    ? currentMonthPayrolls.reduce((sum, record) => sum + (record.netTotal || 0), 0) / currentMonthPayrolls.length
+    : 0;
 
   // Hours statistics
   const totalHoursWorked = currentMonthPayrolls.reduce((sum, record) => {
@@ -168,8 +154,7 @@ const Dashboard = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <p className="text-muted-foreground">
-            Resumen de {currentMonth} • {activeEmployees.length} empleados
-            activos
+            Resumen de {currentMonth} • {activeEmployees.length} empleados activos
           </p>
         </div>
         <div className="text-right">
@@ -190,7 +175,9 @@ const Dashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">{activeEmployees.length}</div>
             <p className="text-xs text-muted-foreground">
-              {inactiveEmployees.length} inactivos
+              {inactiveEmployees.length > 0
+                ? `${inactiveEmployees.length} inactivos`
+                : 'Todos activos'}
             </p>
           </CardContent>
         </Card>
@@ -198,21 +185,21 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Liquidaciones Pendientes
+              Liquidaciones Mes
             </CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CalendarDays className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{pendingPayrolls.length}</div>
+            <div className="text-2xl font-bold">{currentMonthPayrolls.length}</div>
             <p className="text-xs text-muted-foreground">
-              Por procesar y pagar
+              {completionPercentage}% completado
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total a Pagar</CardTitle>
+            <CardTitle className="text-sm font-medium">Total Mes</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -220,12 +207,29 @@ const Dashboard = () => {
               {formatCurrency(totalToPay)}
             </div>
             <p className="text-xs text-muted-foreground">
-              {currentMonthPayrolls.length} liquidaciones este mes
+              {averageSalary > 0
+                ? `Promedio: ${formatCurrency(averageSalary)}`
+                : 'Sin liquidaciones'}
             </p>
           </CardContent>
         </Card>
 
         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Estado General
+            </CardTitle>
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {paidPayrolls.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Liquidaciones pagadas
+            </p>
+          </CardContent>
+        </Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Horas Trabajadas
