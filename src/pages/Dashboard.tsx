@@ -40,6 +40,7 @@ const Dashboard = () => {
     loading: payrollLoading,
     error: payrollError,
   } = usePayroll();
+  const { isAdmin } = usePermissions();
 
   // Check if we have connection errors
   const hasConnectionError = employeesError || payrollError;
