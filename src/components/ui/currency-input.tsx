@@ -118,8 +118,16 @@ export const CurrencyInput = React.forwardRef<
 
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       // Al perder focus, reformatear con moneda
-      const numValue = parseValue(e.target.value);
-      if (numValue === 0) {
+      const inputValue = e.target.value;
+      const numValue = parseValue(inputValue);
+
+      console.log("CurrencyInput blur:", {
+        input: inputValue,
+        parsed: numValue,
+        formatted: numValue > 0 ? formatCurrency(numValue) : "",
+      });
+
+      if (numValue === 0 && !inputValue) {
         setDisplayValue("");
       } else {
         setDisplayValue(formatCurrency(numValue));
