@@ -707,15 +707,14 @@ const Employees = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="informalWage">Sueldo Informal</Label>
-                  <Input
+                  <CurrencyInput
                     id="informalWage"
-                    type="number"
-                    placeholder="0"
+                    placeholder="$ 0"
                     value={newEmployee.informalWage}
-                    onChange={(e) =>
+                    onChange={(value) =>
                       setNewEmployee({
                         ...newEmployee,
-                        informalWage: e.target.value,
+                        informalWage: value,
                       })
                     }
                   />
