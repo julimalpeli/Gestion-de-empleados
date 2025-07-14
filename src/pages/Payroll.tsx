@@ -691,7 +691,7 @@ const Payroll = () => {
     // Total después de deducciones
     const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
 
-    // División entre blanco e informal
+    // Divisi��n entre blanco e informal
     const manualWhiteWage = parseFloat(whiteWage) || 0;
     const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
 
@@ -1060,12 +1060,11 @@ const Payroll = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="discounts">Descuentos</Label>
-                  <Input
+                  <CurrencyInput
                     id="discounts"
-                    type="number"
-                    placeholder="0"
+                    placeholder="$ 0"
                     value={discounts}
-                    onChange={(e) => setDiscounts(e.target.value)}
+                    onChange={(value) => setDiscounts(value)}
                     disabled={editingRecord && !isEditMode}
                   />
                 </div>
