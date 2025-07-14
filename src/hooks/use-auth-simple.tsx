@@ -471,6 +471,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("🚪 Logging out user...");
 
+      // Auditar logout antes de cerrar sesión
+      if (user) {
+        try {
+          await auditService.auditLogin("LOGOUT", user.id);
+        } catch (auditError) {
+          console.error("Error auditing logout:", auditError);
+        }
+      }
+
       // Clear local state first
       setUser(null);
       setSession(null);
