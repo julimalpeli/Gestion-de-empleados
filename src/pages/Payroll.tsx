@@ -1040,7 +1040,7 @@ const Payroll = () => {
                   <Label htmlFor="bonusAmount">Bono Libre</Label>
                   <CurrencyInput
                     id="bonusAmount"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={bonusAmount}
                     onChange={(value) => setBonusAmount(value)}
                     disabled={editingRecord && !isEditMode}
@@ -1051,7 +1051,7 @@ const Payroll = () => {
                   <Label htmlFor="advances">Adelantos</Label>
                   <CurrencyInput
                     id="advances"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={advances}
                     onChange={(value) => setAdvances(value)}
                     disabled={editingRecord && !isEditMode}
@@ -1062,7 +1062,7 @@ const Payroll = () => {
                   <Label htmlFor="discounts">Descuentos</Label>
                   <CurrencyInput
                     id="discounts"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={discounts}
                     onChange={(value) => setDiscounts(value)}
                     disabled={editingRecord && !isEditMode}
@@ -1073,7 +1073,7 @@ const Payroll = () => {
                   <Label htmlFor="whiteWage">Sueldo Depósito</Label>
                   <CurrencyInput
                     id="whiteWage"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={whiteWage}
                     onChange={(value) => setWhiteWage(value)}
                     disabled={editingRecord && !isEditMode}
