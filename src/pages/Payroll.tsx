@@ -125,80 +125,6 @@ const Payroll = () => {
   // Estado para valores históricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
 
-  // Función temporal para corregir datos de historial mezclados
-  const fixSalaryHistoryData = async () => {
-    try {
-      console.log("🔧 Fixing salary history data...");
-
-      const employee = employees.find((e) => e.dni === "44586777");
-      if (!employee) {
-        console.log("❌ Employee not found");
-        return;
-      }
-
-      // Los valores correctos del aumento de julio deberían ser:
-      const correctJulyData = {
-        employee_id: employee.id.toString(),
-        effective_date: "2025-07-01",
-        impact_period: "2025-07",
-        // TODOS los valores del aumento (actuales del empleado)
-        white_wage: employee.whiteWage || employee.white_wage || 0,
-        informal_wage: employee.informalWage || employee.informal_wage || 0,
-        presentismo: employee.presentismo || 70000, // Usar valor actual del empleado
-        // Valores anteriores al aumento (abril-junio)
-        previous_white_wage: 425546,
-        previous_informal_wage: 399454,
-        previous_presentismo: 50000,
-        change_type: "aumento" as const,
-        reason: "Aumento salarial julio 2025 (valores actuales corregidos)",
-      };
-
-      console.log("📝 Correct July data should be:", correctJulyData);
-      console.log(
-        "🧮 Correct July dailyWage should be:",
-        Math.round(
-          (correctJulyData.white_wage + correctJulyData.informal_wage) / 30,
-        ),
-      );
-
-      // Crear nuevo registro corregido
-      const result =
-        await salaryHistoryService.createSalaryHistory(correctJulyData);
-      console.log("✅ Corrected salary history created:", result);
-
-      setSuccessMessage("Datos de historial corregidos exitosamente");
-      setTimeout(() => setSuccessMessage(""), 5000);
-    } catch (error) {
-      console.error("❌ Error fixing salary history:", error);
-      alert(`Error corrigiendo historial: ${error.message}`);
-    }
-  };
-
-  // Función de diagnóstico para problemas de conectividad
-  const diagnoseConnectivity = async () => {
-    try {
-      console.log("🔍 Starting connectivity diagnosis...");
-
-      // Test basic Supabase connection
-      const isConnected = await testSupabaseConnection();
-
-      if (isConnected) {
-        setSuccessMessage("✅ Conexión a Supabase OK");
-
-        // Try to reload data
-        console.log("🔄 Attempting to reload data...");
-        window.location.reload();
-      } else {
-        alert(
-          "❌ No se puede conectar a Supabase. Revisa la consola para más detalles.",
-        );
-      }
-    } catch (error) {
-      console.error("❌ Diagnosis failed:", error);
-      alert(`Error en diagnóstico: ${error.message}`);
-    }
-  };
-
   // Usar hooks de Supabase
   const {
     payrollRecords,
@@ -600,7 +526,7 @@ const Payroll = () => {
         );
 
       console.log(
-        `🔍 Historical salary for period ${record.period}:`,
+        `���� Historical salary for period ${record.period}:`,
         historicalSalaryData,
       );
 
