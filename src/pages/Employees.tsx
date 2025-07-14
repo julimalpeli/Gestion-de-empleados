@@ -72,6 +72,7 @@ import DocumentManager from "@/components/DocumentManager";
 import SalaryHistoryTable from "@/components/SalaryHistoryTable";
 import { useEmployees } from "@/hooks/use-employees";
 import { useUsers } from "@/hooks/use-users";
+import { useSalaryHistory } from "@/hooks/use-salary-history";
 import { employeeService } from "@/services/employeeService";
 
 const Employees = () => {
