@@ -709,7 +709,7 @@ const Employees = () => {
                   <Label htmlFor="informalWage">Sueldo Informal</Label>
                   <CurrencyInput
                     id="informalWage"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={newEmployee.informalWage}
                     onChange={(value) =>
                       setNewEmployee({
