@@ -69,6 +69,7 @@ import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
 import VacationManager from "@/components/VacationManager";
 import DocumentManager from "@/components/DocumentManager";
+import SalaryHistoryTable from "@/components/SalaryHistoryTable";
 import { useEmployees } from "@/hooks/use-employees";
 import { useUsers } from "@/hooks/use-users";
 import { employeeService } from "@/services/employeeService";
