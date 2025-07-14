@@ -94,21 +94,18 @@ export const CurrencyInput = React.forwardRef<
         return;
       }
 
-      // Parsear el valor ingresado
+      // Permitir escritura de números, puntos y comas sin procesar inmediatamente
+      // Solo formatear cuando sea un valor válido completo
+      setDisplayValue(inputValue);
+
+      // Parsear el valor ingresado solo si parece completo
       const numericValue = parseValue(inputValue);
 
-      // Debug logging para valores grandes
-      if (numericValue > 10000) {
-        console.log("CurrencyInput - Large value:", {
-          input: inputValue,
-          parsed: numericValue,
-          formatted: formatCurrency(numericValue),
-        });
-      }
-
-      // Formatear para display
-      const formatted = formatCurrency(numericValue);
-      setDisplayValue(formatted);
+      // Debug logging
+      console.log("CurrencyInput change:", {
+        input: inputValue,
+        parsed: numericValue,
+      });
 
       // Enviar el valor numérico como string al parent
       onChange?.(numericValue.toString());
