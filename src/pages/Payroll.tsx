@@ -1071,12 +1071,11 @@ const Payroll = () => {
 
                 <div className="space-y-2">
                   <Label htmlFor="whiteWage">Sueldo Depósito</Label>
-                  <Input
+                  <CurrencyInput
                     id="whiteWage"
-                    type="number"
-                    placeholder="0"
+                    placeholder="$ 0"
                     value={whiteWage}
-                    onChange={(e) => setWhiteWage(e.target.value)}
+                    onChange={(value) => setWhiteWage(value)}
                     disabled={editingRecord && !isEditMode}
                   />
                   <p className="text-xs text-muted-foreground">
