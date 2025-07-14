@@ -694,7 +694,7 @@ const Employees = () => {
                   <Label htmlFor="whiteWage">Sueldo en Blanco</Label>
                   <CurrencyInput
                     id="whiteWage"
-                    placeholder="$ 0"
+                    placeholder="$ 0,00"
                     value={newEmployee.whiteWage}
                     onChange={(value) =>
                       setNewEmployee({
