@@ -512,6 +512,9 @@ const Payroll = () => {
         `🚀 VIEW - Getting historical salary for employee ${record.employeeId}, period ${record.period}`,
       );
 
+      // Debug: verificar qué datos históricos tenemos
+      await debugSalaryHistory(record.employeeId, record.period);
+
       const historicalSalaryData =
         await salaryHistoryService.getSalaryForPeriod(
           record.employeeId.toString(),
@@ -545,7 +548,7 @@ const Payroll = () => {
       // Guardar los valores históricos para usar en cálculos de vista previa
       setHistoricalSalary(historicalSalaryData);
 
-      // Usar el sueldo blanco histórico para mostrar en vista previa
+      // Usar el sueldo blanco hist��rico para mostrar en vista previa
       setWhiteWage(historicalSalaryData.white_wage.toString());
 
       console.log(
