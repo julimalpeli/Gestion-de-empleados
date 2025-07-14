@@ -456,7 +456,7 @@ const Payroll = () => {
   };
 
   // Función para ver detalles sin edición (solo lectura)
-  const handleViewRecord = (record) => {
+  const handleViewRecord = async (record) => {
     setEditingRecord(record);
     setSelectedEmployee(record.employeeId.toString());
     setSelectedPeriod(record.period);
@@ -464,14 +464,39 @@ const Payroll = () => {
     setHolidayDays(record.holidayDays?.toString() || "");
     setAdvances(record.advances?.toString() || "0");
     setDiscounts(record.discounts?.toString() || "0");
-    setWhiteWage(record.whiteAmount?.toString() || "0");
     setBonusAmount(record.bonusAmount?.toString() || "0");
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
 
-    // Limpiar salario histórico para modo solo lectura
-    setHistoricalSalary(null);
+    // Obtener el sueldo histórico correcto para el período de la liquidación (igual que en edición)
+    try {
+      const historicalSalaryData =
+        await salaryHistoryService.getSalaryForPeriod(
+          record.employeeId.toString(),
+          record.period,
+        );
+
+      console.log(
+        `🔍 Historical salary for VIEW period ${record.period}:`,
+        historicalSalaryData,
+      );
+
+      // Guardar los valores históricos para usar en cálculos de vista previa
+      setHistoricalSalary(historicalSalaryData);
+
+      // Usar el sueldo blanco histórico para mostrar en vista previa
+      setWhiteWage(historicalSalaryData.white_wage.toString());
+
+      console.log(
+        `📊 VIEW mode - Using historical values for period ${record.period}`,
+      );
+    } catch (error) {
+      console.error("Error getting historical salary for view:", error);
+      // Fallback al valor almacenado en la liquidación
+      setWhiteWage(record.whiteAmount?.toString() || "0");
+      setHistoricalSalary(null);
+    }
 
     setIsEditMode(false); // Solo lectura
     setIsNewPayrollOpen(true);
