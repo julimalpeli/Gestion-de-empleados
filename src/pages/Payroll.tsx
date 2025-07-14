@@ -627,8 +627,16 @@ const Payroll = () => {
     const hourlyRate = employee.dailyWage / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: usar el valor histórico si estamos editando, sino el actual
+    // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
     let presentismoToUse = employee?.presentismo || 0;
+
+    // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
+    if (historicalSalary && historicalSalary.presentismo !== undefined) {
+      presentismoToUse = historicalSalary.presentismo;
+      console.log(
+        `💡 Using historical presentismo: ${presentismoToUse} instead of current: ${employee?.presentismo}`,
+      );
+    }
 
     // En modo edición, el presentismo podría ser diferente al actual
     // pero mantener la lógica de mantiene/pierde del form
