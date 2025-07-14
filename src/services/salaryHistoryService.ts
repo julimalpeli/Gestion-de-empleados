@@ -125,10 +125,16 @@ class SalaryHistoryService {
       // Convertir período a fecha para comparación
       const targetDate = new Date(`${period}-01`);
 
-      // Buscar en historial
+      console.log(
+        `🎯 Target date for period ${period}: ${targetDate.toISOString().split("T")[0]}`,
+      );
+
+      // 1. Buscar cambios que sean efectivos en o antes del período objetivo
       const { data: historyData, error: historyError } = await supabase
         .from("salary_history")
-        .select("white_wage, informal_wage, presentismo, effective_date")
+        .select(
+          "white_wage, informal_wage, presentismo, effective_date, previous_white_wage, previous_informal_wage, previous_presentismo",
+        )
         .eq("employee_id", employeeId)
         .lte("effective_date", targetDate.toISOString().split("T")[0])
         .order("effective_date", { ascending: false })
@@ -137,7 +143,10 @@ class SalaryHistoryService {
 
       if (!historyError && historyData && historyData.length > 0) {
         const record = historyData[0];
-        console.log(`✅ Found historical salary:`, record);
+        console.log(
+          `✅ Found historical salary (on or before target):`,
+          record,
+        );
         return {
           white_wage: record.white_wage,
           informal_wage: record.informal_wage,
@@ -146,7 +155,47 @@ class SalaryHistoryService {
         };
       }
 
-      // Si no hay historial, usar valores actuales del empleado
+      console.log(
+        `🔍 No changes found on or before ${period}, checking for later changes...`,
+      );
+
+      // 2. Si no hay cambios en o antes del período, buscar el primer cambio DESPUÉS
+      // y usar los valores "previous_*" (que son los valores que estaban vigentes antes del cambio)
+      const { data: futureChanges, error: futureError } = await supabase
+        .from("salary_history")
+        .select(
+          "white_wage, informal_wage, presentismo, effective_date, previous_white_wage, previous_informal_wage, previous_presentismo",
+        )
+        .eq("employee_id", employeeId)
+        .gt("effective_date", targetDate.toISOString().split("T")[0])
+        .order("effective_date", { ascending: true })
+        .order("created_at", { ascending: true })
+        .limit(1);
+
+      if (!futureError && futureChanges && futureChanges.length > 0) {
+        const futureRecord = futureChanges[0];
+        console.log(
+          `📅 Found future change, using previous values:`,
+          futureRecord,
+        );
+
+        // Si el cambio futuro tiene valores "previous_*", usarlos
+        if (
+          futureRecord.previous_presentismo !== null &&
+          futureRecord.previous_presentismo !== undefined
+        ) {
+          return {
+            white_wage: futureRecord.previous_white_wage || 0,
+            informal_wage: futureRecord.previous_informal_wage || 0,
+            presentismo: futureRecord.previous_presentismo || 0,
+            source: "history_previous",
+          };
+        }
+      }
+
+      console.log(`🔄 No historical data found, using current employee values`);
+
+      // 3. Si no hay historial, usar valores actuales del empleado
       const { data: employeeData, error: employeeError } = await supabase
         .from("employees")
         .select("white_wage, informal_wage, presentismo")
