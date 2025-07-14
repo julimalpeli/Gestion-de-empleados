@@ -116,6 +116,8 @@ const Employees = () => {
 
   const { createEmployeeUser, updateUserEmail } = useUsers();
 
+  const { updateEmployeeSalaryWithHistory } = useSalaryHistory();
+
   const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
     usePermissions();
 
