@@ -92,6 +92,9 @@ const Employees = () => {
   const [employeeToDelete, setEmployeeToDelete] = useState(null);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [viewingEmployee, setViewingEmployee] = useState(null);
+  const [salaryChangeDialogOpen, setSalaryChangeDialogOpen] = useState(false);
+  const [pendingSalaryChanges, setPendingSalaryChanges] = useState(null);
+  const [originalEmployee, setOriginalEmployee] = useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     dni: "",
