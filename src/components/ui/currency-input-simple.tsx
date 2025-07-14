@@ -31,8 +31,29 @@ export const CurrencyInputSimple = React.forwardRef<
       // Permitir solo números, comas y puntos
       const cleaned = input.replace(/[^0-9,.]/g, "");
 
-      // Convertir coma a punto para JavaScript
-      const normalized = cleaned.replace(/,/g, ".");
+      // Manejar formato argentino: último separador como decimal
+      let normalized = cleaned;
+
+      // Si hay comas, la última es decimal
+      const lastCommaIndex = cleaned.lastIndexOf(",");
+      if (lastCommaIndex !== -1) {
+        // Remover puntos antes de la última coma (son separadores de miles)
+        const beforeComma = cleaned
+          .substring(0, lastCommaIndex)
+          .replace(/\./g, "");
+        const afterComma = cleaned.substring(lastCommaIndex + 1);
+        normalized = beforeComma + "." + afterComma;
+      } else {
+        // Sin comas, convertir puntos a decimal solo si es el formato correcto
+        const parts = cleaned.split(".");
+        if (parts.length === 2 && parts[1].length <= 2) {
+          // Probablemente decimal
+          normalized = cleaned;
+        } else {
+          // Separadores de miles, remover
+          normalized = cleaned.replace(/\./g, "");
+        }
+      }
 
       return parseFloat(normalized) || 0;
     };
