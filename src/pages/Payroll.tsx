@@ -121,7 +121,7 @@ const Payroll = () => {
   const [selectedPayrollRecord, setSelectedPayrollRecord] = useState(null);
   const [selectedEmployeeForDocs, setSelectedEmployeeForDocs] = useState(null);
 
-  // Estado para valores históricos (cuando editamos liquidaciones pasadas)
+  // Estado para valores hist��ricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
 
   // Usar hooks de Supabase
@@ -649,9 +649,6 @@ const Payroll = () => {
     // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
     if (historicalSalary && historicalSalary.presentismo !== undefined) {
       presentismoToUse = historicalSalary.presentismo;
-      console.log(
-        `💡 Using historical presentismo: ${presentismoToUse} instead of current: ${employee?.presentismo}`,
-      );
     }
 
     // En modo edición, el presentismo podría ser diferente al actual
