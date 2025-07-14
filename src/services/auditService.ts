@@ -134,12 +134,37 @@ class AuditService {
 
       if (error) {
         console.error("Error fetching audit logs:", error);
+
+        // Si es un error de esquema, devolver array vacío en lugar de fallar
+        if (
+          error.message?.includes("schema cache") ||
+          error.message?.includes("column") ||
+          error.message?.includes("relationship") ||
+          error.message?.includes("relation") ||
+          error.message?.includes("audit_log")
+        ) {
+          console.warn("🔧 Audit log table not properly configured");
+          console.warn("💡 Run database/fix_audit_log_schema.sql to fix this");
+          return [];
+        }
+
         throw new Error(`Failed to fetch audit logs: ${error.message}`);
       }
 
       return data || [];
     } catch (error) {
       console.error("Error getting audit logs:", error);
+
+      // Manejo graceful de errores de esquema
+      if (
+        error.message?.includes("schema cache") ||
+        error.message?.includes("audit_log") ||
+        error.message?.includes("relation")
+      ) {
+        console.warn("🔧 Database schema issue - returning empty audit logs");
+        return [];
+      }
+
       throw error;
     }
   }
