@@ -419,16 +419,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Login error details:", error);
 
-      // Auditar login fallido (only if we have a valid user ID)
+      // Auditar login fallido (skip audit for failed logins - no valid user ID available)
       try {
-        // Don't audit with invalid UUID - skip audit for failed logins without valid user ID
-        if (data?.user?.id) {
-          await auditService.auditLogin("LOGIN_FAILED", data.user.id, {
-            error_message: error.message,
-            attempted_email: email,
-            user_agent: navigator.userAgent,
-          });
-        }
+        // Skip audit for failed logins since we don't have a valid user ID
+        console.log("⚠️ Skipping audit for failed login - no valid user ID");
       } catch (auditError) {
         console.error("Error auditing failed login:", auditError);
       }
