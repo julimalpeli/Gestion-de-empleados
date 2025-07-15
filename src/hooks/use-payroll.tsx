@@ -19,25 +19,6 @@ export const usePayroll = () => {
       console.log("🔄 Payroll: Starting to load records...");
       setLoading(true);
       setError(null);
-
-      // For development: Use fallback immediately if we detect connectivity issues
-      console.log("🔄 Payroll: Loading fallback data for development...");
-      try {
-        const { getFallbackPayrollData } = await import(
-          "@/utils/offlineFallback"
-        );
-        const fallbackData = getFallbackPayrollData();
-        setPayrollRecords(fallbackData);
-        console.log(
-          "✅ Payroll fallback loaded immediately:",
-          fallbackData.length,
-          "records",
-        );
-        setLoading(false);
-        return;
-      } catch (fallbackError) {
-        console.warn("⚠️ Could not load payroll fallback:", fallbackError);
-      }
       const { data, error } = await supabase
         .from("payroll_records")
         .select(
@@ -95,7 +76,7 @@ export const usePayroll = () => {
         const fallbackData = getFallbackPayrollData();
         setPayrollRecords(fallbackData);
         console.log(
-          "✅ Fallback payroll loaded:",
+          "�� Fallback payroll loaded:",
           fallbackData.length,
           "records",
         );
