@@ -156,7 +156,7 @@ if (import.meta.env.DEV) {
 }
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import Employees from "./pages/Employees";
+import EmployeesSimple from "./pages/EmployeesSimple";
 import Payroll from "./pages/Payroll";
 import Reports from "./pages/Reports";
 import UserRoles from "./pages/UserRoles";
