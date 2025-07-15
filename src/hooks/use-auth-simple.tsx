@@ -419,15 +419,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Login error details:", error);
 
-      // Auditar login fallido
+      // Auditar login fallido (only if we have a valid user ID)
       try {
-        await auditService.auditLogin("LOGIN_FAILED", "unknown", {
-          error_message: error.message,
-          attempted_email: email,
-          user_agent: navigator.userAgent,
-        });
+        // Don't audit with invalid UUID - skip audit for failed logins without valid user ID
+        if (data?.user?.id) {
+          await auditService.auditLogin("LOGIN_FAILED", data.user.id, {
+            error_message: error.message,
+            attempted_email: email,
+            user_agent: navigator.userAgent,
+          });
+        }
       } catch (auditError) {
         console.error("Error auditing failed login:", auditError);
+      }
+
+      // Handle email confirmation error
+      if (error.message?.includes("Email not confirmed")) {
+        throw new Error(
+          "Email no confirmado. Revisa tu bandeja de entrada y confirma tu email antes de continuar.",
+        );
       }
 
       // Handle network connectivity errors
