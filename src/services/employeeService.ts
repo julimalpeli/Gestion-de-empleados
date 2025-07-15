@@ -21,7 +21,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         );
 
         if (attempt === 1) {
-          console.log("🔗 URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
+          console.log("�� URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
           console.log(
             "🔑 Key configurada:",
             !!import.meta.env.VITE_SUPABASE_ANON_KEY,
@@ -98,6 +98,24 @@ export class SupabaseEmployeeService implements IEmployeeService {
       } catch (error) {
         lastError = error;
         console.error(`❌ Attempt ${attempt} failed:`, error);
+
+        // Activate fallback immediately for any exception (including network errors)
+        console.log("🚨 EXCEPTION CAUGHT - Activating fallback immediately");
+        try {
+          const { getFallbackEmployeesData } = await import(
+            "@/utils/offlineFallback"
+          );
+          const fallbackData = getFallbackEmployeesData();
+          console.log(
+            "✅ Using fallback employees after exception:",
+            fallbackData.length,
+            "employees",
+          );
+          return fallbackData.map(this.mapFromSupabase);
+        } catch (fallbackError) {
+          console.error("❌ Fallback also failed:", fallbackError);
+          // Continue with original error handling if fallback fails
+        }
 
         // Check if it's a network connectivity error
         const isNetworkError =
