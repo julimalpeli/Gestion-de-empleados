@@ -60,7 +60,9 @@ export const usePayroll = () => {
 
       setPayrollRecords(mappedRecords);
     } catch (err) {
-      console.error("❌ Error loading payroll records:", err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("❌ Error loading payroll records:", errorMessage);
+      console.error("❌ Full payroll error object:", err);
 
       // Intentar usar datos de fallback si hay error de conectividad
       const errorMessage = err instanceof Error ? err.message : String(err);
