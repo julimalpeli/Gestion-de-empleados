@@ -486,14 +486,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Clear any stored auth data
       localStorage.removeItem("supabase.auth.token");
+      localStorage.removeItem("emergency-auth");
       sessionStorage.clear();
 
-      // Sign out from Supabase
-      const { error } = await supabase.auth.signOut();
+      // Check if there's an active session before trying to sign out
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      if (error) {
-        console.error("Error during logout:", error);
-        // Even if Supabase logout fails, we've cleared local state
+        if (session) {
+          console.log("📤 Active session found, signing out from Supabase...");
+          const { error } = await supabase.auth.signOut();
+
+          if (error) {
+            console.warn("⚠️ Supabase logout error (ignoring):", error.message);
+          }
+        } else {
+          console.log("📭 No active session found, local logout only");
+        }
+      } catch (sessionError) {
+        console.warn(
+          "⚠️ Could not check session status:",
+          sessionError.message,
+        );
+        // Continue with local logout even if session check fails
       }
 
       console.log("✅ Logout completed");
