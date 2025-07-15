@@ -581,7 +581,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading,
     login,
     logout,
-    isAuthenticated: !!session?.user && !!user,
+    isAuthenticated: !!user, // Simplified: just check if user exists (works with both normal login and admin bypass)
     hasPermission,
     changePassword,
     resetPassword,
