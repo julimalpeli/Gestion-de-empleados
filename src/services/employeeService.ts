@@ -48,21 +48,29 @@ export class SupabaseEmployeeService implements IEmployeeService {
           `✅ Successfully fetched ${data.length} employees on attempt ${attempt}`,
         );
 
-        // If table is empty, use fallback data for development
+        // Debug: Let's see exactly what we're getting from Supabase
+        console.log("🔍 Raw Supabase data:", data);
+        console.log("🔍 Supabase response details:");
+        console.log("   - Data is array:", Array.isArray(data));
+        console.log("   - Data length:", data?.length);
+        console.log("   - Data type:", typeof data);
+
         if (data.length === 0) {
-          console.log("📊 Empty employee table, loading fallback data...");
+          console.log(
+            "❌ PROBLEM: Supabase returned 0 employees but should have 8+",
+          );
+          console.log("🔍 This suggests:");
+          console.log("   - RLS policies are blocking the query");
+          console.log("   - Wrong database environment");
+          console.log("   - Permission issues with admin bypass");
+
+          // Let's try a raw query to see what's happening
           try {
-            const { getFallbackEmployeesData } = await import(
-              "@/utils/offlineFallback"
-            );
-            const fallbackData = getFallbackEmployeesData();
-            console.log("✅ Using fallback employees:", fallbackData.length);
-            return fallbackData;
-          } catch (fallbackError) {
-            console.warn(
-              "⚠️ Could not load fallback employees:",
-              fallbackError,
-            );
+            console.log("🔬 Testing raw Supabase query...");
+            const rawTest = await supabase.from("employees").select("count");
+            console.log("🔬 Raw count query result:", rawTest);
+          } catch (rawError) {
+            console.log("🔬 Raw query error:", rawError);
           }
         }
 
