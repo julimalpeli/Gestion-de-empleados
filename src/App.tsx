@@ -137,6 +137,16 @@ if (import.meta.env.DEV) {
         console.log("   - activateUser('email') - Activate inactive user");
         console.log("   - listAllUsers() - List all users with status");
         console.log("   - fixUserLoginIssue('email') - Auto-fix login issue");
+        console.log("   📧 EMAIL CONFIRMATION:");
+        console.log(
+          "   - confirmUserEmail('email@ejemplo.com') - Confirm specific email",
+        );
+        console.log(
+          "   - confirmAllUnconfirmedEmails() - Confirm all unconfirmed emails",
+        );
+        console.log(
+          "   - listUsersEmailStatus() - List all users email status",
+        );
       },
     )
     .catch((error) => {
