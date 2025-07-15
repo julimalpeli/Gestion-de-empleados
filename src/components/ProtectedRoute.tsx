@@ -29,7 +29,16 @@ const ProtectedRoute = ({
       isEmployee,
     } = usePermissions();
 
+    // Debug logging
+    console.log("🛡️ ProtectedRoute check:", {
+      isAuthenticated,
+      user: user?.name,
+      role: user?.role,
+      path: window.location.pathname,
+    });
+
     if (!isAuthenticated) {
+      console.log("❌ Not authenticated, redirecting to login");
       return <Navigate to="/login" replace />;
     }
 
