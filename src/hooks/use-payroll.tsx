@@ -64,9 +64,14 @@ export const usePayroll = () => {
 
       // Intentar usar datos de fallback si hay error de conectividad
       const errorMessage = err instanceof Error ? err.message : String(err);
+      console.log("🔍 Payroll error detected:", errorMessage);
+
       if (
         errorMessage.includes("Failed to fetch") ||
-        errorMessage.includes("fetch")
+        errorMessage.includes("fetch") ||
+        errorMessage.includes("TypeError") ||
+        errorMessage.includes("network") ||
+        errorMessage.includes("Supabase")
       ) {
         console.log(
           "🔄 Network error detected, using fallback data for payroll...",
