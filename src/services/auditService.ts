@@ -64,6 +64,25 @@ class AuditService {
           return {} as AuditLogEntry;
         }
 
+        // Handle RLS policy violations gracefully
+        if (error.message?.includes("row-level security policy")) {
+          console.warn(
+            "⚠️ RLS policy violation for audit log - continuing without audit",
+          );
+          return {} as AuditLogEntry;
+        }
+
+        // Handle network errors gracefully
+        if (
+          error.message?.includes("Failed to fetch") ||
+          error.message?.includes("fetch")
+        ) {
+          console.warn(
+            "⚠️ Network error during audit - continuing without audit",
+          );
+          return {} as AuditLogEntry;
+        }
+
         throw new Error(`Failed to create audit log: ${error.message}`);
       }
 
