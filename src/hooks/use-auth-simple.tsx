@@ -389,6 +389,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         };
 
         setUser(adminUser);
+        // Persist admin bypass in localStorage
+        localStorage.setItem("admin-bypass", JSON.stringify(adminUser));
         console.log("✅ Admin user created with bypass");
         return;
       }
