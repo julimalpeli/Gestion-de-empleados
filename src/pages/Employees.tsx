@@ -119,6 +119,13 @@ const Employees = () => {
     deleteEmployee,
   } = useEmployees();
 
+  // Debug logging
+  console.log("🔍 Employees page debug:");
+  console.log("- Loading:", loading);
+  console.log("- Error:", error);
+  console.log("- Employees count:", employees.length);
+  console.log("- Employees data:", employees);
+
   const { createEmployeeUser, updateUserEmail } = useUsers();
 
   const { updateEmployeeSalaryWithHistory } = useSalaryHistory();
