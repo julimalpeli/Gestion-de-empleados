@@ -139,6 +139,23 @@ export class SupabaseEmployeeService implements IEmployeeService {
     // If we get here, all retries failed
     console.error("❌ All retries failed. Last error:", lastError);
 
+    // Final fallback attempt before throwing error
+    console.log("🔄 Final fallback attempt before throwing error...");
+    try {
+      const { getFallbackEmployeesData } = await import(
+        "@/utils/offlineFallback"
+      );
+      const fallbackData = getFallbackEmployeesData();
+      console.log(
+        "✅ Final fallback successful:",
+        fallbackData.length,
+        "employees",
+      );
+      return fallbackData.map(this.mapFromSupabase);
+    } catch (finalFallbackError) {
+      console.error("❌ Final fallback also failed:", finalFallbackError);
+    }
+
     if (
       lastError instanceof TypeError &&
       lastError.message === "Failed to fetch"
