@@ -151,6 +151,12 @@ class AuditService {
     end_date?: string;
     limit?: number;
   }): Promise<AuditLogEntry[]> {
+    // Check if auditing is disabled due to RLS issues
+    if ((window as any).auditDisabled) {
+      console.log("⏭️ Auditing disabled - returning empty audit logs");
+      return [];
+    }
+
     try {
       // Primero intentar consulta simple sin join para evitar errores de esquema
       let query = supabase
