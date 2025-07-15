@@ -289,7 +289,7 @@ const createUserFor35940844 = async () => {
       return { success: false, error: usersError.message };
     }
 
-    console.log("���� === USER CREATED SUCCESSFULLY ===");
+    console.log("🎉 === USER CREATED SUCCESSFULLY ===");
     console.log(`Employee: ${employee.name}`);
     console.log(`Email: ${employee.email}`);
     console.log(`Password: ${employee.dni} (DNI)`);
@@ -485,7 +485,7 @@ const App = () => (
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
-                      <PayrollSimple />
+                      <Payroll />
                     </main>
                   </SidebarProvider>
                 </ProtectedRoute>
