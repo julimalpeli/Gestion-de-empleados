@@ -75,9 +75,32 @@ export const useVacations = (employeeId?: string) => {
 
       setVacations(mappedVacations);
     } catch (err) {
-      console.error("❌ Error loading vacations:", err);
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("❌ Error loading vacations:", errorMessage);
+      console.error("❌ Full error object:", err);
 
-      setError(err instanceof Error ? err.message : "Error loading vacations");
+      // Handle network errors gracefully
+      if (
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("fetch")
+      ) {
+        console.log("🔄 Using fallback vacation data...");
+        try {
+          const { fallbackVacationData } = await import(
+            "@/utils/offlineFallback"
+          );
+          setVacations(fallbackVacationData);
+          console.log("✅ Fallback vacation data loaded");
+          return;
+        } catch (fallbackError) {
+          console.warn(
+            "⚠️ Could not load fallback vacation data:",
+            fallbackError,
+          );
+        }
+      }
+
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
