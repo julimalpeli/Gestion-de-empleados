@@ -351,14 +351,59 @@ const quickCheckEmployeesWithoutUsers = async () => {
   }
 };
 
+// Emergency navigation functions
+const debugRouting = () => {
+  console.log("🔍 Routing Debug Info:");
+  console.log("- Current pathname:", window.location.pathname);
+  console.log("- Current href:", window.location.href);
+
+  const loginElements = document.querySelectorAll('[data-loc*="Login"]');
+  const employeeElements = document.querySelectorAll('[data-loc*="Employees"]');
+  const dashboardElements = document.querySelectorAll(
+    '[data-loc*="Dashboard"]',
+  );
+
+  console.log("- Login components mounted:", loginElements.length);
+  console.log("- Employee components mounted:", employeeElements.length);
+  console.log("- Dashboard components mounted:", dashboardElements.length);
+
+  if (loginElements.length > 0) {
+    console.log("❌ Login component is being rendered when it shouldn't be");
+  }
+};
+
+const forceNavigateTo = (path: string) => {
+  console.log(`🚀 Force navigating to: ${path}`);
+  window.history.pushState({}, "", path);
+  window.location.reload();
+};
+
+const forceEmployeesView = () => {
+  console.log("👥 Forcing employees view...");
+  forceNavigateTo("/empleados");
+};
+
+const forcePayrollView = () => {
+  console.log("💰 Forcing payroll view...");
+  forceNavigateTo("/liquidaciones");
+};
+
 // Expose functions globally immediately
 (window as any).createUserFor35940844 = createUserFor35940844;
 (window as any).quickCheckEmployeesWithoutUsers =
   quickCheckEmployeesWithoutUsers;
+(window as any).debugRouting = debugRouting;
+(window as any).forceNavigateTo = forceNavigateTo;
+(window as any).forceEmployeesView = forceEmployeesView;
+(window as any).forcePayrollView = forcePayrollView;
 
 console.log("🚨 IMMEDIATE FIX FUNCTIONS LOADED:");
 console.log("  - createUserFor35940844()");
 console.log("  - quickCheckEmployeesWithoutUsers()");
+console.log("🚀 EMERGENCY NAVIGATION LOADED:");
+console.log("  - debugRouting() - Show what's actually rendered");
+console.log("  - forceEmployeesView() - Force navigate to employees");
+console.log("  - forcePayrollView() - Force navigate to payroll");
 
 // Loading component for auth state
 const AuthLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
