@@ -58,26 +58,6 @@ export const usePayroll = () => {
           updatedAt: record.updated_at,
         })) || [];
 
-      // If payroll table is empty but connection works, use fallback for development
-      if (mappedRecords.length === 0) {
-        console.log("📊 Empty payroll table detected, using fallback data...");
-        try {
-          const { getFallbackPayrollData } = await import(
-            "@/utils/offlineFallback"
-          );
-          const fallbackData = getFallbackPayrollData();
-          console.log(
-            "✅ Using fallback payroll:",
-            fallbackData.length,
-            "records",
-          );
-          setPayrollRecords(fallbackData);
-          return;
-        } catch (fallbackError) {
-          console.warn("⚠️ Could not load fallback payroll:", fallbackError);
-        }
-      }
-
       setPayrollRecords(mappedRecords);
     } catch (err) {
       console.error("❌ Error loading payroll records:", err);
