@@ -471,7 +471,7 @@ const App = () => (
                   <SidebarProvider>
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
-                      <EmployeesTest />
+                      <Employees />
                     </main>
                   </SidebarProvider>
                 </ProtectedRoute>
