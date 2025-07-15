@@ -19,6 +19,15 @@ export const usePayroll = () => {
       console.log("🔄 Payroll: Starting to load records...");
       setLoading(true);
       setError(null);
+
+      // Test Supabase connection first
+      console.log("🔄 Testing Supabase connection for payroll...");
+      console.log("🔧 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
+      console.log(
+        "🔧 Supabase Key configured:",
+        !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+      );
+
       const { data, error } = await supabase
         .from("payroll_records")
         .select(
@@ -28,6 +37,10 @@ export const usePayroll = () => {
         `,
         )
         .order("period", { ascending: false });
+
+      console.log("🔄 Supabase payroll query result:");
+      console.log("  - Data:", data);
+      console.log("  - Error:", error);
 
       if (error) throw error;
 
@@ -76,7 +89,7 @@ export const usePayroll = () => {
         const fallbackData = getFallbackPayrollData();
         setPayrollRecords(fallbackData);
         console.log(
-          "�� Fallback payroll loaded:",
+          "✅ Fallback payroll loaded:",
           fallbackData.length,
           "records",
         );
