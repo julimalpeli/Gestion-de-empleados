@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import ForcePasswordChange from "@/components/ForcePasswordChange";
 
 // Disabled automatic auth fix scripts to prevent fetch errors
 // Use manual methods in Gestión de Usuarios instead
