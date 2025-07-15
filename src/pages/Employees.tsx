@@ -112,28 +112,57 @@ const Employees = () => {
     email: "",
   });
 
-  const {
-    employees,
-    loading,
-    error,
-    createEmployee,
-    updateEmployee,
-    deleteEmployee,
-  } = useEmployees();
+  // Temporarily comment out hooks to identify the problematic one
+  console.log("🔍 Employees component: Starting hook loading...");
 
-  // Debug logging
-  console.log("🔍 Employees page debug:");
-  console.log("- Loading:", loading);
-  console.log("- Error:", error);
-  console.log("- Employees count:", employees.length);
-  console.log("- Employees data:", employees);
+  try {
+    console.log("🔍 Loading useEmployees...");
+    const {
+      employees,
+      loading,
+      error,
+      createEmployee,
+      updateEmployee,
+      deleteEmployee,
+    } = useEmployees();
+    console.log("✅ useEmployees loaded successfully");
 
-  const { createEmployeeUser, updateUserEmail } = useUsers();
+    // Debug logging
+    console.log("🔍 Employees page debug:");
+    console.log("- Loading:", loading);
+    console.log("- Error:", error);
+    console.log("- Employees count:", employees.length);
+    console.log("- Employees data:", employees);
 
-  const { updateEmployeeSalaryWithHistory } = useSalaryHistory();
+    console.log("🔍 Loading useUsers...");
+    const { createEmployeeUser, updateUserEmail } = useUsers();
+    console.log("✅ useUsers loaded successfully");
 
-  const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
-    usePermissions();
+    console.log("🔍 Loading useSalaryHistory...");
+    const { updateEmployeeSalaryWithHistory } = useSalaryHistory();
+    console.log("✅ useSalaryHistory loaded successfully");
+
+    console.log("🔍 Loading usePermissions...");
+    const {
+      canViewModule,
+      canCreateInModule,
+      canEditModule,
+      canDeleteInModule,
+    } = usePermissions();
+    console.log("✅ usePermissions loaded successfully");
+  } catch (hookError) {
+    console.error("💥 Hook loading failed:", hookError);
+    return (
+      <div className="flex flex-col gap-6 p-6">
+        <div className="bg-red-100 p-4 rounded">
+          <h2 className="text-lg font-semibold text-red-800">
+            ❌ Error en hook
+          </h2>
+          <p className="text-red-700">Error: {hookError.message}</p>
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (successMessage) {
