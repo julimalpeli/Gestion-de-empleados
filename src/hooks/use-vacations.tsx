@@ -276,10 +276,10 @@ export const useVacations = (employeeId?: string) => {
       await fetchVacations();
       console.log("✅ Vacation list refreshed");
     } catch (err) {
-      console.error("❌ Error in deleteVacation:", err);
-      throw new Error(
-        err instanceof Error ? err.message : "Error deleting vacation request",
-      );
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("❌ Error in deleteVacation:", errorMessage);
+      console.error("❌ Full error object:", err);
+      throw new Error(errorMessage || "Error deleting vacation request");
     }
   };
 
