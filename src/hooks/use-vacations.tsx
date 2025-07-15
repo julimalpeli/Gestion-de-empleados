@@ -251,9 +251,10 @@ export const useVacations = (employeeId?: string) => {
 
       await fetchVacations();
     } catch (err) {
-      throw new Error(
-        err instanceof Error ? err.message : "Error updating vacation request",
-      );
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("❌ Error in updateVacation:", errorMessage);
+      console.error("❌ Full error object:", err);
+      throw new Error(errorMessage || "Error updating vacation request");
     }
   };
 
