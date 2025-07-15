@@ -1566,17 +1566,6 @@ const Employees = () => {
       )}
     </div>
   );
-  } catch (error) {
-    console.error("💥 Error in Employees component:", error);
-    return (
-      <div className="flex flex-col gap-6 p-6">
-        <div className="bg-red-100 p-4 rounded">
-          <h2 className="text-lg font-semibold text-red-800">❌ Error en Employees</h2>
-          <p className="text-red-700">Error: {error.message}</p>
-        </div>
-      </div>
-    );
-  }
 };
 
 export default Employees;
