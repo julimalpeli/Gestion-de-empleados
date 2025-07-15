@@ -21,6 +21,19 @@ export interface CreateAuditLogRequest {
 }
 
 class AuditService {
+  constructor() {
+    // Disable auditing immediately if admin bypass is active
+    if (
+      typeof window !== "undefined" &&
+      window.localStorage?.getItem("admin-bypass")
+    ) {
+      console.log(
+        "🔓 Admin bypass detected in constructor - disabling auditing",
+      );
+      (window as any).auditDisabled = true;
+    }
+  }
+
   // Crear entrada de auditoría
   async createAuditEntry(
     request: CreateAuditLogRequest,
@@ -82,7 +95,7 @@ class AuditService {
         // Handle RLS policy violations gracefully
         if (error.message?.includes("row-level security policy")) {
           console.warn(
-            "⚠��� RLS policy violation for audit log - disabling auditing",
+            "⚠️ RLS policy violation for audit log - disabling auditing",
           );
           // Set a flag to disable future audit attempts
           (window as any).auditDisabled = true;
