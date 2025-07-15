@@ -157,7 +157,7 @@ if (import.meta.env.DEV) {
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Employees from "./pages/Employees";
-import PayrollSimple from "./pages/PayrollSimple";
+import Payroll from "./pages/Payroll";
 import Reports from "./pages/Reports";
 import UserRoles from "./pages/UserRoles";
 import UserManagement from "./pages/UserManagement";
@@ -289,7 +289,7 @@ const createUserFor35940844 = async () => {
       return { success: false, error: usersError.message };
     }
 
-    console.log("🎉 === USER CREATED SUCCESSFULLY ===");
+    console.log("���� === USER CREATED SUCCESSFULLY ===");
     console.log(`Employee: ${employee.name}`);
     console.log(`Email: ${employee.email}`);
     console.log(`Password: ${employee.dni} (DNI)`);
