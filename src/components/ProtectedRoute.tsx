@@ -80,9 +80,11 @@ const ProtectedRoute = ({
       }
     }
 
+    console.log("✅ ProtectedRoute: All checks passed, rendering children");
     return <>{children}</>;
   } catch (error) {
-    console.error("ProtectedRoute error:", error);
+    console.error("💥 ProtectedRoute error:", error);
+    console.error("💥 Error details:", error.message, error.stack);
     // If there's an error with auth context, redirect to login
     return <Navigate to="/login" replace />;
   }
