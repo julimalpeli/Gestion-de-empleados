@@ -311,20 +311,65 @@ export const useUsers = () => {
   // Blanquear contraseña (resetear al DNI)
   const resetPassword = async (userId: string, newPassword: string) => {
     try {
-      const passwordHash = btoa(newPassword); // Base64 simple para demo
+      console.log(
+        `🔄 Resetting password for user ${userId} with password: ${newPassword}`,
+      );
 
-      const { error } = await supabase
+      // Primero obtener los datos del usuario para el email
+      const { data: userData, error: fetchError } = await supabase
         .from("users")
-        .update({
-          password_hash: passwordHash,
-          needs_password_change: true,
-        })
-        .eq("id", userId);
+        .select("email, username")
+        .eq("id", userId)
+        .single();
 
-      if (error) throw error;
+      if (fetchError || !userData) {
+        throw new Error("Usuario no encontrado");
+      }
+
+      console.log(`📧 User email: ${userData.email}`);
+
+      // Actualizar la contraseña usando la API de autenticación de Supabase
+      const { error: authError } = await supabase.auth.admin.updateUserById(
+        userId,
+        {
+          password: newPassword,
+          email_confirm: true, // Confirmar el email automáticamente
+        },
+      );
+
+      if (authError) {
+        console.error("❌ Auth API error:", authError);
+        // Si falla la API de auth (403), usar método fallback en la tabla users
+        console.log("🔄 Auth API failed, using fallback method...");
+
+        const passwordHash = btoa(newPassword);
+        const { error: fallbackError } = await supabase
+          .from("users")
+          .update({
+            password_hash: passwordHash,
+            needs_password_change: true,
+          })
+          .eq("id", userId);
+
+        if (fallbackError) throw fallbackError;
+        console.log("✅ Password reset using fallback method");
+      } else {
+        // También actualizar la tabla users para mantener sincronización
+        const passwordHash = btoa(newPassword);
+        await supabase
+          .from("users")
+          .update({
+            password_hash: passwordHash,
+            needs_password_change: true,
+          })
+          .eq("id", userId);
+
+        console.log("✅ Password reset using Auth API");
+      }
 
       await fetchUsers();
     } catch (err) {
+      console.error("❌ Full error:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error resetting password",
       );
