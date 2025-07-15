@@ -91,7 +91,10 @@ class AuditService {
       console.log("✅ Audit log created:", data);
       return data;
     } catch (error) {
-      console.error("Audit service error:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Audit service error:", errorMessage);
+      console.error("Full audit error:", error);
 
       // Handle RLS policy violations gracefully
       if (error.message?.includes("row-level security policy")) {
