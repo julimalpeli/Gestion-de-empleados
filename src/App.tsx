@@ -42,6 +42,7 @@ if (import.meta.env.DEV) {
         debugControlModule,
         fixUserModule,
         userDebugModule,
+        confirmEmailModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
