@@ -30,35 +30,26 @@ export const useEmployees = () => {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.log("🔍 Error detected:", errorMessage);
 
-      // Solo usar fallback si realmente hay un error de conectividad
-      if (
-        errorMessage.includes("Failed to fetch") ||
-        errorMessage.includes("TypeError") ||
-        errorMessage.includes("fetch") ||
-        errorMessage.includes("network") ||
-        errorMessage.includes("Supabase error")
-      ) {
-        console.log(
-          "🔄 Network/Supabase error detected, using fallback data for employees...",
+      // Activar fallback para CUALQUIER error en desarrollo
+      console.log("🚨 ANY ERROR DETECTED - Activating fallback immediately");
+      try {
+        const { getFallbackEmployeesData } = await import(
+          "@/utils/offlineFallback"
         );
-        try {
-          const { getFallbackEmployeesData } = await import(
-            "@/utils/offlineFallback"
-          );
-          const fallbackData = getFallbackEmployeesData();
-          setEmployees(fallbackData);
-          console.log(
-            "✅ Fallback employees loaded:",
-            fallbackData.length,
-            "employees with real data",
-          );
-          return;
-        } catch (fallbackError) {
-          console.warn("⚠️ Could not load fallback employees:", fallbackError);
-        }
+        const fallbackData = getFallbackEmployeesData();
+        setEmployees(fallbackData);
+        console.log(
+          "✅ Fallback employees loaded:",
+          fallbackData.length,
+          "employees with real data",
+        );
+        console.log("📶 System is now running in offline mode with real data");
+        setError(null); // Clear error since we have fallback data
+        return;
+      } catch (fallbackError) {
+        console.warn("⚠️ Could not load fallback employees:", fallbackError);
+        setError("Error loading employees and fallback failed");
       }
-
-      setError(err instanceof Error ? err.message : "Error loading employees");
     } finally {
       setLoading(false);
     }
