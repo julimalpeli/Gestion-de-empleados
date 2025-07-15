@@ -684,8 +684,8 @@ const UserManagement = () => {
                             : "Sin asociar"}
                         </TableCell>
                         <TableCell>
-                          {user.lastLoginAt
-                            ? new Date(user.lastLoginAt).toLocaleString("es-AR")
+                          {user.lastLogin
+                            ? new Date(user.lastLogin).toLocaleString("es-AR")
                             : "Nunca"}
                         </TableCell>
                         <TableCell className="text-right">
