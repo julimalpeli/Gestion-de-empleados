@@ -321,11 +321,10 @@ export const useVacations = (employeeId?: string) => {
 
       await fetchVacations();
     } catch (err) {
-      throw new Error(
-        err instanceof Error
-          ? err.message
-          : "Error processing vacation request",
-      );
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error("❌ Error in processVacation:", errorMessage);
+      console.error("❌ Full error object:", err);
+      throw new Error(errorMessage || "Error processing vacation request");
     }
   };
 
