@@ -64,35 +64,24 @@ export const usePayroll = () => {
       console.error("❌ Error loading payroll records:", errorMessage);
       console.error("❌ Full payroll error object:", err);
 
-      // Intentar usar datos de fallback si hay error de conectividad
-      const errorMessage = err instanceof Error ? err.message : String(err);
+      // Use fallback for any error (aggressive approach for development)
       console.log("🔍 Payroll error detected:", errorMessage);
+      console.log("🔄 Any error detected, activating fallback payroll data...");
 
-      if (
-        errorMessage.includes("Failed to fetch") ||
-        errorMessage.includes("fetch") ||
-        errorMessage.includes("TypeError") ||
-        errorMessage.includes("network") ||
-        errorMessage.includes("Supabase")
-      ) {
-        console.log(
-          "🔄 Network error detected, using fallback data for payroll...",
+      try {
+        const { getFallbackPayrollData } = await import(
+          "@/utils/offlineFallback"
         );
-        try {
-          const { getFallbackPayrollData } = await import(
-            "@/utils/offlineFallback"
-          );
-          const fallbackData = getFallbackPayrollData();
-          setPayrollRecords(fallbackData);
-          console.log(
-            "✅ Fallback payroll loaded:",
-            fallbackData.length,
-            "records",
-          );
-          return;
-        } catch (fallbackError) {
-          console.warn("⚠️ Could not load fallback payroll:", fallbackError);
-        }
+        const fallbackData = getFallbackPayrollData();
+        setPayrollRecords(fallbackData);
+        console.log(
+          "✅ Fallback payroll loaded:",
+          fallbackData.length,
+          "records",
+        );
+        return;
+      } catch (fallbackError) {
+        console.warn("⚠️ Could not load fallback payroll:", fallbackError);
       }
 
       setError(
