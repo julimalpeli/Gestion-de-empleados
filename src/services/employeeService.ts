@@ -47,27 +47,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
         console.log(
           `✅ Successfully fetched ${data.length} employees on attempt ${attempt}`,
         );
-
-        // If table is empty but connection works, use fallback for development
-        if (data.length === 0) {
-          console.log(
-            "📊 Empty employee table detected, using fallback data...",
-          );
-          try {
-            const { getFallbackEmployeesData } = await import(
-              "@/utils/offlineFallback"
-            );
-            const fallbackData = getFallbackEmployeesData();
-            console.log("✅ Using fallback employees:", fallbackData.length);
-            return fallbackData;
-          } catch (fallbackError) {
-            console.warn(
-              "⚠️ Could not load fallback employees:",
-              fallbackError,
-            );
-          }
-        }
-
         const mappedData = data.map(this.mapFromSupabase);
         return mappedData;
       } catch (error) {
