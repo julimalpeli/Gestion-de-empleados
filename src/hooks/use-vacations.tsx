@@ -82,15 +82,24 @@ export const useVacations = (employeeId?: string) => {
       // Handle network errors gracefully
       if (
         errorMessage.includes("Failed to fetch") ||
-        errorMessage.includes("fetch")
+        errorMessage.includes("fetch") ||
+        errorMessage.includes("TypeError") ||
+        errorMessage.includes("network") ||
+        errorMessage.includes("Supabase")
       ) {
-        console.log("🔄 Using fallback vacation data...");
+        console.log(
+          "🔄 Network/Supabase error detected, using fallback vacation data...",
+        );
         try {
           const { fallbackVacationData } = await import(
             "@/utils/offlineFallback"
           );
           setVacations(fallbackVacationData);
-          console.log("✅ Fallback vacation data loaded");
+          console.log(
+            "✅ Fallback vacation data loaded:",
+            fallbackVacationData.length,
+            "records",
+          );
           return;
         } catch (fallbackError) {
           console.warn(
