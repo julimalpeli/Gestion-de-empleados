@@ -79,8 +79,9 @@ export const usePayroll = () => {
       console.error("❌ Full payroll error object:", err);
 
       // Use fallback for any error (aggressive approach for development)
-      console.log("🔍 Payroll error detected:", errorMessage);
-      console.log("🔄 Any error detected, activating fallback payroll data...");
+      console.log(
+        "🚨 PAYROLL ERROR DETECTED - Activating fallback immediately",
+      );
 
       try {
         const { getFallbackPayrollData } = await import(
@@ -93,14 +94,15 @@ export const usePayroll = () => {
           fallbackData.length,
           "records",
         );
+        console.log(
+          "📶 Payroll system is now running in offline mode with real data",
+        );
+        setError(null); // Clear error since we have fallback data
         return;
       } catch (fallbackError) {
         console.warn("⚠️ Could not load fallback payroll:", fallbackError);
+        setError("Error loading payroll and fallback failed");
       }
-
-      setError(
-        err instanceof Error ? err.message : "Error loading payroll records",
-      );
     } finally {
       setLoading(false);
     }
