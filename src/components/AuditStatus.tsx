@@ -32,16 +32,21 @@ export const AuditStatus = () => {
       setAuditStatus("working");
       setLastCheck(new Date().toLocaleString());
     } catch (error) {
-      console.error("Audit check failed:", error);
+      // Better error logging
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Audit check failed:", errorMessage);
+      console.error("Full error object:", error);
 
       // More specific error handling
-      if (error.message?.includes("row-level security policy")) {
-        console.warn("⚠️ RLS policy issue detected");
+      if (errorMessage?.includes("row-level security policy")) {
+        console.warn("⚠️ RLS policy issue detected:", errorMessage);
         setAuditStatus("rls_error");
-      } else if (error.message?.includes("Failed to fetch")) {
-        console.warn("⚠️ Network connectivity issue");
+      } else if (errorMessage?.includes("Failed to fetch")) {
+        console.warn("⚠️ Network connectivity issue:", errorMessage);
         setAuditStatus("network_error");
       } else {
+        console.warn("⚠️ Schema or other audit error:", errorMessage);
         setAuditStatus("schema_error");
       }
 
