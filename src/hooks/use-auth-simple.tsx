@@ -145,7 +145,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       // For any other event without a valid session, clear state
-      if (!session?.user) {
+      // BUT preserve admin bypass users (they don't have Supabase sessions)
+      if (!session?.user && user?.id !== "admin-emergency-id") {
         setSession(null);
         setUser(null);
       }
