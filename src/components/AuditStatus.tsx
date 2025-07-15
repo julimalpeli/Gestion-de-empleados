@@ -33,7 +33,18 @@ export const AuditStatus = () => {
       setLastCheck(new Date().toLocaleString());
     } catch (error) {
       console.error("Audit check failed:", error);
-      setAuditStatus("schema_error");
+
+      // More specific error handling
+      if (error.message?.includes("row-level security policy")) {
+        console.warn("⚠️ RLS policy issue detected");
+        setAuditStatus("rls_error");
+      } else if (error.message?.includes("Failed to fetch")) {
+        console.warn("⚠️ Network connectivity issue");
+        setAuditStatus("network_error");
+      } else {
+        setAuditStatus("schema_error");
+      }
+
       setLastCheck(new Date().toLocaleString());
     } finally {
       setIsChecking(false);
