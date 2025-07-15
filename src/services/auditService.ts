@@ -93,11 +93,8 @@ class AuditService {
         }
 
         // Handle RLS policy violations gracefully
-        if (error.message?.includes("row-level security policy")) {
-          console.warn(
-            "⚠️ RLS policy violation for audit log - disabling auditing",
-          );
-          // Set a flag to disable future audit attempts
+        if (errorMessage?.includes("row-level security policy")) {
+          // Silent disable - no console spam
           (window as any).auditDisabled = true;
           return {} as AuditLogEntry;
         }
