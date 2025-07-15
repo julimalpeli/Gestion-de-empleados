@@ -97,6 +97,8 @@ import { salaryHistoryService } from "@/services/salaryHistoryService";
 // Data is now loaded from Supabase via hooks
 
 const Payroll = () => {
+  console.log("💰 Payroll component starting to render...");
+  console.log("🔍 Payroll component: Loading hooks...");
   const [isNewPayrollOpen, setIsNewPayrollOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [workDays, setWorkDays] = useState("30");
