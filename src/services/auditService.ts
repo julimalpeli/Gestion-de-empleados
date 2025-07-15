@@ -49,7 +49,9 @@ class AuditService {
         .single();
 
       if (error) {
-        console.error("Error creating audit log:", error);
+        const errorMessage = error.message || String(error);
+        console.error("Error creating audit log:", errorMessage);
+        console.error("Full error details:", error);
 
         // Si es un error de esquema, logearlo pero no fallar
         if (
