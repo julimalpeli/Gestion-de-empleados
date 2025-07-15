@@ -537,7 +537,7 @@ const EmployeePortal = () => {
             ¡Bienvenido, {employeeData.name}!
           </h2>
           <p className="text-muted-foreground">
-            Aquí puedes consultar tu informaci��n personal, liquidaciones y
+            Aquí puedes consultar tu información personal, liquidaciones y
             vacaciones.
           </p>
         </div>
