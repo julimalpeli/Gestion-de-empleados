@@ -417,6 +417,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(adminUser);
         // Persist admin bypass in localStorage
         localStorage.setItem("admin-bypass", JSON.stringify(adminUser));
+
+        // Update last login for admin too
+        try {
+          await supabase
+            .from("users")
+            .update({ last_login: new Date().toISOString() })
+            .eq("email", email.trim());
+          console.log("✅ Last login updated for admin");
+        } catch (updateError) {
+          console.warn("⚠️ Could not update admin last login:", updateError);
+        }
+
         console.log("✅ Admin user created with bypass");
         return;
       }
@@ -639,7 +651,7 @@ const checkAuthContext = async () => {
       data: { session },
       error: sessionError,
     } = await supabase.auth.getSession();
-    console.log("📱 Client session:", {
+    console.log("�� Client session:", {
       session: !!session,
       user: session?.user?.id,
       email: session?.user?.email,
