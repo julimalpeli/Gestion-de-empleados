@@ -63,21 +63,28 @@ export const usePayroll = () => {
       console.error("❌ Error loading payroll records:", err);
 
       // Intentar usar datos de fallback si hay error de conectividad
-      if (err instanceof Error && err.message.includes("Failed to fetch")) {
-        console.log("🔄 Usando datos de fallback para payroll...");
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      if (
+        errorMessage.includes("Failed to fetch") ||
+        errorMessage.includes("fetch")
+      ) {
+        console.log(
+          "🔄 Network error detected, using fallback data for payroll...",
+        );
         try {
           const { getFallbackPayrollData } = await import(
             "@/utils/offlineFallback"
           );
           const fallbackData = getFallbackPayrollData();
           setPayrollRecords(fallbackData);
-          console.log("✅ Datos de fallback de payroll cargados");
+          console.log(
+            "✅ Fallback payroll loaded:",
+            fallbackData.length,
+            "records",
+          );
           return;
         } catch (fallbackError) {
-          console.warn(
-            "⚠️ No se pudieron cargar datos de fallback de payroll:",
-            fallbackError,
-          );
+          console.warn("⚠️ Could not load fallback payroll:", fallbackError);
         }
       }
 
@@ -305,7 +312,7 @@ export const usePayroll = () => {
 
       if (error) throw error;
 
-      // Auditar eliminación de liquidación
+      // Auditar eliminaci��n de liquidación
       try {
         await auditPayroll(
           "DELETE",
