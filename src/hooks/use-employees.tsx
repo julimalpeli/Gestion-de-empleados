@@ -27,11 +27,10 @@ export const useEmployees = () => {
       setEmployees(data);
     } catch (err) {
       console.error("❌ Error cargando empleados:", err);
-
-      // Intentar usar datos de fallback si hay error de conectividad
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.log("🔍 Error detected:", errorMessage);
 
+      // Solo usar fallback si realmente hay un error de conectividad
       if (
         errorMessage.includes("Failed to fetch") ||
         errorMessage.includes("TypeError") ||
