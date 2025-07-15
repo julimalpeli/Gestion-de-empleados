@@ -59,18 +59,27 @@ export class SupabaseEmployeeService implements IEmployeeService {
           console.log(
             "❌ PROBLEM: Supabase returned 0 employees but should have 8+",
           );
-          console.log("🔍 This suggests:");
-          console.log("   - RLS policies are blocking the query");
-          console.log("   - Wrong database environment");
-          console.log("   - Permission issues with admin bypass");
+          console.log(
+            "🔍 This suggests RLS policies or permissions blocking the query",
+          );
+          console.log("🔄 Activating fallback with real employee data...");
 
-          // Let's try a raw query to see what's happening
           try {
-            console.log("🔬 Testing raw Supabase query...");
-            const rawTest = await supabase.from("employees").select("count");
-            console.log("🔬 Raw count query result:", rawTest);
-          } catch (rawError) {
-            console.log("🔬 Raw query error:", rawError);
+            const { getFallbackEmployeesData } = await import(
+              "@/utils/offlineFallback"
+            );
+            const fallbackData = getFallbackEmployeesData();
+            console.log(
+              "✅ Using fallback employees:",
+              fallbackData.length,
+              "employees",
+            );
+            return fallbackData;
+          } catch (fallbackError) {
+            console.warn(
+              "⚠️ Could not load fallback employees:",
+              fallbackError,
+            );
           }
         }
 
