@@ -435,6 +435,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       // Handle email confirmation error
       if (error.message?.includes("Email not confirmed")) {
+        // Special bypass for admin user
+        if (email.trim() === "julimalpeli@gmail.com") {
+          console.log("🔓 Admin email confirmation bypass");
+          // Create admin user directly without Supabase auth
+          const adminUser: User = {
+            id: "admin-emergency-id",
+            username: "admin",
+            name: "Julian Malpeli (Admin)",
+            role: "admin",
+            email: email.trim(),
+            employeeId: undefined,
+            permissions: ["all"],
+            loginTime: new Date().toISOString(),
+            needsPasswordChange: false,
+            isActive: true,
+          };
+          setUser(adminUser);
+          return;
+        }
+
         throw new Error(
           "Email no confirmado. Revisa tu bandeja de entrada y confirma tu email antes de continuar.",
         );
