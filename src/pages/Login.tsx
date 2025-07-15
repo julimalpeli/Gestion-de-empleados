@@ -80,13 +80,19 @@ const Login = () => {
     }
   }, []);
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated and on login page
   useEffect(() => {
+    // Only redirect if we're actually on the login page
+    if (window.location.pathname !== "/login") {
+      return;
+    }
+
     console.log("🔄 Login redirect check:", {
       isAuthenticated,
       user: user?.name,
       role: user?.role,
       loading,
+      path: window.location.pathname,
     });
 
     // Don't redirect if still loading
