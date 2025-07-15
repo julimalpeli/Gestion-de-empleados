@@ -24,6 +24,7 @@ if (import.meta.env.DEV) {
     import("@/utils/debugControl"),
     import("@/utils/fixUser35940844"),
     import("@/utils/debugUserStatus"),
+    import("@/utils/confirmEmail"),
   ])
     .then(
       ([
