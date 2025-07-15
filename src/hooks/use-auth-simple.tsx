@@ -80,6 +80,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    // Check for admin bypass in localStorage
+    const adminBypass = localStorage.getItem("admin-bypass");
+    if (adminBypass) {
+      try {
+        const adminUser = JSON.parse(adminBypass);
+        console.log("🔓 Restoring admin bypass from localStorage");
+        setUser(adminUser);
+        return;
+      } catch (error) {
+        console.warn("⚠️ Invalid admin bypass data in localStorage");
+        localStorage.removeItem("admin-bypass");
+      }
+    }
+
     // Set up periodic user status check for logged-in users
     const checkUserStatus = async () => {
       if (user && user.email && user.isActive !== false) {
