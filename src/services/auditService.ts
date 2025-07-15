@@ -31,6 +31,13 @@ class AuditService {
       return {} as AuditLogEntry;
     }
 
+    // Check if we're using admin bypass (no Supabase session) - disable audit proactively
+    if ((window as any).localStorage?.getItem("admin-bypass")) {
+      console.log("🔓 Admin bypass detected - disabling auditing proactively");
+      (window as any).auditDisabled = true;
+      return {} as AuditLogEntry;
+    }
+
     try {
       console.log("📝 Creating audit log entry:", request);
 
@@ -75,7 +82,7 @@ class AuditService {
         // Handle RLS policy violations gracefully
         if (error.message?.includes("row-level security policy")) {
           console.warn(
-            "⚠️ RLS policy violation for audit log - disabling auditing",
+            "⚠��� RLS policy violation for audit log - disabling auditing",
           );
           // Set a flag to disable future audit attempts
           (window as any).auditDisabled = true;
