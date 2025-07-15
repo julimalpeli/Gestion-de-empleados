@@ -25,6 +25,12 @@ class AuditService {
   async createAuditEntry(
     request: CreateAuditLogRequest,
   ): Promise<AuditLogEntry> {
+    // Check if auditing is disabled due to RLS issues
+    if ((window as any).auditDisabled) {
+      console.log("⏭️ Auditing disabled - skipping entry");
+      return {} as AuditLogEntry;
+    }
+
     try {
       console.log("📝 Creating audit log entry:", request);
 
