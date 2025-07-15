@@ -356,6 +356,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         userData.name,
         userData.role,
       );
+
+      // Update last login timestamp
+      try {
+        await supabase
+          .from("users")
+          .update({ last_login: new Date().toISOString() })
+          .eq("id", userProfile.id);
+        console.log("✅ Last login updated for user:", userProfile.name);
+      } catch (updateError) {
+        console.warn("⚠️ Could not update last login:", updateError);
+      }
     } catch (error) {
       console.error("❌ Error loading user profile:", error);
 
