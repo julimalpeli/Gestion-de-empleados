@@ -91,6 +91,25 @@ class AuditService {
     } catch (error) {
       console.error("Audit service error:", error);
 
+      // Handle RLS policy violations gracefully
+      if (error.message?.includes("row-level security policy")) {
+        console.warn(
+          "⚠️ RLS policy violation caught in catch block - continuing without audit",
+        );
+        return {} as AuditLogEntry;
+      }
+
+      // Handle network errors gracefully
+      if (
+        error.message?.includes("Failed to fetch") ||
+        error.message?.includes("fetch")
+      ) {
+        console.warn(
+          "⚠️ Network error caught in catch block - continuing without audit",
+        );
+        return {} as AuditLogEntry;
+      }
+
       // Log schema issues specifically
       if (
         error.message?.includes("schema cache") ||
