@@ -71,6 +71,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Initialize admin bypass immediately
+  useState(() => {
+    const adminBypass = localStorage.getItem("admin-bypass");
+    if (adminBypass) {
+      try {
+        const adminUser = JSON.parse(adminBypass);
+        console.log("🔓 Admin bypass initialized immediately");
+        setUser(adminUser);
+      } catch (error) {
+        console.warn("⚠️ Invalid admin bypass data");
+        localStorage.removeItem("admin-bypass");
+      }
+    }
+  });
+
   useEffect(() => {
     // Check for emergency auth first
     const emergencyUser = checkEmergencyAuth();
