@@ -531,6 +531,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Clear any stored auth data
       localStorage.removeItem("supabase.auth.token");
       localStorage.removeItem("emergency-auth");
+      localStorage.removeItem("admin-bypass");
       sessionStorage.clear();
 
       // Check if there's an active session before trying to sign out
