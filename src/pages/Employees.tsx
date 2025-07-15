@@ -78,8 +78,11 @@ import { useSalaryHistory } from "@/hooks/use-salary-history";
 import { employeeService } from "@/services/employeeService";
 
 const Employees = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("active");
+  console.log("🏢 Employees component starting to render...");
+
+  try {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [statusFilter, setStatusFilter] = useState("active");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
