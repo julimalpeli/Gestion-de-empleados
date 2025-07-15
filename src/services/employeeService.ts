@@ -39,9 +39,19 @@ export class SupabaseEmployeeService implements IEmployeeService {
           console.error("❌ Error code:", error.code);
           console.error("❌ Error details:", error.details);
           console.error("❌ Error hint:", error.hint);
-          throw new Error(
-            `Supabase error: ${error.message} (Code: ${error.code})`,
+
+          // Activate fallback immediately for any Supabase error
+          console.log("🚨 SUPABASE ERROR - Activating fallback immediately");
+          const { getFallbackEmployeesData } = await import(
+            "@/utils/offlineFallback"
           );
+          const fallbackData = getFallbackEmployeesData();
+          console.log(
+            "✅ Using fallback employees:",
+            fallbackData.length,
+            "employees",
+          );
+          return fallbackData;
         }
 
         console.log(
