@@ -1670,7 +1670,7 @@ const Payroll = () => {
                           {formatCurrency(record.whiteAmount)}
                         </TableCell>
                         <TableCell className="font-medium">
-                          {formatCurrency(record.informalAmount)}
+                          {formatCurrency(record.netTotal - record.whiteAmount)}
                         </TableCell>
                         <TableCell className="font-bold">
                           <div>
