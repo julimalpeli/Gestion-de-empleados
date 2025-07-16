@@ -99,6 +99,18 @@ export class SupabaseEmployeeService implements IEmployeeService {
         lastError = error;
         console.error(`❌ Attempt ${attempt} failed:`, error);
 
+        // Detailed error logging
+        if (error && typeof error === "object") {
+          console.error("❌ Detailed error info:", {
+            message: (error as any).message,
+            code: (error as any).code,
+            name: (error as any).name,
+            stack: (error as any).stack,
+            errorType: typeof error,
+            errorConstructor: error.constructor?.name,
+          });
+        }
+
         // Activate fallback immediately for any exception (including network errors)
         console.log("🚨 EXCEPTION CAUGHT - Activating fallback immediately");
         try {
