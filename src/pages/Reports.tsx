@@ -223,8 +223,17 @@ const Reports = () => {
         return result;
       });
 
-      // Tomar el mejor sueldo de todos los períodos
+      // Tomar el mejor sueldo de todos los períodos y guardar cuál fue
+      const maxSalaryIndex = salaryCalculations.indexOf(
+        Math.max(...salaryCalculations),
+      );
       bestSalary = Math.max(...salaryCalculations, bestSalary);
+
+      // Determinar el período del mejor sueldo
+      let bestSalaryPeriod = "Sueldo base";
+      if (maxSalaryIndex >= 0 && employeePayrolls[maxSalaryIndex]) {
+        bestSalaryPeriod = employeePayrolls[maxSalaryIndex].period;
+      }
 
       // Debug final
       if (
@@ -236,9 +245,13 @@ const Reports = () => {
           {
             calculations: salaryCalculations,
             fallback: employee.whiteWage + employee.informalWage,
+            bestPeriod: bestSalaryPeriod,
           },
         );
       }
+    } else {
+      // Si no hay liquidaciones previas, usar sueldo base
+      bestSalaryPeriod = "Sueldo base";
     }
 
     // Calcular aguinaldo
