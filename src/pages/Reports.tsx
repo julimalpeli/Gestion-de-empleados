@@ -477,7 +477,14 @@ const Reports = () => {
                       </TableCell>
                       <TableCell>{formatDate(emp.startDate)}</TableCell>
                       <TableCell>
-                        {formatCurrency(emp.aguinaldo.bestSalary || 0)}
+                        <div>
+                          <div className="font-medium">
+                            {formatCurrency(emp.aguinaldo.bestSalary || 0)}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {emp.aguinaldo.bestSalaryPeriod || "Sueldo base"}
+                          </div>
+                        </div>
                       </TableCell>
                       <TableCell>
                         {emp.aguinaldo.corresponds ? (
