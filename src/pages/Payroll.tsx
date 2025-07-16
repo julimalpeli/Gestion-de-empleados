@@ -701,15 +701,35 @@ const Payroll = () => {
     // Total después de deducciones
     const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
 
-    // Divisi��n entre blanco e informal
+    // División entre blanco e informal
     const manualWhiteWage = parseFloat(whiteWage) || 0;
-    const informalAmount = Math.max(0, totalAfterDeductions - manualWhiteWage);
+
+    // El informalAmount debe ser el informal_wage del empleado, no un cálculo
+    let informalAmount = 0;
+    if (employee) {
+      // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
+      if (historicalSalary && historicalSalary.informal_wage !== undefined) {
+        informalAmount = historicalSalary.informal_wage;
+      } else {
+        informalAmount = employee.informalWage || 0;
+      }
+    }
 
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
     const aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod);
 
-    // Total neto = total después de deducciones + aguinaldo
-    const netTotal = totalAfterDeductions + aguinaldoAmount;
+    // Total neto = todos los conceptos positivos - deducciones
+    // Fórmula: white_amount + informal_amount + presentismo_amount + overtime_amount + bonus_amount + holiday_bonus + aguinaldo - advances - discounts
+    const netTotal =
+      manualWhiteWage +
+      informalAmount +
+      presentismoAmount +
+      overtimePay +
+      bonusPay +
+      holidayPay +
+      aguinaldoAmount -
+      totalAdvances -
+      totalDiscounts;
 
     return {
       basePay,
