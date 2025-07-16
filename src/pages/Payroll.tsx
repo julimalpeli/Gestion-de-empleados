@@ -106,6 +106,12 @@ const Payroll = () => {
   const [advances, setAdvances] = useState("");
   const [discounts, setDiscounts] = useState("");
   const [whiteWage, setWhiteWage] = useState("");
+
+  // Debug logging para whiteWage
+  const debugSetWhiteWage = (value, source = "unknown") => {
+    console.log(`🔍 Setting whiteWage: "${value}" from: ${source}`);
+    setWhiteWage(value);
+  };
   const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
   const [overtimeEnabled, setOvertimeEnabled] = useState(false);
   const [overtimeHours, setOvertimeHours] = useState("");
