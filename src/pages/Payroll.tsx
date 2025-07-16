@@ -667,7 +667,7 @@ const Payroll = () => {
     const advancesNum = parseFloat(advances) || 0;
     const discountsNum = parseFloat(discounts) || 0;
 
-    // Sueldo base - usar dailyWage histórico si está disponible, sino el actual
+    // Sueldo base - usar dailyWage hist��rico si está disponible, sino el actual
     let dailyWageToUse = employee.dailyWage;
 
     // Si tenemos salario histórico, calcular el dailyWage histórico
@@ -762,7 +762,7 @@ const Payroll = () => {
       totalDiscounts,
       totalAfterDeductions,
       whiteAmount: manualWhiteWage, // Forma de pago (depósito)
-      informalAmount: realInformalAmount, // Monto real que debe cobrar
+      informalAmount: netTotal - manualWhiteWage, // Efectivo = Total Neto - Depósito
       realWhiteAmount, // Monto real en blanco
       realInformalAmount, // Monto real informal
       netTotal,
