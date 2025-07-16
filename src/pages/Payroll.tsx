@@ -500,8 +500,8 @@ const Payroll = () => {
       // Guardar los valores históricos para usar en cálculos de vista previa
       setHistoricalSalary(historicalSalaryData);
 
-      // Usar el sueldo blanco histórico para mostrar en vista previa
-      setWhiteWage(historicalSalaryData.white_wage.toString());
+      // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
+      setWhiteWage(record.whiteAmount?.toString() || "");
     } catch (error) {
       console.error("Error getting historical salary for view:", error);
       // Fallback al valor almacenado en la liquidación
