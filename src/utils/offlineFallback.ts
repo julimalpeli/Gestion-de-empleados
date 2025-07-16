@@ -603,6 +603,28 @@ export const fallbackPayrollData = [
     status: "paid",
     processedDate: "2025-04-30",
   },
+  {
+    id: "payroll-21",
+    employeeId: "d516e112-beac-481c-b2f0-8f46d115186d",
+    employeeName: "Bustamante Mantilla Carlos Manuel",
+    period: "2025-04",
+    baseDays: 27,
+    holidayDays: 3,
+    baseAmount: 396000, // 27 días × 14666.67
+    whiteAmount: 0,
+    informalAmount: 440000, // Del informal_wage del empleado
+    presentismoAmount: 70000,
+    aguinaldo: 0,
+    advances: 6000,
+    discounts: 0,
+    overtimeHours: 0,
+    overtimeAmount: 0,
+    bonusAmount: 0,
+    holidayBonus: 44000, // 3 días × 14666.67
+    netTotal: 544000, // 0 + 440000 + 70000 + 0 + 0 + 44000 + 0 - 6000 - 0
+    status: "paid",
+    processedDate: "2025-04-30",
+  },
 ];
 
 export const fallbackVacationData = [
