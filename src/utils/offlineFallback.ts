@@ -616,13 +616,13 @@ export const fallbackPayrollData = [
     presentismoAmount: 70000,
     aguinaldo: 0,
     advances: 6000,
-    discounts: 0,
+    discounts: 50000, // Los 50000 de descuentos que mencionas
     overtimeHours: 0,
     overtimeAmount: 0,
     bonusAmount: 0,
     holidayBonus: 44000, // 3 días × 14666.67
-    netTotal: 544000, // 0 + 440000 + 70000 + 0 + 0 + 44000 + 0 - 6000 - 0
-    status: "paid",
+    netTotal: 504000, // 0 + 440000 + 70000 + 0 + 0 + 44000 + 0 - 6000 - 50000
+    status: "draft", // Cambio a draft para que sea editable
     processedDate: "2025-04-30",
   },
 ];
