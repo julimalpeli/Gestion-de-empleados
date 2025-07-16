@@ -269,6 +269,7 @@ const Reports = () => {
       totalDays: totalSemesterDays,
       proportional: isProportional,
       bestSalary,
+      bestSalaryPeriod,
       fullAguinaldo: Math.round(fullAguinaldo),
       reason: isProportional
         ? "Aguinaldo proporcional por días trabajados"
