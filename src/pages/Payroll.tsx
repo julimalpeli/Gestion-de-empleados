@@ -675,7 +675,7 @@ const Payroll = () => {
     const hourlyRate = dailyWageToUse / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
+    // Presentismo: usar el valor histórico si est�� disponible, sino el actual del empleado
     let presentismoToUse = employee?.presentismo || 0;
 
     // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
@@ -701,17 +701,21 @@ const Payroll = () => {
     // Total después de deducciones
     const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
 
-    // División entre blanco e informal
+    // División entre blanco e informal para FORMAS DE PAGO (no afecta el total)
     const manualWhiteWage = parseFloat(whiteWage) || 0;
 
-    // El informalAmount debe ser el informal_wage del empleado, no un cálculo
-    let informalAmount = 0;
+    // Los montos reales que debe cobrar el empleado (independiente de la forma de pago)
+    let realWhiteAmount = 0;
+    let realInformalAmount = 0;
+
     if (employee) {
-      // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
-      if (historicalSalary && historicalSalary.informal_wage !== undefined) {
-        informalAmount = historicalSalary.informal_wage;
+      // Si tenemos salario histórico (editando liquidación pasada), usar esos valores
+      if (historicalSalary && historicalSalary.white_wage !== undefined) {
+        realWhiteAmount = historicalSalary.white_wage;
+        realInformalAmount = historicalSalary.informal_wage;
       } else {
-        informalAmount = employee.informalWage || 0;
+        realWhiteAmount = employee.whiteWage || 0;
+        realInformalAmount = employee.informalWage || 0;
       }
     }
 
@@ -719,10 +723,10 @@ const Payroll = () => {
     const aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod);
 
     // Total neto = todos los conceptos positivos - deducciones
-    // Fórmula: white_amount + informal_amount + presentismo_amount + overtime_amount + bonus_amount + holiday_bonus + aguinaldo - advances - discounts
+    // Usar los montos REALES del empleado, no las formas de pago
     const netTotal =
-      manualWhiteWage +
-      informalAmount +
+      realWhiteAmount +
+      realInformalAmount +
       presentismoAmount +
       overtimePay +
       bonusPay +
@@ -2120,7 +2124,7 @@ const Payroll = () => {
             {recordToDelete?.status === "paid" && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
                 ⚠️ <strong>Advertencia:</strong> Esta liquidación está marcada
-                como PAGADA. Eliminarla afectará los registros de pagos
+                como PAGADA. Eliminarla afectar�� los registros de pagos
                 realizados.
               </div>
             )}
