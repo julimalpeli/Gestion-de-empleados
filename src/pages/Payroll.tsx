@@ -510,7 +510,10 @@ const Payroll = () => {
       setHistoricalSalary(historicalSalaryData);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
-      setWhiteWage(record.whiteAmount?.toString() || "");
+      debugSetWhiteWage(
+        record.whiteAmount?.toString() || "",
+        "view record load",
+      );
     } catch (error) {
       console.error("Error getting historical salary for view:", error);
       // Fallback al valor almacenado en la liquidación
