@@ -30,6 +30,18 @@ export const useEmployees = () => {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.log("🔍 Error detected:", errorMessage);
 
+      // Detailed error logging
+      if (err && typeof err === "object") {
+        console.error("❌ Employee error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          stack: (err as any).stack,
+          errorType: typeof err,
+          errorConstructor: err.constructor?.name,
+        });
+      }
+
       // Activar fallback para CUALQUIER error en desarrollo
       console.log("🚨 ANY ERROR DETECTED - Activating fallback immediately");
       try {
