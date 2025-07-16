@@ -543,8 +543,8 @@ const Payroll = () => {
       // Guardar los valores históricos para usar en cálculos
       setHistoricalSalary(historicalSalaryData);
 
-      // Usar el sueldo blanco histórico en lugar del almacenado en la liquidación
-      setWhiteWage(historicalSalaryData.white_wage.toString());
+      // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
+      setWhiteWage(record.whiteAmount?.toString() || "");
 
       // También actualizar el presentismo histórico si es necesario
       const employee = employees.find(
