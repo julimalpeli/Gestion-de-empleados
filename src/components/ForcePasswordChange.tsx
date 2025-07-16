@@ -54,31 +54,50 @@ const ForcePasswordChange = ({
     }
 
     try {
+      console.log("🔍 ForcePasswordChange Debug:");
+      console.log("  - Username:", username);
+      console.log("  - Current password entered:", currentPassword);
+
       // Verificar contraseña actual
       const { data: user, error: fetchError } = await supabase
         .from("users")
-        .select("id, password_hash")
+        .select("id, password_hash, username, name")
         .eq("username", username)
         .single();
 
+      console.log("  - User found:", user);
+      console.log("  - Fetch error:", fetchError);
+
       if (fetchError || !user) {
+        console.error("❌ User not found or error:", fetchError);
         setError("Error al verificar usuario");
         setIsLoading(false);
         return;
       }
+
+      console.log("  - Stored password_hash:", user.password_hash);
 
       // Verificar contraseña actual
       let storedPassword;
       try {
         // Intentar decodificar como base64
         storedPassword = atob(user.password_hash);
+        console.log("  - Decoded password (base64):", storedPassword);
       } catch (e) {
         // Si falla la decodificación, asumir que el hash no es base64
         storedPassword = user.password_hash;
+        console.log("  - Password (not base64):", storedPassword);
       }
 
+      console.log("  - Password comparison:");
+      console.log("    Current entered:", currentPassword);
+      console.log("    Stored decoded:", storedPassword);
+      console.log("    Match:", storedPassword === currentPassword);
+
       if (storedPassword !== currentPassword) {
-        setError("La contraseña actual es incorrecta");
+        setError(
+          `La contraseña actual es incorrecta. Esperaba: "${storedPassword}", recibió: "${currentPassword}"`,
+        );
         setIsLoading(false);
         return;
       }
