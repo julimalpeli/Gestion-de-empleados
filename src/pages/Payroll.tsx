@@ -1117,7 +1117,7 @@ const Payroll = () => {
                     id="whiteWage"
                     placeholder="$ 0,00"
                     value={whiteWage}
-                    onChange={(value) => setWhiteWage(value)}
+                    onChange={(value) => debugSetWhiteWage(value, "user input")}
                     disabled={editingRecord && !isEditMode}
                   />
                   <p className="text-xs text-muted-foreground">
