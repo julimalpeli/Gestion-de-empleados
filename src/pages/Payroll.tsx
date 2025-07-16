@@ -245,7 +245,10 @@ const Payroll = () => {
       setHolidayDays(record.holidayDays?.toString() || "");
       setAdvances(record.advances?.toString() || "");
       setDiscounts(record.discounts?.toString() || "");
-      setWhiteWage(record.whiteAmount?.toString() || "");
+      debugSetWhiteWage(
+        record.whiteAmount?.toString() || "",
+        "edit form setup",
+      );
       setBonusAmount(record.bonusAmount?.toString() || "");
 
       // Set overtime data
