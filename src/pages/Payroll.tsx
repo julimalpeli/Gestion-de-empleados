@@ -517,7 +517,7 @@ const Payroll = () => {
     } catch (error) {
       console.error("Error getting historical salary for view:", error);
       // Fallback al valor almacenado en la liquidación
-      setWhiteWage(record.whiteAmount?.toString() || "0");
+      debugSetWhiteWage(record.whiteAmount?.toString() || "0", "view fallback");
       setHistoricalSalary(null);
     }
 
