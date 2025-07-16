@@ -1655,12 +1655,26 @@ const Payroll = () => {
                           <div>
                             <div>{formatCurrency(record.netTotal)}</div>
                             {isAguinaldoPeriod(record.period) &&
-                              record.aguinaldo > 0 && (
-                                <div className="text-xs text-green-700">
-                                  Incluye aguinaldo:{" "}
-                                  {formatCurrency(record.aguinaldo)}
-                                </div>
-                              )}
+                              (() => {
+                                const employee = employees.find(
+                                  (e) => e.name === record.employeeName,
+                                );
+                                if (employee) {
+                                  const correctAguinaldo = calculateAguinaldo(
+                                    employee,
+                                    record.period,
+                                  );
+                                  if (correctAguinaldo > 0) {
+                                    return (
+                                      <div className="text-xs text-green-700">
+                                        Incluye aguinaldo:{" "}
+                                        {formatCurrency(correctAguinaldo)}
+                                      </div>
+                                    );
+                                  }
+                                }
+                                return null;
+                              })()}
                           </div>
                         </TableCell>
                         <TableCell>
