@@ -192,13 +192,14 @@ const Reports = () => {
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
       // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
-      // whiteAmount + informalAmount YA incluyen días base + feriados, overtimeAmount son las horas extras
       const salaryCalculations = employeePayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
+        const holidayBonus = payroll.holidayBonus || 0;
 
-        const result = whiteAmount + informalAmount + overtimeAmount;
+        const result =
+          whiteAmount + informalAmount + overtimeAmount + holidayBonus;
 
         // Debug log para DNI específico
         if (
@@ -212,8 +213,10 @@ const Reports = () => {
             whiteAmount,
             informalAmount,
             overtimeAmount,
+            holidayBonus,
             bestSalaryForAguinaldo: result,
-            note: "feriados ya incluidos en white+informal, no duplicar con holidayBonus",
+            formula:
+              "whiteAmount + informalAmount + overtimeAmount + holidayBonus",
           });
         }
 
