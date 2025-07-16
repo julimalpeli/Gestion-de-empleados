@@ -456,7 +456,7 @@ const Payroll = () => {
       setHolidayDays("");
       setAdvances("");
       setDiscounts("");
-      setWhiteWage("");
+      debugSetWhiteWage("", "reset after create");
       setPresentismoStatus("mantiene");
       setOvertimeEnabled(false);
       setOvertimeHours("");
