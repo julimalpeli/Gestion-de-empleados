@@ -241,20 +241,25 @@ const Reports = () => {
         bestSalaryPeriod = "Sueldo base";
       }
 
-      // Debug final
-      if (
-        employee.name?.includes("Daiana") ||
-        employee.name?.includes("Porras")
-      ) {
-        console.log(
-          `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
-          {
-            calculations: salaryCalculations,
-            fallback: employee.whiteWage + employee.informalWage,
-            bestPeriod: bestSalaryPeriod,
-          },
-        );
-      }
+      // Debug para todos los empleados
+      console.log(
+        `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
+        {
+          baseSalary: employee.whiteWage + employee.informalWage,
+          historicalSalaries: salaryCalculations,
+          maxHistoricalSalary,
+          maxSalaryIndex,
+          bestPeriod: bestSalaryPeriod,
+          employeePayrolls: employeePayrolls.map((p) => ({
+            period: p.period,
+            amount:
+              p.whiteAmount +
+              p.informalAmount +
+              p.overtimeAmount +
+              p.holidayBonus,
+          })),
+        },
+      );
     } else {
       // Si no hay liquidaciones previas, usar sueldo base
       bestSalaryPeriod = "Sueldo base";
