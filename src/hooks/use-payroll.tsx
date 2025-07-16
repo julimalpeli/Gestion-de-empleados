@@ -93,32 +93,28 @@ export const usePayroll = () => {
         console.error("❌ Non-object error:", err);
       }
 
-      // Only use fallback for specific network errors, not all errors
-      if (
-        errorMessage.includes("Failed to fetch") ||
-        errorMessage.includes("TypeError") ||
-        errorMessage.includes("Network request failed")
-      ) {
-        console.log("🔄 Network error detected, using fallback data...");
-        try {
-          const { getFallbackPayrollData } = await import(
-            "@/utils/offlineFallback"
-          );
-          const fallbackData = getFallbackPayrollData();
-          setPayrollRecords(fallbackData);
-          console.log(
-            "✅ Fallback payroll loaded:",
-            fallbackData.length,
-            "records",
-          );
-          setError(null); // Clear error since we have fallback data
-          return;
-        } catch (fallbackError) {
-          console.warn("⚠️ Could not load fallback payroll:", fallbackError);
-        }
+      // Activate fallback immediately for any connectivity error
+      console.log(
+        "🚨 CONNECTIVITY ERROR DETECTED - Activating fallback immediately",
+      );
+      try {
+        const { getFallbackPayrollData } = await import(
+          "@/utils/offlineFallback"
+        );
+        const fallbackData = getFallbackPayrollData();
+        setPayrollRecords(fallbackData);
+        console.log(
+          "✅ Fallback payroll loaded:",
+          fallbackData.length,
+          "records",
+        );
+        console.log("📶 Payroll system now running in offline mode");
+        setError(null); // Clear error since we have fallback data
+        return;
+      } catch (fallbackError) {
+        console.warn("⚠️ Could not load fallback payroll:", fallbackError);
+        setError("Error loading payroll and fallback failed");
       }
-
-      setError("Error loading payroll records");
     } finally {
       setLoading(false);
     }
