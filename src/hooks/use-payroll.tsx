@@ -94,7 +94,6 @@ export const usePayroll = () => {
       }
 
       // Only use fallback for specific network errors, not all errors
-      const errorMessage = err instanceof Error ? err.message : String(err);
       if (
         errorMessage.includes("Failed to fetch") ||
         errorMessage.includes("TypeError") ||
