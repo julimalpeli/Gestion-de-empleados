@@ -76,7 +76,22 @@ export const usePayroll = () => {
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error("❌ Error loading payroll records:", errorMessage);
-      console.error("❌ Full payroll error object:", err);
+
+      // Detailed error logging
+      if (err && typeof err === "object") {
+        console.error("❌ Full payroll error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+          stack: (err as any).stack,
+          errorType: typeof err,
+          errorConstructor: err.constructor?.name,
+        });
+        console.error("❌ Raw error object:", JSON.stringify(err, null, 2));
+      } else {
+        console.error("❌ Non-object error:", err);
+      }
 
       // Use fallback for any error (aggressive approach for development)
       console.log(
