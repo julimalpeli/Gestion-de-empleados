@@ -675,7 +675,7 @@ const Payroll = () => {
     const hourlyRate = dailyWageToUse / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: usar el valor histórico si est�� disponible, sino el actual del empleado
+    // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
     let presentismoToUse = employee?.presentismo || 0;
 
     // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
@@ -746,8 +746,10 @@ const Payroll = () => {
       totalAdvances,
       totalDiscounts,
       totalAfterDeductions,
-      whiteAmount: manualWhiteWage,
-      informalAmount,
+      whiteAmount: manualWhiteWage, // Forma de pago (depósito)
+      informalAmount: realInformalAmount, // Monto real que debe cobrar
+      realWhiteAmount, // Monto real en blanco
+      realInformalAmount, // Monto real informal
       netTotal,
       holidayBonus: holidayPay,
       aguinaldo: aguinaldoAmount,
@@ -2124,7 +2126,7 @@ const Payroll = () => {
             {recordToDelete?.status === "paid" && (
               <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
                 ⚠️ <strong>Advertencia:</strong> Esta liquidación está marcada
-                como PAGADA. Eliminarla afectar�� los registros de pagos
+                como PAGADA. Eliminarla afectará los registros de pagos
                 realizados.
               </div>
             )}
