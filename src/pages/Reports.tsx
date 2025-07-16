@@ -224,16 +224,21 @@ const Reports = () => {
         return result;
       });
 
-      // Tomar el mejor sueldo de todos los períodos y guardar cuál fue
-      const maxSalaryIndex = salaryCalculations.indexOf(
-        Math.max(...salaryCalculations),
-      );
-      bestSalary = Math.max(...salaryCalculations, bestSalary);
+      // Encontrar el mejor sueldo y su período
+      const maxHistoricalSalary = Math.max(...salaryCalculations);
+      const maxSalaryIndex = salaryCalculations.indexOf(maxHistoricalSalary);
 
-      // Determinar el período del mejor sueldo
-      let bestSalaryPeriod = "Sueldo base";
-      if (maxSalaryIndex >= 0 && employeePayrolls[maxSalaryIndex]) {
+      // Comparar con el sueldo base para determinar cuál es mejor
+      const baseSalary = employee.whiteWage + employee.informalWage;
+
+      if (maxHistoricalSalary > baseSalary) {
+        // El mejor sueldo es de un período histórico
+        bestSalary = maxHistoricalSalary;
         bestSalaryPeriod = employeePayrolls[maxSalaryIndex].period;
+      } else {
+        // El sueldo base es el mejor
+        bestSalary = baseSalary;
+        bestSalaryPeriod = "Sueldo base";
       }
 
       // Debug final
