@@ -188,6 +188,7 @@ const Reports = () => {
     );
 
     let bestSalary = employee.whiteWage + employee.informalWage; // Fallback por si no hay históricos
+    let bestSalaryPeriod = "Sueldo base"; // Por defecto
 
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
