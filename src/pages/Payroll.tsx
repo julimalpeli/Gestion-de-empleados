@@ -351,14 +351,14 @@ const Payroll = () => {
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
       // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
-      // NO restar adelantos ni descuentos
+      // baseAmount YA incluye días base + feriados, overtimeAmount son las horas extras
       const salaryCalculations = employeePayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
-        const holidayBonus = payroll.holidayBonus || 0;
 
-        return whiteAmount + informalAmount + overtimeAmount + holidayBonus;
+        // El baseAmount incluye días trabajados + feriados, no agregar holidayBonus que sería duplicar
+        return whiteAmount + informalAmount + overtimeAmount;
       });
 
       // Tomar el mejor sueldo de todos los períodos
