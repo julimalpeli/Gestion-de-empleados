@@ -574,14 +574,13 @@ export class SupabaseEmployeeService implements IEmployeeService {
     let vacationDays = 0;
 
     if (totalMonths >= 6) {
-      // Determinar días de vacaciones según antigüedad (después de 6 meses)
-      vacationDays = 14; // Por defecto hasta 5 años
-      if (years >= 20) {
-        vacationDays = 35;
-      } else if (years >= 10) {
-        vacationDays = 28;
-      } else if (years >= 5) {
-        vacationDays = 21;
+      // Sistema acumulativo: 14 días por año trabajado
+      // Se consideran años completos trabajados
+      vacationDays = Math.max(years, 0) * 14;
+
+      // Si tiene al menos 6 meses pero menos de 1 año, otorgar días proporcionales
+      if (years === 0 && totalMonths >= 6) {
+        vacationDays = 14; // Primer año completo de 14 días después de 6 meses
       }
     }
 
