@@ -153,13 +153,8 @@ BEGIN
     -- Calcular salario diario: (sueldo_blanco + informal) / 30
     NEW.daily_wage := ROUND((NEW.white_wage + NEW.informal_wage) / 30.0, 2);
 
-    -- Calcular días de vacaciones según antigüedad
-    NEW.vacation_days := CASE
-        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date)) >= 20 THEN 35
-        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date)) >= 10 THEN 28
-        WHEN EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date)) >= 5 THEN 21
-        ELSE 14
-    END;
+    -- Calcular días de vacaciones según antigüedad (sistema acumulativo: 14 días por año)
+    NEW.vacation_days := GREATEST(EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date))::INTEGER, 0) * 14;
 
     NEW.updated_at := NOW();
     RETURN NEW;
