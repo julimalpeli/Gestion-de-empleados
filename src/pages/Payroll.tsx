@@ -301,7 +301,9 @@ const Payroll = () => {
   useEffect(() => {
     if (payrollRecords && payrollRecords.length > 0 && periodFilter === "all") {
       // Obtener todos los períodos únicos y ordenarlos del más reciente al más antiguo
-      const periods = [...new Set(payrollRecords.map(record => record.period))];
+      const periods = [
+        ...new Set(payrollRecords.map((record) => record.period)),
+      ];
       const sortedPeriods = periods.sort((a, b) => {
         // Convertir "YYYY-MM" a Date para comparar
         const dateA = new Date(a + "-01");
