@@ -297,6 +297,26 @@ const Payroll = () => {
     }
   }, [selectedPeriod]);
 
+  // Filtrar automáticamente por el último período disponible al cargar
+  useEffect(() => {
+    if (payrollRecords && payrollRecords.length > 0 && periodFilter === "all") {
+      // Obtener todos los períodos únicos y ordenarlos del más reciente al más antiguo
+      const periods = [...new Set(payrollRecords.map(record => record.period))];
+      const sortedPeriods = periods.sort((a, b) => {
+        // Convertir "YYYY-MM" a Date para comparar
+        const dateA = new Date(a + "-01");
+        const dateB = new Date(b + "-01");
+        return dateB.getTime() - dateA.getTime(); // Más reciente primero
+      });
+
+      if (sortedPeriods.length > 0) {
+        const latestPeriod = sortedPeriods[0];
+        console.log(`🔍 Auto-selecting latest period: ${latestPeriod}`);
+        setPeriodFilter(latestPeriod);
+      }
+    }
+  }, [payrollRecords, periodFilter]);
+
   // Función para verificar si un período es de aguinaldo (junio o diciembre)
   const isAguinaldoPeriod = (period: string) => {
     const [year, month] = period.split("-");
