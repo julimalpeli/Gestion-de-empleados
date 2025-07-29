@@ -161,10 +161,21 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
     const headers = [
       "Empleado",
       "Período",
+      "Días Trabajados",
+      "Días Feriados",
+      "Sueldo Base",
+      "Presentismo",
+      "Horas Extra",
+      "Monto H.Extra",
+      "Bonificaciones",
+      "Adelantos",
+      "Descuentos",
+      "Feriado Doble",
+      "Aguinaldo",
       "Efectivo",
       "Depósito",
-      "Aguinaldo",
       "Total Neto",
+      "Estado",
     ];
     const csvContent = [
       headers.join(","),
@@ -172,10 +183,21 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         [
           record.employeeName,
           record.period,
+          record.baseDays,
+          record.holidayDays,
+          record.baseSalary,
+          record.presentismo,
+          record.overtimeHours,
+          record.overtimeAmount,
+          record.bonusAmount,
+          -record.advances, // Negativo para mostrar como descuento
+          -record.discounts, // Negativo para mostrar como descuento
+          record.holidayBonus,
+          record.aguinaldo,
           record.efectivo,
           record.deposito,
-          record.aguinaldo,
           record.totalNeto,
+          record.status,
         ].join(","),
       ),
     ].join("\n");
