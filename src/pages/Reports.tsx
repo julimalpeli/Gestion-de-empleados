@@ -1034,10 +1034,14 @@ const Reports = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Liquidations Report Modal */}
+      {/* Liquidations Report Modals */}
       <LiquidationsReport
         isOpen={isLiquidationsReportOpen}
         onClose={() => setIsLiquidationsReportOpen(false)}
+      />
+      <SimpleLiquidationsReport
+        isOpen={isSimpleLiquidationsReportOpen}
+        onClose={() => setIsSimpleLiquidationsReportOpen(false)}
       />
     </div>
   );
