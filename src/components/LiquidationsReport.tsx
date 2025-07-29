@@ -300,8 +300,9 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       formatCurrency(totals.presentismo),
       "",
       formatCurrency(totals.bonusAmount),
+      formatCurrency(-totals.advances), // Total adelantos
+      formatCurrency(-totals.discounts), // Total descuentos
       formatCurrency(totals.holidayBonus), // Total de feriados
-      formatCurrency(totals.aguinaldo),
       formatCurrency(totals.efectivo),
       formatCurrency(totals.deposito),
       formatCurrency(totals.totalNeto),
@@ -318,8 +319,9 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
           "Presentismo",
           "H.Extra",
           "Bonificac.",
+          "Adelantos",
+          "Descuentos",
           "Feriados",
-          "Aguinaldo",
           "Efectivo",
           "Depósito",
           "Total Neto",
@@ -345,19 +347,20 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         halign: "center",
       },
       columnStyles: {
-        0: { cellWidth: 38, halign: "left" }, // Empleado
-        1: { cellWidth: 17, halign: "center" }, // Período
-        2: { cellWidth: 11, halign: "center" }, // Días
-        3: { cellWidth: 25, halign: "right" }, // Sueldo Base - Más ancho para números grandes
-        4: { cellWidth: 22, halign: "right" }, // Presentismo - Más ancho
-        5: { cellWidth: 14, halign: "center" }, // H.Extra
-        6: { cellWidth: 22, halign: "right" }, // Bonificaciones - Más ancho
-        7: { cellWidth: 20, halign: "right" }, // Feriados - Más ancho
-        8: { cellWidth: 22, halign: "right" }, // Aguinaldo - Más ancho
-        9: { cellWidth: 25, halign: "right" }, // Efectivo - Más ancho para números grandes
-        10: { cellWidth: 25, halign: "right" }, // Depósito - Más ancho para números grandes
-        11: { cellWidth: 28, halign: "right" }, // Total Neto - El más ancho para totales
-        12: { cellWidth: 17, halign: "center" }, // Estado
+        0: { cellWidth: 35, halign: "left" }, // Empleado
+        1: { cellWidth: 16, halign: "center" }, // Período
+        2: { cellWidth: 10, halign: "center" }, // Días
+        3: { cellWidth: 22, halign: "right" }, // Sueldo Base
+        4: { cellWidth: 20, halign: "right" }, // Presentismo
+        5: { cellWidth: 12, halign: "center" }, // H.Extra
+        6: { cellWidth: 18, halign: "right" }, // Bonificaciones
+        7: { cellWidth: 18, halign: "right" }, // Adelantos
+        8: { cellWidth: 18, halign: "right" }, // Descuentos
+        9: { cellWidth: 16, halign: "right" }, // Feriados
+        10: { cellWidth: 22, halign: "right" }, // Efectivo
+        11: { cellWidth: 22, halign: "right" }, // Depósito
+        12: { cellWidth: 25, halign: "right" }, // Total Neto
+        13: { cellWidth: 16, halign: "center" }, // Estado
       },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
