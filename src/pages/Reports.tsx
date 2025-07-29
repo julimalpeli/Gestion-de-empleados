@@ -361,20 +361,33 @@ const Reports = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex justify-center">
+              <div className="flex justify-center gap-4">
+                <Button
+                  onClick={() => setIsSimpleLiquidationsReportOpen(true)}
+                  size="lg"
+                  variant="outline"
+                  className="text-lg px-6 py-4"
+                >
+                  <FileText className="h-5 w-5 mr-2" />
+                  Reporte Simple
+                </Button>
                 <Button
                   onClick={() => setIsLiquidationsReportOpen(true)}
                   size="lg"
-                  className="text-lg px-8 py-4"
+                  className="text-lg px-6 py-4"
                 >
                   <FileBarChart className="h-5 w-5 mr-2" />
-                  Generar Reporte de Liquidaciones
+                  Reporte Detallado
                 </Button>
               </div>
-              <p className="text-center text-muted-foreground mt-4">
-                Genera un reporte completo con efectivo, depósitos y aguinaldos
-                de todas las liquidaciones
-              </p>
+              <div className="mt-4 space-y-2">
+                <p className="text-center text-muted-foreground text-sm">
+                  <strong>Simple:</strong> Efectivo, depósito, aguinaldo y total neto
+                </p>
+                <p className="text-center text-muted-foreground text-sm">
+                  <strong>Detallado:</strong> Todos los conceptos, días, bonificaciones, etc.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
