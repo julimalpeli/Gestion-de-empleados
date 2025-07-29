@@ -717,15 +717,31 @@ const Payroll = () => {
     // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
     let presentismoToUse = employee?.presentismo || 0;
 
+    // Debug para verificar estado
+    if (employee?.dni === "44586777") {
+      console.log("🔍 MODO ACTUAL:");
+      console.log("   - isEditMode:", isEditMode);
+      console.log("   - editingRecord:", editingRecord);
+      console.log("   - historicalSalary:", historicalSalary);
+      console.log("   - employee.presentismo:", employee?.presentismo);
+    }
+
     // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
     if (historicalSalary && historicalSalary.presentismo !== undefined) {
       presentismoToUse = historicalSalary.presentismo;
+      if (employee?.dni === "44586777") {
+        console.log("   - USANDO HISTÓRICO:", presentismoToUse);
+      }
     }
 
     // En modo edición, el presentismo podría ser diferente al actual
     // pero mantener la lógica de mantiene/pierde del form
     const presentismoAmount =
       presentismoStatus === "mantiene" ? presentismoToUse : 0;
+
+    if (employee?.dni === "44586777") {
+      console.log("   - presentismoAmount FINAL:", presentismoAmount);
+    }
 
     const bonusPay = bonusNum;
 
