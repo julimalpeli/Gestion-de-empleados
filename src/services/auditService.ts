@@ -94,8 +94,7 @@ class AuditService {
 
         // Handle RLS policy violations gracefully
         if (errorMessage?.includes("row-level security policy")) {
-          // Silent disable - no console spam
-          (window as any).auditDisabled = true;
+          console.warn("🔒 RLS policy blocking audit log - run database/fix_audit_log_rls.sql");
           return {} as AuditLogEntry;
         }
 
@@ -123,8 +122,7 @@ class AuditService {
 
       // Handle RLS policy violations gracefully
       if (errorMessage?.includes("row-level security policy")) {
-        // Silent disable - no console spam
-        (window as any).auditDisabled = true;
+        console.warn("🔒 RLS policy blocking audit log - run database/fix_audit_log_rls.sql");
         return {} as AuditLogEntry;
       }
 
@@ -334,7 +332,7 @@ class AuditService {
     });
   }
 
-  // Auditoría de login/logout
+  // Auditor��a de login/logout
   async auditLogin(
     action: "LOGIN" | "LOGOUT" | "LOGIN_FAILED",
     userId: string,
