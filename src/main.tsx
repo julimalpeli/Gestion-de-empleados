@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import { testSupabaseConnection } from "./lib/supabase";
+import "./utils/autoReloadOnError"; // Initialize auto-reload error handler
 
 // Suppress ResizeObserver warnings
 const resizeObserverErrorHandler = (e: ErrorEvent) => {
