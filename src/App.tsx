@@ -606,6 +606,7 @@ const AppContent = () => {
           }}
         />
       )}
+      </div>
     </>
   );
 };
