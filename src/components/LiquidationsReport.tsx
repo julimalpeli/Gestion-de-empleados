@@ -329,19 +329,19 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         halign: 'center',
       },
       columnStyles: {
-        0: { cellWidth: 40, halign: 'left' }, // Empleado - Más ancho para nombres completos
-        1: { cellWidth: 18, halign: 'center' }, // Período
-        2: { cellWidth: 12, halign: 'center' }, // Días
-        3: { cellWidth: 22, halign: 'right' }, // Sueldo Base - Más ancho para evitar saltos
-        4: { cellWidth: 20, halign: 'right' }, // Presentismo
-        5: { cellWidth: 15, halign: 'center' }, // H.Extra
-        6: { cellWidth: 20, halign: 'right' }, // Bonificaciones
-        7: { cellWidth: 18, halign: 'right' }, // Feriados
-        8: { cellWidth: 20, halign: 'right' }, // Aguinaldo
-        9: { cellWidth: 22, halign: 'right' }, // Efectivo - Más ancho
-        10: { cellWidth: 22, halign: 'right' }, // Depósito - Más ancho
-        11: { cellWidth: 25, halign: 'right' }, // Total Neto - Más ancho
-        12: { cellWidth: 18, halign: 'center' }, // Estado
+        0: { cellWidth: 38, halign: 'left' }, // Empleado
+        1: { cellWidth: 17, halign: 'center' }, // Período
+        2: { cellWidth: 11, halign: 'center' }, // Días
+        3: { cellWidth: 25, halign: 'right' }, // Sueldo Base - Más ancho para números grandes
+        4: { cellWidth: 22, halign: 'right' }, // Presentismo - Más ancho
+        5: { cellWidth: 14, halign: 'center' }, // H.Extra
+        6: { cellWidth: 22, halign: 'right' }, // Bonificaciones - Más ancho
+        7: { cellWidth: 20, halign: 'right' }, // Feriados - Más ancho
+        8: { cellWidth: 22, halign: 'right' }, // Aguinaldo - Más ancho
+        9: { cellWidth: 25, halign: 'right' }, // Efectivo - Más ancho para números grandes
+        10: { cellWidth: 25, halign: 'right' }, // Depósito - Más ancho para números grandes
+        11: { cellWidth: 28, halign: 'right' }, // Total Neto - El más ancho para totales
+        12: { cellWidth: 17, halign: 'center' }, // Estado
       },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
