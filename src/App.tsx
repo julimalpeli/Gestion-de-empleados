@@ -212,7 +212,7 @@ const createUserFor35940844 = async () => {
       return { success: true, message: "User already exists" };
     }
 
-    console.log("🔄 Creating auth user...");
+    console.log("��� Creating auth user...");
     const { data: authUser, error: authError } = await supabase.auth.signUp({
       email: employee.email,
       password: employee.dni,
@@ -431,10 +431,59 @@ const AuthLoadingWrapper = ({ children }: { children: React.ReactNode }) => {
 // Component wrapper para manejar ForcePasswordChange
 const AppContent = () => {
   const { user } = useAuth();
+  const [isOffline, setIsOffline] = useState(false);
+
+  // Listen for fallback activation messages
+  useEffect(() => {
+    const handleMessage = (event: any) => {
+      if (event.data?.type === 'FALLBACK_ACTIVATED') {
+        setIsOffline(true);
+      }
+    };
+
+    // Listen for console messages to detect offline mode
+    const originalConsoleLog = console.log;
+    console.log = (...args) => {
+      const message = args.join(' ');
+      if (message.includes('now running in OFFLINE MODE') ||
+          message.includes('FALLBACK ACTIVATED')) {
+        setIsOffline(true);
+      }
+      originalConsoleLog.apply(console, args);
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      console.log = originalConsoleLog;
+    };
+  }, []);
 
   return (
     <>
-      <BrowserRouter>
+      {/* Offline Mode Banner */}
+      {isOffline && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-orange-100 border-b border-orange-200">
+          <Alert className="rounded-none border-0 bg-orange-100">
+            <WifiOff className="h-4 w-4" />
+            <AlertDescription className="flex items-center justify-between">
+              <span>
+                <strong>Modo Offline:</strong> Sin conexión a internet. Los datos mostrados son una copia local.
+              </span>
+              <button
+                onClick={() => window.location.reload()}
+                className="text-orange-800 underline hover:no-underline"
+              >
+                Reintentar conexión
+              </button>
+            </AlertDescription>
+          </Alert>
+        </div>
+      )}
+
+      <div className={isOffline ? "mt-16" : ""}>
+        <BrowserRouter>
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
