@@ -26,6 +26,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   FileBarChart,
+  FileText,
   TrendingUp,
   Calendar,
   DollarSign,
