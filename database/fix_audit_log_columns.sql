@@ -111,13 +111,27 @@ BEGIN
         NEW.changed_at := NEW.timestamp;
     END IF;
 
-    -- Set defaults
+    -- Set defaults for required fields
     IF NEW.timestamp IS NULL THEN
         NEW.timestamp := NOW();
     END IF;
 
     IF NEW.changed_at IS NULL THEN
         NEW.changed_at := NOW();
+    END IF;
+
+    -- Ensure action has a default if null
+    IF NEW.action IS NULL THEN
+        NEW.action := 'UPDATE';
+    END IF;
+
+    -- Initialize JSON fields if null
+    IF NEW.old_values IS NULL THEN
+        NEW.old_values := '{}'::JSONB;
+    END IF;
+
+    IF NEW.new_values IS NULL THEN
+        NEW.new_values := '{}'::JSONB;
     END IF;
 
     RETURN NEW;
