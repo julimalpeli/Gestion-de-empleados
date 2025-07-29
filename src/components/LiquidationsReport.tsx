@@ -621,6 +621,11 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                             ? formatCurrency(record.holidayBonus)
                             : "-"}
                         </TableCell>
+                        <TableCell className="text-right text-purple-600">
+                          {record.aguinaldo > 0
+                            ? formatCurrency(record.aguinaldo)
+                            : "-"}
+                        </TableCell>
                         <TableCell className="text-right font-medium text-green-600">
                           {formatCurrency(record.efectivo)}
                         </TableCell>
