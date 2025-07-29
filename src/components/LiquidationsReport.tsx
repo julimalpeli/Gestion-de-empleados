@@ -561,7 +561,6 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       <TableHead className="text-right">Adelantos</TableHead>
                       <TableHead className="text-right">Descuentos</TableHead>
                       <TableHead className="text-right">Fer.Doble</TableHead>
-                      <TableHead className="text-right">Aguinaldo</TableHead>
                       <TableHead className="text-right">Efectivo</TableHead>
                       <TableHead className="text-right">Depósito</TableHead>
                       <TableHead className="text-right">Total Neto</TableHead>
@@ -618,15 +617,6 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                           {record.holidayBonus > 0
                             ? formatCurrency(record.holidayBonus)
                             : "-"}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {record.aguinaldo > 0 ? (
-                            <span className="font-medium text-purple-600">
-                              {formatCurrency(record.aguinaldo)}
-                            </span>
-                          ) : (
-                            <span className="text-muted-foreground">-</span>
-                          )}
                         </TableCell>
                         <TableCell className="text-right font-medium text-green-600">
                           {formatCurrency(record.efectivo)}
@@ -690,9 +680,6 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       </TableCell>
                       <TableCell className="text-right text-orange-600">
                         {formatCurrency(totals.holidayBonus)}
-                      </TableCell>
-                      <TableCell className="text-right text-purple-600">
-                        {formatCurrency(totals.aguinaldo)}
                       </TableCell>
                       <TableCell className="text-right text-green-600">
                         {formatCurrency(totals.efectivo)}
