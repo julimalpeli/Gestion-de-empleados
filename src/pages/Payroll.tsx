@@ -530,7 +530,9 @@ const Payroll = () => {
 
       // Para visualización, NO usar salario histórico - usar valores actuales del empleado
       // Esto evita confusión y muestra los cálculos con valores actuales
-      console.log("👁️ [DEBUG] Vista en modo solo lectura - no aplicando salario histórico");
+      console.log(
+        "👁️ [DEBUG] Vista en modo solo lectura - no aplicando salario histórico",
+      );
       setHistoricalSalary(null);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
@@ -571,7 +573,9 @@ const Payroll = () => {
     try {
       if (isCurrentPeriod) {
         // Para el período actual, usar valores actuales del empleado
-        console.log(`🔍 Editing current period ${record.period} - using current employee values`);
+        console.log(
+          `🔍 Editing current period ${record.period} - using current employee values`,
+        );
         setHistoricalSalary(null);
       } else {
         // Solo para períodos pasados, usar valores históricos
