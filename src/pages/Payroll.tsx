@@ -604,14 +604,23 @@ const Payroll = () => {
       const employee = employees.find(
         (e) => e.id.toString() === record.employeeId.toString(),
       );
-      if (
-        employee &&
-        historicalSalaryData.presentismo !== employee.presentismo
-      ) {
-        // El presentismo histórico es diferente al actual
-        console.log(
-          `📊 Using historical presentismo: ${historicalSalaryData.presentismo} vs current: ${employee.presentismo}`,
-        );
+
+      // Solo verificar presentismo histórico si se cargó data histórica
+      if (!isCurrentPeriod && employee) {
+        try {
+          const salaryData = await salaryHistoryService.getSalaryForPeriod(
+            record.employeeId.toString(),
+            record.period,
+          );
+
+          if (salaryData && salaryData.presentismo !== employee.presentismo) {
+            console.log(
+              `📊 Using historical presentismo: ${salaryData.presentismo} vs current: ${employee.presentismo}`,
+            );
+          }
+        } catch (err) {
+          console.log("Could not verify historical presentismo:", err.message);
+        }
       }
     } catch (error) {
       console.error("Error getting historical salary:", error);
