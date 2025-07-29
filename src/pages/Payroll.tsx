@@ -279,7 +279,7 @@ const Payroll = () => {
 
       // Show success message
       setSuccessMessage(
-        `Liquidación duplicada. Modifica los datos necesarios y guarda.`,
+        `Liquidaci��n duplicada. Modifica los datos necesarios y guarda.`,
       );
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
@@ -715,15 +715,32 @@ const Payroll = () => {
     // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
     let presentismoToUse = employee?.presentismo || 0;
 
+    // Debug logging para presentismo
+    if (employee?.dni === "44586777") {
+      console.log("🔍 DEBUG PRESENTISMO DNI 44586777:");
+      console.log("   - employee.presentismo:", employee?.presentismo);
+      console.log("   - historicalSalary:", historicalSalary);
+      console.log("   - presentismoToUse inicial:", presentismoToUse);
+      console.log("   - presentismoStatus:", presentismoStatus);
+    }
+
     // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
     if (historicalSalary && historicalSalary.presentismo !== undefined) {
       presentismoToUse = historicalSalary.presentismo;
+      if (employee?.dni === "44586777") {
+        console.log("   - presentismoToUse desde histórico:", presentismoToUse);
+      }
     }
 
     // En modo edición, el presentismo podría ser diferente al actual
     // pero mantener la lógica de mantiene/pierde del form
     const presentismoAmount =
       presentismoStatus === "mantiene" ? presentismoToUse : 0;
+
+    // Debug final para presentismo
+    if (employee?.dni === "44586777") {
+      console.log("   - presentismoAmount final:", presentismoAmount);
+    }
 
     const bonusPay = bonusNum;
 
