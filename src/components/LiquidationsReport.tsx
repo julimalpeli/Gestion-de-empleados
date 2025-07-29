@@ -217,12 +217,17 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
     // Create PDF in landscape orientation for better table fit
     const doc = new jsPDF("landscape", "mm", "a4");
 
+    // Set default font to Helvetica for better readability
+    doc.setFont("helvetica", "normal");
+
     // Add title
-    doc.setFontSize(16);
-    doc.text("Reporte de Liquidaciones", 20, 20);
+    doc.setFontSize(18);
+    doc.setFont("helvetica", "bold");
+    doc.text("Reporte de Liquidaciones", 15, 20);
 
     // Add period
-    doc.setFontSize(11);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
     const [year, month] = selectedPeriod.split("-");
     const monthNames = [
       "Enero",
@@ -239,14 +244,19 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       "Diciembre",
     ];
     const monthName = monthNames[parseInt(month) - 1];
-    doc.text(`Período: ${monthName} ${year}`, 20, 28);
+    doc.text(`Período: ${monthName} ${year}`, 15, 28);
 
-    // Add summary in two columns for landscape
-    doc.text("Resumen:", 20, 40);
-    doc.text(`Total Efectivo: ${formatCurrency(totals.efectivo)}`, 20, 47);
-    doc.text(`Total Depósito: ${formatCurrency(totals.deposito)}`, 20, 54);
-    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 150, 47);
-    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 150, 54);
+    // Add summary in columns with better spacing
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Resumen:", 15, 38);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text(`Total Efectivo: ${formatCurrency(totals.efectivo)}`, 15, 45);
+    doc.text(`Total Depósito: ${formatCurrency(totals.deposito)}`, 15, 52);
+    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 140, 45);
+    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 140, 52);
 
     // Simplified table with main columns for better readability
     const tableData = filteredData.map((record) => [
@@ -301,27 +311,37 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         ],
       ],
       body: tableData,
-      startY: 65,
+      startY: 60,
+      margin: { left: 10, right: 10 }, // Usar más espacio horizontal
       styles: {
-        fontSize: 8,
-        cellPadding: 2,
+        fontSize: 9, // Fuente un poco más grande
+        cellPadding: 3, // Más padding para mejor legibilidad
         halign: 'center',
-        overflow: 'linebreak',
+        valign: 'middle',
+        lineWidth: 0.1,
+        font: 'helvetica',
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: [255, 255, 255],
+        fontSize: 9,
+        fontStyle: 'bold',
+        halign: 'center',
       },
       columnStyles: {
-        0: { cellWidth: 35, halign: 'left' }, // Empleado - Más ancho
-        1: { cellWidth: 16, halign: 'center' }, // Período
-        2: { cellWidth: 10, halign: 'center' }, // Días
-        3: { cellWidth: 18, halign: 'right' }, // Sueldo Base
-        4: { cellWidth: 16, halign: 'right' }, // Presentismo
-        5: { cellWidth: 12, halign: 'center' }, // H.Extra
-        6: { cellWidth: 16, halign: 'right' }, // Bonificaciones
-        7: { cellWidth: 15, halign: 'right' }, // Feriados
-        8: { cellWidth: 16, halign: 'right' }, // Aguinaldo
-        9: { cellWidth: 18, halign: 'right' }, // Efectivo
-        10: { cellWidth: 18, halign: 'right' }, // Depósito
-        11: { cellWidth: 20, halign: 'right' }, // Total Neto
-        12: { cellWidth: 15, halign: 'center' }, // Estado
+        0: { cellWidth: 40, halign: 'left' }, // Empleado - Más ancho para nombres completos
+        1: { cellWidth: 18, halign: 'center' }, // Período
+        2: { cellWidth: 12, halign: 'center' }, // Días
+        3: { cellWidth: 22, halign: 'right' }, // Sueldo Base - Más ancho para evitar saltos
+        4: { cellWidth: 20, halign: 'right' }, // Presentismo
+        5: { cellWidth: 15, halign: 'center' }, // H.Extra
+        6: { cellWidth: 20, halign: 'right' }, // Bonificaciones
+        7: { cellWidth: 18, halign: 'right' }, // Feriados
+        8: { cellWidth: 20, halign: 'right' }, // Aguinaldo
+        9: { cellWidth: 22, halign: 'right' }, // Efectivo - Más ancho
+        10: { cellWidth: 22, halign: 'right' }, // Depósito - Más ancho
+        11: { cellWidth: 25, halign: 'right' }, // Total Neto - Más ancho
+        12: { cellWidth: 18, halign: 'center' }, // Estado
       },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
