@@ -314,7 +314,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       startY: 60,
       margin: { left: 10, right: 10 }, // Usar más espacio horizontal
       styles: {
-        fontSize: 9, // Fuente un poco más grande
+        fontSize: 8, // Reducido de 9 a 8 para evitar saltos
         cellPadding: 3, // Más padding para mejor legibilidad
         halign: 'center',
         valign: 'middle',
@@ -324,7 +324,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       headStyles: {
         fillColor: [41, 128, 185],
         textColor: [255, 255, 255],
-        fontSize: 9,
+        fontSize: 8, // Reducido de 9 a 8 para evitar saltos
         fontStyle: 'bold',
         halign: 'center',
       },
