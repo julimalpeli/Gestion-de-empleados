@@ -241,10 +241,10 @@ const EmployeePortal = () => {
       console.log("Download URL:", downloadUrl);
 
       // Crear un elemento <a> temporal para forzar la descarga
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = downloadUrl;
-      link.target = '_blank';
-      link.download = fileName || 'documento.pdf';
+      link.target = "_blank";
+      link.download = fileName || "documento.pdf";
 
       // Agregar al DOM temporalmente
       document.body.appendChild(link);
@@ -256,7 +256,6 @@ const EmployeePortal = () => {
       document.body.removeChild(link);
 
       console.log("✅ Document download initiated successfully");
-
     } catch (error) {
       console.error("❌ Error downloading document:", error);
       alert("Error descargando documento: " + error.message);

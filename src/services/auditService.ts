@@ -94,7 +94,9 @@ class AuditService {
 
         // Handle RLS policy violations gracefully
         if (errorMessage?.includes("row-level security policy")) {
-          console.warn("🔒 RLS policy blocking audit log - run database/fix_audit_log_rls.sql");
+          console.warn(
+            "🔒 RLS policy blocking audit log - run database/fix_audit_log_rls.sql",
+          );
           return {} as AuditLogEntry;
         }
 
@@ -122,7 +124,9 @@ class AuditService {
 
       // Handle RLS policy violations gracefully
       if (errorMessage?.includes("row-level security policy")) {
-        console.warn("🔒 RLS policy blocking audit log - run database/fix_audit_log_rls.sql");
+        console.warn(
+          "🔒 RLS policy blocking audit log - run database/fix_audit_log_rls.sql",
+        );
         return {} as AuditLogEntry;
       }
 
