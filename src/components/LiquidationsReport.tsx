@@ -214,14 +214,15 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
+    // Create PDF in landscape orientation for better table fit
+    const doc = new jsPDF("landscape", "mm", "a4");
 
     // Add title
-    doc.setFontSize(18);
-    doc.text("Reporte de Liquidaciones", 14, 22);
+    doc.setFontSize(16);
+    doc.text("Reporte de Liquidaciones", 20, 20);
 
     // Add period
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     const [year, month] = selectedPeriod.split("-");
     const monthNames = [
       "Enero",
@@ -238,46 +239,29 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       "Diciembre",
     ];
     const monthName = monthNames[parseInt(month) - 1];
-    doc.text(`Período: ${monthName} ${year}`, 14, 32);
+    doc.text(`Período: ${monthName} ${year}`, 20, 28);
 
-    // Add summary
-    doc.text("Resumen:", 14, 45);
-    doc.text(`Total Sueldos Base: ${formatCurrency(totals.baseSalary)}`, 14, 52);
-    doc.text(`Total Presentismo: ${formatCurrency(totals.presentismo)}`, 14, 59);
-    doc.text(`Total Horas Extra: ${formatCurrency(totals.overtimeAmount)}`, 14, 66);
-    doc.text(`Total Bonificaciones: ${formatCurrency(totals.bonusAmount)}`, 14, 73);
-    doc.text(`Total Adelantos: ${formatCurrency(-totals.advances)}`, 14, 80);
-    doc.text(`Total Descuentos: ${formatCurrency(-totals.discounts)}`, 14, 87);
-    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 14, 94);
-    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 14, 101);
+    // Add summary in two columns for landscape
+    doc.text("Resumen:", 20, 40);
+    doc.text(`Total Efectivo: ${formatCurrency(totals.efectivo)}`, 20, 47);
+    doc.text(`Total Depósito: ${formatCurrency(totals.deposito)}`, 20, 54);
+    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 150, 47);
+    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 150, 54);
 
-    // Add table
+    // Simplified table with main columns for better readability
     const tableData = filteredData.map((record) => [
-      record.employeeName,
+      record.employeeName.length > 20 ? record.employeeName.substring(0, 20) + "..." : record.employeeName,
       record.period,
       record.baseDays.toString(),
-      record.holidayDays.toString(),
       formatCurrency(record.baseSalary),
-      formatCurrency(record.presentismo),
+      record.presentismo > 0 ? formatCurrency(record.presentismo) : "-",
       record.overtimeHours > 0 ? `${record.overtimeHours}h` : "-",
-      record.overtimeAmount > 0 ? formatCurrency(record.overtimeAmount) : "-",
       record.bonusAmount > 0 ? formatCurrency(record.bonusAmount) : "-",
-      record.advances > 0 ? formatCurrency(-record.advances) : "-",
-      record.discounts > 0 ? formatCurrency(-record.discounts) : "-",
-      record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-",
       record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
       formatCurrency(record.totalNeto),
-      record.status === "paid"
-        ? "Pagada"
-        : record.status === "processed"
-          ? "Procesada"
-          : record.status === "approved"
-            ? "Aprobada"
-            : record.status === "pending"
-              ? "Pendiente"
-              : "Borrador",
+      record.status === "paid" ? "Pagada" : record.status === "processed" ? "Procesada" : record.status === "approved" ? "Aprobada" : record.status === "pending" ? "Pendiente" : "Borrador",
     ]);
 
     // Add totals row
@@ -285,15 +269,10 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       "TOTALES",
       "",
       "",
-      "",
       formatCurrency(totals.baseSalary),
       formatCurrency(totals.presentismo),
       "",
-      formatCurrency(totals.overtimeAmount),
       formatCurrency(totals.bonusAmount),
-      formatCurrency(-totals.advances),
-      formatCurrency(-totals.discounts),
-      formatCurrency(totals.holidayBonus),
       formatCurrency(totals.aguinaldo),
       formatCurrency(totals.efectivo),
       formatCurrency(totals.deposito),
@@ -306,26 +285,39 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         [
           "Empleado",
           "Período",
-          "D.Trab",
-          "D.Fer",
+          "Días",
           "Sueldo Base",
-          "Present.",
-          "H.E",
-          "M.H.E",
-          "Bonif.",
-          "Adelan.",
-          "Desc.",
-          "Fer.Doble",
-          "Aguinal.",
+          "Presentismo",
+          "H.Extra",
+          "Bonificac.",
+          "Aguinaldo",
           "Efectivo",
           "Depósito",
-          "Total",
+          "Total Neto",
           "Estado",
         ],
       ],
       body: tableData,
-      startY: 110,
-      styles: { fontSize: 6 },
+      startY: 65,
+      styles: {
+        fontSize: 8,
+        cellPadding: 2,
+        halign: 'center',
+      },
+      columnStyles: {
+        0: { cellWidth: 25, halign: 'left' }, // Empleado
+        1: { cellWidth: 18, halign: 'center' }, // Período
+        2: { cellWidth: 12, halign: 'center' }, // Días
+        3: { cellWidth: 20, halign: 'right' }, // Sueldo Base
+        4: { cellWidth: 18, halign: 'right' }, // Presentismo
+        5: { cellWidth: 15, halign: 'center' }, // H.Extra
+        6: { cellWidth: 18, halign: 'right' }, // Bonificaciones
+        7: { cellWidth: 18, halign: 'right' }, // Aguinaldo
+        8: { cellWidth: 20, halign: 'right' }, // Efectivo
+        9: { cellWidth: 20, halign: 'right' }, // Depósito
+        10: { cellWidth: 22, halign: 'right' }, // Total Neto
+        11: { cellWidth: 18, halign: 'center' }, // Estado
+      },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
         // Make totals row bold
