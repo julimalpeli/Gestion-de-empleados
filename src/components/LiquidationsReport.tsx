@@ -275,8 +275,9 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       record.presentismo > 0 ? formatCurrency(record.presentismo) : "-",
       record.overtimeHours > 0 ? `${record.overtimeHours}h` : "-",
       record.bonusAmount > 0 ? formatCurrency(record.bonusAmount) : "-",
-      record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-", // Agregar feriados
-      record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
+      record.advances > 0 ? formatCurrency(-record.advances) : "-", // Adelantos
+      record.discounts > 0 ? formatCurrency(-record.discounts) : "-", // Descuentos
+      record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-", // Feriados
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
       formatCurrency(record.totalNeto),
