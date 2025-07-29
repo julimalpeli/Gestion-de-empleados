@@ -563,6 +563,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       <TableHead className="text-right">Adelantos</TableHead>
                       <TableHead className="text-right">Descuentos</TableHead>
                       <TableHead className="text-right">Fer.Doble</TableHead>
+                      <TableHead className="text-right">Aguinaldo</TableHead>
                       <TableHead className="text-right">Efectivo</TableHead>
                       <TableHead className="text-right">Depósito</TableHead>
                       <TableHead className="text-right">Total Neto</TableHead>
