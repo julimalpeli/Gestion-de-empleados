@@ -77,43 +77,27 @@ export const usePayroll = () => {
       const errorMessage = err instanceof Error ? err.message : String(err);
       console.error("❌ Error loading payroll records:", errorMessage);
 
-      // Detailed error logging
-      if (err && typeof err === "object") {
-        console.error("❌ Full payroll error details:", {
-          message: (err as any).message,
-          code: (err as any).code,
-          details: (err as any).details,
-          hint: (err as any).hint,
-          stack: (err as any).stack,
-          errorType: typeof err,
-          errorConstructor: err.constructor?.name,
-        });
-        console.error("❌ Raw error object:", JSON.stringify(err, null, 2));
-      } else {
-        console.error("❌ Non-object error:", err);
-      }
+      // Immediate fallback activation for any error
+      console.log("🚨 ERROR DETECTED - Activating fallback immediately");
+      console.log("🔄 Switching to offline mode...");
 
-      // Activate fallback immediately for any connectivity error
-      console.log(
-        "🚨 CONNECTIVITY ERROR DETECTED - Activating fallback immediately",
-      );
       try {
         const { getFallbackPayrollData } = await import(
           "@/utils/offlineFallback"
         );
         const fallbackData = getFallbackPayrollData();
         setPayrollRecords(fallbackData);
-        console.log(
-          "✅ Fallback payroll loaded:",
-          fallbackData.length,
-          "records",
-        );
-        console.log("📶 Payroll system now running in offline mode");
-        setError(null); // Clear error since we have fallback data
+        console.log("✅ ✅ FALLBACK ACTIVATED SUCCESSFULLY!");
+        console.log(`📊 Loaded ${fallbackData.length} payroll records from fallback`);
+        console.log("📶 System now running in OFFLINE MODE");
+        console.log("🎯 You can continue working normally with cached data");
+
+        // Clear error since we have working fallback data
+        setError(null);
         return;
       } catch (fallbackError) {
-        console.warn("⚠️ Could not load fallback payroll:", fallbackError);
-        setError("Error loading payroll and fallback failed");
+        console.error("❌ CRITICAL: Fallback failed:", fallbackError);
+        setError("Sistema sin conexión - Por favor recarga la página");
       }
     } finally {
       setLoading(false);
