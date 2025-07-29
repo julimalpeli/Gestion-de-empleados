@@ -53,6 +53,37 @@ BEGIN
         ALTER TABLE audit_log ADD COLUMN changed_by VARCHAR(255);
         RAISE NOTICE 'Added changed_by column';
     END IF;
+
+    -- Add core columns that the audit service expects
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'audit_log' AND column_name = 'table_name') THEN
+        ALTER TABLE audit_log ADD COLUMN table_name VARCHAR(50);
+        RAISE NOTICE 'Added table_name column';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'audit_log' AND column_name = 'record_id') THEN
+        ALTER TABLE audit_log ADD COLUMN record_id VARCHAR(255);
+        RAISE NOTICE 'Added record_id column';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'audit_log' AND column_name = 'action') THEN
+        ALTER TABLE audit_log ADD COLUMN action VARCHAR(50);
+        RAISE NOTICE 'Added action column';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'audit_log' AND column_name = 'old_values') THEN
+        ALTER TABLE audit_log ADD COLUMN old_values JSONB;
+        RAISE NOTICE 'Added old_values column';
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'audit_log' AND column_name = 'new_values') THEN
+        ALTER TABLE audit_log ADD COLUMN new_values JSONB;
+        RAISE NOTICE 'Added new_values column';
+    END IF;
 END $$;
 
 -- Create a trigger to sync entity_type with table_name and entity_id with record_id
