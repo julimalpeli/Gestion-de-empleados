@@ -229,9 +229,36 @@ const EmployeePortal = () => {
 
   const downloadDocument = async (docId, fileName) => {
     try {
-      await documentService.downloadDocument(docId, fileName);
+      console.log("Downloading document:", docId, fileName);
+
+      // Obtener la URL del documento
+      const downloadUrl = await documentService.downloadDocument(docId);
+
+      if (!downloadUrl) {
+        throw new Error("No se pudo obtener la URL del documento");
+      }
+
+      console.log("Download URL:", downloadUrl);
+
+      // Crear un elemento <a> temporal para forzar la descarga
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.target = '_blank';
+      link.download = fileName || 'documento.pdf';
+
+      // Agregar al DOM temporalmente
+      document.body.appendChild(link);
+
+      // Hacer clic automáticamente para iniciar la descarga
+      link.click();
+
+      // Remover el elemento temporal
+      document.body.removeChild(link);
+
+      console.log("✅ Document download initiated successfully");
+
     } catch (error) {
-      console.error("Error downloading document:", error);
+      console.error("❌ Error downloading document:", error);
       alert("Error descargando documento: " + error.message);
     }
   };
