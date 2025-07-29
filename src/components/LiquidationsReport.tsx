@@ -72,17 +72,47 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
   // Filter records by selected period - real data from database
   const reportData = payrollRecords
     .filter((record) => record.period === selectedPeriod)
-    .map((record) => ({
-      id: record.id, // Add unique identifier for React key
-      employeeName: record.employeeName,
-      period: record.period,
-      efectivo: record.informalAmount || 0,
-      deposito: record.whiteAmount || 0,
-      aguinaldo: record.aguinaldo || 0,
-      totalNeto: record.netTotal || 0,
-      hasAguinaldo: (record.aguinaldo || 0) > 0,
-      status: record.status || "draft", // Include real status
-    }));
+    .map((record) => {
+      // Calcular sueldo base (días trabajados * salario diario)
+      const baseDays = record.baseDays || 0;
+      const holidayDays = record.holidayDays || 0;
+      const overtimeHours = record.overtimeHours || 0;
+      const overtimeAmount = record.overtimeAmount || 0;
+      const presentismo = record.presentismoAmount || 0;
+      const bonusAmount = record.bonusAmount || 0;
+      const advances = record.advances || 0;
+      const discounts = record.discounts || 0;
+      const holidayBonus = record.holidayBonus || 0;
+      const aguinaldo = record.aguinaldo || 0;
+
+      // Calcular sueldo base aproximado
+      const baseSalary = (record.netTotal || 0) - presentismo - overtimeAmount - bonusAmount - holidayBonus - aguinaldo + advances + discounts;
+
+      return {
+        id: record.id,
+        employeeName: record.employeeName,
+        period: record.period,
+        // Datos de días y horas
+        baseDays,
+        holidayDays,
+        overtimeHours,
+        // Montos de conceptos
+        baseSalary,
+        presentismo,
+        overtimeAmount,
+        bonusAmount,
+        advances,
+        discounts,
+        holidayBonus,
+        aguinaldo,
+        // Totales por forma de pago
+        efectivo: record.informalAmount || 0,
+        deposito: record.whiteAmount || 0,
+        totalNeto: record.netTotal || 0,
+        hasAguinaldo: aguinaldo > 0,
+        status: record.status || "draft",
+      };
+    });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
@@ -100,12 +130,31 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
 
   const totals = filteredData.reduce(
     (acc, record) => ({
+      baseSalary: acc.baseSalary + record.baseSalary,
+      presentismo: acc.presentismo + record.presentismo,
+      overtimeAmount: acc.overtimeAmount + record.overtimeAmount,
+      bonusAmount: acc.bonusAmount + record.bonusAmount,
+      advances: acc.advances + record.advances,
+      discounts: acc.discounts + record.discounts,
+      holidayBonus: acc.holidayBonus + record.holidayBonus,
+      aguinaldo: acc.aguinaldo + record.aguinaldo,
       efectivo: acc.efectivo + record.efectivo,
       deposito: acc.deposito + record.deposito,
-      aguinaldo: acc.aguinaldo + record.aguinaldo,
       totalNeto: acc.totalNeto + record.totalNeto,
     }),
-    { efectivo: 0, deposito: 0, aguinaldo: 0, totalNeto: 0 },
+    {
+      baseSalary: 0,
+      presentismo: 0,
+      overtimeAmount: 0,
+      bonusAmount: 0,
+      advances: 0,
+      discounts: 0,
+      holidayBonus: 0,
+      aguinaldo: 0,
+      efectivo: 0,
+      deposito: 0,
+      totalNeto: 0
+    },
   );
 
   const exportToCSV = () => {
