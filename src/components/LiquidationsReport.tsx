@@ -179,7 +179,6 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       "Adelantos",
       "Descuentos",
       "Feriado Doble",
-      "Aguinaldo",
       "Efectivo",
       "Depósito",
       "Total Neto",
@@ -201,7 +200,6 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
           -record.advances, // Negativo para mostrar como descuento
           -record.discounts, // Negativo para mostrar como descuento
           record.holidayBonus,
-          record.aguinaldo,
           record.efectivo,
           record.deposito,
           record.totalNeto,
