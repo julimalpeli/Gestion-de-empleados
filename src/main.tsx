@@ -3,6 +3,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { testSupabaseConnection } from "./lib/supabase";
 import "./utils/autoReloadOnError"; // Initialize auto-reload error handler
+import "./utils/emergencyPayrollRecovery"; // Emergency payroll recovery
 
 // Suppress ResizeObserver warnings
 const resizeObserverErrorHandler = (e: ErrorEvent) => {
