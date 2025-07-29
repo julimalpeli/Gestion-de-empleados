@@ -786,10 +786,9 @@ const Payroll = () => {
     const aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod);
 
     // Total neto = todos los conceptos positivos - deducciones
-    // Usar los montos REALES del empleado, no las formas de pago
+    // Usar el salario base proporcional a días trabajados, no el sueldo completo
     const netTotal =
-      realWhiteAmount +
-      realInformalAmount +
+      basePay + // Salario base proporcional a días trabajados
       presentismoAmount +
       overtimePay +
       bonusPay +
