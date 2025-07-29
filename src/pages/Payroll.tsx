@@ -528,8 +528,10 @@ const Payroll = () => {
         `💰 [DEBUG] Setting whiteWage to: ${historicalSalaryData.white_wage} (from ${historicalSalaryData.source})`,
       );
 
-      // Guardar los valores históricos para usar en cálculos de vista previa
-      setHistoricalSalary(historicalSalaryData);
+      // Para visualización, NO usar salario histórico - usar valores actuales del empleado
+      // Esto evita confusión y muestra los cálculos con valores actuales
+      console.log("👁️ [DEBUG] Vista en modo solo lectura - no aplicando salario histórico");
+      setHistoricalSalary(null);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
       debugSetWhiteWage(
