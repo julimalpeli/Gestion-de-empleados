@@ -435,20 +435,20 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Efectivo
+                  Sueldos Base
                 </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {formatCurrency(totals.efectivo)}
+                <div className="text-xl font-bold text-blue-600">
+                  {formatCurrency(totals.baseSalary)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Pagos en efectivo
+                  Salarios básicos
                 </p>
               </CardContent>
             </Card>
@@ -456,16 +456,16 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Depósito
+                  Presentismo
                 </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-blue-600">
-                  {formatCurrency(totals.deposito)}
+                <div className="text-xl font-bold text-green-600">
+                  {formatCurrency(totals.presentismo)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Transferencias bancarias
+                  Asistencia perfecta
                 </p>
               </CardContent>
             </Card>
@@ -473,16 +473,84 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Aguinaldo
+                  Horas Extra
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold text-orange-600">
+                  {formatCurrency(totals.overtimeAmount)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Trabajo extra
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Bonificaciones
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold text-purple-600">
+                  {formatCurrency(totals.bonusAmount)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Premios y bonos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Adelantos
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold text-red-600">
+                  {formatCurrency(-totals.advances)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Anticipos descontados
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Descuentos
+                </CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-xl font-bold text-red-600">
+                  {formatCurrency(-totals.discounts)}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Otros descuentos
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Aguinaldos
                 </CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-purple-600">
+                <div className="text-xl font-bold text-purple-600">
                   {formatCurrency(totals.aguinaldo)}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Sueldo anual complementario
+                  SAC del período
                 </p>
               </CardContent>
             </Card>
@@ -495,10 +563,10 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-xl font-bold">
                   {formatCurrency(totals.totalNeto)}
                 </div>
-                <p className="text-xs text-muted-foreground">Total a pagar</p>
+                <p className="text-xs text-muted-foreground">Total neto a pagar</p>
               </CardContent>
             </Card>
           </div>
