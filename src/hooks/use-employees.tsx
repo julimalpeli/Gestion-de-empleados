@@ -52,17 +52,16 @@ export const useEmployees = () => {
         );
         const fallbackData = getFallbackEmployeesData();
         setEmployees(fallbackData);
-        console.log(
-          "✅ Fallback employees loaded:",
-          fallbackData.length,
-          "employees",
-        );
-        console.log("📶 Employee system now running in offline mode");
-        setError(null); // Clear error since we have fallback data
+        console.log("✅ ✅ EMPLOYEE FALLBACK ACTIVATED!");
+        console.log(`👥 Loaded ${fallbackData.length} employees from fallback`);
+        console.log("📶 Employee system now running in OFFLINE MODE");
+
+        // Clear error since we have working fallback data
+        setError(null);
         return;
       } catch (fallbackError) {
-        console.warn("⚠️ Could not load fallback employees:", fallbackError);
-        setError("Error loading employees and fallback failed");
+        console.error("❌ CRITICAL: Employee fallback failed:", fallbackError);
+        setError("Sistema sin conexión - Por favor recarga la página");
       }
     } finally {
       setLoading(false);
