@@ -689,6 +689,9 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       <TableCell className="text-right text-orange-600">
                         {formatCurrency(totals.holidayBonus)}
                       </TableCell>
+                      <TableCell className="text-right text-purple-600">
+                        {formatCurrency(totals.aguinaldo)}
+                      </TableCell>
                       <TableCell className="text-right text-green-600">
                         {formatCurrency(totals.efectivo)}
                       </TableCell>
