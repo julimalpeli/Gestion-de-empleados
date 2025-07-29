@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LiquidationsReport from "@/components/LiquidationsReport";
+import SimpleLiquidationsReport from "@/components/SimpleLiquidationsReport";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 
@@ -118,6 +119,8 @@ const Reports = () => {
     error: payrollError,
   } = usePayroll();
   const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
+    useState(false);
+  const [isSimpleLiquidationsReportOpen, setIsSimpleLiquidationsReportOpen] =
     useState(false);
 
   const formatCurrency = (amount: number) => {
