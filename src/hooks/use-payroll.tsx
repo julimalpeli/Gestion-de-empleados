@@ -362,6 +362,23 @@ export const usePayroll = () => {
   // Cargar datos al montar el componente
   useEffect(() => {
     fetchPayrollRecords();
+
+    // Listen for emergency fallback activation
+    const handleEmergencyFallback = (event: any) => {
+      if (event.detail?.data) {
+        console.log("🚨 Emergency fallback received!");
+        setPayrollRecords(event.detail.data);
+        setError(null);
+        setLoading(false);
+        console.log("✅ Payroll records restored from emergency fallback");
+      }
+    };
+
+    window.addEventListener('emergency-payroll-fallback', handleEmergencyFallback);
+
+    return () => {
+      window.removeEventListener('emergency-payroll-fallback', handleEmergencyFallback);
+    };
   }, []);
 
   return {
