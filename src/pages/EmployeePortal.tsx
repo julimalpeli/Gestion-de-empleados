@@ -334,11 +334,12 @@ const EmployeePortal = () => {
   // Vacation calculation logging removed to reduce console noise
   const payrollHistory = (payrollRecords || [])
     .filter((record) => record.employeeId === employeeId)
-    .filter((record) =>
-      // Solo mostrar liquidaciones aprobadas o superiores (no draft ni pending)
-      record.status === "approved" ||
-      record.status === "processed" ||
-      record.status === "paid"
+    .filter(
+      (record) =>
+        // Solo mostrar liquidaciones aprobadas o superiores (no draft ni pending)
+        record.status === "approved" ||
+        record.status === "processed" ||
+        record.status === "paid",
     )
     .map((record) => ({
       id: record.id,
