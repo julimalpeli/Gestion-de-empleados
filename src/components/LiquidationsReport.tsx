@@ -242,18 +242,32 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
 
     // Add summary
     doc.text("Resumen:", 14, 45);
-    doc.text(`Total Efectivo: ${formatCurrency(totals.efectivo)}`, 14, 52);
-    doc.text(`Total Depósito: ${formatCurrency(totals.deposito)}`, 14, 59);
-    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 14, 66);
-    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 14, 73);
+    doc.text(`Total Sueldos Base: ${formatCurrency(totals.baseSalary)}`, 14, 52);
+    doc.text(`Total Presentismo: ${formatCurrency(totals.presentismo)}`, 14, 59);
+    doc.text(`Total Horas Extra: ${formatCurrency(totals.overtimeAmount)}`, 14, 66);
+    doc.text(`Total Bonificaciones: ${formatCurrency(totals.bonusAmount)}`, 14, 73);
+    doc.text(`Total Adelantos: ${formatCurrency(-totals.advances)}`, 14, 80);
+    doc.text(`Total Descuentos: ${formatCurrency(-totals.discounts)}`, 14, 87);
+    doc.text(`Total Aguinaldo: ${formatCurrency(totals.aguinaldo)}`, 14, 94);
+    doc.text(`Total General: ${formatCurrency(totals.totalNeto)}`, 14, 101);
 
     // Add table
     const tableData = filteredData.map((record) => [
       record.employeeName,
       record.period,
+      record.baseDays.toString(),
+      record.holidayDays.toString(),
+      formatCurrency(record.baseSalary),
+      formatCurrency(record.presentismo),
+      record.overtimeHours > 0 ? `${record.overtimeHours}h` : "-",
+      record.overtimeAmount > 0 ? formatCurrency(record.overtimeAmount) : "-",
+      record.bonusAmount > 0 ? formatCurrency(record.bonusAmount) : "-",
+      record.advances > 0 ? formatCurrency(-record.advances) : "-",
+      record.discounts > 0 ? formatCurrency(-record.discounts) : "-",
+      record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-",
+      record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
-      record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
       formatCurrency(record.totalNeto),
       record.status === "paid"
         ? "Pagada"
@@ -270,9 +284,19 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
     tableData.push([
       "TOTALES",
       "",
+      "",
+      "",
+      formatCurrency(totals.baseSalary),
+      formatCurrency(totals.presentismo),
+      "",
+      formatCurrency(totals.overtimeAmount),
+      formatCurrency(totals.bonusAmount),
+      formatCurrency(-totals.advances),
+      formatCurrency(-totals.discounts),
+      formatCurrency(totals.holidayBonus),
+      formatCurrency(totals.aguinaldo),
       formatCurrency(totals.efectivo),
       formatCurrency(totals.deposito),
-      formatCurrency(totals.aguinaldo),
       formatCurrency(totals.totalNeto),
       "",
     ]);
@@ -282,16 +306,26 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         [
           "Empleado",
           "Período",
+          "D.Trab",
+          "D.Fer",
+          "Sueldo Base",
+          "Present.",
+          "H.E",
+          "M.H.E",
+          "Bonif.",
+          "Adelan.",
+          "Desc.",
+          "Fer.Doble",
+          "Aguinal.",
           "Efectivo",
           "Depósito",
-          "Aguinaldo",
-          "Total Neto",
+          "Total",
           "Estado",
         ],
       ],
       body: tableData,
-      startY: 85,
-      styles: { fontSize: 8 },
+      startY: 110,
+      styles: { fontSize: 6 },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
         // Make totals row bold
