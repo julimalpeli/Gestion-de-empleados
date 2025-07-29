@@ -74,30 +74,41 @@ export const usePayroll = () => {
 
       setPayrollRecords(mappedRecords);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Error loading payroll records:", errorMessage);
+      console.error("❌ PAYROLL ERROR DETECTED:", err);
 
-      // Immediate fallback activation for any error
-      console.log("🚨 ERROR DETECTED - Activating fallback immediately");
-      console.log("🔄 Switching to offline mode...");
+      // IMMEDIATE FALLBACK - NO QUESTIONS ASKED
+      console.log("🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK 🚨 🚨 🚨");
+      console.log("🔄 Loading cached payroll data...");
 
       try {
-        const { getFallbackPayrollData } = await import(
-          "@/utils/offlineFallback"
-        );
+        // Import and use fallback data immediately
+        const { getFallbackPayrollData } = await import("@/utils/offlineFallback");
         const fallbackData = getFallbackPayrollData();
-        setPayrollRecords(fallbackData);
-        console.log("✅ ✅ FALLBACK ACTIVATED SUCCESSFULLY!");
-        console.log(`📊 Loaded ${fallbackData.length} payroll records from fallback`);
-        console.log("📶 System now running in OFFLINE MODE");
-        console.log("🎯 You can continue working normally with cached data");
 
-        // Clear error since we have working fallback data
-        setError(null);
-        return;
+        if (fallbackData && fallbackData.length > 0) {
+          setPayrollRecords(fallbackData);
+          console.log("🎉 🎉 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
+          console.log(`✅ ${fallbackData.length} payroll records loaded`);
+          console.log("📶 OFFLINE MODE ACTIVE - You can work normally!");
+
+          // Clear any error state
+          setError(null);
+
+          // Show success in UI
+          if (window.location.pathname.includes('liquidaciones') || window.location.pathname.includes('payroll')) {
+            setTimeout(() => {
+              console.log("💡 TIP: All payroll features available in offline mode");
+            }, 1000);
+          }
+
+          return;
+        } else {
+          throw new Error("Fallback data is empty");
+        }
       } catch (fallbackError) {
-        console.error("❌ CRITICAL: Fallback failed:", fallbackError);
-        setError("Sistema sin conexión - Por favor recarga la página");
+        console.error("💥 FALLBACK FAILED:", fallbackError);
+        setError("Error crítico: No se pueden cargar las liquidaciones");
+        setPayrollRecords([]); // Set empty array as last resort
       }
     } finally {
       setLoading(false);
