@@ -586,9 +586,19 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                     <TableRow>
                       <TableHead>Empleado</TableHead>
                       <TableHead>Período</TableHead>
+                      <TableHead className="text-center">D.Trab</TableHead>
+                      <TableHead className="text-center">D.Fer</TableHead>
+                      <TableHead className="text-right">Sueldo Base</TableHead>
+                      <TableHead className="text-right">Presentismo</TableHead>
+                      <TableHead className="text-center">H.Extra</TableHead>
+                      <TableHead className="text-right">Monto H.E</TableHead>
+                      <TableHead className="text-right">Bonificac.</TableHead>
+                      <TableHead className="text-right">Adelantos</TableHead>
+                      <TableHead className="text-right">Descuentos</TableHead>
+                      <TableHead className="text-right">Fer.Doble</TableHead>
+                      <TableHead className="text-right">Aguinaldo</TableHead>
                       <TableHead className="text-right">Efectivo</TableHead>
                       <TableHead className="text-right">Depósito</TableHead>
-                      <TableHead className="text-right">Aguinaldo</TableHead>
                       <TableHead className="text-right">Total Neto</TableHead>
                       <TableHead>Estado</TableHead>
                     </TableRow>
@@ -600,11 +610,35 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                           {record.employeeName}
                         </TableCell>
                         <TableCell>{record.period}</TableCell>
-                        <TableCell className="text-right font-medium text-green-600">
-                          {formatCurrency(record.efectivo)}
+                        <TableCell className="text-center">
+                          {record.baseDays}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {record.holidayDays || "-"}
                         </TableCell>
                         <TableCell className="text-right font-medium text-blue-600">
-                          {formatCurrency(record.deposito)}
+                          {formatCurrency(record.baseSalary)}
+                        </TableCell>
+                        <TableCell className="text-right font-medium text-green-600">
+                          {record.presentismo > 0 ? formatCurrency(record.presentismo) : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {record.overtimeHours > 0 ? `${record.overtimeHours}h` : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-orange-600">
+                          {record.overtimeAmount > 0 ? formatCurrency(record.overtimeAmount) : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-purple-600">
+                          {record.bonusAmount > 0 ? formatCurrency(record.bonusAmount) : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-red-600">
+                          {record.advances > 0 ? formatCurrency(-record.advances) : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-red-600">
+                          {record.discounts > 0 ? formatCurrency(-record.discounts) : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-orange-600">
+                          {record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-"}
                         </TableCell>
                         <TableCell className="text-right">
                           {record.aguinaldo > 0 ? (
@@ -614,6 +648,12 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                           ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
+                        </TableCell>
+                        <TableCell className="text-right font-medium text-green-600">
+                          {formatCurrency(record.efectivo)}
+                        </TableCell>
+                        <TableCell className="text-right font-medium text-blue-600">
+                          {formatCurrency(record.deposito)}
                         </TableCell>
                         <TableCell className="text-right font-bold">
                           {formatCurrency(record.totalNeto)}
@@ -649,15 +689,37 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
 
                     {/* Totals Row */}
                     <TableRow className="border-t-2 font-bold bg-muted/50">
-                      <TableCell colSpan={2}>TOTALES</TableCell>
+                      <TableCell colSpan={4}>TOTALES</TableCell>
+                      <TableCell className="text-right text-blue-600">
+                        {formatCurrency(totals.baseSalary)}
+                      </TableCell>
+                      <TableCell className="text-right text-green-600">
+                        {formatCurrency(totals.presentismo)}
+                      </TableCell>
+                      <TableCell></TableCell>
+                      <TableCell className="text-right text-orange-600">
+                        {formatCurrency(totals.overtimeAmount)}
+                      </TableCell>
+                      <TableCell className="text-right text-purple-600">
+                        {formatCurrency(totals.bonusAmount)}
+                      </TableCell>
+                      <TableCell className="text-right text-red-600">
+                        {formatCurrency(-totals.advances)}
+                      </TableCell>
+                      <TableCell className="text-right text-red-600">
+                        {formatCurrency(-totals.discounts)}
+                      </TableCell>
+                      <TableCell className="text-right text-orange-600">
+                        {formatCurrency(totals.holidayBonus)}
+                      </TableCell>
+                      <TableCell className="text-right text-purple-600">
+                        {formatCurrency(totals.aguinaldo)}
+                      </TableCell>
                       <TableCell className="text-right text-green-600">
                         {formatCurrency(totals.efectivo)}
                       </TableCell>
                       <TableCell className="text-right text-blue-600">
                         {formatCurrency(totals.deposito)}
-                      </TableCell>
-                      <TableCell className="text-right text-purple-600">
-                        {formatCurrency(totals.aguinaldo)}
                       </TableCell>
                       <TableCell className="text-right">
                         {formatCurrency(totals.totalNeto)}
