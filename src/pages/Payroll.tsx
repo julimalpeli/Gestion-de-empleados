@@ -620,8 +620,8 @@ const Payroll = () => {
         overtimeHours: overtimeEnabled ? parseFloat(overtimeHours) || 0 : 0,
         advances: parseFloat(advances) || 0,
         discounts: parseFloat(discounts) || 0,
-        whiteAmount: calculation.realWhiteAmount || 0, // Guardar monto real en blanco
-        informalAmount: calculation.realInformalAmount || 0, // Guardar monto real informal
+        whiteAmount: calculation.whiteAmount || 0, // Guardar monto del depósito (valor ingresado por usuario)
+        informalAmount: calculation.informalAmount || 0, // Guardar monto del efectivo (calculado)
         bonusAmount: parseFloat(bonusAmount) || 0,
         presentismoAmount: calculation.presentismoAmount || 0,
         aguinaldo: calculation.aguinaldo || 0,
