@@ -4,6 +4,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import ForcePasswordChange from "@/components/ForcePasswordChange";
+import { useState, useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Wifi, WifiOff } from "lucide-react";
 
 // Disabled automatic auth fix scripts to prevent fetch errors
 // Use manual methods in Gestión de Usuarios instead
