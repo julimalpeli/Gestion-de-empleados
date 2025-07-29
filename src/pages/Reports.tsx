@@ -383,10 +383,12 @@ const Reports = () => {
               </div>
               <div className="mt-4 space-y-2">
                 <p className="text-center text-muted-foreground text-sm">
-                  <strong>Simple:</strong> Efectivo, depósito, aguinaldo y total neto
+                  <strong>Simple:</strong> Efectivo, depósito, aguinaldo y total
+                  neto
                 </p>
                 <p className="text-center text-muted-foreground text-sm">
-                  <strong>Detallado:</strong> Todos los conceptos, días, bonificaciones, etc.
+                  <strong>Detallado:</strong> Todos los conceptos, días,
+                  bonificaciones, etc.
                 </p>
               </div>
             </CardContent>

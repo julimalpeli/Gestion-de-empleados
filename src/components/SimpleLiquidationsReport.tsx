@@ -52,7 +52,10 @@ interface SimpleLiquidationsReportProps {
   onClose: () => void;
 }
 
-const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportProps) => {
+const SimpleLiquidationsReport = ({
+  isOpen,
+  onClose,
+}: SimpleLiquidationsReportProps) => {
   const { payrollRecords } = usePayroll();
 
   // Get unique periods from real payroll data
@@ -155,8 +158,18 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
     doc.setFont("helvetica", "normal");
     const [year, month] = selectedPeriod.split("-");
     const monthNames = [
-      "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-      "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
     ];
     const monthName = monthNames[parseInt(month) - 1];
     doc.text(`Período: ${monthName} ${year}`, 15, 28);
@@ -165,7 +178,7 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.text("Resumen:", 15, 38);
-    
+
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text(`Total Efectivo: ${formatCurrency(totals.efectivo)}`, 15, 45);
@@ -181,7 +194,15 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
       formatCurrency(record.deposito),
       record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
       formatCurrency(record.totalNeto),
-      record.status === "paid" ? "Pagada" : record.status === "processed" ? "Procesada" : record.status === "approved" ? "Aprobada" : record.status === "pending" ? "Pendiente" : "Borrador",
+      record.status === "paid"
+        ? "Pagada"
+        : record.status === "processed"
+          ? "Procesada"
+          : record.status === "approved"
+            ? "Aprobada"
+            : record.status === "pending"
+              ? "Pendiente"
+              : "Borrador",
     ]);
 
     // Add totals row
@@ -196,31 +217,41 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
     ]);
 
     autoTable(doc, {
-      head: [["Empleado", "Período", "Efectivo", "Depósito", "Aguinaldo", "Total Neto", "Estado"]],
+      head: [
+        [
+          "Empleado",
+          "Período",
+          "Efectivo",
+          "Depósito",
+          "Aguinaldo",
+          "Total Neto",
+          "Estado",
+        ],
+      ],
       body: tableData,
       startY: 60,
       margin: { left: 15, right: 15 },
-      styles: { 
+      styles: {
         fontSize: 9,
         cellPadding: 3,
-        halign: 'center',
-        font: 'helvetica',
+        halign: "center",
+        font: "helvetica",
       },
       headStyles: {
         fillColor: [41, 128, 185],
         textColor: [255, 255, 255],
         fontSize: 9,
-        fontStyle: 'bold',
-        halign: 'center',
+        fontStyle: "bold",
+        halign: "center",
       },
       columnStyles: {
-        0: { cellWidth: 50, halign: 'left' }, // Empleado
-        1: { cellWidth: 25, halign: 'center' }, // Período  
-        2: { cellWidth: 35, halign: 'right' }, // Efectivo
-        3: { cellWidth: 35, halign: 'right' }, // Depósito
-        4: { cellWidth: 35, halign: 'right' }, // Aguinaldo
-        5: { cellWidth: 40, halign: 'right' }, // Total Neto
-        6: { cellWidth: 25, halign: 'center' }, // Estado
+        0: { cellWidth: 50, halign: "left" }, // Empleado
+        1: { cellWidth: 25, halign: "center" }, // Período
+        2: { cellWidth: 35, halign: "right" }, // Efectivo
+        3: { cellWidth: 35, halign: "right" }, // Depósito
+        4: { cellWidth: 35, halign: "right" }, // Aguinaldo
+        5: { cellWidth: 40, halign: "right" }, // Total Neto
+        6: { cellWidth: 25, halign: "center" }, // Estado
       },
       didParseCell: function (data: any) {
         if (data.row.index === tableData.length - 1) {
@@ -242,7 +273,8 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
             Reporte Simple de Liquidaciones
           </DialogTitle>
           <DialogDescription>
-            Reporte básico con montos principales (efectivo, depósito y aguinaldos)
+            Reporte básico con montos principales (efectivo, depósito y
+            aguinaldos)
           </DialogDescription>
         </DialogHeader>
 
@@ -260,8 +292,18 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
                     availablePeriods.map((period) => {
                       const [year, month] = period.split("-");
                       const monthNames = [
-                        "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                        "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre",
                       ];
                       const monthName = monthNames[parseInt(month) - 1];
                       return (
@@ -288,7 +330,9 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
                 <SelectContent>
                   <SelectItem value="all">Todas las liquidaciones</SelectItem>
                   <SelectItem value="with-aguinaldo">Con aguinaldo</SelectItem>
-                  <SelectItem value="without-aguinaldo">Sin aguinaldo</SelectItem>
+                  <SelectItem value="without-aguinaldo">
+                    Sin aguinaldo
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -319,46 +363,60 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
           <div className="grid gap-4 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Efectivo</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Efectivo
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
                   {formatCurrency(totals.efectivo)}
                 </div>
-                <p className="text-xs text-muted-foreground">Pagos en efectivo</p>
+                <p className="text-xs text-muted-foreground">
+                  Pagos en efectivo
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Depósito</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Depósito
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600">
                   {formatCurrency(totals.deposito)}
                 </div>
-                <p className="text-xs text-muted-foreground">Transferencias bancarias</p>
+                <p className="text-xs text-muted-foreground">
+                  Transferencias bancarias
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Aguinaldo</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Aguinaldo
+                </CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-purple-600">
                   {formatCurrency(totals.aguinaldo)}
                 </div>
-                <p className="text-xs text-muted-foreground">Sueldo anual complementario</p>
+                <p className="text-xs text-muted-foreground">
+                  Sueldo anual complementario
+                </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total General</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total General
+                </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -374,7 +432,9 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
           <Card>
             <CardHeader>
               <CardTitle>Liquidaciones por Empleado</CardTitle>
-              <CardDescription>Vista simplificada con conceptos principales</CardDescription>
+              <CardDescription>
+                Vista simplificada con conceptos principales
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -393,7 +453,9 @@ const SimpleLiquidationsReport = ({ isOpen, onClose }: SimpleLiquidationsReportP
                   <TableBody>
                     {filteredData.map((record) => (
                       <TableRow key={record.id}>
-                        <TableCell className="font-medium">{record.employeeName}</TableCell>
+                        <TableCell className="font-medium">
+                          {record.employeeName}
+                        </TableCell>
                         <TableCell>{record.period}</TableCell>
                         <TableCell className="text-right font-medium text-green-600">
                           {formatCurrency(record.efectivo)}

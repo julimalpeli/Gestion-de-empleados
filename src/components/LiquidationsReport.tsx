@@ -86,7 +86,15 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       const aguinaldo = record.aguinaldo || 0;
 
       // Calcular sueldo base aproximado
-      const baseSalary = (record.netTotal || 0) - presentismo - overtimeAmount - bonusAmount - holidayBonus - aguinaldo + advances + discounts;
+      const baseSalary =
+        (record.netTotal || 0) -
+        presentismo -
+        overtimeAmount -
+        bonusAmount -
+        holidayBonus -
+        aguinaldo +
+        advances +
+        discounts;
 
       return {
         id: record.id,
@@ -153,7 +161,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       aguinaldo: 0,
       efectivo: 0,
       deposito: 0,
-      totalNeto: 0
+      totalNeto: 0,
     },
   );
 
@@ -272,7 +280,15 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
       formatCurrency(record.totalNeto),
-      record.status === "paid" ? "Pagada" : record.status === "processed" ? "Procesada" : record.status === "approved" ? "Aprobada" : record.status === "pending" ? "Pendiente" : "Borrador",
+      record.status === "paid"
+        ? "Pagada"
+        : record.status === "processed"
+          ? "Procesada"
+          : record.status === "approved"
+            ? "Aprobada"
+            : record.status === "pending"
+              ? "Pendiente"
+              : "Borrador",
     ]);
 
     // Add totals row
@@ -316,32 +332,32 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       styles: {
         fontSize: 8, // Reducido de 9 a 8 para evitar saltos
         cellPadding: 3, // Más padding para mejor legibilidad
-        halign: 'center',
-        valign: 'middle',
+        halign: "center",
+        valign: "middle",
         lineWidth: 0.1,
-        font: 'helvetica',
+        font: "helvetica",
       },
       headStyles: {
         fillColor: [41, 128, 185],
         textColor: [255, 255, 255],
         fontSize: 8, // Reducido de 9 a 8 para evitar saltos
-        fontStyle: 'bold',
-        halign: 'center',
+        fontStyle: "bold",
+        halign: "center",
       },
       columnStyles: {
-        0: { cellWidth: 38, halign: 'left' }, // Empleado
-        1: { cellWidth: 17, halign: 'center' }, // Período
-        2: { cellWidth: 11, halign: 'center' }, // Días
-        3: { cellWidth: 25, halign: 'right' }, // Sueldo Base - Más ancho para números grandes
-        4: { cellWidth: 22, halign: 'right' }, // Presentismo - Más ancho
-        5: { cellWidth: 14, halign: 'center' }, // H.Extra
-        6: { cellWidth: 22, halign: 'right' }, // Bonificaciones - Más ancho
-        7: { cellWidth: 20, halign: 'right' }, // Feriados - Más ancho
-        8: { cellWidth: 22, halign: 'right' }, // Aguinaldo - Más ancho
-        9: { cellWidth: 25, halign: 'right' }, // Efectivo - Más ancho para números grandes
-        10: { cellWidth: 25, halign: 'right' }, // Depósito - Más ancho para números grandes
-        11: { cellWidth: 28, halign: 'right' }, // Total Neto - El más ancho para totales
-        12: { cellWidth: 17, halign: 'center' }, // Estado
+        0: { cellWidth: 38, halign: "left" }, // Empleado
+        1: { cellWidth: 17, halign: "center" }, // Período
+        2: { cellWidth: 11, halign: "center" }, // Días
+        3: { cellWidth: 25, halign: "right" }, // Sueldo Base - Más ancho para números grandes
+        4: { cellWidth: 22, halign: "right" }, // Presentismo - Más ancho
+        5: { cellWidth: 14, halign: "center" }, // H.Extra
+        6: { cellWidth: 22, halign: "right" }, // Bonificaciones - Más ancho
+        7: { cellWidth: 20, halign: "right" }, // Feriados - Más ancho
+        8: { cellWidth: 22, halign: "right" }, // Aguinaldo - Más ancho
+        9: { cellWidth: 25, halign: "right" }, // Efectivo - Más ancho para números grandes
+        10: { cellWidth: 25, halign: "right" }, // Depósito - Más ancho para números grandes
+        11: { cellWidth: 28, halign: "right" }, // Total Neto - El más ancho para totales
+        12: { cellWidth: 17, halign: "center" }, // Estado
       },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
@@ -569,25 +585,39 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                           {formatCurrency(record.baseSalary)}
                         </TableCell>
                         <TableCell className="text-right font-medium text-green-600">
-                          {record.presentismo > 0 ? formatCurrency(record.presentismo) : "-"}
+                          {record.presentismo > 0
+                            ? formatCurrency(record.presentismo)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-center">
-                          {record.overtimeHours > 0 ? `${record.overtimeHours}h` : "-"}
+                          {record.overtimeHours > 0
+                            ? `${record.overtimeHours}h`
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right text-orange-600">
-                          {record.overtimeAmount > 0 ? formatCurrency(record.overtimeAmount) : "-"}
+                          {record.overtimeAmount > 0
+                            ? formatCurrency(record.overtimeAmount)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right text-purple-600">
-                          {record.bonusAmount > 0 ? formatCurrency(record.bonusAmount) : "-"}
+                          {record.bonusAmount > 0
+                            ? formatCurrency(record.bonusAmount)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right text-red-600">
-                          {record.advances > 0 ? formatCurrency(-record.advances) : "-"}
+                          {record.advances > 0
+                            ? formatCurrency(-record.advances)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right text-red-600">
-                          {record.discounts > 0 ? formatCurrency(-record.discounts) : "-"}
+                          {record.discounts > 0
+                            ? formatCurrency(-record.discounts)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right text-orange-600">
-                          {record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-"}
+                          {record.holidayBonus > 0
+                            ? formatCurrency(record.holidayBonus)
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right">
                           {record.aguinaldo > 0 ? (
