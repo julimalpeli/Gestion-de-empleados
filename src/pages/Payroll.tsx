@@ -563,21 +563,32 @@ const Payroll = () => {
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
 
-    // Obtener el sueldo histórico correcto para el período de la liquidación
+    // Obtener el sueldo histórico solo para períodos pasados, no para el período actual
+    const now = new Date();
+    const currentPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+    const isCurrentPeriod = record.period === currentPeriod;
+
     try {
-      const historicalSalaryData =
-        await salaryHistoryService.getSalaryForPeriod(
-          record.employeeId.toString(),
-          record.period,
+      if (isCurrentPeriod) {
+        // Para el período actual, usar valores actuales del empleado
+        console.log(`🔍 Editing current period ${record.period} - using current employee values`);
+        setHistoricalSalary(null);
+      } else {
+        // Solo para períodos pasados, usar valores históricos
+        const historicalSalaryData =
+          await salaryHistoryService.getSalaryForPeriod(
+            record.employeeId.toString(),
+            record.period,
+          );
+
+        console.log(
+          `🔍 Historical salary for past period ${record.period}:`,
+          historicalSalaryData,
         );
 
-      console.log(
-        `🔍 Historical salary for period ${record.period}:`,
-        historicalSalaryData,
-      );
-
-      // Guardar los valores históricos para usar en cálculos
-      setHistoricalSalary(historicalSalaryData);
+        // Guardar los valores históricos para usar en cálculos
+        setHistoricalSalary(historicalSalaryData);
+      }
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
       debugSetWhiteWage(
