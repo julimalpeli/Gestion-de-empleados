@@ -659,8 +659,43 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Reset password
   const resetPassword = async (email: string) => {
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) throw error;
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+      if (error) {
+        // Handle specific rate limit error
+        if (error.message.includes('rate limit') || error.message.includes('email rate limit exceeded')) {
+          throw new Error(
+            `Límite de emails excedido. \n\n` +
+            `Solución manual:\n` +
+            `1. Ve al dashboard de Supabase\n` +
+            `2. Authentication > Users\n` +
+            `3. Busca el usuario: ${email}\n` +
+            `4. Actualiza la contraseña manualmente\n\n` +
+            `O usa el método SQL:\n` +
+            `UPDATE auth.users SET encrypted_password = crypt('nueva_password', gen_salt('bf')) WHERE email = '${email}';`
+          );
+        }
+
+        // Handle other email errors (like SMTP not configured)
+        if (error.message.includes('SMTP') || error.message.includes('email')) {
+          throw new Error(
+            `Servicio de email no configurado.\n\n` +
+            `Para resetear contraseñas necesitas:\n` +
+            `1. Configurar SMTP en Supabase (recomendado)\n` +
+            `2. O usar el método SQL manual\n\n` +
+            `Contacta al administrador para configurar el email.`
+          );
+        }
+
+        throw error;
+      }
+
+      console.log("✅ Reset password email sent successfully");
+    } catch (error) {
+      console.error("Error sending reset email:", error);
+      throw error;
+    }
   };
 
   // Export security logs
