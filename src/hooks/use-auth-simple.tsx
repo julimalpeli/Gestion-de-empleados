@@ -435,42 +435,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // Special bypass for manager user - temporary fix for auth issues
-      if (email.trim() === "gerente@cadizbar.com" && password === "cadiz57") {
-        console.log("🔓 Manager login detected - using bypass");
 
-        // Create manager user directly
-        const managerUser: User = {
-          id: "manager-emergency-id",
-          username: "gerente",
-          name: "Gerente",
-          role: "manager",
-          email: email.trim(),
-          employeeId: undefined,
-          permissions: ["employees", "payroll", "reports", "documents"],
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-        };
-
-        setUser(managerUser);
-        // Persist manager bypass in localStorage
-        localStorage.setItem("manager-bypass", JSON.stringify(managerUser));
-
-        // Update last login for manager
-        try {
-          await supabase
-            .from("users")
-            .update({ last_login: new Date().toISOString() })
-            .eq("email", email.trim());
-          console.log("✅ Last login updated for manager");
-        } catch (updateError) {
-          console.warn("⚠️ Could not update manager last login:", updateError);
-        }
-
-        console.log("✅ Manager user created with bypass");
-        return;
-      }
 
       // For non-admin users, check if they exist in database first
       console.log("🔍 Checking user in database...");
