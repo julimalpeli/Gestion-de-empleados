@@ -308,7 +308,38 @@ export const useUsers = () => {
     }
   };
 
-  // Blanquear contraseña (resetear al DNI)
+  // Función para crear usuario en Supabase Auth si no existe
+  const ensureAuthUserExists = async (email: string, password: string) => {
+    try {
+      // Intentar crear el usuario en Supabase Auth usando signUp
+      console.log(`🔄 Creating auth user for: ${email}`);
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: undefined, // No enviar email de confirmación
+        }
+      });
+
+      if (error) {
+        // Si el usuario ya existe, esto es normal
+        if (error.message.includes('already exists') || error.message.includes('registered')) {
+          console.log("✅ Auth user already exists");
+          return { exists: true, created: false };
+        }
+        throw error;
+      }
+
+      console.log("✅ Auth user created successfully");
+      return { exists: true, created: true, authUser: data.user };
+    } catch (error) {
+      console.error("❌ Error creating auth user:", error);
+      return { exists: false, created: false, error };
+    }
+  };
+
+  // Blanquear contraseña (resetear al DNI) - método integral
   const resetPassword = async (userId: string, newPassword: string) => {
     try {
       console.log(
@@ -318,7 +349,7 @@ export const useUsers = () => {
       // Primero obtener los datos del usuario para el email
       const { data: userData, error: fetchError } = await supabase
         .from("users")
-        .select("email, username")
+        .select("email, username, name")
         .eq("id", userId)
         .single();
 
@@ -328,42 +359,67 @@ export const useUsers = () => {
 
       console.log(`📧 User email: ${userData.email}`);
 
-      // Usar email reset method (el único método disponible sin admin API)
-      console.log("🔄 Sending password reset email...");
+      // Paso 1: Asegurar que el usuario existe en Supabase Auth
+      const authResult = await ensureAuthUserExists(userData.email, newPassword);
 
-      const { error: emailError } = await supabase.auth.resetPasswordForEmail(
-        userData.email,
-        {
-          redirectTo: `${window.location.origin}/reset-password`,
+      if (!authResult.exists) {
+        console.error("❌ Could not create auth user:", authResult.error);
+        throw new Error("No se pudo crear el usuario en el sistema de autenticación. Contacte al administrador.");
+      }
+
+      if (authResult.created) {
+        console.log("🆕 New auth user created, password is already set");
+
+        // Marcar en la base de datos que necesita cambiar contraseña
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({
+            needs_password_change: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          console.warn("⚠️ Could not update needs_password_change flag:", updateError);
         }
-      );
 
-      if (emailError) {
-        console.error("❌ Email reset error:", emailError);
-        throw new Error(`No se pudo enviar el email de reset: ${emailError.message}\n\nVerifica que el servicio de email esté configurado en Supabase.`);
+        alert(`Usuario creado en el sistema de autenticación.\n\n` +
+              `Email: ${userData.email}\n` +
+              `Contraseña: ${newPassword}\n\n` +
+              `El usuario ya puede hacer login con estas credenciales.`);
+      } else {
+        // Usuario ya existía, usar reset por email
+        console.log("🔄 Auth user exists, sending password reset email...");
+
+        const { error: emailError } = await supabase.auth.resetPasswordForEmail(
+          userData.email,
+          {
+            redirectTo: `${window.location.origin}/reset-password`,
+          }
+        );
+
+        if (emailError) {
+          console.error("❌ Email reset error:", emailError);
+          throw new Error(`No se pudo enviar el email de reset: ${emailError.message}`);
+        }
+
+        // Marcar en la base de datos que necesita cambiar contraseña
+        const { error: updateError } = await supabase
+          .from("users")
+          .update({
+            needs_password_change: true,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", userId);
+
+        if (updateError) {
+          console.warn("⚠️ Could not update needs_password_change flag:", updateError);
+        }
+
+        alert(`Email de reset enviado a: ${userData.email}\n\n` +
+              `El usuario recibirá un enlace para cambiar su contraseña.\n` +
+              `Contraseña sugerida: ${newPassword}`);
       }
-
-      // Solo marcar en la base de datos que necesita cambiar contraseña (sin tocar password_hash)
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({
-          needs_password_change: true,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId);
-
-      if (updateError) {
-        console.warn("⚠️ Could not update needs_password_change flag:", updateError);
-      }
-
-      console.log("✅ Password reset email sent successfully");
-
-      // Mostrar información al administrador
-      alert(`Email de reset enviado a: ${userData.email}\n\n` +
-            `El usuario recibirá un enlace para cambiar su contraseña.\n` +
-            `Contraseña sugerida: ${newPassword}\n\n` +
-            `Nota: El usuario puede elegir cualquier contraseña nueva.`);
-
 
       await fetchUsers();
     } catch (err) {
