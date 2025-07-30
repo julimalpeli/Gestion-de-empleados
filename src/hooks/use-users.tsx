@@ -348,7 +348,6 @@ export const useUsers = () => {
         .update({
           password_hash: passwordHash,
           needs_password_change: true,
-          password_reset_token: newPassword, // Guardar contraseña temporal
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
