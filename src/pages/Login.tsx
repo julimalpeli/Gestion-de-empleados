@@ -133,8 +133,9 @@ const Login = () => {
       await login(email, password);
 
       console.log("✅ Login successful");
-      // Reset failed attempts on successful login
+      // Reset failed attempts and clear error on successful login
       setFailedAttempts(0);
+      setError(""); // Clear any previous error messages
       localStorage.removeItem("loginBlock");
 
       // Navigation will be handled by the auth state change
