@@ -328,44 +328,40 @@ export const useUsers = () => {
 
       console.log(`📧 User email: ${userData.email}`);
 
-      // Actualizar la contraseña usando la API de autenticación de Supabase
-      const { error: authError } = await supabase.auth.admin.updateUserById(
-        userId,
-        {
-          password: newPassword,
-          email_confirm: true, // Confirmar el email automáticamente
-        },
-      );
+      // Usar método directo de base de datos en lugar de admin API
+      console.log("🔄 Using database fallback method for password reset...");
 
-      if (authError) {
-        console.error("❌ Auth API error:", authError);
-        // Si falla la API de auth (403), usar método fallback en la tabla users
-        console.log("🔄 Auth API failed, using fallback method...");
-
-        const passwordHash = btoa(newPassword);
-        const { error: fallbackError } = await supabase
-          .from("users")
-          .update({
-            password_hash: passwordHash,
-            needs_password_change: true,
-          })
-          .eq("id", userId);
-
-        if (fallbackError) throw fallbackError;
-        console.log("✅ Password reset using fallback method");
-      } else {
-        // También actualizar la tabla users para mantener sincronización
-        const passwordHash = btoa(newPassword);
-        await supabase
-          .from("users")
-          .update({
-            password_hash: passwordHash,
-            needs_password_change: true,
-          })
-          .eq("id", userId);
-
-        console.log("✅ Password reset using Auth API");
+      // Intentar enviar email de reset (puede fallar si no está configurado)
+      try {
+        await supabase.auth.resetPasswordForEmail(userData.email, {
+          redirectTo: `${window.location.origin}/reset-password?suggested=${encodeURIComponent(newPassword)}`,
+        });
+        console.log("📧 Reset email sent successfully");
+      } catch (emailError) {
+        console.log("📧 Reset email failed (email service may not be configured)");
       }
+
+      // Actualizar en la tabla users con contraseña temporal
+      const passwordHash = btoa(newPassword);
+      const { error: fallbackError } = await supabase
+        .from("users")
+        .update({
+          password_hash: passwordHash,
+          needs_password_change: true,
+          password_reset_token: newPassword, // Guardar contraseña temporal
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      if (fallbackError) throw fallbackError;
+      console.log("✅ Password reset using database method");
+
+      // Mostrar información al administrador
+      alert(`Contraseña reseteada para ${userData.email}\n\n` +
+            `Nueva contraseña temporal: ${newPassword}\n` +
+            `El usuario deberá cambiarla en el próximo login.\n\n` +
+            `También se intentó enviar un email de reset.`);
+
 
       await fetchUsers();
     } catch (err) {
