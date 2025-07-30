@@ -396,6 +396,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
+      console.log(`🔐 Login attempt for: ${email.trim()}`);
+
       // Special bypass for admin user to avoid email confirmation issues
       if (email.trim() === "julimalpeli@gmail.com") {
         console.log("🔓 Admin login detected - using bypass");
@@ -433,12 +435,41 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
+      // For non-admin users, check if they exist in database first
+      console.log("🔍 Checking user in database...");
+      const { data: dbUser, error: dbError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email.trim())
+        .single();
+
+      if (dbError || !dbUser) {
+        console.error("❌ User not found in database:", dbError);
+        throw new Error("Usuario no encontrado. Contacte al administrador para crear su cuenta.");
+      }
+
+      if (!dbUser.is_active) {
+        console.error("❌ User is inactive");
+        throw new Error("Usuario inactivo. Contacte al administrador.");
+      }
+
+      console.log("📧 Attempting Supabase auth login...");
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Supabase auth error:", error);
+
+        // Check if this is an employee user that might not have been created in auth
+        if (dbUser.role === "employee") {
+          console.log("👤 Employee user detected, checking if auth account exists...");
+          throw new Error("Credenciales incorrectas o cuenta no configurada en el sistema de autenticación. Contacte al administrador.");
+        }
+
+        throw error;
+      }
 
       // Additional check: Verify user is active in database before allowing login
       if (data.user) {
