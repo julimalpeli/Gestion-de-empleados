@@ -462,15 +462,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        console.error("❌ Supabase auth error:", error);
+        console.error("❌ Supabase auth error details:");
+        console.error("   - Error code:", error.status);
+        console.error("   - Error message:", error.message);
+        console.error("   - Full error:", error);
 
-        // Check if this is an employee user that might not have been created in auth
-        if (dbUser.role === "employee") {
-          console.log("👤 Employee user detected, checking if auth account exists...");
-          throw new Error("Credenciales incorrectas o cuenta no configurada en el sistema de autenticación. Contacte al administrador.");
+        // Provide specific error messages based on error type
+        if (error.message.includes("Invalid login credentials")) {
+          console.log("🔍 Invalid credentials - checking user status in auth...");
+
+          // Check if this is an employee user that might not have been created in auth
+          if (dbUser.role === "employee") {
+            throw new Error("Credenciales incorrectas o cuenta no configurada en el sistema de autenticación. Contacte al administrador.");
+          } else {
+            // For non-employee users, provide more specific guidance
+            throw new Error(`Credenciales incorrectas para ${email}.\n\n` +
+                          `Posibles causas:\n` +
+                          `1. La contraseña no es correcta\n` +
+                          `2. El usuario no está confirmado en Supabase\n` +
+                          `3. El usuario está deshabilitado\n\n` +
+                          `Solución: Ve a Gestión de Usuarios y resetea la contraseña del usuario.`);
+          }
+        } else if (error.message.includes("Email not confirmed")) {
+          throw new Error("El email del usuario no está confirmado. Contacte al administrador para confirmar la cuenta.");
+        } else if (error.message.includes("User not found")) {
+          throw new Error("Usuario no encontrado en el sistema de autenticación. Contacte al administrador.");
         }
 
-        throw error;
+        throw new Error(`Error de autenticación: ${error.message}`);
       }
 
       // Additional check: Verify user is active in database before allowing login
