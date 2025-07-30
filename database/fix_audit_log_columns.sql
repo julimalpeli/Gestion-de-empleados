@@ -56,6 +56,14 @@ BEGIN
         -- If column exists but is UUID type, alter it to VARCHAR
         IF EXISTS (SELECT 1 FROM information_schema.columns
                    WHERE table_name = 'audit_log' AND column_name = 'changed_by' AND data_type = 'uuid') THEN
+            -- Drop foreign key constraint if it exists
+            IF EXISTS (SELECT 1 FROM information_schema.table_constraints
+                       WHERE table_name = 'audit_log' AND constraint_name = 'audit_log_changed_by_fkey') THEN
+                ALTER TABLE audit_log DROP CONSTRAINT audit_log_changed_by_fkey;
+                RAISE NOTICE 'Dropped foreign key constraint audit_log_changed_by_fkey';
+            END IF;
+
+            -- Now alter the column type
             ALTER TABLE audit_log ALTER COLUMN changed_by TYPE VARCHAR(255) USING changed_by::text;
             RAISE NOTICE 'Changed changed_by column from UUID to VARCHAR';
         END IF;
