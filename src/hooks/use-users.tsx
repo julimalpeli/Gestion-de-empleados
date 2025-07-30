@@ -328,38 +328,41 @@ export const useUsers = () => {
 
       console.log(`📧 User email: ${userData.email}`);
 
-      // Usar método directo de base de datos en lugar de admin API
-      console.log("🔄 Using database fallback method for password reset...");
+      // Usar email reset method (el único método disponible sin admin API)
+      console.log("🔄 Sending password reset email...");
 
-      // Intentar enviar email de reset (puede fallar si no está configurado)
-      try {
-        await supabase.auth.resetPasswordForEmail(userData.email, {
-          redirectTo: `${window.location.origin}/reset-password?suggested=${encodeURIComponent(newPassword)}`,
-        });
-        console.log("📧 Reset email sent successfully");
-      } catch (emailError) {
-        console.log("📧 Reset email failed (email service may not be configured)");
+      const { error: emailError } = await supabase.auth.resetPasswordForEmail(
+        userData.email,
+        {
+          redirectTo: `${window.location.origin}/reset-password`,
+        }
+      );
+
+      if (emailError) {
+        console.error("❌ Email reset error:", emailError);
+        throw new Error(`No se pudo enviar el email de reset: ${emailError.message}\n\nVerifica que el servicio de email esté configurado en Supabase.`);
       }
 
-      // Actualizar en la tabla users con contraseña temporal
-      const passwordHash = btoa(newPassword);
-      const { error: fallbackError } = await supabase
+      // Solo marcar en la base de datos que necesita cambiar contraseña (sin tocar password_hash)
+      const { error: updateError } = await supabase
         .from("users")
         .update({
-          password_hash: passwordHash,
           needs_password_change: true,
           updated_at: new Date().toISOString(),
         })
         .eq("id", userId);
 
-      if (fallbackError) throw fallbackError;
-      console.log("✅ Password reset using database method");
+      if (updateError) {
+        console.warn("⚠️ Could not update needs_password_change flag:", updateError);
+      }
+
+      console.log("✅ Password reset email sent successfully");
 
       // Mostrar información al administrador
-      alert(`Contraseña reseteada para ${userData.email}\n\n` +
-            `Nueva contraseña temporal: ${newPassword}\n` +
-            `El usuario deberá cambiarla en el próximo login.\n\n` +
-            `También se intentó enviar un email de reset.`);
+      alert(`Email de reset enviado a: ${userData.email}\n\n` +
+            `El usuario recibirá un enlace para cambiar su contraseña.\n` +
+            `Contraseña sugerida: ${newPassword}\n\n` +
+            `Nota: El usuario puede elegir cualquier contraseña nueva.`);
 
 
       await fetchUsers();
