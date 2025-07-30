@@ -435,8 +435,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-
-
       // For non-admin users, check if they exist in database first
       console.log("🔍 Checking user in database...");
       const { data: dbUser, error: dbError } = await supabase
@@ -447,7 +445,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (dbError || !dbUser) {
         console.error("❌ User not found in database:", dbError);
-        throw new Error("Usuario no encontrado. Contacte al administrador para crear su cuenta.");
+        throw new Error(
+          "Usuario no encontrado. Contacte al administrador para crear su cuenta.",
+        );
       }
 
       if (!dbUser.is_active) {
@@ -469,24 +469,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         // Provide specific error messages based on error type
         if (error.message.includes("Invalid login credentials")) {
-          console.log("🔍 Invalid credentials - checking user status in auth...");
+          console.log(
+            "🔍 Invalid credentials - checking user status in auth...",
+          );
 
           // Check if this is an employee user that might not have been created in auth
           if (dbUser.role === "employee") {
-            throw new Error("Credenciales incorrectas o cuenta no configurada en el sistema de autenticación. Contacte al administrador.");
+            throw new Error(
+              "Credenciales incorrectas o cuenta no configurada en el sistema de autenticación. Contacte al administrador.",
+            );
           } else {
             // For non-employee users, provide more specific guidance
-            throw new Error(`Credenciales incorrectas para ${email}.\n\n` +
-                          `Posibles causas:\n` +
-                          `1. La contraseña no es correcta\n` +
-                          `2. El usuario no está confirmado en Supabase\n` +
-                          `3. El usuario está deshabilitado\n\n` +
-                          `Solución: Ve a Gestión de Usuarios y resetea la contraseña del usuario.`);
+            throw new Error(
+              `Credenciales incorrectas para ${email}.\n\n` +
+                `Posibles causas:\n` +
+                `1. La contraseña no es correcta\n` +
+                `2. El usuario no está confirmado en Supabase\n` +
+                `3. El usuario está deshabilitado\n\n` +
+                `Solución: Ve a Gestión de Usuarios y resetea la contraseña del usuario.`,
+            );
           }
         } else if (error.message.includes("Email not confirmed")) {
-          throw new Error("El email del usuario no está confirmado. Contacte al administrador para confirmar la cuenta.");
+          throw new Error(
+            "El email del usuario no está confirmado. Contacte al administrador para confirmar la cuenta.",
+          );
         } else if (error.message.includes("User not found")) {
-          throw new Error("Usuario no encontrado en el sistema de autenticación. Contacte al administrador.");
+          throw new Error(
+            "Usuario no encontrado en el sistema de autenticación. Contacte al administrador.",
+          );
         }
 
         throw new Error(`Error de autenticación: ${error.message}`);
@@ -664,27 +674,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) {
         // Handle specific rate limit error
-        if (error.message.includes('rate limit') || error.message.includes('email rate limit exceeded')) {
+        if (
+          error.message.includes("rate limit") ||
+          error.message.includes("email rate limit exceeded")
+        ) {
           throw new Error(
             `Límite de emails excedido. \n\n` +
-            `Solución manual:\n` +
-            `1. Ve al dashboard de Supabase\n` +
-            `2. Authentication > Users\n` +
-            `3. Busca el usuario: ${email}\n` +
-            `4. Actualiza la contraseña manualmente\n\n` +
-            `O usa el método SQL:\n` +
-            `UPDATE auth.users SET encrypted_password = crypt('nueva_password', gen_salt('bf')) WHERE email = '${email}';`
+              `Solución manual:\n` +
+              `1. Ve al dashboard de Supabase\n` +
+              `2. Authentication > Users\n` +
+              `3. Busca el usuario: ${email}\n` +
+              `4. Actualiza la contraseña manualmente\n\n` +
+              `O usa el método SQL:\n` +
+              `UPDATE auth.users SET encrypted_password = crypt('nueva_password', gen_salt('bf')) WHERE email = '${email}';`,
           );
         }
 
         // Handle other email errors (like SMTP not configured)
-        if (error.message.includes('SMTP') || error.message.includes('email')) {
+        if (error.message.includes("SMTP") || error.message.includes("email")) {
           throw new Error(
             `Servicio de email no configurado.\n\n` +
-            `Para resetear contraseñas necesitas:\n` +
-            `1. Configurar SMTP en Supabase (recomendado)\n` +
-            `2. O usar el método SQL manual\n\n` +
-            `Contacta al administrador para configurar el email.`
+              `Para resetear contraseñas necesitas:\n` +
+              `1. Configurar SMTP en Supabase (recomendado)\n` +
+              `2. O usar el método SQL manual\n\n` +
+              `Contacta al administrador para configurar el email.`,
           );
         }
 
