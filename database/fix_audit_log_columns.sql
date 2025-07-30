@@ -185,7 +185,7 @@ INSERT INTO audit_log (
 ) VALUES (
     'test',
     '12345678-1234-1234-1234-123456789abc',
-    'SCHEMA_FIX_TEST',
+    'INSERT',
     '{}',
     '{"test": "schema fixed"}',
     COALESCE(auth.uid()::text, 'system'),
