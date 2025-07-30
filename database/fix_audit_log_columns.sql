@@ -112,12 +112,24 @@ BEGIN
         NEW.table_name := NEW.entity_type;
     END IF;
 
-    -- Sync entity_id with record_id
-    IF NEW.record_id IS NOT NULL AND NEW.entity_id IS NULL THEN
-        NEW.entity_id := NEW.record_id;
-    ELSIF NEW.entity_id IS NOT NULL AND NEW.record_id IS NULL THEN
-        NEW.record_id := NEW.entity_id;
-    END IF;
+    -- Sync entity_id with record_id (handle data type differences safely)
+    BEGIN
+        IF NEW.record_id IS NOT NULL AND NEW.entity_id IS NULL THEN
+            NEW.entity_id := NEW.record_id::text;
+        ELSIF NEW.entity_id IS NOT NULL AND NEW.record_id IS NULL THEN
+            -- Only assign if entity_id looks like a valid UUID
+            IF NEW.entity_id ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN
+                NEW.record_id := NEW.entity_id::uuid;
+            ELSE
+                -- For non-UUID entity_id, leave record_id as NULL
+                NEW.record_id := NULL;
+            END IF;
+        END IF;
+    EXCEPTION
+        WHEN OTHERS THEN
+            -- Ignore type conversion errors and continue
+            NULL;
+    END;
 
     -- Sync timestamp with changed_at
     IF NEW.changed_at IS NOT NULL AND NEW.timestamp IS NULL THEN
