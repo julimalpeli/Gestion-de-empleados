@@ -184,7 +184,7 @@ INSERT INTO audit_log (
     timestamp
 ) VALUES (
     'test',
-    'test-id-schema-fix',
+    '12345678-1234-1234-1234-123456789abc',
     'SCHEMA_FIX_TEST',
     '{}',
     '{"test": "schema fixed"}',
