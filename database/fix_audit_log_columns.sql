@@ -161,7 +161,7 @@ INSERT INTO audit_log (
     'SCHEMA_FIX_TEST',
     '{}',
     '{"test": "schema fixed"}',
-    COALESCE(auth.email(), 'system@test.com'),
+    COALESCE(auth.uid()::text, 'system'),
     COALESCE(auth.email(), 'system@test.com'),
     NOW()
 );
