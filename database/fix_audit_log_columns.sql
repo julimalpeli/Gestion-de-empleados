@@ -52,6 +52,13 @@ BEGIN
                    WHERE table_name = 'audit_log' AND column_name = 'changed_by') THEN
         ALTER TABLE audit_log ADD COLUMN changed_by VARCHAR(255);
         RAISE NOTICE 'Added changed_by column';
+    ELSE
+        -- If column exists but is UUID type, alter it to VARCHAR
+        IF EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'audit_log' AND column_name = 'changed_by' AND data_type = 'uuid') THEN
+            ALTER TABLE audit_log ALTER COLUMN changed_by TYPE VARCHAR(255) USING changed_by::text;
+            RAISE NOTICE 'Changed changed_by column from UUID to VARCHAR';
+        END IF;
     END IF;
 
     -- Add core columns that the audit service expects
