@@ -1062,6 +1062,10 @@ const Reports = () => {
         isOpen={isSimpleLiquidationsReportOpen}
         onClose={() => setIsSimpleLiquidationsReportOpen(false)}
       />
+      <MultipleReceiptsReport
+        isOpen={isMultipleReceiptsReportOpen}
+        onClose={() => setIsMultipleReceiptsReportOpen(false)}
+      />
     </div>
   );
 };
