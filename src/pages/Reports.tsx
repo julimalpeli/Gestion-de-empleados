@@ -33,6 +33,7 @@ import {
   Calculator,
   Info,
   Users,
+  Scissors,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LiquidationsReport from "@/components/LiquidationsReport";
@@ -412,7 +413,7 @@ const Reports = () => {
               <div className="flex items-center gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Período a calcular:
+                    Per��odo a calcular:
                   </label>
                   <Select
                     value={selectedPeriod}
