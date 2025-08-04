@@ -113,8 +113,8 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         discounts,
         holidayBonus,
         aguinaldo,
-        // Totales por forma de pago
-        efectivo: record.informalAmount || 0,
+        // Totales por forma de pago - corregir efectivo cuando whiteAmount es 0
+        efectivo: (record.whiteAmount || 0) === 0 ? (record.netTotal || 0) : (record.informalAmount || 0),
         deposito: record.whiteAmount || 0,
         totalNeto: record.netTotal || 0,
         hasAguinaldo: aguinaldo > 0,
