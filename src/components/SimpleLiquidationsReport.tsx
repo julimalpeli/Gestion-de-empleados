@@ -84,14 +84,22 @@ const SimpleLiquidationsReport = ({
         });
       }
 
+      // Calcular efectivo real: si whiteAmount es 0, todo se paga en efectivo
+      const whiteAmount = record.whiteAmount || 0;
+      const informalAmount = record.informalAmount || 0;
+      const netTotal = record.netTotal || 0;
+
+      // Si no hay depósito (whiteAmount = 0), todo el netTotal va a efectivo
+      const efectivoReal = whiteAmount === 0 ? netTotal : informalAmount;
+
       return {
         id: record.id,
         employeeName: record.employeeName,
         period: record.period,
-        efectivo: record.informalAmount || 0,
-        deposito: record.whiteAmount || 0,
+        efectivo: efectivoReal,
+        deposito: whiteAmount,
         aguinaldo: record.aguinaldo || 0,
-        totalNeto: record.netTotal || 0,
+        totalNeto: netTotal,
         hasAguinaldo: (record.aguinaldo || 0) > 0,
         status: record.status || "draft",
       };
