@@ -65,6 +65,21 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
   const getReceiptItems = (record: any): ReceiptItem[] => {
     const items: ReceiptItem[] = [];
 
+    // Debug logging for data verification
+    console.log(`🔍 Receipt data for ${record.employeeName}:`, {
+      informalAmount: record.informalAmount,
+      whiteAmount: record.whiteAmount,
+      presentismoAmount: record.presentismoAmount,
+      overtimeAmount: record.overtimeAmount,
+      holidayBonus: record.holidayBonus,
+      bonusAmount: record.bonusAmount,
+      aguinaldo: record.aguinaldo,
+      advances: record.advances,
+      discounts: record.discounts,
+      netTotal: record.netTotal,
+      dataSource: 'Database via usePayroll hook'
+    });
+
     // Sueldo (campo Informal de la grilla liquidaciones)
     const sueldoAmount = record.informalAmount || 0;
     if (sueldoAmount > 0) {
