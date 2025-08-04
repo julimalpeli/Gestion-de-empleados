@@ -403,6 +403,9 @@ const Reports = () => {
                   <strong>Detallado:</strong> Todos los conceptos, días,
                   bonificaciones, etc.
                 </p>
+                <p className="text-center text-muted-foreground text-sm">
+                  <strong>Recibos:</strong> Para imprimir y recortar, entrega individual
+                </p>
               </div>
             </CardContent>
           </Card>
