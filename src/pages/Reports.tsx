@@ -125,6 +125,8 @@ const Reports = () => {
     useState(false);
   const [isSimpleLiquidationsReportOpen, setIsSimpleLiquidationsReportOpen] =
     useState(false);
+  const [isMultipleReceiptsReportOpen, setIsMultipleReceiptsReportOpen] =
+    useState(false);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
@@ -413,7 +415,7 @@ const Reports = () => {
               <div className="flex items-center gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">
-                    Per��odo a calcular:
+                    Período a calcular:
                   </label>
                   <Select
                     value={selectedPeriod}
