@@ -384,6 +384,15 @@ const Reports = () => {
                   <FileBarChart className="h-5 w-5 mr-2" />
                   Reporte Detallado
                 </Button>
+                <Button
+                  onClick={() => setIsMultipleReceiptsReportOpen(true)}
+                  size="lg"
+                  variant="secondary"
+                  className="text-lg px-6 py-4"
+                >
+                  <Scissors className="h-5 w-5 mr-2" />
+                  Recibos para Imprimir
+                </Button>
               </div>
               <div className="mt-4 space-y-2">
                 <p className="text-center text-muted-foreground text-sm">
