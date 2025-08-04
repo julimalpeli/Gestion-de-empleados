@@ -73,14 +73,14 @@ const SimpleLiquidationsReport = ({
     .filter((record) => record.period === selectedPeriod)
     .map((record) => {
       // Debug logging for employee 41007938
-      if (record.employeeName?.includes('41007938')) {
+      if (record.employeeName?.includes("41007938")) {
         console.log(`🔍 Debug employee 41007938:`, {
           informalAmount: record.informalAmount,
           whiteAmount: record.whiteAmount,
           netTotal: record.netTotal,
           realInformalAmount: record.realInformalAmount,
           realWhiteAmount: record.realWhiteAmount,
-          fullRecord: record
+          fullRecord: record,
         });
       }
 
