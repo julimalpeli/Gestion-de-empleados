@@ -16,6 +16,8 @@ import {
   CheckCircle,
   Settings,
   Edit3,
+  Plane,
+  Calendar,
 } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEmployees } from "@/hooks/use-employees";
