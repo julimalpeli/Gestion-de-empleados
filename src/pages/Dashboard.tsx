@@ -20,6 +20,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
+import { useVacations } from "@/hooks/use-vacations";
 import AuditStatus from "@/components/AuditStatus";
 import usePermissions from "@/hooks/use-permissions";
 
