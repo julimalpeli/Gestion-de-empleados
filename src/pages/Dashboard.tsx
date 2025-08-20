@@ -130,11 +130,11 @@ const Dashboard = () => {
 
   // Vacation calculations
   const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split("T")[0];
 
   // Current vacations (employees on vacation today)
-  const currentVacations = vacations.filter(vacation => {
-    if (vacation.status !== 'approved') return false;
+  const currentVacations = vacations.filter((vacation) => {
+    if (vacation.status !== "approved") return false;
     const startDate = new Date(vacation.startDate);
     const endDate = new Date(vacation.endDate);
     return today >= startDate && today <= endDate;
@@ -143,18 +143,18 @@ const Dashboard = () => {
   // Upcoming vacations (next 30 days)
   const next30Days = new Date();
   next30Days.setDate(today.getDate() + 30);
-  const next30DaysStr = next30Days.toISOString().split('T')[0];
+  const next30DaysStr = next30Days.toISOString().split("T")[0];
 
-  const upcomingVacations = vacations.filter(vacation => {
-    if (vacation.status !== 'approved') return false;
+  const upcomingVacations = vacations.filter((vacation) => {
+    if (vacation.status !== "approved") return false;
     const startDate = new Date(vacation.startDate);
     return startDate > today && startDate <= next30Days;
   });
 
   // Get employee names for vacations
   const getEmployeeName = (employeeId: string) => {
-    const employee = employees.find(emp => emp.id === employeeId);
-    return employee?.name || 'Empleado no encontrado';
+    const employee = employees.find((emp) => emp.id === employeeId);
+    return employee?.name || "Empleado no encontrado";
   };
 
   // Average salary calculation
@@ -379,16 +379,21 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               {currentVacations.length === 0
                 ? "Ningún empleado de vacaciones"
-                : `${currentVacations.length} empleado${currentVacations.length > 1 ? 's' : ''} ausente${currentVacations.length > 1 ? 's' : ''}`
-              }
+                : `${currentVacations.length} empleado${currentVacations.length > 1 ? "s" : ""} ausente${currentVacations.length > 1 ? "s" : ""}`}
             </p>
             {currentVacations.length > 0 && (
               <div className="mt-2 space-y-1">
                 {currentVacations.slice(0, 2).map((vacation) => (
-                  <div key={vacation.id} className="text-xs bg-blue-50 p-2 rounded">
-                    <span className="font-medium">{getEmployeeName(vacation.employeeId)}</span>
+                  <div
+                    key={vacation.id}
+                    className="text-xs bg-blue-50 p-2 rounded"
+                  >
+                    <span className="font-medium">
+                      {getEmployeeName(vacation.employeeId)}
+                    </span>
                     <span className="text-muted-foreground ml-1">
-                      hasta {new Date(vacation.endDate).toLocaleDateString('es-AR')}
+                      hasta{" "}
+                      {new Date(vacation.endDate).toLocaleDateString("es-AR")}
                     </span>
                   </div>
                 ))}
@@ -404,7 +409,9 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Próximas Vacaciones</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Próximas Vacaciones
+            </CardTitle>
             <Calendar className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
@@ -414,16 +421,21 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               {upcomingVacations.length === 0
                 ? "Sin vacaciones próximas"
-                : `Próximos 30 días`
-              }
+                : `Próximos 30 días`}
             </p>
             {upcomingVacations.length > 0 && (
               <div className="mt-2 space-y-1">
                 {upcomingVacations.slice(0, 2).map((vacation) => (
-                  <div key={vacation.id} className="text-xs bg-orange-50 p-2 rounded">
-                    <span className="font-medium">{getEmployeeName(vacation.employeeId)}</span>
+                  <div
+                    key={vacation.id}
+                    className="text-xs bg-orange-50 p-2 rounded"
+                  >
+                    <span className="font-medium">
+                      {getEmployeeName(vacation.employeeId)}
+                    </span>
                     <span className="text-muted-foreground ml-1">
-                      desde {new Date(vacation.startDate).toLocaleDateString('es-AR')}
+                      desde{" "}
+                      {new Date(vacation.startDate).toLocaleDateString("es-AR")}
                     </span>
                   </div>
                 ))}
