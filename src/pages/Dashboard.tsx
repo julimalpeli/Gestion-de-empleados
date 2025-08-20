@@ -128,6 +128,35 @@ const Dashboard = () => {
       ? Math.round((currentMonthPayrolls.length / activeEmployees.length) * 100)
       : 0;
 
+  // Vacation calculations
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+
+  // Current vacations (employees on vacation today)
+  const currentVacations = vacations.filter(vacation => {
+    if (vacation.status !== 'approved') return false;
+    const startDate = new Date(vacation.startDate);
+    const endDate = new Date(vacation.endDate);
+    return today >= startDate && today <= endDate;
+  });
+
+  // Upcoming vacations (next 30 days)
+  const next30Days = new Date();
+  next30Days.setDate(today.getDate() + 30);
+  const next30DaysStr = next30Days.toISOString().split('T')[0];
+
+  const upcomingVacations = vacations.filter(vacation => {
+    if (vacation.status !== 'approved') return false;
+    const startDate = new Date(vacation.startDate);
+    return startDate > today && startDate <= next30Days;
+  });
+
+  // Get employee names for vacations
+  const getEmployeeName = (employeeId: string) => {
+    const employee = employees.find(emp => emp.id === employeeId);
+    return employee?.name || 'Empleado no encontrado';
+  };
+
   // Average salary calculation
   const averageSalary =
     currentMonthPayrolls.length > 0
