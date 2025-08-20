@@ -365,6 +365,79 @@ const Dashboard = () => {
         </Card>
       </div>
 
+      {/* Vacation Status */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">En Vacaciones</CardTitle>
+            <Plane className="h-4 w-4 text-blue-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">
+              {currentVacations.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {currentVacations.length === 0
+                ? "Ningún empleado de vacaciones"
+                : `${currentVacations.length} empleado${currentVacations.length > 1 ? 's' : ''} ausente${currentVacations.length > 1 ? 's' : ''}`
+              }
+            </p>
+            {currentVacations.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {currentVacations.slice(0, 2).map((vacation) => (
+                  <div key={vacation.id} className="text-xs bg-blue-50 p-2 rounded">
+                    <span className="font-medium">{getEmployeeName(vacation.employeeId)}</span>
+                    <span className="text-muted-foreground ml-1">
+                      hasta {new Date(vacation.endDate).toLocaleDateString('es-AR')}
+                    </span>
+                  </div>
+                ))}
+                {currentVacations.length > 2 && (
+                  <p className="text-xs text-muted-foreground">
+                    y {currentVacations.length - 2} más...
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Próximas Vacaciones</CardTitle>
+            <Calendar className="h-4 w-4 text-orange-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-orange-600">
+              {upcomingVacations.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {upcomingVacations.length === 0
+                ? "Sin vacaciones próximas"
+                : `Próximos 30 días`
+              }
+            </p>
+            {upcomingVacations.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {upcomingVacations.slice(0, 2).map((vacation) => (
+                  <div key={vacation.id} className="text-xs bg-orange-50 p-2 rounded">
+                    <span className="font-medium">{getEmployeeName(vacation.employeeId)}</span>
+                    <span className="text-muted-foreground ml-1">
+                      desde {new Date(vacation.startDate).toLocaleDateString('es-AR')}
+                    </span>
+                  </div>
+                ))}
+                {upcomingVacations.length > 2 && (
+                  <p className="text-xs text-muted-foreground">
+                    y {upcomingVacations.length - 2} más...
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Summary Cards */}
       <div className="grid gap-6 md:grid-cols-2">
         {/* Current Status */}
