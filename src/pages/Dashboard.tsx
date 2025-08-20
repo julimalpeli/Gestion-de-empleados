@@ -43,6 +43,11 @@ const Dashboard = () => {
     loading: payrollLoading,
     error: payrollError,
   } = usePayroll();
+  const {
+    vacations,
+    loading: vacationsLoading,
+    error: vacationsError,
+  } = useVacations();
   const { isAdmin } = usePermissions();
 
   // Format currency
