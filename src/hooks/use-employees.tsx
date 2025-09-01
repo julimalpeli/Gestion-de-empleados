@@ -36,9 +36,13 @@ export const useEmployees = () => {
           message: (err as any).message,
           code: (err as any).code,
           details: (err as any).details,
+          hint: (err as any).hint,
           stack: (err as any).stack,
           errorType: typeof err,
           errorConstructor: err.constructor?.name,
+          fullError: err,
+          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+          hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY
         });
       }
 
