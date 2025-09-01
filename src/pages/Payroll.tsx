@@ -738,13 +738,15 @@ const Payroll = () => {
     const hourlyRate = dailyWageToUse / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: usar el valor histórico si está disponible, sino el actual del empleado
+    // Presentismo: SIEMPRE usar el valor actual del empleado para consistencia
+    // No usar valores históricos para presentismo para evitar discrepancias
     let presentismoToUse = employee?.presentismo || 0;
 
-    // Si tenemos salario histórico (editando liquidación pasada), usar ese valor
-    if (historicalSalary && historicalSalary.presentismo !== undefined) {
-      presentismoToUse = historicalSalary.presentismo;
-    }
+    // COMENTARIO: Se removió la lógica de presentismo histórico para mantener consistencia
+    // El presentismo debe reflejar el valor actual del empleado en todos los casos
+    // if (historicalSalary && historicalSalary.presentismo !== undefined) {
+    //   presentismoToUse = historicalSalary.presentismo;
+    // }
 
     // En modo edición, el presentismo podría ser diferente al actual
     // pero mantener la lógica de mantiene/pierde del form
@@ -1487,7 +1489,7 @@ const Payroll = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar liquidaciones por empleado, período, posición o DNI..."
+                  placeholder="Buscar liquidaciones por empleado, per��odo, posición o DNI..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
