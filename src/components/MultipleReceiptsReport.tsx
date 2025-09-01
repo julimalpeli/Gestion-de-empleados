@@ -144,7 +144,7 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
 
     filteredRecords.forEach((record, index) => {
       const items = getReceiptItems(record);
-      const totalAmount = record.netTotal || 0;
+      const totalAmount = record.informalAmount || 0;
 
       // Check if we need a new page
       if (currentY + receiptHeight > pageHeight - margin) {
@@ -305,7 +305,7 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
               <div className="grid grid-cols-3 gap-4">
                 {filteredRecords.slice(0, 9).map((record) => {
                   const items = getReceiptItems(record);
-                  const totalAmount = record.netTotal || 0;
+                  const totalAmount = record.informalAmount || 0;
 
                   return (
                     <div key={record.id} className="border-2 border-dashed border-gray-300 p-3 bg-white">
