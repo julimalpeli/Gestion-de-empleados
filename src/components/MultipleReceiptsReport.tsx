@@ -80,41 +80,13 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
       dataSource: 'Database via usePayroll hook'
     });
 
-    // Sueldo (campo Informal de la grilla liquidaciones)
-    const sueldoAmount = record.informalAmount || 0;
-    if (sueldoAmount > 0) {
-      items.push({ label: "Sueldo", amount: sueldoAmount });
+    // Solo mostrar el monto en efectivo (informal_amount) sin desglose
+    const efectivoAmount = record.informalAmount || 0;
+    if (efectivoAmount > 0) {
+      items.push({ label: "Efectivo", amount: efectivoAmount });
     }
 
-    // Items condicionales (solo si > 0)
-    if (record.presentismoAmount > 0) {
-      items.push({ label: "Presentismo", amount: record.presentismoAmount });
-    }
-
-    if (record.overtimeAmount > 0) {
-      items.push({ label: "Horas Extras", amount: record.overtimeAmount });
-    }
-
-    if (record.holidayBonus > 0) {
-      items.push({ label: "Feriado Doble", amount: record.holidayBonus });
-    }
-
-    if (record.bonusAmount > 0) {
-      items.push({ label: "Bonificaciones", amount: record.bonusAmount });
-    }
-
-    if (record.aguinaldo > 0) {
-      items.push({ label: "Aguinaldo", amount: record.aguinaldo });
-    }
-
-    // Deducciones (solo si > 0)
-    if (record.advances > 0) {
-      items.push({ label: "Adelantos", amount: record.advances, isDeduction: true });
-    }
-
-    if (record.discounts > 0) {
-      items.push({ label: "Descuentos", amount: record.discounts, isDeduction: true });
-    }
+    // No mostrar otros conceptos - solo el total en efectivo según Opción B
 
     return items;
   };
