@@ -76,6 +76,20 @@ export const usePayroll = () => {
     } catch (err) {
       console.error("❌ PAYROLL ERROR DETECTED:", err);
 
+      // Detailed error logging
+      if (err && typeof err === "object") {
+        console.error("❌ Payroll error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+          stack: (err as any).stack,
+          errorType: typeof err,
+          errorConstructor: err.constructor?.name,
+          fullError: err
+        });
+      }
+
       // IMMEDIATE FALLBACK - NO QUESTIONS ASKED
       console.log("🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK 🚨 🚨 🚨");
       console.log("🔄 Loading cached payroll data...");
