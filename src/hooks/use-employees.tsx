@@ -22,57 +22,24 @@ export const useEmployees = () => {
       console.log("🔄 Iniciando carga de empleados...");
       setLoading(true);
       setError(null);
+
       const data = await employeeService.getAllEmployees();
-      console.log("✅ Empleados cargados desde Supabase:", data);
+      console.log("✅ Empleados cargados exitosamente:", data.length);
       setEmployees(data);
+
     } catch (err) {
       console.error("❌ Error cargando empleados:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
-      console.log("🔍 Error detected:", errorMessage);
 
-      // Detailed error logging
-      if (err && typeof err === "object") {
-        console.error(
-          "❌ Employee error details:",
-          JSON.stringify(
-            {
-              message: (err as any).message,
-              code: (err as any).code,
-              details: (err as any).details,
-              hint: (err as any).hint,
-              errorType: typeof err,
-              errorConstructor: err.constructor?.name,
-              supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-              hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-            },
-            null,
-            2,
-          ),
-        );
-        console.error("❌ Full error object:", err);
-      }
+      // The service already handles fallback, so this should rarely happen
+      // But if it does, show a user-friendly error
+      setError("Error cargando empleados. Reintentando...");
 
-      // Activate fallback immediately for any error (aggressive offline mode)
-      console.log(
-        "🚨 CONNECTIVITY ERROR DETECTED - Activating fallback immediately",
-      );
-      try {
-        const { getFallbackEmployeesData } = await import(
-          "@/utils/offlineFallback"
-        );
-        const fallbackData = getFallbackEmployeesData();
-        setEmployees(fallbackData);
-        console.log("✅ ✅ EMPLOYEE FALLBACK ACTIVATED!");
-        console.log(`👥 Loaded ${fallbackData.length} employees from fallback`);
-        console.log("📶 Employee system now running in OFFLINE MODE");
+      // Try one more time after a short delay
+      setTimeout(() => {
+        fetchEmployees();
+      }, 2000);
 
-        // Clear error since we have working fallback data
-        setError(null);
-        return;
-      } catch (fallbackError) {
-        console.error("❌ CRITICAL: Employee fallback failed:", fallbackError);
-        setError("Sistema sin conexión - Por favor recarga la página");
-      }
     } finally {
       setLoading(false);
     }
