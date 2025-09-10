@@ -294,6 +294,7 @@ class DocumentService {
       sac: "SAC",
       documentos: "Documentos",
       formularios: "Formularios",
+      certificados_medicos: "Certificados Médicos",
       otros: "Otros Documentos",
     };
     return categoryNames[category] || category;
