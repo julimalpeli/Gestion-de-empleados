@@ -32,18 +32,17 @@ export const useEmployees = () => {
 
       // Detailed error logging
       if (err && typeof err === "object") {
-        console.error("❌ Employee error details:", {
+        console.error("❌ Employee error details:", JSON.stringify({
           message: (err as any).message,
           code: (err as any).code,
           details: (err as any).details,
           hint: (err as any).hint,
-          stack: (err as any).stack,
           errorType: typeof err,
           errorConstructor: err.constructor?.name,
-          fullError: err,
           supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
           hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY
-        });
+        }, null, 2));
+        console.error("❌ Full error object:", err);
       }
 
       // Activate fallback immediately for any error (aggressive offline mode)
