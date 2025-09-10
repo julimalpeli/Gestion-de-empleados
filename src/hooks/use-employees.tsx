@@ -32,16 +32,23 @@ export const useEmployees = () => {
 
       // Detailed error logging
       if (err && typeof err === "object") {
-        console.error("❌ Employee error details:", JSON.stringify({
-          message: (err as any).message,
-          code: (err as any).code,
-          details: (err as any).details,
-          hint: (err as any).hint,
-          errorType: typeof err,
-          errorConstructor: err.constructor?.name,
-          supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-          hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY
-        }, null, 2));
+        console.error(
+          "❌ Employee error details:",
+          JSON.stringify(
+            {
+              message: (err as any).message,
+              code: (err as any).code,
+              details: (err as any).details,
+              hint: (err as any).hint,
+              errorType: typeof err,
+              errorConstructor: err.constructor?.name,
+              supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
+              hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
+            },
+            null,
+            2,
+          ),
+        );
         console.error("❌ Full error object:", err);
       }
 

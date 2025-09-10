@@ -78,14 +78,21 @@ export const usePayroll = () => {
 
       // Detailed error logging
       if (err && typeof err === "object") {
-        console.error("❌ Payroll error details:", JSON.stringify({
-          message: (err as any).message,
-          code: (err as any).code,
-          details: (err as any).details,
-          hint: (err as any).hint,
-          errorType: typeof err,
-          errorConstructor: err.constructor?.name,
-        }, null, 2));
+        console.error(
+          "❌ Payroll error details:",
+          JSON.stringify(
+            {
+              message: (err as any).message,
+              code: (err as any).code,
+              details: (err as any).details,
+              hint: (err as any).hint,
+              errorType: typeof err,
+              errorConstructor: err.constructor?.name,
+            },
+            null,
+            2,
+          ),
+        );
         console.error("❌ Full error object:", err);
       }
 

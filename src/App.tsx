@@ -445,7 +445,9 @@ const AppContent = () => {
       const isConnected = await testSupabaseConnection();
 
       if (!isConnected) {
-        console.warn("⚠️ Supabase connection failed on startup - enabling offline mode");
+        console.warn(
+          "⚠️ Supabase connection failed on startup - enabling offline mode",
+        );
         setIsOffline(true);
       } else {
         console.log("✅ Supabase connection successful on startup");
@@ -456,7 +458,7 @@ const AppContent = () => {
     testConnection();
 
     const handleMessage = (event: any) => {
-      if (event.data?.type === 'FALLBACK_ACTIVATED') {
+      if (event.data?.type === "FALLBACK_ACTIVATED") {
         setIsOffline(true);
       }
     };
@@ -464,20 +466,22 @@ const AppContent = () => {
     // Listen for console messages to detect offline mode
     const originalConsoleLog = console.log;
     console.log = (...args) => {
-      const message = args.join(' ');
-      if (message.includes('now running in OFFLINE MODE') ||
-          message.includes('FALLBACK ACTIVATED') ||
-          message.includes('EMERGENCY FALLBACK') ||
-          message.includes('CONNECTIVITY ERROR DETECTED')) {
+      const message = args.join(" ");
+      if (
+        message.includes("now running in OFFLINE MODE") ||
+        message.includes("FALLBACK ACTIVATED") ||
+        message.includes("EMERGENCY FALLBACK") ||
+        message.includes("CONNECTIVITY ERROR DETECTED")
+      ) {
         setIsOffline(true);
       }
       originalConsoleLog.apply(console, args);
     };
 
-    window.addEventListener('message', handleMessage);
+    window.addEventListener("message", handleMessage);
 
     return () => {
-      window.removeEventListener('message', handleMessage);
+      window.removeEventListener("message", handleMessage);
       console.log = originalConsoleLog;
     };
   }, []);
@@ -491,7 +495,8 @@ const AppContent = () => {
             <WifiOff className="h-4 w-4" />
             <AlertDescription className="flex items-center justify-between">
               <span>
-                <strong>Modo Offline:</strong> Sin conexión a internet. Los datos mostrados son una copia local.
+                <strong>Modo Offline:</strong> Sin conexión a internet. Los
+                datos mostrados son una copia local.
               </span>
               <button
                 onClick={() => window.location.reload()}
@@ -506,128 +511,128 @@ const AppContent = () => {
 
       <div className={isOffline ? "mt-16" : ""}>
         <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/unauthorized" element={<Unauthorized />} />
-          <Route path="/inactive" element={<InactiveUser />} />
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/inactive" element={<InactiveUser />} />
 
-          {/* Employee portal */}
-          <Route
-            path="/portal-empleado"
-            element={
-              <ProtectedRoute requiredRole="employee">
-                <EmployeePortal />
-              </ProtectedRoute>
-            }
+            {/* Employee portal */}
+            <Route
+              path="/portal-empleado"
+              element={
+                <ProtectedRoute requiredRole="employee">
+                  <EmployeePortal />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Dashboard with sidebar - Allow admin, manager, hr */}
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute
+                  allowedRoles={["admin", "manager", "hr", "readonly"]}
+                >
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Dashboard />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/empleados"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Employees />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/liquidaciones"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Payroll />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/reportes"
+              element={
+                <ProtectedRoute
+                  allowedRoles={["admin", "manager", "hr", "readonly"]}
+                >
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Reports />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/roles"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <UserRoles />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* User Management - Solo Admin */}
+            <Route
+              path="/usuarios"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <UserManagement />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Fallback routes */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+
+        {/* Force Password Change Dialog */}
+        {user && user.needsPasswordChange && (
+          <ForcePasswordChange
+            isOpen={true}
+            username={user.username}
+            onPasswordChanged={() => {
+              // Reload user data to update needsPasswordChange
+              window.location.reload();
+            }}
           />
-
-          {/* Dashboard with sidebar - Allow admin, manager, hr */}
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute
-                allowedRoles={["admin", "manager", "hr", "readonly"]}
-              >
-                <SidebarProvider>
-                  <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <Dashboard />
-                  </main>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/empleados"
-            element={
-              <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
-                <SidebarProvider>
-                  <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <Employees />
-                  </main>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/liquidaciones"
-            element={
-              <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
-                <SidebarProvider>
-                  <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <Payroll />
-                  </main>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/reportes"
-            element={
-              <ProtectedRoute
-                allowedRoles={["admin", "manager", "hr", "readonly"]}
-              >
-                <SidebarProvider>
-                  <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <Reports />
-                  </main>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/roles"
-            element={
-              <ProtectedRoute allowedRoles={["admin", "manager"]}>
-                <SidebarProvider>
-                  <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <UserRoles />
-                  </main>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* User Management - Solo Admin */}
-          <Route
-            path="/usuarios"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <SidebarProvider>
-                  <AppSidebar />
-                  <main className="flex-1 overflow-auto">
-                    <UserManagement />
-                  </main>
-                </SidebarProvider>
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Fallback routes */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-
-      {/* Force Password Change Dialog */}
-      {user && user.needsPasswordChange && (
-        <ForcePasswordChange
-          isOpen={true}
-          username={user.username}
-          onPasswordChanged={() => {
-            // Reload user data to update needsPasswordChange
-            window.location.reload();
-          }}
-        />
-      )}
+        )}
       </div>
     </>
   );

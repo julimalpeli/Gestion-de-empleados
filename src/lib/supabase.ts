@@ -29,7 +29,9 @@ if (import.meta.env.DEV) {
   setTimeout(() => {
     testSupabaseConnection().then((success) => {
       if (!success) {
-        console.warn("⚠️ Supabase connection failed - app may fall back to offline mode");
+        console.warn(
+          "⚠️ Supabase connection failed - app may fall back to offline mode",
+        );
       }
     });
   }, 1000);
@@ -81,14 +83,21 @@ export const logSupabaseError = (context: string, error: any) => {
   console.error(`❌ ${context}:`);
 
   if (error && typeof error === "object") {
-    console.error("   - Error details:", JSON.stringify({
-      message: error.message,
-      code: error.code,
-      details: error.details,
-      hint: error.hint,
-      errorType: typeof error,
-      errorConstructor: error.constructor?.name,
-    }, null, 2));
+    console.error(
+      "   - Error details:",
+      JSON.stringify(
+        {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint,
+          errorType: typeof error,
+          errorConstructor: error.constructor?.name,
+        },
+        null,
+        2,
+      ),
+    );
   }
 
   console.error("   - Raw error object:", error);
