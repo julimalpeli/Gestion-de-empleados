@@ -109,7 +109,7 @@ const Payroll = () => {
 
   // Debug logging para whiteWage
   const debugSetWhiteWage = (value, source = "unknown") => {
-    console.log(`🔍 Setting whiteWage: "${value}" from: ${source}`);
+    console.log(`���� Setting whiteWage: "${value}" from: ${source}`);
     setWhiteWage(value);
   };
   const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
@@ -226,7 +226,7 @@ const Payroll = () => {
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Error al actualizar el estado de la liquidaci��n");
+      alert("Error al actualizar el estado de la liquidación");
     }
   };
 
