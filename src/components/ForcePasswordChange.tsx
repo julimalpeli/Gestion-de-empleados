@@ -210,6 +210,9 @@ const ForcePasswordChange = ({
       console.log("   - New password set successfully");
       console.log("   - User should now login with new password");
 
+      // Mostrar mensaje de éxito
+      alert("✅ Contraseña cambiada exitosamente!\n\nAhora puedes usar tu nueva contraseña para iniciar sesión.");
+
       // Éxito
       onPasswordChanged();
     } catch (error) {
