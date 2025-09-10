@@ -433,8 +433,24 @@ const AppContent = () => {
   const { user } = useAuth();
   const [isOffline, setIsOffline] = useState(false);
 
-  // Listen for fallback activation messages
+  // Test Supabase connection and handle connectivity issues
   useEffect(() => {
+    // Test connection on app startup
+    const testConnection = async () => {
+      console.log("🔄 Testing Supabase connection on app startup...");
+      const isConnected = await testSupabaseConnection();
+
+      if (!isConnected) {
+        console.warn("⚠️ Supabase connection failed on startup - enabling offline mode");
+        setIsOffline(true);
+      } else {
+        console.log("✅ Supabase connection successful on startup");
+        setIsOffline(false);
+      }
+    };
+
+    testConnection();
+
     const handleMessage = (event: any) => {
       if (event.data?.type === 'FALLBACK_ACTIVATED') {
         setIsOffline(true);
@@ -446,7 +462,9 @@ const AppContent = () => {
     console.log = (...args) => {
       const message = args.join(' ');
       if (message.includes('now running in OFFLINE MODE') ||
-          message.includes('FALLBACK ACTIVATED')) {
+          message.includes('FALLBACK ACTIVATED') ||
+          message.includes('EMERGENCY FALLBACK') ||
+          message.includes('CONNECTIVITY ERROR DETECTED')) {
         setIsOffline(true);
       }
       originalConsoleLog.apply(console, args);
