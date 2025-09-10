@@ -420,7 +420,7 @@ const Reports = () => {
                 Calculadora de Aguinaldos (SAC)
               </CardTitle>
               <CardDescription>
-                Cálculo automático del Sueldo Anual Complementario por per��odo
+                Cálculo automático del Sueldo Anual Complementario por período
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
