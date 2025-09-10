@@ -336,7 +336,7 @@ class AuditService {
     });
   }
 
-  // Auditor��a de login/logout
+  // Auditoría de login/logout
   async auditLogin(
     action: "LOGIN" | "LOGOUT" | "LOGIN_FAILED",
     userId: string,
