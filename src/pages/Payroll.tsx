@@ -1183,7 +1183,7 @@ const Payroll = () => {
                     disabled={editingRecord && !isEditMode}
                   />
                   <p className="text-xs text-muted-foreground">
-                    El resto se calcular�� como sueldo en efectivo
+                    El resto se calculará como sueldo en efectivo
                   </p>
                 </div>
               </div>
@@ -1532,7 +1532,7 @@ const Payroll = () => {
                 <SelectValue placeholder="Filtrar por período" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos los períodos</SelectItem>
+                <SelectItem value="all">Todos los per��odos</SelectItem>
                 {Array.from(new Set(payrollRecords.map((r) => r.period)))
                   .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
                   .map((period) => (
