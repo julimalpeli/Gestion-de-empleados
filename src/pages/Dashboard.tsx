@@ -413,7 +413,11 @@ const Dashboard = () => {
                 {currentVacations.slice(0, 2).map((vacation) => {
                   const startDate = new Date(vacation.startDate);
                   const endDate = new Date(vacation.endDate);
-                  const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                  const daysDiff =
+                    Math.ceil(
+                      (endDate.getTime() - startDate.getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    ) + 1;
 
                   return (
                     <div
@@ -425,7 +429,9 @@ const Dashboard = () => {
                       </div>
                       <div className="text-muted-foreground mt-1">
                         <div>Hasta: {endDate.toLocaleDateString("es-AR")}</div>
-                        <div>{daysDiff} día{daysDiff !== 1 ? 's' : ''}</div>
+                        <div>
+                          {daysDiff} día{daysDiff !== 1 ? "s" : ""}
+                        </div>
                       </div>
                     </div>
                   );
@@ -461,7 +467,11 @@ const Dashboard = () => {
                 {upcomingVacations.slice(0, 2).map((vacation) => {
                   const startDate = new Date(vacation.startDate);
                   const endDate = new Date(vacation.endDate);
-                  const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+                  const daysDiff =
+                    Math.ceil(
+                      (endDate.getTime() - startDate.getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    ) + 1;
 
                   return (
                     <div
@@ -472,9 +482,13 @@ const Dashboard = () => {
                         {getEmployeeName(vacation.employeeId)}
                       </div>
                       <div className="text-muted-foreground mt-1">
-                        <div>Desde: {startDate.toLocaleDateString("es-AR")}</div>
+                        <div>
+                          Desde: {startDate.toLocaleDateString("es-AR")}
+                        </div>
                         <div>Hasta: {endDate.toLocaleDateString("es-AR")}</div>
-                        <div>{daysDiff} día{daysDiff !== 1 ? 's' : ''}</div>
+                        <div>
+                          {daysDiff} día{daysDiff !== 1 ? "s" : ""}
+                        </div>
                       </div>
                     </div>
                   );
