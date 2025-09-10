@@ -1298,175 +1298,383 @@ const Employees = () => {
       </AlertDialog>
 
       {/* Employee View Dialog */}
+      {/* Employee View Dialog - Rediseñado */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{viewingEmployee?.name || "Empleado"}</DialogTitle>
-            <DialogDescription>
-              Información completa y historial salarial
-            </DialogDescription>
-          </DialogHeader>
-
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
           {viewingEmployee && (
-            <Tabs defaultValue="info" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="info">📋 Información</TabsTrigger>
-                <TabsTrigger value="salary-history">
-                  💰 Historial Sueldo
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="info" className="mt-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Nombre Completo</Label>
-                    <p className="text-lg font-medium">
+            <div className="flex flex-col h-full">
+              {/* Header con gradiente */}
+              <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white p-6">
+                <div className="flex items-center gap-4">
+                  <AvatarInitials name={viewingEmployee.name} size="lg" />
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold mb-1">
                       {viewingEmployee.name}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>
-                      {viewingEmployee.documentType?.toUpperCase() || "DNI"}
-                    </Label>
-                    <p className="text-lg font-mono">{viewingEmployee.dni}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Puesto</Label>
-                    <p className="text-lg">
+                    </h2>
+                    <p className="text-blue-100 text-lg mb-2">
                       {formatPosition(viewingEmployee.position)}
                     </p>
+                    <div className="flex items-center gap-4 text-sm">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {viewingEmployee.startDate
+                          ? (() => {
+                              const vacationInfo =
+                                employeeService.calculateVacationDays(
+                                  viewingEmployee.startDate,
+                                );
+                              const years = vacationInfo.years;
+                              const months = vacationInfo.totalMonths % 12;
+                              if (years > 0) {
+                                return `${years} año${years > 1 ? "s" : ""} ${months > 0 ? `${months} mes${months > 1 ? "es" : ""}` : ""} en la empresa`;
+                              } else {
+                                return `${months} mes${months > 1 ? "es" : ""} en la empresa`;
+                              }
+                            })()
+                          : "Antigüedad no calculada"}
+                      </span>
+                      <Badge
+                        variant={
+                          viewingEmployee.status === "active"
+                            ? "default"
+                            : "secondary"
+                        }
+                        className="bg-white/20 text-white border-white/30"
+                      >
+                        {viewingEmployee.status === "active"
+                          ? "🟢 Activo"
+                          : "🔴 Inactivo"}
+                      </Badge>
+                    </div>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label>Fecha de Ingreso</Label>
-                    <p className="text-lg">
-                      {viewingEmployee.startDate
-                        ? new Date(
-                            viewingEmployee.startDate + "T00:00:00",
-                          ).toLocaleDateString("es-AR")
-                        : "No registrada"}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Antigüedad</Label>
-                    <p className="text-lg">
-                      {viewingEmployee.startDate
-                        ? (() => {
-                            const vacationInfo =
-                              employeeService.calculateVacationDays(
-                                viewingEmployee.startDate,
-                              );
-                            const years = vacationInfo.years;
-                            const months = vacationInfo.totalMonths % 12;
-                            if (years > 0) {
-                              return `${years} año${years > 1 ? "s" : ""}${months > 0 ? ` y ${months} mes${months > 1 ? "es" : ""}` : ""}`;
-                            } else {
-                              return `${months} mes${months > 1 ? "es" : ""}`;
-                            }
-                          })()
-                        : "No calculada"}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Sueldo Diario</Label>
-                    <p className="text-lg font-semibold text-green-600">
-                      {formatCurrency(viewingEmployee.dailyWage || 0)}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Sueldo Mensual Blanco</Label>
-                    <p className="text-lg">
-                      {formatCurrency(viewingEmployee.whiteWage || 0)}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Sueldo Mensual Informal</Label>
-                    <p className="text-lg">
-                      {formatCurrency(viewingEmployee.informalWage || 0)}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Presentismo</Label>
-                    <p className="text-lg">
-                      {formatCurrency(viewingEmployee.presentismo || 0)}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Email</Label>
-                    <p className="text-lg">
-                      {viewingEmployee.email || "No registrado"}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Dirección</Label>
-                    <p className="text-lg">
-                      {viewingEmployee.address || "No registrada"}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Estado</Label>
-                    <Badge
-                      variant={
-                        viewingEmployee.status === "active"
-                          ? "default"
-                          : "secondary"
-                      }
-                    >
-                      {viewingEmployee.status === "active"
-                        ? "Activo"
-                        : "Inactivo"}
-                    </Badge>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Días de Vacaciones</Label>
-                    <p className="text-lg">
-                      {viewingEmployee.startDate
-                        ? (() => {
-                            const vacationInfo =
-                              employeeService.calculateVacationDays(
-                                viewingEmployee.startDate,
-                              );
-                            if (vacationInfo.eligibleForVacations) {
-                              return `${vacationInfo.vacationDays} días anuales`;
-                            } else {
-                              return `0 días (requiere 6 meses de antigüedad)`;
-                            }
-                          })()
-                        : "No calculado"}
-                    </p>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsViewDialogOpen(false)}
+                    className="text-white hover:bg-white/20"
+                  >
+                    ✕
+                  </Button>
                 </div>
-              </TabsContent>
+              </div>
 
-              <TabsContent value="salary-history" className="mt-6">
-                <SalaryHistoryTable
-                  employeeId={viewingEmployee.id}
-                  employeeName={viewingEmployee.name}
-                />
-              </TabsContent>
+              {/* Contenido con scroll */}
+              <div className="flex-1 overflow-y-auto">
+                <Tabs defaultValue="info" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
+                    <TabsTrigger value="info" className="gap-2">
+                      📋 Información Personal
+                    </TabsTrigger>
+                    <TabsTrigger value="salary-history" className="gap-2">
+                      💰 Historial Salarial
+                    </TabsTrigger>
+                  </TabsList>
 
-            </Tabs>
+                  <TabsContent value="info" className="p-6 space-y-8">
+                    {/* Información Personal */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        📋 <span>Información Personal</span>
+                      </h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              🆔
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                DOCUMENTO
+                              </p>
+                              <p className="font-medium">
+                                {viewingEmployee.documentType?.toUpperCase() ||
+                                  "DNI"}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-lg font-mono">
+                            {viewingEmployee.dni}
+                          </p>
+                        </Card>
+
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              📞
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                CONTACTO
+                              </p>
+                              <p className="font-medium">Email</p>
+                            </div>
+                          </div>
+                          <p className="text-sm">
+                            {viewingEmployee.email || "No registrado"}
+                          </p>
+                        </Card>
+
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                              🏠
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                DIRECCIÓN
+                              </p>
+                              <p className="font-medium">Ubicación</p>
+                            </div>
+                          </div>
+                          <p className="text-sm">
+                            {viewingEmployee.address || "No registrada"}
+                          </p>
+                        </Card>
+                      </div>
+                    </div>
+
+                    {/* Información Laboral */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        💼 <span>Información Laboral</span>
+                      </h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              📅
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                FECHA INGRESO
+                              </p>
+                              <p className="font-medium">Inicio</p>
+                            </div>
+                          </div>
+                          <p className="text-lg font-semibold">
+                            {viewingEmployee.startDate
+                              ? new Date(
+                                  viewingEmployee.startDate + "T00:00:00",
+                                ).toLocaleDateString("es-AR")
+                              : "No registrada"}
+                          </p>
+                        </Card>
+
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                              🏖️
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                VACACIONES
+                              </p>
+                              <p className="font-medium">Días disponibles</p>
+                            </div>
+                          </div>
+                          <p className="text-lg font-semibold">
+                            {viewingEmployee.startDate
+                              ? (() => {
+                                  const vacationInfo =
+                                    employeeService.calculateVacationDays(
+                                      viewingEmployee.startDate,
+                                    );
+                                  if (vacationInfo.eligibleForVacations) {
+                                    return `${vacationInfo.vacationDays} días`;
+                                  } else {
+                                    return `0 días`;
+                                  }
+                                })()
+                              : "No calculado"}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {viewingEmployee.vacationsTaken || 0} usados
+                          </p>
+                        </Card>
+
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                              ⏰
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                ANTIGÜEDAD
+                              </p>
+                              <p className="font-medium">Tiempo servicio</p>
+                            </div>
+                          </div>
+                          <p className="text-lg font-semibold">
+                            {viewingEmployee.startDate
+                              ? (() => {
+                                  const vacationInfo =
+                                    employeeService.calculateVacationDays(
+                                      viewingEmployee.startDate,
+                                    );
+                                  const years = vacationInfo.years;
+                                  const months = vacationInfo.totalMonths % 12;
+                                  if (years > 0) {
+                                    return `${years}a ${months}m`;
+                                  } else {
+                                    return `${months}m`;
+                                  }
+                                })()
+                              : "N/A"}
+                          </p>
+                        </Card>
+                      </div>
+                    </div>
+
+                    {/* Información Salarial */}
+                    <div>
+                      <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                        💰 <span>Información Salarial</span>
+                      </h3>
+
+                      {/* Sueldo Diario Destacado */}
+                      <Card className="p-6 mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              SUELDO DIARIO CALCULADO
+                            </p>
+                            <p className="text-3xl font-bold text-green-600">
+                              {formatCurrency(
+                                calculateDailySalary(
+                                  viewingEmployee.whiteWage || 0,
+                                  viewingEmployee.informalWage || 0,
+                                ),
+                              )}
+                            </p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              (Sueldo Blanco + Sueldo Informal) ÷ 30
+                            </p>
+                          </div>
+                          <div className="text-6xl opacity-20">💵</div>
+                        </div>
+                        <div className="mt-4">
+                          <ProgressBar
+                            value={
+                              (viewingEmployee.whiteWage || 0) +
+                              (viewingEmployee.informalWage || 0)
+                            }
+                            max={1500000}
+                            color="green"
+                            showPercentage={false}
+                          />
+                        </div>
+                      </Card>
+
+                      {/* Distribución Salarial */}
+                      <div className="grid grid-cols-3 gap-4">
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              🏦
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                SUELDO BLANCO
+                              </p>
+                              <p className="font-medium">Registrado</p>
+                            </div>
+                          </div>
+                          <p className="text-xl font-bold text-blue-600">
+                            {formatCurrency(viewingEmployee.whiteWage || 0)}
+                          </p>
+                          <div className="mt-2">
+                            <ProgressBar
+                              value={viewingEmployee.whiteWage || 0}
+                              max={
+                                (viewingEmployee.whiteWage || 0) +
+                                (viewingEmployee.informalWage || 0)
+                              }
+                              color="blue"
+                              showPercentage={true}
+                            />
+                          </div>
+                        </Card>
+
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                              💼
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                SUELDO INFORMAL
+                              </p>
+                              <p className="font-medium">No registrado</p>
+                            </div>
+                          </div>
+                          <p className="text-xl font-bold text-purple-600">
+                            {formatCurrency(viewingEmployee.informalWage || 0)}
+                          </p>
+                          <div className="mt-2">
+                            <ProgressBar
+                              value={viewingEmployee.informalWage || 0}
+                              max={
+                                (viewingEmployee.whiteWage || 0) +
+                                (viewingEmployee.informalWage || 0)
+                              }
+                              color="purple"
+                              showPercentage={true}
+                            />
+                          </div>
+                        </Card>
+
+                        <Card className="p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-orange-100 rounded-lg">
+                              🎯
+                            </div>
+                            <div>
+                              <p className="text-sm text-muted-foreground">
+                                PRESENTISMO
+                              </p>
+                              <p className="font-medium">Bono asistencia</p>
+                            </div>
+                          </div>
+                          <p className="text-xl font-bold text-orange-600">
+                            {formatCurrency(viewingEmployee.presentismo || 0)}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {viewingEmployee.losesPresentismo
+                              ? "❌ En riesgo"
+                              : "✅ Mantenido"}
+                          </p>
+                        </Card>
+                      </div>
+
+                      {/* Botón para ver historial */}
+                      <div className="flex justify-center mt-6">
+                        <Button
+                          variant="outline"
+                          className="gap-2"
+                          onClick={() => {
+                            // Cambiar a la pestaña de historial
+                            const historyTab = document.querySelector(
+                              '[value="salary-history"]',
+                            ) as HTMLElement;
+                            historyTab?.click();
+                          }}
+                        >
+                          🏃‍♂️ Ver Historial Completo
+                        </Button>
+                      </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="salary-history" className="p-6">
+                    <SalaryHistoryTable
+                      employeeId={viewingEmployee.id}
+                      employeeName={viewingEmployee.name}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </div>
+            </div>
           )}
-
-          <div className="flex justify-end pt-4">
-            <Button
-              variant="outline"
-              onClick={() => setIsViewDialogOpen(false)}
-            >
-              Cerrar
-            </Button>
-          </div>
         </DialogContent>
       </Dialog>
 
