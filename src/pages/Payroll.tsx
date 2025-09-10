@@ -1493,7 +1493,7 @@ const Payroll = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar liquidaciones por empleado, per��odo, posición o DNI..."
+                  placeholder="Buscar liquidaciones por empleado, período, posición o DNI..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
