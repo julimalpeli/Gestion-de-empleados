@@ -345,7 +345,7 @@ export const usePayroll = () => {
 
       if (error) throw error;
 
-      // Auditar eliminaci��n de liquidación
+      // Auditar eliminación de liquidación
       try {
         await auditPayroll(
           "DELETE",
