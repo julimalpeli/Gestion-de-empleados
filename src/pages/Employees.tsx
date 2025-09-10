@@ -339,7 +339,7 @@ const Employees = () => {
         editingEmployee.documentType === "dni" &&
         !/^\d{1,8}$/.test(editingEmployee.dni.trim())
       ) {
-        alert("El DNI debe ser un número de máximo 8 d��gitos");
+        alert("El DNI debe ser un número de máximo 8 dígitos");
         return;
       }
       if (
