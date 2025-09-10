@@ -78,6 +78,7 @@ import { useSalaryHistory } from "@/hooks/use-salary-history";
 import { employeeService } from "@/services/employeeService";
 import { AvatarInitials } from "@/components/ui/avatar-initials";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 const Employees = () => {
   console.log("🏢 Employees component starting to render...");
@@ -1301,6 +1302,18 @@ const Employees = () => {
       {/* Employee View Dialog - Rediseñado */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
+          <DialogHeader>
+            <VisuallyHidden>
+              <DialogTitle>
+                Información del empleado {viewingEmployee?.name || ""}
+              </DialogTitle>
+            </VisuallyHidden>
+            <VisuallyHidden>
+              <DialogDescription>
+                Información completa y historial salarial del empleado
+              </DialogDescription>
+            </VisuallyHidden>
+          </DialogHeader>
           {viewingEmployee && (
             <div className="flex flex-col h-full">
               {/* Header con gradiente */}
@@ -1641,7 +1654,7 @@ const Employees = () => {
                           <p className="text-xs text-muted-foreground mt-1">
                             {viewingEmployee.losesPresentismo
                               ? "❌ En riesgo"
-                              : "✅ Mantenido"}
+                              : "��� Mantenido"}
                           </p>
                         </Card>
                       </div>
