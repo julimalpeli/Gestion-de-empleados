@@ -501,7 +501,7 @@ const Payroll = () => {
     }
   };
 
-  // Funci��n para ver detalles sin edición (solo lectura)
+  // Función para ver detalles sin edición (solo lectura)
   const handleViewRecord = async (record) => {
     setEditingRecord(record);
     setSelectedEmployee(record.employeeId.toString());
