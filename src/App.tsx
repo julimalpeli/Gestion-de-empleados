@@ -99,6 +99,9 @@ if (import.meta.env.DEV) {
         console.log("   - recreateEmployeeUsers()");
         console.log("   - checkEmployeeUserStatus()");
         console.log("   - testConnection()");
+        console.log("   🔗 CONNECTION DEBUG:");
+        console.log("   - debugConnection() - Full connection diagnosis");
+        console.log("   - retryConnection() - Retry connection with delays");
         console.log("   - syncVacationsTaken()");
         console.log("   - manualSyncVacations()");
         console.log("   - debugRLSPermissions()");
@@ -339,7 +342,7 @@ const quickCheckEmployeesWithoutUsers = async () => {
       (emp) => !employeeIdsWithUsers.includes(emp.id),
     );
 
-    console.log(`���� Total employees with email: ${employees.length}`);
+    console.log(`📊 Total employees with email: ${employees.length}`);
     console.log(`👤 Employees with users: ${employeeIdsWithUsers.length}`);
     console.log(`❌ Employees without users: ${employeesWithoutUsers.length}`);
 
