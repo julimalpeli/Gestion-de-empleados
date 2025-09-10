@@ -109,7 +109,7 @@ const Payroll = () => {
 
   // Debug logging para whiteWage
   const debugSetWhiteWage = (value, source = "unknown") => {
-    console.log(`���� Setting whiteWage: "${value}" from: ${source}`);
+    console.log(`🔍 Setting whiteWage: "${value}" from: ${source}`);
     setWhiteWage(value);
   };
   const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
@@ -235,7 +235,7 @@ const Payroll = () => {
     try {
       const employee = employees.find((e) => e.name === record.employeeName);
       if (!employee) {
-        alert("No se encontró el empleado para duplicar la liquidaci��n");
+        alert("No se encontró el empleado para duplicar la liquidación");
         return;
       }
 
