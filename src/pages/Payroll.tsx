@@ -279,7 +279,7 @@ const Payroll = () => {
 
       // Show success message
       setSuccessMessage(
-        `Liquidaci��n duplicada. Modifica los datos necesarios y guarda.`,
+        `Liquidación duplicada. Modifica los datos necesarios y guarda.`,
       );
       setTimeout(() => setSuccessMessage(""), 5000);
     } catch (error) {
