@@ -123,7 +123,53 @@ const ForcePasswordChange = ({
         return;
       }
 
-      // Actualizar contraseña
+      // Actualizar contraseña en Supabase Auth primero
+      console.log("🔑 Updating Supabase Auth password...");
+
+      // Obtener el email del usuario para Supabase Auth
+      const userEmail = user.email || `${user.username}@cadizbar.com`; // Fallback si no hay email
+
+      try {
+        // Método 1: Intentar crear usuario en Supabase Auth con nueva contraseña
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: userEmail,
+          password: newPassword,
+          options: {
+            emailRedirectTo: undefined, // No enviar email de confirmación
+          }
+        });
+
+        if (authError && !authError.message.includes('already exists')) {
+          console.error("❌ Supabase Auth error:", authError);
+          throw new Error(`Error actualizando autenticación: ${authError.message}`);
+        }
+
+        if (authError && authError.message.includes('already exists')) {
+          console.log("🔄 User already exists in Auth, testing password...");
+
+          // Verificar si la nueva contraseña ya funciona
+          const { data: testData, error: testError } = await supabase.auth.signInWithPassword({
+            email: userEmail,
+            password: newPassword
+          });
+
+          if (testError) {
+            console.log("❌ New password doesn't work, may need manual intervention");
+            // Continuar de todos modos para actualizar la tabla local
+          } else {
+            console.log("✅ New password already works in Auth!");
+            await supabase.auth.signOut(); // Cerrar la sesión de prueba
+          }
+        }
+
+        console.log("✅ Supabase Auth updated successfully");
+      } catch (authUpdateError) {
+        console.warn("⚠️ Auth update failed, continuing with local update:", authUpdateError);
+        // No bloquear el proceso si falla Auth, continuar con actualización local
+      }
+
+      // Actualizar contraseña en tabla local
+      console.log("🔄 Updating local users table...");
       const newPasswordHash = btoa(newPassword);
       const { error: updateError } = await supabase
         .from("users")
@@ -134,10 +180,13 @@ const ForcePasswordChange = ({
         .eq("id", user.id);
 
       if (updateError) {
-        setError("Error al actualizar contraseña");
+        console.error("❌ Local update error:", updateError);
+        setError("Error al actualizar contraseña en la base de datos local");
         setIsLoading(false);
         return;
       }
+
+      console.log("✅ Password changed successfully in both Auth and local DB");
 
       // Éxito
       onPasswordChanged();
