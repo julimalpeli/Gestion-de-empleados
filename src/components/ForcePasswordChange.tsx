@@ -78,26 +78,47 @@ const ForcePasswordChange = ({
       console.log("  - Stored password_hash:", user.password_hash);
 
       // Verificar contraseña actual
-      let storedPassword;
-      try {
-        // Intentar decodificar como base64
-        storedPassword = atob(user.password_hash);
-        console.log("  - Decoded password (base64):", storedPassword);
-      } catch (e) {
-        // Si falla la decodificación, asumir que el hash no es base64
-        storedPassword = user.password_hash;
-        console.log("  - Password (not base64):", storedPassword);
+      let isPasswordValid = false;
+
+      // Caso especial: Primera vez (Supabase Auth manejando la contraseña)
+      if (user.password_hash === '$supabase$auth$handled') {
+        console.log("  - First-time user detected (Supabase Auth handled)");
+        console.log("    Checking if entered password matches username/DNI");
+        console.log("    Username:", user.username);
+        console.log("    Entered password:", currentPassword);
+
+        // Para primera vez, la contraseña actual debe ser el DNI/username
+        isPasswordValid = currentPassword === user.username;
+        console.log("    Password valid (DNI match):", isPasswordValid);
+      } else {
+        // Caso normal: contraseña almacenada en base64
+        let storedPassword;
+        try {
+          // Intentar decodificar como base64
+          storedPassword = atob(user.password_hash);
+          console.log("  - Decoded password (base64):", storedPassword);
+        } catch (e) {
+          // Si falla la decodificación, asumir que el hash no es base64
+          storedPassword = user.password_hash;
+          console.log("  - Password (not base64):", storedPassword);
+        }
+
+        console.log("  - Password comparison:");
+        console.log("    Current entered:", currentPassword);
+        console.log("    Stored decoded:", storedPassword);
+
+        isPasswordValid = storedPassword === currentPassword;
+        console.log("    Match:", isPasswordValid);
       }
 
-      console.log("  - Password comparison:");
-      console.log("    Current entered:", currentPassword);
-      console.log("    Stored decoded:", storedPassword);
-      console.log("    Match:", storedPassword === currentPassword);
-
-      if (storedPassword !== currentPassword) {
-        setError(
-          `La contraseña actual es incorrecta. Esperaba: "${storedPassword}", recibió: "${currentPassword}"`,
-        );
+      if (!isPasswordValid) {
+        if (user.password_hash === '$supabase$auth$handled') {
+          setError(
+            `La contraseña actual es incorrecta. Para el primer acceso, debes ingresar tu DNI: "${user.username}"`
+          );
+        } else {
+          setError("La contraseña actual es incorrecta");
+        }
         setIsLoading(false);
         return;
       }
