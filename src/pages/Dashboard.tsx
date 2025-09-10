@@ -140,16 +140,16 @@ const Dashboard = () => {
     return today >= startDate && today <= endDate;
   });
 
-  // Upcoming vacations (rest of the year)
-  const endOfYear = new Date();
-  endOfYear.setFullYear(today.getFullYear(), 11, 31); // December 31st of current year
-  const endOfYearStr = endOfYear.toISOString().split("T")[0];
+  // Upcoming vacations (next 3 months)
+  const threeMonthsFromNow = new Date();
+  threeMonthsFromNow.setMonth(today.getMonth() + 3); // Add 3 months
+  const threeMonthsFromNowStr = threeMonthsFromNow.toISOString().split("T")[0];
 
   // Debug vacation data
   console.log("🏖️ Vacation debug info:");
   console.log("  - Total vacations loaded:", vacations.length);
   console.log("  - Today:", today.toISOString().split("T")[0]);
-  console.log("  - End of year:", endOfYear.toISOString().split("T")[0]);
+  console.log("  - Three months from now:", threeMonthsFromNow.toISOString().split("T")[0]);
 
   const approvedVacations = vacations.filter(v => v.status === "approved");
   console.log("  - Approved vacations:", approvedVacations.length);
@@ -161,7 +161,7 @@ const Dashboard = () => {
   const upcomingVacations = vacations.filter((vacation) => {
     if (vacation.status !== "approved") return false;
     const startDate = new Date(vacation.startDate);
-    const isUpcoming = startDate > today && startDate <= endOfYear;
+    const isUpcoming = startDate > today && startDate <= threeMonthsFromNow;
 
     // Debug each vacation
     if (vacation.status === "approved") {
@@ -443,7 +443,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               {upcomingVacations.length === 0
                 ? "Sin vacaciones próximas"
-                : `Resto del año ${today.getFullYear()}`}
+                : "Próximos 3 meses"}
             </p>
             {upcomingVacations.length > 0 && (
               <div className="mt-2 space-y-1">
