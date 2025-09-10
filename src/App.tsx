@@ -17,6 +17,7 @@ if (import.meta.env.DEV) {
     import("@/utils/recreateEmployeeUsers"),
     import("@/utils/quickFixEmployee"),
     import("@/utils/connectionTest"),
+    import("@/utils/connectionDebug"),
     import("@/utils/syncVacations"),
     import("@/utils/debugRLS"),
     import("@/utils/fixAuthUsers"),
@@ -338,7 +339,7 @@ const quickCheckEmployeesWithoutUsers = async () => {
       (emp) => !employeeIdsWithUsers.includes(emp.id),
     );
 
-    console.log(`📊 Total employees with email: ${employees.length}`);
+    console.log(`���� Total employees with email: ${employees.length}`);
     console.log(`👤 Employees with users: ${employeeIdsWithUsers.length}`);
     console.log(`❌ Employees without users: ${employeesWithoutUsers.length}`);
 
