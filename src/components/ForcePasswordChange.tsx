@@ -204,6 +204,11 @@ const ForcePasswordChange = ({
       }
 
       console.log("✅ Password changed successfully in both Auth and local DB");
+      console.log("📝 Summary:");
+      console.log("   - User:", user.username, "(" + userEmail + ")");
+      console.log("   - Old password was:", user.password_hash === '$supabase$auth$handled' ? 'First-time (DNI)' : 'Previous custom password');
+      console.log("   - New password set successfully");
+      console.log("   - User should now login with new password");
 
       // Éxito
       onPasswordChanged();
