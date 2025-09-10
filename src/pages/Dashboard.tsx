@@ -443,7 +443,7 @@ const Dashboard = () => {
             <p className="text-xs text-muted-foreground">
               {upcomingVacations.length === 0
                 ? "Sin vacaciones próximas"
-                : `Próximos 30 días`}
+                : `Próximos 60 días`}
             </p>
             {upcomingVacations.length > 0 && (
               <div className="mt-2 space-y-1">
