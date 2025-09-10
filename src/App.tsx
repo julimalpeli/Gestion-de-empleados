@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabase";
+import { supabase, testSupabaseConnection } from "@/lib/supabase";
 import ForcePasswordChange from "@/components/ForcePasswordChange";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
