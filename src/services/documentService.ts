@@ -19,7 +19,7 @@ export interface CreateDocumentRequest {
   employeeId: string;
   payrollId?: string; // Optional, for payroll-specific documents
   file: File;
-  category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "otros";
+  category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "certificados_medicos" | "otros";
   description?: string;
 }
 
