@@ -1403,36 +1403,36 @@ const Employees = () => {
                           </p>
                         </Card>
 
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-green-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg flex-shrink-0">
                               📞
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 CONTACTO
                               </p>
-                              <p className="font-medium">Email</p>
+                              <p className="font-medium text-sm sm:text-base">Email</p>
                             </div>
                           </div>
-                          <p className="text-sm">
+                          <p className="text-sm truncate">
                             {viewingEmployee.email || "No registrado"}
                           </p>
                         </Card>
 
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-purple-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
                               🏠
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 DIRECCIÓN
                               </p>
-                              <p className="font-medium">Ubicación</p>
+                              <p className="font-medium text-sm sm:text-base">Ubicación</p>
                             </div>
                           </div>
-                          <p className="text-sm">
+                          <p className="text-sm truncate">
                             {viewingEmployee.address || "No registrada"}
                           </p>
                         </Card>
