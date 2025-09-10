@@ -1,4 +1,4 @@
-import { supabase, logSupabaseError } from "@/lib/supabase";
+import { supabase, logSupabaseError, withRetry, getConnectionHealth } from "@/lib/supabase";
 import { auditService } from "@/services/auditService";
 import type {
   IEmployeeService,
@@ -11,22 +11,20 @@ import type {
 // Implementación con Supabase - Se puede cambiar fácilmente
 export class SupabaseEmployeeService implements IEmployeeService {
   async getAllEmployees(): Promise<Employee[]> {
-    const maxRetries = 3;
-    let lastError;
+    try {
+      console.log("🔄 Consultando empleados en Supabase...");
 
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        console.log(
-          `🔄 Consultando empleados en Supabase (intento ${attempt}/${maxRetries})...`,
-        );
+      // Check connection health first
+      const health = getConnectionHealth();
+      console.log("💊 Connection health:", health);
 
-        if (attempt === 1) {
-          console.log("�� URL Supabase:", import.meta.env.VITE_SUPABASE_URL);
-          console.log(
-            "🔑 Key configurada:",
-            !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-          );
-        }
+      if (health.state === 'disconnected' && health.retries >= 3) {
+        console.log("🚨 Connection unhealthy, using fallback immediately");
+        return this.getFallbackEmployees();
+      }
+
+      const result = await withRetry(async () => {
+        console.log("🔍 Executing employees query...");
 
         const { data, error } = await supabase
           .from("employees")
@@ -34,130 +32,65 @@ export class SupabaseEmployeeService implements IEmployeeService {
           .order("created_at", { ascending: false });
 
         if (error) {
-          logSupabaseError("getAllEmployees", error);
-          throw new Error(
-            `Supabase error: ${error.message} (Code: ${error.code})`,
-          );
+          console.error("❌ Supabase query error:", error);
+          throw new Error(`Supabase error: ${error.message} (Code: ${error.code || 'UNKNOWN'})`);
         }
 
-        console.log(
-          `✅ Successfully fetched ${data.length} employees on attempt ${attempt}`,
-        );
+        console.log(`✅ Supabase returned ${data?.length || 0} employees`);
 
-        // Debug: Let's see exactly what we're getting from Supabase
-        console.log("🔍 Raw Supabase data:", data);
-        console.log("🔍 Supabase response details:");
-        console.log("   - Data is array:", Array.isArray(data));
-        console.log("   - Data length:", data?.length);
-        console.log("   - Data type:", typeof data);
-
-        if (data.length === 0) {
-          console.log(
-            "❌ PROBLEM: Supabase returned 0 employees but should have 8+",
-          );
-          console.log(
-            "🔍 This suggests RLS policies or permissions blocking the query",
-          );
-          console.log("🔄 Activating fallback with real employee data...");
-
-          try {
-            const { getFallbackEmployeesData } = await import(
-              "@/utils/offlineFallback"
-            );
-            const fallbackData = getFallbackEmployeesData();
-            console.log(
-              "✅ Using fallback employees:",
-              fallbackData.length,
-              "employees",
-            );
-            return fallbackData;
-          } catch (fallbackError) {
-            console.warn(
-              "⚠️ Could not load fallback employees:",
-              fallbackError,
-            );
-          }
+        // Check if we got empty results (possible RLS issue)
+        if (!data || data.length === 0) {
+          console.warn("⚠️ Empty result from Supabase - this might be an RLS issue");
+          console.log("🔄 Attempting fallback due to empty results");
+          throw new Error("Empty results from database - possible RLS issue");
         }
 
-        const mappedData = data.map(this.mapFromSupabase);
-        return mappedData;
-      } catch (error) {
-        lastError = error;
-        console.error(`❌ Attempt ${attempt} failed:`, error);
+        return data;
+      }, "getAllEmployees", 2);
 
-        // Enhanced error logging
-        logSupabaseError(`getAllEmployees - Attempt ${attempt}`, error);
+      console.log(`✅ Successfully fetched ${result.length} employees`);
+      return result.map(this.mapFromSupabase);
 
-        // Activate fallback immediately for any exception (including network errors)
-        console.log("🚨 EXCEPTION CAUGHT - Activating fallback immediately");
-        try {
-          const { getFallbackEmployeesData } = await import(
-            "@/utils/offlineFallback"
-          );
-          const fallbackData = getFallbackEmployeesData();
-          console.log(
-            "✅ Using fallback employees after exception:",
-            fallbackData.length,
-            "employees",
-          );
-          return fallbackData.map(this.mapFromSupabase);
-        } catch (fallbackError) {
-          console.error("❌ Fallback also failed:", fallbackError);
-          // Continue with original error handling if fallback fails
-        }
+    } catch (error) {
+      console.error("❌ getAllEmployees final error:", error);
+      logSupabaseError("getAllEmployees - Final error", error);
 
-        // Check if it's a network connectivity error
-        const isNetworkError =
-          error instanceof TypeError &&
-          (error.message.includes("Failed to fetch") ||
-            error.message.includes("Network"));
-
-        if (attempt < maxRetries && isNetworkError) {
-          console.log(
-            `⏳ Network error detected, retrying in ${attempt * 2} seconds...`,
-          );
-          await new Promise((resolve) => setTimeout(resolve, attempt * 2000));
-          continue;
-        }
-
-        // If it's not a network error or we're out of retries, break
-        break;
-      }
+      // Always fall back to offline data on any error
+      console.log("🔄 Falling back to offline employee data...");
+      return this.getFallbackEmployees();
     }
+  }
 
-    // If we get here, all retries failed
-    console.error("❌ All retries failed. Last error:");
-    if (lastError) {
-      logSupabaseError("getAllEmployees - Final error", lastError);
-    }
-
-    // Final fallback attempt before throwing error
-    console.log("🔄 Final fallback attempt before throwing error...");
+  private async getFallbackEmployees(): Promise<Employee[]> {
     try {
-      const { getFallbackEmployeesData } = await import(
-        "@/utils/offlineFallback"
-      );
+      const { getFallbackEmployeesData } = await import("@/utils/offlineFallback");
       const fallbackData = getFallbackEmployeesData();
-      console.log(
-        "✅ Final fallback successful:",
-        fallbackData.length,
-        "employees",
-      );
+      console.log("✅ Using fallback employees:", fallbackData.length, "employees");
       return fallbackData.map(this.mapFromSupabase);
-    } catch (finalFallbackError) {
-      console.error("❌ Final fallback also failed:", finalFallbackError);
+    } catch (fallbackError) {
+      console.error("❌ Critical: Fallback employee data failed:", fallbackError);
+      // Return minimal fallback as last resort
+      return [{
+        id: "fallback-employee-1",
+        name: "Empleado de Ejemplo",
+        dni: "00000000",
+        documentType: "dni",
+        position: "Empleado",
+        whiteWage: 0,
+        informalWage: 500000,
+        dailyWage: 16667,
+        presentismo: 0,
+        losesPresentismo: false,
+        status: "active",
+        startDate: "2024-01-01",
+        vacationDays: 14,
+        vacationsTaken: 0,
+        address: "",
+        email: "",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }];
     }
-
-    if (
-      lastError instanceof TypeError &&
-      lastError.message === "Failed to fetch"
-    ) {
-      throw new Error(
-        "Error de conectividad: No se puede conectar a la base de datos. Verifique su conexión a internet.",
-      );
-    }
-
-    throw lastError || new Error("Unknown error occurred");
   }
 
   async getEmployeeById(id: string): Promise<Employee | null> {

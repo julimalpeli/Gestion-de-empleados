@@ -24,32 +24,51 @@ if (
   console.error("   - Current key configured:", !!supabaseAnonKey);
 }
 
-// Test connection on module load in development
-if (import.meta.env.DEV) {
-  setTimeout(() => {
-    testSupabaseConnection().then((success) => {
-      if (!success) {
-        console.warn(
-          "⚠️ Supabase connection failed - app may fall back to offline mode",
-        );
-      }
-    });
-  }, 1000);
-}
+// Create Supabase client with enhanced configuration
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: false
+  },
+  global: {
+    headers: {
+      'x-client-info': 'cadiz-bar-tapas-app'
+    }
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
+});
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Connection state management
+let connectionState: 'testing' | 'connected' | 'disconnected' | 'error' = 'testing';
+let lastSuccessfulConnection: Date | null = null;
+let connectionRetries = 0;
+const MAX_RETRIES = 3;
 
-// Test connectivity function
-export const testSupabaseConnection = async () => {
+// Test connectivity function with enhanced error handling
+export const testSupabaseConnection = async (): Promise<boolean> => {
   try {
     console.log("🔄 Testing Supabase connection...");
     console.log("   - URL:", supabaseUrl);
     console.log("   - Key length:", supabaseAnonKey?.length || 0);
     console.log("   - Key prefix:", supabaseAnonKey?.slice(0, 20) + "...");
 
+    connectionState = 'testing';
+    
+    // Simple health check query with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     const { data, error } = await supabase
       .from("employees")
-      .select("count", { count: "exact", head: true });
+      .select("count", { count: "exact", head: true })
+      .abortSignal(controller.signal);
+
+    clearTimeout(timeoutId);
 
     if (error) {
       console.error("❌ Supabase connection test failed:");
@@ -57,34 +76,53 @@ export const testSupabaseConnection = async () => {
       console.error("   - Error message:", error.message);
       console.error("   - Error details:", error.details);
       console.error("   - Error hint:", error.hint);
-      console.error("   - Full error object:", JSON.stringify(error, null, 2));
+      
+      connectionState = 'error';
+      connectionRetries++;
       return false;
     }
 
     console.log("✅ Supabase connection test successful");
     console.log("   - Count data:", data);
+    
+    connectionState = 'connected';
+    lastSuccessfulConnection = new Date();
+    connectionRetries = 0;
     return true;
   } catch (error) {
-    console.error("�� Supabase connection test exception:");
+    console.error("💥 Supabase connection test exception:");
     console.error("   - Error type:", typeof error);
     console.error(
       "   - Error message:",
       error instanceof Error ? error.message : String(error),
     );
     console.error("   - Error constructor:", error?.constructor?.name);
-    console.error("   - Full error object:", JSON.stringify(error, null, 2));
-    console.error("   - Raw error:", error);
+    
+    // Check for specific network errors
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        console.error("   - 🕐 CONNECTION TIMEOUT: Request took longer than 10 seconds");
+      } else if (error.message.includes('Failed to fetch')) {
+        console.error("   - 🌐 NETWORK ERROR: Cannot reach Supabase server");
+        console.error("   - 🔗 Check internet connection and Supabase URL");
+      } else if (error.message.includes('NetworkError')) {
+        console.error("   - 🌐 NETWORK ERROR: Network request failed");
+      }
+    }
+    
+    connectionState = 'disconnected';
+    connectionRetries++;
     return false;
   }
 };
 
 // Enhanced error logging utility
 export const logSupabaseError = (context: string, error: any) => {
-  console.error(`❌ ${context}:`);
+  console.group(`❌ ${context}`);
 
   if (error && typeof error === "object") {
     console.error(
-      "   - Error details:",
+      "Error details:",
       JSON.stringify(
         {
           message: error.message,
@@ -100,14 +138,116 @@ export const logSupabaseError = (context: string, error: any) => {
     );
   }
 
-  console.error("   - Raw error object:", error);
+  console.error("Raw error object:", error);
 
-  // Check for common network errors
+  // Enhanced error analysis
   if (error instanceof TypeError && error.message === "Failed to fetch") {
-    console.error("   - 🌐 NETWORK ERROR: Cannot reach Supabase server");
-    console.error("   - 🔗 Check internet connection and Supabase URL");
+    console.error("🌐 NETWORK ERROR: Cannot reach Supabase server");
+    console.error("🔗 Possible causes:");
+    console.error("   - Internet connection issues");
+    console.error("   - Supabase URL is incorrect");
+    console.error("   - Firewall blocking the request");
+    console.error("   - CORS configuration issues");
+  } else if (error?.code === 'PGRST301') {
+    console.error("🔒 RLS POLICY ERROR: Row Level Security is blocking the query");
+  } else if (error?.code === '42501') {
+    console.error("🔒 PERMISSION ERROR: Insufficient database permissions");
+  } else if (error?.code === 'PGRST116') {
+    console.error("📊 QUERY ERROR: Malformed query or missing table");
   }
+  
+  console.error("🌍 Connection state:", connectionState);
+  console.error("📅 Last successful connection:", lastSuccessfulConnection?.toISOString() || 'Never');
+  console.error("🔄 Connection retries:", connectionRetries);
+  
+  console.groupEnd();
 };
+
+// Connection health checker
+export const getConnectionHealth = () => {
+  return {
+    state: connectionState,
+    lastSuccessfulConnection,
+    retries: connectionRetries,
+    isHealthy: connectionState === 'connected' && connectionRetries < MAX_RETRIES
+  };
+};
+
+// Retry mechanism for queries
+export const withRetry = async <T>(
+  operation: () => Promise<T>,
+  operationName: string,
+  maxRetries: number = 2
+): Promise<T> => {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
+    try {
+      console.log(`🔄 ${operationName} (attempt ${attempt}/${maxRetries + 1})`);
+      
+      const result = await operation();
+      
+      if (attempt > 1) {
+        console.log(`✅ ${operationName} succeeded on retry attempt ${attempt}`);
+      }
+      
+      return result;
+    } catch (error) {
+      lastError = error;
+      logSupabaseError(`${operationName} - Attempt ${attempt}`, error);
+      
+      // Don't retry on certain types of errors
+      if (error && typeof error === 'object') {
+        const errorCode = (error as any).code;
+        const errorMessage = (error as any).message;
+        
+        // Don't retry on authentication/permission errors
+        if (errorCode === '42501' || errorCode === 'PGRST301') {
+          console.log(`❌ ${operationName} - Not retrying auth/permission error`);
+          break;
+        }
+        
+        // Don't retry on malformed queries
+        if (errorCode === 'PGRST116') {
+          console.log(`❌ ${operationName} - Not retrying query error`);
+          break;
+        }
+      }
+      
+      // Check if it's a network error that we can retry
+      const isNetworkError = 
+        error instanceof TypeError && 
+        (error.message.includes("Failed to fetch") || 
+         error.message.includes("NetworkError") ||
+         error.message.includes("AbortError"));
+      
+      if (attempt <= maxRetries && isNetworkError) {
+        const delay = attempt * 1000; // Progressive delay: 1s, 2s, 3s
+        console.log(`⏳ ${operationName} - Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // If it's not a network error or we're out of retries, break
+      break;
+    }
+  }
+  
+  throw lastError;
+};
+
+// Test connection on module load in development
+if (import.meta.env.DEV) {
+  setTimeout(() => {
+    testSupabaseConnection().then((success) => {
+      if (!success) {
+        console.warn(
+          "⚠️ Supabase connection failed - app will fall back to offline mode",
+        );
+      }
+    });
+  }, 1000);
+}
 
 // Database Types - Estas se generarán automáticamente después
 export interface Database {
