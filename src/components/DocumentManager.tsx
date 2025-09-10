@@ -232,6 +232,7 @@ export default function DocumentManager({
       sac: "bg-blue-100 text-blue-800",
       documentos: "bg-purple-100 text-purple-800",
       formularios: "bg-orange-100 text-orange-800",
+      certificados_medicos: "bg-red-100 text-red-800",
       otros: "bg-gray-100 text-gray-800",
     };
     return colors[category] || colors.otros;
