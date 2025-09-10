@@ -1850,7 +1850,7 @@ const Payroll = () => {
                                       </Button>
                                     </TooltipTrigger>
                                     <TooltipContent>
-                                      <p>Aprobar liquidaci��n</p>
+                                      <p>Aprobar liquidación</p>
                                     </TooltipContent>
                                   </Tooltip>
                                 </TooltipProvider>
