@@ -245,15 +245,18 @@ const ForcePasswordChange = ({
 
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="current">Contraseña Actual (tu DNI)</Label>
+            <Label htmlFor="current">Contraseña Actual</Label>
             <Input
               id="current"
               type="password"
-              placeholder="Ingresa tu DNI"
+              placeholder="Ingresa tu DNI (primera vez) o contraseña actual"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
             />
+            <p className="text-xs text-muted-foreground">
+              Si es tu primera vez, ingresa tu DNI. Si ya cambiaste tu contraseña antes, ingresa tu contraseña actual.
+            </p>
           </div>
 
           <div className="space-y-2">
