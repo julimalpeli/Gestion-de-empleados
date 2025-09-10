@@ -262,17 +262,35 @@ class DocumentService {
 
   async downloadDocument(id: string): Promise<string> {
     try {
+      // Get the file name from the database
       const { data, error } = await supabase
         .from("employee_documents")
-        .select("file_url, original_file_name")
+        .select("file_name, original_file_name")
         .eq("id", id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching document metadata:", error);
+        throw new Error("Document not found");
+      }
 
-      return data.file_url;
+      // Create a signed URL for download (valid for 1 hour)
+      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
+        .from(this.BUCKET_NAME)
+        .createSignedUrl(data.file_name, 3600); // 1 hour expiry
+
+      if (signedUrlError) {
+        console.error("Error creating signed URL:", signedUrlError);
+        throw new Error("Failed to create download URL");
+      }
+
+      console.log("Created signed URL for download:", signedUrlData.signedUrl);
+      return signedUrlData.signedUrl;
     } catch (error) {
       console.error("Error getting download URL:", error);
+      if (error instanceof Error) {
+        throw error;
+      }
       throw new Error("Failed to get download URL");
     }
   }
