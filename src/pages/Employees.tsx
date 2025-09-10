@@ -1573,19 +1573,19 @@ const Employees = () => {
 
                       {/* Distribución Salarial */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-blue-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
                               🏦
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 SUELDO BLANCO
                               </p>
-                              <p className="font-medium">Registrado</p>
+                              <p className="font-medium text-sm sm:text-base">Registrado</p>
                             </div>
                           </div>
-                          <p className="text-xl font-bold text-blue-600">
+                          <p className="text-lg sm:text-xl font-bold text-blue-600 truncate">
                             {formatCurrency(viewingEmployee.whiteWage || 0)}
                           </p>
                           <div className="mt-2">
@@ -1601,19 +1601,19 @@ const Employees = () => {
                           </div>
                         </Card>
 
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-purple-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
                               💼
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 SUELDO INFORMAL
                               </p>
-                              <p className="font-medium">No registrado</p>
+                              <p className="font-medium text-sm sm:text-base">No registrado</p>
                             </div>
                           </div>
-                          <p className="text-xl font-bold text-purple-600">
+                          <p className="text-lg sm:text-xl font-bold text-purple-600 truncate">
                             {formatCurrency(viewingEmployee.informalWage || 0)}
                           </p>
                           <div className="mt-2">
@@ -1629,19 +1629,19 @@ const Employees = () => {
                           </div>
                         </Card>
 
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-orange-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg flex-shrink-0">
                               🎯
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 PRESENTISMO
                               </p>
-                              <p className="font-medium">Bono asistencia</p>
+                              <p className="font-medium text-sm sm:text-base">Bono asistencia</p>
                             </div>
                           </div>
-                          <p className="text-xl font-bold text-orange-600">
+                          <p className="text-lg sm:text-xl font-bold text-orange-600 truncate">
                             {formatCurrency(viewingEmployee.presentismo || 0)}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">
@@ -1653,10 +1653,10 @@ const Employees = () => {
                       </div>
 
                       {/* Botón para ver historial */}
-                      <div className="flex justify-center mt-6">
+                      <div className="flex justify-center mt-4 sm:mt-6">
                         <Button
                           variant="outline"
-                          className="gap-2"
+                          className="gap-1 sm:gap-2 text-sm sm:text-base"
                           onClick={() => {
                             // Cambiar a la pestaña de historial
                             const historyTab = document.querySelector(
@@ -1665,7 +1665,8 @@ const Employees = () => {
                             historyTab?.click();
                           }}
                         >
-                          🏃‍♂️ Ver Historial Completo
+                          <span className="hidden sm:inline">🏃‍♂️ Ver Historial Completo</span>
+                          <span className="sm:hidden">📊 Ver Historial</span>
                         </Button>
                       </div>
                     </div>
