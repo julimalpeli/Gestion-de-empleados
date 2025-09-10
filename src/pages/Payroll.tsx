@@ -297,9 +297,12 @@ const Payroll = () => {
     }
   }, [selectedPeriod]);
 
-  // Filtrar automáticamente por el último período disponible al cargar
+  // Auto-seleccionar el último período solo al cargar inicialmente los datos
+  // No cambiar automáticamente si el usuario ya eligió "all"
+  const [hasAutoSelected, setHasAutoSelected] = useState(false);
+
   useEffect(() => {
-    if (payrollRecords && payrollRecords.length > 0 && periodFilter === "all") {
+    if (payrollRecords && payrollRecords.length > 0 && periodFilter === "all" && !hasAutoSelected) {
       // Obtener todos los períodos únicos y ordenarlos del más reciente al más antiguo
       const periods = [
         ...new Set(payrollRecords.map((record) => record.period)),
@@ -315,9 +318,10 @@ const Payroll = () => {
         const latestPeriod = sortedPeriods[0];
         console.log(`🔍 Auto-selecting latest period: ${latestPeriod}`);
         setPeriodFilter(latestPeriod);
+        setHasAutoSelected(true);
       }
     }
-  }, [payrollRecords, periodFilter]);
+  }, [payrollRecords, periodFilter, hasAutoSelected]);
 
   // Función para verificar si un período es de aguinaldo (junio o diciembre)
   const isAguinaldoPeriod = (period: string) => {
