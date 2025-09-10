@@ -719,7 +719,7 @@ const Payroll = () => {
     const advancesNum = parseFloat(advances) || 0;
     const discountsNum = parseFloat(discounts) || 0;
 
-    // Sueldo base - usar dailyWage hist��rico si está disponible, sino el actual
+    // Sueldo base - usar dailyWage histórico si está disponible, sino el actual
     let dailyWageToUse = employee.dailyWage;
 
     // Si tenemos salario histórico, calcular el dailyWage histórico
