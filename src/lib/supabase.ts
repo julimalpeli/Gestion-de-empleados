@@ -19,6 +19,20 @@ if (
   supabaseAnonKey === "YOUR_SUPABASE_ANON_KEY"
 ) {
   console.error("❌ Supabase environment variables not configured!");
+  console.error("   - Expected VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY");
+  console.error("   - Current URL:", supabaseUrl);
+  console.error("   - Current key configured:", !!supabaseAnonKey);
+}
+
+// Test connection on module load in development
+if (import.meta.env.DEV) {
+  setTimeout(() => {
+    testSupabaseConnection().then((success) => {
+      if (!success) {
+        console.warn("⚠️ Supabase connection failed - app may fall back to offline mode");
+      }
+    });
+  }, 1000);
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
@@ -29,6 +43,7 @@ export const testSupabaseConnection = async () => {
     console.log("🔄 Testing Supabase connection...");
     console.log("   - URL:", supabaseUrl);
     console.log("   - Key length:", supabaseAnonKey?.length || 0);
+    console.log("   - Key prefix:", supabaseAnonKey?.slice(0, 20) + "...");
 
     const { data, error } = await supabase
       .from("employees")
@@ -40,22 +55,48 @@ export const testSupabaseConnection = async () => {
       console.error("   - Error message:", error.message);
       console.error("   - Error details:", error.details);
       console.error("   - Error hint:", error.hint);
-      console.error("   - Full error:", error);
+      console.error("   - Full error object:", JSON.stringify(error, null, 2));
       return false;
     }
 
     console.log("✅ Supabase connection test successful");
-    console.log("   - Data:", data);
+    console.log("   - Count data:", data);
     return true;
   } catch (error) {
-    console.error("❌ Supabase connection test exception:");
+    console.error("�� Supabase connection test exception:");
     console.error("   - Error type:", typeof error);
     console.error(
       "   - Error message:",
       error instanceof Error ? error.message : String(error),
     );
-    console.error("   - Full error:", error);
+    console.error("   - Error constructor:", error?.constructor?.name);
+    console.error("   - Full error object:", JSON.stringify(error, null, 2));
+    console.error("   - Raw error:", error);
     return false;
+  }
+};
+
+// Enhanced error logging utility
+export const logSupabaseError = (context: string, error: any) => {
+  console.error(`❌ ${context}:`);
+
+  if (error && typeof error === "object") {
+    console.error("   - Error details:", JSON.stringify({
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint,
+      errorType: typeof error,
+      errorConstructor: error.constructor?.name,
+    }, null, 2));
+  }
+
+  console.error("   - Raw error object:", error);
+
+  // Check for common network errors
+  if (error instanceof TypeError && error.message === "Failed to fetch") {
+    console.error("   - 🌐 NETWORK ERROR: Cannot reach Supabase server");
+    console.error("   - 🔗 Check internet connection and Supabase URL");
   }
 };
 
