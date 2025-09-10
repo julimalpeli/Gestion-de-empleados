@@ -1359,6 +1359,15 @@ const Employees = () => {
                       </Badge>
                     </div>
                   </div>
+                  {/* Botón cerrar */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setIsViewDialogOpen(false)}
+                    className="text-white hover:bg-white/20 flex-shrink-0"
+                  >
+                    ✕
+                  </Button>
                 </div>
               </div>
 
