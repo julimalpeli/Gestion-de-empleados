@@ -60,14 +60,7 @@ class DocumentService {
         );
       }
 
-      // Get public URL
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from(this.BUCKET_NAME).getPublicUrl(fileName);
-
-      console.log("Generated public URL:", publicUrl);
-
-      // Save document metadata to database
+      // Save document metadata to database (no need for public URL since we use signed URLs)
       const documentData = {
         employee_id: request.employeeId,
         payroll_id: request.payrollId || null,
@@ -77,7 +70,7 @@ class DocumentService {
         file_size: request.file.size,
         category: request.category,
         description: request.description,
-        file_url: publicUrl,
+        file_url: "", // No longer needed - we use signed URLs for downloads
         uploaded_by: "system", // TODO: Get from auth context
       };
 
