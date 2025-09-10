@@ -1301,7 +1301,7 @@ const Employees = () => {
       {/* Employee View Dialog */}
       {/* Employee View Dialog - Rediseñado */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-5xl max-h-[95vh] sm:max-h-[90vh] p-0 w-full mx-2 sm:mx-4">
+        <DialogContent className="max-w-5xl h-[95vh] sm:h-[90vh] p-0 w-full mx-2 sm:mx-4 flex flex-col">
           <VisuallyHidden asChild>
             <DialogTitle>
               Información del empleado {viewingEmployee?.name || ""}
@@ -1373,121 +1373,78 @@ const Employees = () => {
 
               {/* Contenido scrolleable */}
               <div className="flex-1 min-h-0">
-                <Tabs defaultValue="info" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 rounded-none border-b">
-                    <TabsTrigger value="info" className="gap-1 sm:gap-2 text-xs sm:text-sm">
-                      <span className="hidden sm:inline">📋 Información Personal</span>
-                      <span className="sm:hidden">📋 Info</span>
+                <Tabs defaultValue="info" className="w-full h-full flex flex-col">
+                  <TabsList className="grid w-full grid-cols-2 rounded-none border-b bg-gray-50">
+                    <TabsTrigger value="info" className="text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Información</span>
+                      <span className="sm:hidden">Info</span>
                     </TabsTrigger>
-                    <TabsTrigger value="salary-history" className="gap-1 sm:gap-2 text-xs sm:text-sm">
-                      <span className="hidden sm:inline">💰 Historial Salarial</span>
-                      <span className="sm:hidden">💰 Historial</span>
+                    <TabsTrigger value="salary-history" className="text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Historial Salarial</span>
+                      <span className="sm:hidden">Historial</span>
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="info" className="p-4 sm:p-6 space-y-6 sm:space-y-8">
+                  <TabsContent value="info" className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
                     {/* Información Personal */}
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-                        📋 <span>Información Personal</span>
+                      <h3 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
+                        Información Personal
                       </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                              🆔
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                DOCUMENTO
-                              </p>
-                              <p className="font-medium text-sm sm:text-base truncate">
-                                {viewingEmployee.documentType?.toUpperCase() ||
-                                  "DNI"}
-                              </p>
-                            </div>
-                          </div>
-                          <p className="text-base sm:text-lg font-mono truncate">
-                            {viewingEmployee.dni}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Documento
+                          </Label>
+                          <p className="text-lg font-semibold text-gray-900 mt-1">
+                            {viewingEmployee.documentType?.toUpperCase() || "DNI"}: {viewingEmployee.dni}
                           </p>
-                        </Card>
+                        </div>
 
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg flex-shrink-0">
-                              📞
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                CONTACTO
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Email</p>
-                            </div>
-                          </div>
-                          <p className="text-sm truncate">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Email
+                          </Label>
+                          <p className="text-lg font-semibold text-gray-900 mt-1 truncate">
                             {viewingEmployee.email || "No registrado"}
                           </p>
-                        </Card>
+                        </div>
 
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
-                              🏠
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                DIRECCIÓN
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Ubicación</p>
-                            </div>
-                          </div>
-                          <p className="text-sm truncate">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Dirección
+                          </Label>
+                          <p className="text-lg font-semibold text-gray-900 mt-1 truncate">
                             {viewingEmployee.address || "No registrada"}
                           </p>
-                        </Card>
+                        </div>
                       </div>
                     </div>
 
                     {/* Información Laboral */}
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-                        💼 <span>Información Laboral</span>
+                      <h3 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
+                        Información Laboral
                       </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                              📅
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                FECHA INGRESO
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Inicio</p>
-                            </div>
-                          </div>
-                          <p className="text-base sm:text-lg font-semibold truncate">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Fecha de Ingreso
+                          </Label>
+                          <p className="text-lg font-semibold text-gray-900 mt-1">
                             {viewingEmployee.startDate
                               ? new Date(
                                   viewingEmployee.startDate + "T00:00:00",
                                 ).toLocaleDateString("es-AR")
                               : "No registrada"}
                           </p>
-                        </Card>
+                        </div>
 
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg flex-shrink-0">
-                              🏖️
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                VACACIONES
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Días disponibles</p>
-                            </div>
-                          </div>
-                          <p className="text-base sm:text-lg font-semibold">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Vacaciones
+                          </Label>
+                          <p className="text-lg font-semibold text-gray-900 mt-1">
                             {viewingEmployee.startDate
                               ? (() => {
                                   const vacationInfo =
@@ -1502,24 +1459,16 @@ const Employees = () => {
                                 })()
                               : "No calculado"}
                           </p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-gray-500 mt-1">
                             {viewingEmployee.vacationsTaken || 0} usados
                           </p>
-                        </Card>
+                        </div>
 
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
-                              ⏰
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                ANTIGÜEDAD
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Tiempo servicio</p>
-                            </div>
-                          </div>
-                          <p className="text-base sm:text-lg font-semibold">
+                        <div className="bg-gray-50 p-4 rounded-lg">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Antigüedad
+                          </Label>
+                          <p className="text-lg font-semibold text-gray-900 mt-1">
                             {viewingEmployee.startDate
                               ? (() => {
                                   const vacationInfo =
@@ -1529,143 +1478,82 @@ const Employees = () => {
                                   const years = vacationInfo.years;
                                   const months = vacationInfo.totalMonths % 12;
                                   if (years > 0) {
-                                    return `${years}a ${months}m`;
+                                    return `${years} año${years > 1 ? "s" : ""} ${months > 0 ? `${months} mes${months > 1 ? "es" : ""}` : ""}`;
                                   } else {
-                                    return `${months}m`;
+                                    return `${months} mes${months > 1 ? "es" : ""}`;
                                   }
                                 })()
                               : "N/A"}
                           </p>
-                        </Card>
+                        </div>
                       </div>
                     </div>
 
                     {/* Información Salarial */}
                     <div>
-                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-                        💰 <span>Información Salarial</span>
+                      <h3 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
+                        Información Salarial
                       </h3>
 
-                      {/* Sueldo Diario Destacado */}
-                      <Card className="p-4 sm:p-6 mb-4 sm:mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1 min-w-0">
-                            <p className="text-xs sm:text-sm text-muted-foreground mb-1">
-                              SUELDO DIARIO CALCULADO
-                            </p>
-                            <p className="text-xl sm:text-3xl font-bold text-green-600 truncate">
-                              {formatCurrency(
-                                calculateDailySalary(
-                                  viewingEmployee.whiteWage || 0,
-                                  viewingEmployee.informalWage || 0,
-                                ),
-                              )}
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              (Sueldo Blanco + Sueldo Informal) ÷ 30
-                            </p>
-                          </div>
-                          <div className="text-4xl sm:text-6xl opacity-20 flex-shrink-0">💵</div>
+                      {/* Sueldo Diario */}
+                      <div className="bg-gray-900 text-white p-6 rounded-lg mb-6">
+                        <div>
+                          <p className="text-sm text-gray-300 mb-1">
+                            SUELDO DIARIO
+                          </p>
+                          <p className="text-3xl font-bold">
+                            {formatCurrency(
+                              calculateDailySalary(
+                                viewingEmployee.whiteWage || 0,
+                                viewingEmployee.informalWage || 0,
+                              ),
+                            )}
+                          </p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            Calculado como (Blanco + Informal) ÷ 30
+                          </p>
                         </div>
-                        <div className="mt-4">
-                          <ProgressBar
-                            value={
-                              (viewingEmployee.whiteWage || 0) +
-                              (viewingEmployee.informalWage || 0)
-                            }
-                            max={1500000}
-                            color="green"
-                            showPercentage={false}
-                          />
-                        </div>
-                      </Card>
+                      </div>
 
                       {/* Distribución Salarial */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                              🏦
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                SUELDO BLANCO
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Registrado</p>
-                            </div>
-                          </div>
-                          <p className="text-lg sm:text-xl font-bold text-blue-600 truncate">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Sueldo en Blanco
+                          </Label>
+                          <p className="text-xl font-bold text-gray-900 mt-1">
                             {formatCurrency(viewingEmployee.whiteWage || 0)}
                           </p>
-                          <div className="mt-2">
-                            <ProgressBar
-                              value={viewingEmployee.whiteWage || 0}
-                              max={
-                                (viewingEmployee.whiteWage || 0) +
-                                (viewingEmployee.informalWage || 0)
-                              }
-                              color="blue"
-                              showPercentage={true}
-                            />
-                          </div>
-                        </Card>
+                          <p className="text-xs text-gray-500 mt-1">Registrado oficialmente</p>
+                        </div>
 
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
-                              💼
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                SUELDO INFORMAL
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">No registrado</p>
-                            </div>
-                          </div>
-                          <p className="text-lg sm:text-xl font-bold text-purple-600 truncate">
+                        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-500">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Sueldo Informal
+                          </Label>
+                          <p className="text-xl font-bold text-gray-900 mt-1">
                             {formatCurrency(viewingEmployee.informalWage || 0)}
                           </p>
-                          <div className="mt-2">
-                            <ProgressBar
-                              value={viewingEmployee.informalWage || 0}
-                              max={
-                                (viewingEmployee.whiteWage || 0) +
-                                (viewingEmployee.informalWage || 0)
-                              }
-                              color="purple"
-                              showPercentage={true}
-                            />
-                          </div>
-                        </Card>
+                          <p className="text-xs text-gray-500 mt-1">No registrado</p>
+                        </div>
 
-                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                            <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg flex-shrink-0">
-                              🎯
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <p className="text-xs sm:text-sm text-muted-foreground">
-                                PRESENTISMO
-                              </p>
-                              <p className="font-medium text-sm sm:text-base">Bono asistencia</p>
-                            </div>
-                          </div>
-                          <p className="text-lg sm:text-xl font-bold text-orange-600 truncate">
+                        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
+                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Presentismo
+                          </Label>
+                          <p className="text-xl font-bold text-gray-900 mt-1">
                             {formatCurrency(viewingEmployee.presentismo || 0)}
                           </p>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {viewingEmployee.losesPresentismo
-                              ? "❌ En riesgo"
-                              : "✅ Mantenido"}
+                          <p className="text-xs text-gray-500 mt-1">
+                            {viewingEmployee.losesPresentismo ? "En riesgo" : "Activo"}
                           </p>
-                        </Card>
+                        </div>
                       </div>
 
                       {/* Botón para ver historial */}
-                      <div className="flex justify-center mt-4 sm:mt-6">
+                      <div className="flex justify-center mt-6">
                         <Button
                           variant="outline"
-                          className="gap-1 sm:gap-2 text-sm sm:text-base"
                           onClick={() => {
                             // Cambiar a la pestaña de historial
                             const historyTab = document.querySelector(
@@ -1674,8 +1562,7 @@ const Employees = () => {
                             historyTab?.click();
                           }}
                         >
-                          <span className="hidden sm:inline">🏃‍♂️ Ver Historial Completo</span>
-                          <span className="sm:hidden">📊 Ver Historial</span>
+                          Ver Historial Completo
                         </Button>
                       </div>
                     </div>
