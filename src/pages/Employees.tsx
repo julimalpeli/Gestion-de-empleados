@@ -1302,17 +1302,13 @@ const Employees = () => {
       {/* Employee View Dialog - Rediseñado */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden p-0">
-          <DialogHeader>
-            <VisuallyHidden>
-              <DialogTitle>
-                Información del empleado {viewingEmployee?.name || ""}
-              </DialogTitle>
-            </VisuallyHidden>
-            <VisuallyHidden>
-              <DialogDescription>
-                Información completa y historial salarial del empleado
-              </DialogDescription>
-            </VisuallyHidden>
+          <DialogHeader className="sr-only">
+            <DialogTitle>
+              Información del empleado {viewingEmployee?.name || ""}
+            </DialogTitle>
+            <DialogDescription>
+              Información completa y historial salarial del empleado
+            </DialogDescription>
           </DialogHeader>
           {viewingEmployee && (
             <div className="flex flex-col h-full">
@@ -1654,7 +1650,7 @@ const Employees = () => {
                           <p className="text-xs text-muted-foreground mt-1">
                             {viewingEmployee.losesPresentismo
                               ? "❌ En riesgo"
-                              : "��� Mantenido"}
+                              : "✅ Mantenido"}
                           </p>
                         </Card>
                       </div>
