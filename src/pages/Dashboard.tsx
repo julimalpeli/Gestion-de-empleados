@@ -145,11 +145,33 @@ const Dashboard = () => {
   next30Days.setDate(today.getDate() + 30);
   const next30DaysStr = next30Days.toISOString().split("T")[0];
 
+  // Debug vacation data
+  console.log("🏖️ Vacation debug info:");
+  console.log("  - Total vacations loaded:", vacations.length);
+  console.log("  - Today:", today.toISOString().split("T")[0]);
+  console.log("  - Next 30 days:", next30Days.toISOString().split("T")[0]);
+
+  const approvedVacations = vacations.filter(v => v.status === "approved");
+  console.log("  - Approved vacations:", approvedVacations.length);
+
+  if (vacations.length > 0) {
+    console.log("  - Sample vacation:", vacations[0]);
+  }
+
   const upcomingVacations = vacations.filter((vacation) => {
     if (vacation.status !== "approved") return false;
     const startDate = new Date(vacation.startDate);
-    return startDate > today && startDate <= next30Days;
+    const isUpcoming = startDate > today && startDate <= next30Days;
+
+    // Debug each vacation
+    if (vacation.status === "approved") {
+      console.log(`    - Vacation ${vacation.id}: ${vacation.startDate} - upcoming: ${isUpcoming}`);
+    }
+
+    return isUpcoming;
   });
+
+  console.log("  - Upcoming vacations found:", upcomingVacations.length);
 
   // Get employee names for vacations
   const getEmployeeName = (employeeId: string) => {
