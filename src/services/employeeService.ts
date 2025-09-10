@@ -348,7 +348,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         updateData.vacation_days = vacationInfo.vacationDays;
         updateData.start_date = employee.startDate;
         console.log(
-          `🔄 Recalculando vacaciones para nueva fecha: ${employee.startDate} ��� ${vacationInfo.vacationDays} días`,
+          `🔄 Recalculando vacaciones para nueva fecha: ${employee.startDate} → ${vacationInfo.vacationDays} días`,
         );
       }
 
