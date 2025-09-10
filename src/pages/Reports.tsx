@@ -404,7 +404,8 @@ const Reports = () => {
                   bonificaciones, etc.
                 </p>
                 <p className="text-center text-muted-foreground text-sm">
-                  <strong>Recibos:</strong> Para imprimir y recortar, entrega individual
+                  <strong>Recibos:</strong> Para imprimir y recortar, entrega
+                  individual
                 </p>
               </div>
             </CardContent>

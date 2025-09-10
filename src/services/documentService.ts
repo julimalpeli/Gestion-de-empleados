@@ -8,7 +8,13 @@ export interface EmployeeDocument {
   originalFileName: string;
   fileType: string;
   fileSize: number;
-  category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "certificados_medicos" | "otros";
+  category:
+    | "recibo_sueldo"
+    | "sac"
+    | "documentos"
+    | "formularios"
+    | "certificados_medicos"
+    | "otros";
   description?: string;
   uploadedAt: string;
   uploadedBy: string;
@@ -19,7 +25,13 @@ export interface CreateDocumentRequest {
   employeeId: string;
   payrollId?: string; // Optional, for payroll-specific documents
   file: File;
-  category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "certificados_medicos" | "otros";
+  category:
+    | "recibo_sueldo"
+    | "sac"
+    | "documentos"
+    | "formularios"
+    | "certificados_medicos"
+    | "otros";
   description?: string;
 }
 
@@ -268,9 +280,10 @@ class DocumentService {
       }
 
       // Create a signed URL for download (valid for 1 hour)
-      const { data: signedUrlData, error: signedUrlError } = await supabase.storage
-        .from(this.BUCKET_NAME)
-        .createSignedUrl(data.file_name, 3600); // 1 hour expiry
+      const { data: signedUrlData, error: signedUrlError } =
+        await supabase.storage
+          .from(this.BUCKET_NAME)
+          .createSignedUrl(data.file_name, 3600); // 1 hour expiry
 
       if (signedUrlError) {
         console.error("Error creating signed URL:", signedUrlError);

@@ -302,7 +302,12 @@ const Payroll = () => {
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
   useEffect(() => {
-    if (payrollRecords && payrollRecords.length > 0 && periodFilter === "all" && !hasAutoSelected) {
+    if (
+      payrollRecords &&
+      payrollRecords.length > 0 &&
+      periodFilter === "all" &&
+      !hasAutoSelected
+    ) {
       // Obtener todos los períodos únicos y ordenarlos del más reciente al más antiguo
       const periods = [
         ...new Set(payrollRecords.map((record) => record.period)),

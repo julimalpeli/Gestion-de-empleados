@@ -86,7 +86,7 @@ export const usePayroll = () => {
           stack: (err as any).stack,
           errorType: typeof err,
           errorConstructor: err.constructor?.name,
-          fullError: err
+          fullError: err,
         });
       }
 
@@ -96,7 +96,9 @@ export const usePayroll = () => {
 
       try {
         // Import and use fallback data immediately
-        const { getFallbackPayrollData } = await import("@/utils/offlineFallback");
+        const { getFallbackPayrollData } = await import(
+          "@/utils/offlineFallback"
+        );
         const fallbackData = getFallbackPayrollData();
 
         if (fallbackData && fallbackData.length > 0) {
@@ -109,9 +111,14 @@ export const usePayroll = () => {
           setError(null);
 
           // Show success in UI
-          if (window.location.pathname.includes('liquidaciones') || window.location.pathname.includes('payroll')) {
+          if (
+            window.location.pathname.includes("liquidaciones") ||
+            window.location.pathname.includes("payroll")
+          ) {
             setTimeout(() => {
-              console.log("💡 TIP: All payroll features available in offline mode");
+              console.log(
+                "💡 TIP: All payroll features available in offline mode",
+              );
             }, 1000);
           }
 
@@ -388,10 +395,16 @@ export const usePayroll = () => {
       }
     };
 
-    window.addEventListener('emergency-payroll-fallback', handleEmergencyFallback);
+    window.addEventListener(
+      "emergency-payroll-fallback",
+      handleEmergencyFallback,
+    );
 
     return () => {
-      window.removeEventListener('emergency-payroll-fallback', handleEmergencyFallback);
+      window.removeEventListener(
+        "emergency-payroll-fallback",
+        handleEmergencyFallback,
+      );
     };
   }, []);
 
