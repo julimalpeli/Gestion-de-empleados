@@ -140,16 +140,16 @@ const Dashboard = () => {
     return today >= startDate && today <= endDate;
   });
 
-  // Upcoming vacations (next 60 days)
-  const next60Days = new Date();
-  next60Days.setDate(today.getDate() + 60);
-  const next60DaysStr = next60Days.toISOString().split("T")[0];
+  // Upcoming vacations (rest of the year)
+  const endOfYear = new Date();
+  endOfYear.setFullYear(today.getFullYear(), 11, 31); // December 31st of current year
+  const endOfYearStr = endOfYear.toISOString().split("T")[0];
 
   // Debug vacation data
   console.log("🏖️ Vacation debug info:");
   console.log("  - Total vacations loaded:", vacations.length);
   console.log("  - Today:", today.toISOString().split("T")[0]);
-  console.log("  - Next 60 days:", next60Days.toISOString().split("T")[0]);
+  console.log("  - End of year:", endOfYear.toISOString().split("T")[0]);
 
   const approvedVacations = vacations.filter(v => v.status === "approved");
   console.log("  - Approved vacations:", approvedVacations.length);
