@@ -81,7 +81,7 @@ const ForcePasswordChange = ({
       let isPasswordValid = false;
 
       // Caso especial: Primera vez (Supabase Auth manejando la contraseña)
-      if (user.password_hash === '$supabase$auth$handled') {
+      if (user.password_hash === "$supabase$auth$handled") {
         console.log("  - First-time user detected (Supabase Auth handled)");
         console.log("    Checking if entered password matches username/DNI");
         console.log("    Username:", user.username);
@@ -112,9 +112,9 @@ const ForcePasswordChange = ({
       }
 
       if (!isPasswordValid) {
-        if (user.password_hash === '$supabase$auth$handled') {
+        if (user.password_hash === "$supabase$auth$handled") {
           setError(
-            `La contraseña actual es incorrecta. Para el primer acceso, debes ingresar tu DNI: "${user.username}"`
+            `La contraseña actual es incorrecta. Para el primer acceso, debes ingresar tu DNI: "${user.username}"`,
           );
         } else {
           setError("La contraseña actual es incorrecta");
@@ -148,30 +148,37 @@ const ForcePasswordChange = ({
 
       try {
         // Método 1: Intentar crear usuario en Supabase Auth con nueva contraseña
-        const { data: authData, error: authError } = await supabase.auth.signUp({
-          email: userEmail,
-          password: newPassword,
-          options: {
-            emailRedirectTo: undefined, // No enviar email de confirmación
-          }
-        });
+        const { data: authData, error: authError } = await supabase.auth.signUp(
+          {
+            email: userEmail,
+            password: newPassword,
+            options: {
+              emailRedirectTo: undefined, // No enviar email de confirmación
+            },
+          },
+        );
 
-        if (authError && !authError.message.includes('already exists')) {
+        if (authError && !authError.message.includes("already exists")) {
           console.error("❌ Supabase Auth error:", authError);
-          throw new Error(`Error actualizando autenticación: ${authError.message}`);
+          throw new Error(
+            `Error actualizando autenticación: ${authError.message}`,
+          );
         }
 
-        if (authError && authError.message.includes('already exists')) {
+        if (authError && authError.message.includes("already exists")) {
           console.log("🔄 User already exists in Auth, testing password...");
 
           // Verificar si la nueva contraseña ya funciona
-          const { data: testData, error: testError } = await supabase.auth.signInWithPassword({
-            email: userEmail,
-            password: newPassword
-          });
+          const { data: testData, error: testError } =
+            await supabase.auth.signInWithPassword({
+              email: userEmail,
+              password: newPassword,
+            });
 
           if (testError) {
-            console.log("❌ New password doesn't work, may need manual intervention");
+            console.log(
+              "❌ New password doesn't work, may need manual intervention",
+            );
             // Continuar de todos modos para actualizar la tabla local
           } else {
             console.log("✅ New password already works in Auth!");
@@ -181,7 +188,10 @@ const ForcePasswordChange = ({
 
         console.log("✅ Supabase Auth updated successfully");
       } catch (authUpdateError) {
-        console.warn("⚠️ Auth update failed, continuing with local update:", authUpdateError);
+        console.warn(
+          "⚠️ Auth update failed, continuing with local update:",
+          authUpdateError,
+        );
         // No bloquear el proceso si falla Auth, continuar con actualización local
       }
 
@@ -206,12 +216,19 @@ const ForcePasswordChange = ({
       console.log("✅ Password changed successfully in both Auth and local DB");
       console.log("📝 Summary:");
       console.log("   - User:", user.username, "(" + userEmail + ")");
-      console.log("   - Old password was:", user.password_hash === '$supabase$auth$handled' ? 'First-time (DNI)' : 'Previous custom password');
+      console.log(
+        "   - Old password was:",
+        user.password_hash === "$supabase$auth$handled"
+          ? "First-time (DNI)"
+          : "Previous custom password",
+      );
       console.log("   - New password set successfully");
       console.log("   - User should now login with new password");
 
       // Mostrar mensaje de éxito
-      alert("✅ Contraseña cambiada exitosamente!\n\nAhora puedes usar tu nueva contraseña para iniciar sesión.");
+      alert(
+        "✅ Contraseña cambiada exitosamente!\n\nAhora puedes usar tu nueva contraseña para iniciar sesión.",
+      );
 
       // Éxito
       onPasswordChanged();
@@ -258,7 +275,8 @@ const ForcePasswordChange = ({
               required
             />
             <p className="text-xs text-muted-foreground">
-              Si es tu primera vez, ingresa tu DNI. Si ya cambiaste tu contraseña antes, ingresa tu contraseña actual.
+              Si es tu primera vez, ingresa tu DNI. Si ya cambiaste tu
+              contraseña antes, ingresa tu contraseña actual.
             </p>
           </div>
 
