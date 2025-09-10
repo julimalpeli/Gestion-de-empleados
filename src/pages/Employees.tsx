@@ -1445,19 +1445,19 @@ const Employees = () => {
                         💼 <span>Información Laboral</span>
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-blue-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg flex-shrink-0">
                               📅
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 FECHA INGRESO
                               </p>
-                              <p className="font-medium">Inicio</p>
+                              <p className="font-medium text-sm sm:text-base">Inicio</p>
                             </div>
                           </div>
-                          <p className="text-lg font-semibold">
+                          <p className="text-base sm:text-lg font-semibold truncate">
                             {viewingEmployee.startDate
                               ? new Date(
                                   viewingEmployee.startDate + "T00:00:00",
@@ -1466,19 +1466,19 @@ const Employees = () => {
                           </p>
                         </Card>
 
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-green-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg flex-shrink-0">
                               🏖️
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 VACACIONES
                               </p>
-                              <p className="font-medium">Días disponibles</p>
+                              <p className="font-medium text-sm sm:text-base">Días disponibles</p>
                             </div>
                           </div>
-                          <p className="text-lg font-semibold">
+                          <p className="text-base sm:text-lg font-semibold">
                             {viewingEmployee.startDate
                               ? (() => {
                                   const vacationInfo =
@@ -1498,19 +1498,19 @@ const Employees = () => {
                           </p>
                         </Card>
 
-                        <Card className="p-4 hover:shadow-md transition-shadow">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="p-2 bg-purple-100 rounded-lg">
+                        <Card className="p-3 sm:p-4 hover:shadow-md transition-shadow">
+                          <div className="flex items-center gap-2 sm:gap-3 mb-2">
+                            <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg flex-shrink-0">
                               ⏰
                             </div>
-                            <div>
-                              <p className="text-sm text-muted-foreground">
+                            <div className="min-w-0 flex-1">
+                              <p className="text-xs sm:text-sm text-muted-foreground">
                                 ANTIGÜEDAD
                               </p>
-                              <p className="font-medium">Tiempo servicio</p>
+                              <p className="font-medium text-sm sm:text-base">Tiempo servicio</p>
                             </div>
                           </div>
-                          <p className="text-lg font-semibold">
+                          <p className="text-base sm:text-lg font-semibold">
                             {viewingEmployee.startDate
                               ? (() => {
                                   const vacationInfo =
