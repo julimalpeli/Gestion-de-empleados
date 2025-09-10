@@ -8,7 +8,7 @@ export interface EmployeeDocument {
   originalFileName: string;
   fileType: string;
   fileSize: number;
-  category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "otros";
+  category: "recibo_sueldo" | "sac" | "documentos" | "formularios" | "certificados_medicos" | "otros";
   description?: string;
   uploadedAt: string;
   uploadedBy: string;
