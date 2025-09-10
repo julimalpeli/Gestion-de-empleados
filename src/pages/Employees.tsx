@@ -1568,7 +1568,7 @@ const Employees = () => {
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="salary-history" className="p-4 sm:p-6">
+                  <TabsContent value="salary-history" className="flex-1 overflow-y-auto p-4 sm:p-6">
                     <SalaryHistoryTable
                       employeeId={viewingEmployee.id}
                       employeeName={viewingEmployee.name}
