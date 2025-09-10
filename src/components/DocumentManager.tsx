@@ -51,6 +51,7 @@ const DOCUMENT_CATEGORIES = [
   { value: "sac", label: "SAC" },
   { value: "documentos", label: "Documentos" },
   { value: "formularios", label: "Formularios" },
+  { value: "certificados_medicos", label: "Certificados Médicos" },
   { value: "otros", label: "Otros Documentos" },
 ];
 
