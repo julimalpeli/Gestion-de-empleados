@@ -149,9 +149,12 @@ const Dashboard = () => {
   console.log("🏖️ Vacation debug info:");
   console.log("  - Total vacations loaded:", vacations.length);
   console.log("  - Today:", today.toISOString().split("T")[0]);
-  console.log("  - Three months from now:", threeMonthsFromNow.toISOString().split("T")[0]);
+  console.log(
+    "  - Three months from now:",
+    threeMonthsFromNow.toISOString().split("T")[0],
+  );
 
-  const approvedVacations = vacations.filter(v => v.status === "approved");
+  const approvedVacations = vacations.filter((v) => v.status === "approved");
   console.log("  - Approved vacations:", approvedVacations.length);
 
   if (vacations.length > 0) {
@@ -165,7 +168,9 @@ const Dashboard = () => {
 
     // Debug each vacation
     if (vacation.status === "approved") {
-      console.log(`    - Vacation ${vacation.id}: ${vacation.startDate} - upcoming: ${isUpcoming}`);
+      console.log(
+        `    - Vacation ${vacation.id}: ${vacation.startDate} - upcoming: ${isUpcoming}`,
+      );
     }
 
     return isUpcoming;
