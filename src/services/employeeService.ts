@@ -126,7 +126,10 @@ export class SupabaseEmployeeService implements IEmployeeService {
     }
 
     // If we get here, all retries failed
-    console.error("❌ All retries failed. Last error:", lastError);
+    console.error("❌ All retries failed. Last error:");
+    if (lastError) {
+      logSupabaseError("getAllEmployees - Final error", lastError);
+    }
 
     // Final fallback attempt before throwing error
     console.log("🔄 Final fallback attempt before throwing error...");
