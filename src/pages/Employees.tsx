@@ -1307,12 +1307,11 @@ const Employees = () => {
 
           {viewingEmployee && (
             <Tabs defaultValue="info" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="info">📋 Información</TabsTrigger>
                 <TabsTrigger value="salary-history">
                   💰 Historial Sueldo
                 </TabsTrigger>
-                <TabsTrigger value="documents">📄 Documentos</TabsTrigger>
               </TabsList>
 
               <TabsContent value="info" className="mt-6">
@@ -1455,12 +1454,6 @@ const Employees = () => {
                 />
               </TabsContent>
 
-              <TabsContent value="documents" className="mt-6">
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>Gestión de documentos del empleado</p>
-                  <p className="text-sm">Próximamente disponible</p>
-                </div>
-              </TabsContent>
             </Tabs>
           )}
 
