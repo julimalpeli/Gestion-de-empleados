@@ -78,7 +78,6 @@ import { useSalaryHistory } from "@/hooks/use-salary-history";
 import { employeeService } from "@/services/employeeService";
 import { AvatarInitials } from "@/components/ui/avatar-initials";
 import { ProgressBar } from "@/components/ui/progress-bar";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
 
 const Employees = () => {
   console.log("🏢 Employees component starting to render...");
