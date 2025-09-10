@@ -34,12 +34,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
           .order("created_at", { ascending: false });
 
         if (error) {
-          console.error("❌ Error de Supabase completo:", error);
-          console.error("❌ Error message:", error.message);
-          console.error("❌ Error code:", error.code);
-          console.error("❌ Error details:", error.details);
-          console.error("❌ Error hint:", error.hint);
-
+          logSupabaseError("getAllEmployees", error);
           throw new Error(
             `Supabase error: ${error.message} (Code: ${error.code})`,
           );
@@ -383,7 +378,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       // Check if any rows were updated
       if (!data || data.length === 0) {
-        console.error("❌ No rows were updated. Running diagnostics...");
+        console.error("��� No rows were updated. Running diagnostics...");
 
         // Try a simple count query to check if employee exists
         try {
