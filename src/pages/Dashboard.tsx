@@ -161,7 +161,7 @@ const Dashboard = () => {
   const upcomingVacations = vacations.filter((vacation) => {
     if (vacation.status !== "approved") return false;
     const startDate = new Date(vacation.startDate);
-    const isUpcoming = startDate > today && startDate <= next60Days;
+    const isUpcoming = startDate > today && startDate <= endOfYear;
 
     // Debug each vacation
     if (vacation.status === "approved") {
