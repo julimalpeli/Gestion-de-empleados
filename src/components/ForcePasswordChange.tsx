@@ -127,7 +127,24 @@ const ForcePasswordChange = ({
       console.log("🔑 Updating Supabase Auth password...");
 
       // Obtener el email del usuario para Supabase Auth
-      const userEmail = user.email || `${user.username}@cadizbar.com`; // Fallback si no hay email
+      let userEmail = user.email;
+
+      // Si no tenemos email en el user object, buscarlo en la tabla users
+      if (!userEmail) {
+        const { data: fullUser, error: emailError } = await supabase
+          .from("users")
+          .select("email")
+          .eq("username", username)
+          .single();
+
+        if (!emailError && fullUser?.email) {
+          userEmail = fullUser.email;
+          console.log("📧 Email found in users table:", userEmail);
+        } else {
+          console.warn("⚠️ No email found, using fallback");
+          userEmail = `${user.username}@cadizbar.com`; // Fallback si no hay email
+        }
+      }
 
       try {
         // Método 1: Intentar crear usuario en Supabase Auth con nueva contraseña
