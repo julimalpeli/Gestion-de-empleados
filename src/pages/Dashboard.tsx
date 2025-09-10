@@ -410,20 +410,26 @@ const Dashboard = () => {
             </p>
             {currentVacations.length > 0 && (
               <div className="mt-2 space-y-1">
-                {currentVacations.slice(0, 2).map((vacation) => (
-                  <div
-                    key={vacation.id}
-                    className="text-xs bg-blue-50 p-2 rounded"
-                  >
-                    <span className="font-medium">
-                      {getEmployeeName(vacation.employeeId)}
-                    </span>
-                    <span className="text-muted-foreground ml-1">
-                      hasta{" "}
-                      {new Date(vacation.endDate).toLocaleDateString("es-AR")}
-                    </span>
-                  </div>
-                ))}
+                {currentVacations.slice(0, 2).map((vacation) => {
+                  const startDate = new Date(vacation.startDate);
+                  const endDate = new Date(vacation.endDate);
+                  const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+                  return (
+                    <div
+                      key={vacation.id}
+                      className="text-xs bg-blue-50 p-2 rounded"
+                    >
+                      <div className="font-medium">
+                        {getEmployeeName(vacation.employeeId)}
+                      </div>
+                      <div className="text-muted-foreground mt-1">
+                        <div>Hasta: {endDate.toLocaleDateString("es-AR")}</div>
+                        <div>{daysDiff} día{daysDiff !== 1 ? 's' : ''}</div>
+                      </div>
+                    </div>
+                  );
+                })}
                 {currentVacations.length > 2 && (
                   <p className="text-xs text-muted-foreground">
                     y {currentVacations.length - 2} más...
@@ -452,20 +458,27 @@ const Dashboard = () => {
             </p>
             {upcomingVacations.length > 0 && (
               <div className="mt-2 space-y-1">
-                {upcomingVacations.slice(0, 2).map((vacation) => (
-                  <div
-                    key={vacation.id}
-                    className="text-xs bg-orange-50 p-2 rounded"
-                  >
-                    <span className="font-medium">
-                      {getEmployeeName(vacation.employeeId)}
-                    </span>
-                    <span className="text-muted-foreground ml-1">
-                      desde{" "}
-                      {new Date(vacation.startDate).toLocaleDateString("es-AR")}
-                    </span>
-                  </div>
-                ))}
+                {upcomingVacations.slice(0, 2).map((vacation) => {
+                  const startDate = new Date(vacation.startDate);
+                  const endDate = new Date(vacation.endDate);
+                  const daysDiff = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+                  return (
+                    <div
+                      key={vacation.id}
+                      className="text-xs bg-orange-50 p-2 rounded"
+                    >
+                      <div className="font-medium">
+                        {getEmployeeName(vacation.employeeId)}
+                      </div>
+                      <div className="text-muted-foreground mt-1">
+                        <div>Desde: {startDate.toLocaleDateString("es-AR")}</div>
+                        <div>Hasta: {endDate.toLocaleDateString("es-AR")}</div>
+                        <div>{daysDiff} día{daysDiff !== 1 ? 's' : ''}</div>
+                      </div>
+                    </div>
+                  );
+                })}
                 {upcomingVacations.length > 2 && (
                   <p className="text-xs text-muted-foreground">
                     y {upcomingVacations.length - 2} más...
