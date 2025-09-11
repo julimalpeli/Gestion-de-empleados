@@ -75,41 +75,74 @@ export const useVacations = (employeeId?: string) => {
 
       setVacations(mappedVacations);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Error loading vacations:", errorMessage);
-      console.error("❌ Full error object:", err);
+      console.group("❌ Error loading vacations");
 
-      // Handle network errors gracefully
-      if (
-        errorMessage.includes("Failed to fetch") ||
-        errorMessage.includes("fetch") ||
-        errorMessage.includes("TypeError") ||
-        errorMessage.includes("network") ||
-        errorMessage.includes("Supabase")
-      ) {
-        console.log(
-          "🔄 Network/Supabase error detected, using fallback vacation data...",
-        );
-        try {
-          const { fallbackVacationData } = await import(
-            "@/utils/offlineFallback"
-          );
-          setVacations(fallbackVacationData);
-          console.log(
-            "✅ Fallback vacation data loaded:",
-            fallbackVacationData.length,
-            "records",
-          );
-          return;
-        } catch (fallbackError) {
-          console.warn(
-            "⚠️ Could not load fallback vacation data:",
-            fallbackError,
-          );
-        }
+      // Enhanced error logging
+      if (err && typeof err === "object") {
+        console.error("Error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+          errorType: typeof err,
+          errorConstructor: err.constructor?.name,
+        });
       }
 
-      setError(errorMessage);
+      console.error("Raw error object:", err);
+      console.groupEnd();
+
+      const errorMessage = err instanceof Error ? err.message : String(err);
+
+      // Check for specific Supabase errors
+      if (err && typeof err === "object") {
+        const supabaseError = err as any;
+
+        // RLS Policy error
+        if (supabaseError.code === 'PGRST301') {
+          console.error("🔒 RLS POLICY ERROR: Row Level Security is blocking vacation queries");
+          console.error("📋 Possible solutions:");
+          console.error("   - Check if vacation_requests table has RLS enabled");
+          console.error("   - Check if user has permissions to read vacation_requests");
+          console.error("   - Check RLS policies on vacation_requests table");
+          setError("Sin permisos para acceder a las vacaciones. Contacte al administrador.");
+        }
+        // Permission error
+        else if (supabaseError.code === '42501') {
+          console.error("🔒 PERMISSION ERROR: Insufficient database permissions");
+          setError("Permisos insuficientes para acceder a las vacaciones.");
+        }
+        // Table not found
+        else if (supabaseError.code === 'PGRST116') {
+          console.error("📊 TABLE ERROR: vacation_requests table may not exist");
+          setError("Tabla de vacaciones no encontrada en la base de datos.");
+        }
+        // Network/Connection errors
+        else if (
+          errorMessage.includes("Failed to fetch") ||
+          errorMessage.includes("fetch") ||
+          errorMessage.includes("TypeError") ||
+          errorMessage.includes("network") ||
+          errorMessage.includes("NetworkError")
+        ) {
+          console.log("🔄 Network error detected, using fallback vacation data...");
+          try {
+            const { fallbackVacationData } = await import("@/utils/offlineFallback");
+            setVacations(fallbackVacationData);
+            console.log("✅ Fallback vacation data loaded:", fallbackVacationData.length, "records");
+            setError(null); // Clear error since we have fallback data
+            return;
+          } catch (fallbackError) {
+            console.warn("⚠️ Could not load fallback vacation data:", fallbackError);
+            setError("Error de conectividad. No se pudieron cargar las vacaciones.");
+          }
+        }
+        else {
+          setError(`Error de base de datos: ${errorMessage}`);
+        }
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
@@ -220,17 +253,42 @@ export const useVacations = (employeeId?: string) => {
       await fetchVacations();
       return data;
     } catch (err) {
-      console.error("❌ Full error creating vacation:");
-      console.error("   - Error type:", typeof err);
-      console.error("   - Error instanceof Error:", err instanceof Error);
-      console.error(
-        "   - Error message:",
-        err instanceof Error ? err.message : String(err),
-      );
-      console.error("   - Full error:", JSON.stringify(err, null, 2));
-      throw new Error(
-        err instanceof Error ? err.message : "Error creating vacation request",
-      );
+      console.group("❌ Error creating vacation");
+      console.error("Error type:", typeof err);
+      console.error("Error instanceof Error:", err instanceof Error);
+
+      if (err && typeof err === "object") {
+        console.error("Error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+          errorType: typeof err,
+          errorConstructor: err.constructor?.name,
+        });
+      }
+
+      console.error("Raw error object:", err);
+      console.groupEnd();
+
+      // Create user-friendly error message
+      let userMessage = "Error al crear solicitud de vacaciones";
+
+      if (err && typeof err === "object") {
+        const supabaseError = err as any;
+
+        if (supabaseError.code === 'PGRST301') {
+          userMessage = "Sin permisos para crear solicitudes de vacaciones";
+        } else if (supabaseError.code === '42501') {
+          userMessage = "Permisos insuficientes para crear vacaciones";
+        } else if (supabaseError.code === '23505') {
+          userMessage = "Ya existe una solicitud similar";
+        } else if (supabaseError.message) {
+          userMessage = `Error: ${supabaseError.message}`;
+        }
+      }
+
+      throw new Error(userMessage);
     }
   };
 
@@ -260,10 +318,22 @@ export const useVacations = (employeeId?: string) => {
 
       await fetchVacations();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Error in updateVacation:", errorMessage);
-      console.error("❌ Full error object:", err);
-      throw new Error(errorMessage || "Error updating vacation request");
+      console.group("❌ Error updating vacation");
+
+      if (err && typeof err === "object") {
+        console.error("Error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+        });
+      }
+
+      console.error("Raw error object:", err);
+      console.groupEnd();
+
+      const errorMessage = err instanceof Error ? err.message : "Error updating vacation request";
+      throw new Error(errorMessage);
     }
   };
 
@@ -286,10 +356,22 @@ export const useVacations = (employeeId?: string) => {
       await fetchVacations();
       console.log("✅ Vacation list refreshed");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Error in deleteVacation:", errorMessage);
-      console.error("❌ Full error object:", err);
-      throw new Error(errorMessage || "Error deleting vacation request");
+      console.group("❌ Error deleting vacation");
+
+      if (err && typeof err === "object") {
+        console.error("Error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+        });
+      }
+
+      console.error("Raw error object:", err);
+      console.groupEnd();
+
+      const errorMessage = err instanceof Error ? err.message : "Error deleting vacation request";
+      throw new Error(errorMessage);
     }
   };
 
@@ -330,10 +412,22 @@ export const useVacations = (employeeId?: string) => {
 
       await fetchVacations();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("❌ Error in processVacation:", errorMessage);
-      console.error("❌ Full error object:", err);
-      throw new Error(errorMessage || "Error processing vacation request");
+      console.group("❌ Error processing vacation");
+
+      if (err && typeof err === "object") {
+        console.error("Error details:", {
+          message: (err as any).message,
+          code: (err as any).code,
+          details: (err as any).details,
+          hint: (err as any).hint,
+        });
+      }
+
+      console.error("Raw error object:", err);
+      console.groupEnd();
+
+      const errorMessage = err instanceof Error ? err.message : "Error processing vacation request";
+      throw new Error(errorMessage);
     }
   };
 
