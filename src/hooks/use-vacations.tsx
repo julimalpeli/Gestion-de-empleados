@@ -513,3 +513,26 @@ export const useVacations = (employeeId?: string) => {
     processVacation,
   };
 };
+
+// Make debugging functions available in development
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  (window as any).debugVacations = async () => {
+    console.log("🔍 Manual vacation debug test");
+    try {
+      const { data, error } = await supabase
+        .from("vacation_requests")
+        .select("*")
+        .limit(5);
+
+      if (error) {
+        console.error("❌ Direct query failed:", error);
+      } else {
+        console.log("✅ Direct query successful:", data);
+      }
+    } catch (err) {
+      console.error("❌ Exception in direct query:", err);
+    }
+  };
+
+  console.log("🔧 Vacation debug function available: debugVacations()");
+}
