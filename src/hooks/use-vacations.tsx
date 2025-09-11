@@ -2,6 +2,11 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { getFallbackEmployeeData } from "@/utils/offlineFallback";
 
+// Import debug utilities
+if (import.meta.env.DEV) {
+  import("@/utils/vacationDebug");
+}
+
 export interface VacationRequest {
   id: string;
   employeeId: string;
@@ -142,28 +147,34 @@ export const useVacations = (employeeId?: string) => {
           console.error("📊 TABLE ERROR: vacation_requests table may not exist");
           setError("Tabla de vacaciones no encontrada en la base de datos.");
         }
-        // Network/Connection errors
-        else if (
-          errorMessage.includes("Failed to fetch") ||
-          errorMessage.includes("fetch") ||
-          errorMessage.includes("TypeError") ||
-          errorMessage.includes("network") ||
-          errorMessage.includes("NetworkError")
-        ) {
-          console.log("🔄 Network error detected, using fallback vacation data...");
+        // Network/Connection errors OR any unhandled error
+        else {
+          console.log("🔄 Error detected, attempting fallback vacation data...");
           try {
             const { fallbackVacationData } = await import("@/utils/offlineFallback");
-            setVacations(fallbackVacationData);
-            console.log("✅ Fallback vacation data loaded:", fallbackVacationData.length, "records");
+
+            // Filter fallback data by employeeId if needed
+            let filteredData = fallbackVacationData;
+            if (employeeId) {
+              filteredData = fallbackVacationData.filter(v => v.employeeId === employeeId);
+            }
+
+            setVacations(filteredData);
+            console.log("✅ Fallback vacation data loaded:", filteredData.length, "records");
             setError(null); // Clear error since we have fallback data
             return;
           } catch (fallbackError) {
             console.warn("⚠️ Could not load fallback vacation data:", fallbackError);
-            setError("Error de conectividad. No se pudieron cargar las vacaciones.");
+
+            if (errorMessage.includes("Failed to fetch") ||
+                errorMessage.includes("fetch") ||
+                errorMessage.includes("TypeError") ||
+                errorMessage.includes("network")) {
+              setError("Error de conectividad. No se pudieron cargar las vacaciones.");
+            } else {
+              setError(`Error de base de datos: ${errorMessage}`);
+            }
           }
-        }
-        else {
-          setError(`Error de base de datos: ${errorMessage}`);
         }
       } else {
         setError(errorMessage);
