@@ -37,6 +37,22 @@ export const useVacations = (employeeId?: string) => {
       setLoading(true);
       setError(null);
 
+      console.log("🔄 Loading vacations...");
+      console.log("   - Employee ID filter:", employeeId || "all employees");
+
+      // Test simple connection first
+      console.log("🔍 Testing vacation_requests table access...");
+      const { data: testData, error: testError } = await supabase
+        .from("vacation_requests")
+        .select("count", { count: "exact", head: true });
+
+      if (testError) {
+        console.error("❌ Failed basic vacation_requests access test:", testError);
+        throw testError;
+      }
+
+      console.log("✅ Basic table access successful, count:", testData);
+
       let query = supabase
         .from("vacation_requests")
         .select(
@@ -52,9 +68,17 @@ export const useVacations = (employeeId?: string) => {
         query = query.eq("employee_id", employeeId);
       }
 
+      console.log("🔄 Executing vacation query...");
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Vacation query failed:", error);
+        throw error;
+      }
+
+      console.log("✅ Vacation query successful");
+      console.log("   - Raw data received:", data?.length || 0, "records");
+      console.log("   - Sample data:", data?.[0] || "No data");
 
       const mappedVacations =
         data?.map((vacation) => ({
@@ -73,6 +97,7 @@ export const useVacations = (employeeId?: string) => {
           updatedAt: vacation.updated_at,
         })) || [];
 
+      console.log("✅ Mapped vacations:", mappedVacations.length, "records");
       setVacations(mappedVacations);
     } catch (err) {
       console.group("❌ Error loading vacations");
