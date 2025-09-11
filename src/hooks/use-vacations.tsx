@@ -52,7 +52,10 @@ export const useVacations = (employeeId?: string) => {
         .select("count", { count: "exact", head: true });
 
       if (testError) {
-        console.error("❌ Failed basic vacation_requests access test:", testError);
+        console.error(
+          "❌ Failed basic vacation_requests access test:",
+          testError,
+        );
         throw testError;
       }
 
@@ -129,48 +132,77 @@ export const useVacations = (employeeId?: string) => {
         const supabaseError = err as any;
 
         // RLS Policy error
-        if (supabaseError.code === 'PGRST301') {
-          console.error("🔒 RLS POLICY ERROR: Row Level Security is blocking vacation queries");
+        if (supabaseError.code === "PGRST301") {
+          console.error(
+            "🔒 RLS POLICY ERROR: Row Level Security is blocking vacation queries",
+          );
           console.error("📋 Possible solutions:");
-          console.error("   - Check if vacation_requests table has RLS enabled");
-          console.error("   - Check if user has permissions to read vacation_requests");
+          console.error(
+            "   - Check if vacation_requests table has RLS enabled",
+          );
+          console.error(
+            "   - Check if user has permissions to read vacation_requests",
+          );
           console.error("   - Check RLS policies on vacation_requests table");
-          setError("Sin permisos para acceder a las vacaciones. Contacte al administrador.");
+          setError(
+            "Sin permisos para acceder a las vacaciones. Contacte al administrador.",
+          );
         }
         // Permission error
-        else if (supabaseError.code === '42501') {
-          console.error("🔒 PERMISSION ERROR: Insufficient database permissions");
+        else if (supabaseError.code === "42501") {
+          console.error(
+            "🔒 PERMISSION ERROR: Insufficient database permissions",
+          );
           setError("Permisos insuficientes para acceder a las vacaciones.");
         }
         // Table not found
-        else if (supabaseError.code === 'PGRST116') {
-          console.error("📊 TABLE ERROR: vacation_requests table may not exist");
+        else if (supabaseError.code === "PGRST116") {
+          console.error(
+            "📊 TABLE ERROR: vacation_requests table may not exist",
+          );
           setError("Tabla de vacaciones no encontrada en la base de datos.");
         }
         // Network/Connection errors OR any unhandled error
         else {
-          console.log("🔄 Error detected, attempting fallback vacation data...");
+          console.log(
+            "🔄 Error detected, attempting fallback vacation data...",
+          );
           try {
-            const { fallbackVacationData } = await import("@/utils/offlineFallback");
+            const { fallbackVacationData } = await import(
+              "@/utils/offlineFallback"
+            );
 
             // Filter fallback data by employeeId if needed
             let filteredData = fallbackVacationData;
             if (employeeId) {
-              filteredData = fallbackVacationData.filter(v => v.employeeId === employeeId);
+              filteredData = fallbackVacationData.filter(
+                (v) => v.employeeId === employeeId,
+              );
             }
 
             setVacations(filteredData);
-            console.log("✅ Fallback vacation data loaded:", filteredData.length, "records");
+            console.log(
+              "✅ Fallback vacation data loaded:",
+              filteredData.length,
+              "records",
+            );
             setError(null); // Clear error since we have fallback data
             return;
           } catch (fallbackError) {
-            console.warn("⚠️ Could not load fallback vacation data:", fallbackError);
+            console.warn(
+              "⚠️ Could not load fallback vacation data:",
+              fallbackError,
+            );
 
-            if (errorMessage.includes("Failed to fetch") ||
-                errorMessage.includes("fetch") ||
-                errorMessage.includes("TypeError") ||
-                errorMessage.includes("network")) {
-              setError("Error de conectividad. No se pudieron cargar las vacaciones.");
+            if (
+              errorMessage.includes("Failed to fetch") ||
+              errorMessage.includes("fetch") ||
+              errorMessage.includes("TypeError") ||
+              errorMessage.includes("network")
+            ) {
+              setError(
+                "Error de conectividad. No se pudieron cargar las vacaciones.",
+              );
             } else {
               setError(`Error de base de datos: ${errorMessage}`);
             }
@@ -313,11 +345,11 @@ export const useVacations = (employeeId?: string) => {
       if (err && typeof err === "object") {
         const supabaseError = err as any;
 
-        if (supabaseError.code === 'PGRST301') {
+        if (supabaseError.code === "PGRST301") {
           userMessage = "Sin permisos para crear solicitudes de vacaciones";
-        } else if (supabaseError.code === '42501') {
+        } else if (supabaseError.code === "42501") {
           userMessage = "Permisos insuficientes para crear vacaciones";
-        } else if (supabaseError.code === '23505') {
+        } else if (supabaseError.code === "23505") {
           userMessage = "Ya existe una solicitud similar";
         } else if (supabaseError.message) {
           userMessage = `Error: ${supabaseError.message}`;
@@ -368,7 +400,8 @@ export const useVacations = (employeeId?: string) => {
       console.error("Raw error object:", err);
       console.groupEnd();
 
-      const errorMessage = err instanceof Error ? err.message : "Error updating vacation request";
+      const errorMessage =
+        err instanceof Error ? err.message : "Error updating vacation request";
       throw new Error(errorMessage);
     }
   };
@@ -406,7 +439,8 @@ export const useVacations = (employeeId?: string) => {
       console.error("Raw error object:", err);
       console.groupEnd();
 
-      const errorMessage = err instanceof Error ? err.message : "Error deleting vacation request";
+      const errorMessage =
+        err instanceof Error ? err.message : "Error deleting vacation request";
       throw new Error(errorMessage);
     }
   };
@@ -462,7 +496,10 @@ export const useVacations = (employeeId?: string) => {
       console.error("Raw error object:", err);
       console.groupEnd();
 
-      const errorMessage = err instanceof Error ? err.message : "Error processing vacation request";
+      const errorMessage =
+        err instanceof Error
+          ? err.message
+          : "Error processing vacation request";
       throw new Error(errorMessage);
     }
   };

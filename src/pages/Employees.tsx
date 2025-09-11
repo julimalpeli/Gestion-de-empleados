@@ -1373,19 +1373,30 @@ const Employees = () => {
 
               {/* Contenido scrolleable */}
               <div className="flex-1 min-h-0">
-                <Tabs defaultValue="info" className="w-full h-full flex flex-col">
+                <Tabs
+                  defaultValue="info"
+                  className="w-full h-full flex flex-col"
+                >
                   <TabsList className="grid w-full grid-cols-2 rounded-none border-b bg-gray-50">
                     <TabsTrigger value="info" className="text-xs sm:text-sm">
                       <span className="hidden sm:inline">Información</span>
                       <span className="sm:hidden">Info</span>
                     </TabsTrigger>
-                    <TabsTrigger value="salary-history" className="text-xs sm:text-sm">
-                      <span className="hidden sm:inline">Historial Salarial</span>
+                    <TabsTrigger
+                      value="salary-history"
+                      className="text-xs sm:text-sm"
+                    >
+                      <span className="hidden sm:inline">
+                        Historial Salarial
+                      </span>
                       <span className="sm:hidden">Historial</span>
                     </TabsTrigger>
                   </TabsList>
 
-                  <TabsContent value="info" className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                  <TabsContent
+                    value="info"
+                    className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6"
+                  >
                     {/* Información Personal */}
                     <div>
                       <h3 className="text-lg font-semibold mb-4 text-gray-900 border-b border-gray-200 pb-2">
@@ -1397,7 +1408,9 @@ const Employees = () => {
                             Documento
                           </Label>
                           <p className="text-lg font-semibold text-gray-900 mt-1">
-                            {viewingEmployee.documentType?.toUpperCase() || "DNI"}: {viewingEmployee.dni}
+                            {viewingEmployee.documentType?.toUpperCase() ||
+                              "DNI"}
+                            : {viewingEmployee.dni}
                           </p>
                         </div>
 
@@ -1524,7 +1537,9 @@ const Employees = () => {
                           <p className="text-xl font-bold text-gray-900 mt-1">
                             {formatCurrency(viewingEmployee.whiteWage || 0)}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">Registrado oficialmente</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Registrado oficialmente
+                          </p>
                         </div>
 
                         <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-500">
@@ -1534,7 +1549,9 @@ const Employees = () => {
                           <p className="text-xl font-bold text-gray-900 mt-1">
                             {formatCurrency(viewingEmployee.informalWage || 0)}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">No registrado</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            No registrado
+                          </p>
                         </div>
 
                         <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
@@ -1545,15 +1562,19 @@ const Employees = () => {
                             {formatCurrency(viewingEmployee.presentismo || 0)}
                           </p>
                           <p className="text-xs text-gray-500 mt-1">
-                            {viewingEmployee.losesPresentismo ? "En riesgo" : "Activo"}
+                            {viewingEmployee.losesPresentismo
+                              ? "En riesgo"
+                              : "Activo"}
                           </p>
                         </div>
                       </div>
-
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="salary-history" className="flex-1 overflow-y-auto p-4 sm:p-6">
+                  <TabsContent
+                    value="salary-history"
+                    className="flex-1 overflow-y-auto p-4 sm:p-6"
+                  >
                     <SalaryHistoryTable
                       employeeId={viewingEmployee.id}
                       employeeName={viewingEmployee.name}

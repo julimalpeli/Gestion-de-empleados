@@ -30,23 +30,31 @@ export const testVacationAccess = async () => {
       return false;
     }
 
-    console.log("✅ Simple select successful:", simpleData?.length || 0, "records");
+    console.log(
+      "✅ Simple select successful:",
+      simpleData?.length || 0,
+      "records",
+    );
 
     // Test 3: Join with employees
     console.log("Test 3: Join with employees table...");
     const { data: joinData, error: joinError } = await supabase
       .from("vacation_requests")
-      .select(`
+      .select(
+        `
         id,
         employee_id,
         status,
         employee:employees(name)
-      `)
+      `,
+      )
       .limit(1);
 
     if (joinError) {
       console.error("❌ Join query failed:", joinError);
-      console.error("This might be a permissions issue with the employees table");
+      console.error(
+        "This might be a permissions issue with the employees table",
+      );
       return false;
     }
 
@@ -54,7 +62,9 @@ export const testVacationAccess = async () => {
 
     // Test 4: Check current user context
     console.log("Test 4: Current user context...");
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     console.log("Current session:", {
       user_id: session?.user?.id,
       email: session?.user?.email,
@@ -63,7 +73,6 @@ export const testVacationAccess = async () => {
 
     console.log("✅ All vacation access tests passed!");
     return true;
-
   } catch (error) {
     console.error("❌ Vacation access test failed:", error);
     return false;
@@ -88,13 +97,15 @@ export const debugVacationLoad = async (employeeId?: string) => {
 
     // Step 2: Test the exact query used by the hook
     console.log("Step 2: Testing exact hook query...");
-    
+
     let query = supabase
       .from("vacation_requests")
-      .select(`
+      .select(
+        `
         *,
         employee:employees(name)
-      `)
+      `,
+      )
       .order("created_at", { ascending: false });
 
     if (employeeId) {
@@ -105,7 +116,7 @@ export const debugVacationLoad = async (employeeId?: string) => {
 
     if (error) {
       console.error("❌ Hook query failed:", error);
-      
+
       // Try without the join to isolate the issue
       console.log("Trying without employee join...");
       const { data: simpleData, error: simpleError } = await supabase
@@ -123,7 +134,6 @@ export const debugVacationLoad = async (employeeId?: string) => {
       console.log("✅ Hook query successful!");
       console.log("Data:", data);
     }
-
   } catch (error) {
     console.error("❌ Debug vacation load failed:", error);
   } finally {
