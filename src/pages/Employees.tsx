@@ -1550,21 +1550,6 @@ const Employees = () => {
                         </div>
                       </div>
 
-                      {/* Botón para ver historial */}
-                      <div className="flex justify-center mt-6">
-                        <Button
-                          variant="outline"
-                          onClick={() => {
-                            // Cambiar a la pestaña de historial
-                            const historyTab = document.querySelector(
-                              '[value="salary-history"]',
-                            ) as HTMLElement;
-                            historyTab?.click();
-                          }}
-                        >
-                          Ver Historial Completo
-                        </Button>
-                      </div>
                     </div>
                   </TabsContent>
 
