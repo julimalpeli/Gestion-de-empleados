@@ -697,7 +697,7 @@ export const fallbackPayrollData = [
 export const fallbackVacationData = [
   {
     id: "vacation-1",
-    employeeId: "d6f06332-1d49-4935-b931-5d7657d58468",
+    employeeId: "d6f06332-1d49-4935-b931-5d7657d58468", // Porras Daiana Ayelen
     startDate: "2025-01-27",
     endDate: "2025-01-31",
     days: 5,
@@ -711,7 +711,7 @@ export const fallbackVacationData = [
   },
   {
     id: "vacation-2",
-    employeeId: "d6f06332-1d49-4935-b931-5d7657d58468",
+    employeeId: "d6f06332-1d49-4935-b931-5d7657d58468", // Porras Daiana Ayelen
     startDate: "2025-02-10",
     endDate: "2025-02-14",
     days: 5,
@@ -725,7 +725,7 @@ export const fallbackVacationData = [
   },
   {
     id: "vacation-3",
-    employeeId: "f3b73f9d-280f-4300-8b69-f8d35590323e",
+    employeeId: "3a6a388e-cbe0-4519-b623-c68c3ec5032f", // Juan Manuel Giamatolo
     startDate: "2025-01-20",
     endDate: "2025-01-24",
     days: 5,
@@ -739,7 +739,7 @@ export const fallbackVacationData = [
   },
   {
     id: "vacation-4",
-    employeeId: "f3b73f9d-280f-4300-8b69-f8d35590323e",
+    employeeId: "a607745d-963f-42b8-badf-49b95ae52a4f", // Roa Maite Iara
     startDate: "2025-03-15",
     endDate: "2025-03-21",
     days: 7,
@@ -753,31 +753,59 @@ export const fallbackVacationData = [
   },
   {
     id: "vacation-5",
-    employeeId: "d6f06332-1d49-4935-b931-5d7657d58468",
+    employeeId: "f33d0128-11b8-4ff2-b226-c6e9a2014fed", // Tablar Ignacio
     startDate: "2025-07-01",
     endDate: "2025-07-14",
     days: 14,
     reason: "Vacaciones de invierno",
-    status: "approved",
+    status: "pending",
     requestDate: "2025-05-15",
-    approvedBy: "Julian Malpeli",
-    approvedDate: "2025-05-16",
+    approvedBy: null,
+    approvedDate: null,
     createdAt: "2025-05-15T10:00:00Z",
-    updatedAt: "2025-05-16T09:00:00Z",
+    updatedAt: "2025-05-15T10:00:00Z",
   },
   {
     id: "vacation-6",
-    employeeId: "f3b73f9d-280f-4300-8b69-f8d35590323e",
+    employeeId: "496092eb-759f-4fd2-938d-2c0a810294b5", // Gutierrez Javier Maximiliano
     startDate: "2025-11-25",
     endDate: "2025-11-29",
     days: 5,
     reason: "Vacaciones de fin de año",
-    status: "approved",
+    status: "pending",
     requestDate: "2025-10-01",
-    approvedBy: "Julian Malpeli",
-    approvedDate: "2025-10-02",
+    approvedBy: null,
+    approvedDate: null,
     createdAt: "2025-10-01T14:00:00Z",
-    updatedAt: "2025-10-02T08:30:00Z",
+    updatedAt: "2025-10-01T14:00:00Z",
+  },
+  {
+    id: "vacation-7",
+    employeeId: "900c2e04-45a2-474a-a96d-bd5472b10ec6", // Acevedo Rosa Graciela
+    startDate: "2025-08-10",
+    endDate: "2025-08-17",
+    days: 8,
+    reason: "Vacaciones familiares",
+    status: "approved",
+    requestDate: "2025-06-15",
+    approvedBy: "Julian Malpeli",
+    approvedDate: "2025-06-16",
+    createdAt: "2025-06-15T09:00:00Z",
+    updatedAt: "2025-06-16T10:00:00Z",
+  },
+  {
+    id: "vacation-8",
+    employeeId: "990f841d-76f7-4bcd-909f-ca93d83d2df7", // Carcamo Mauricio Damian
+    startDate: "2025-12-20",
+    endDate: "2025-12-31",
+    days: 12,
+    reason: "Vacaciones de fin de año",
+    status: "pending",
+    requestDate: "2025-10-10",
+    approvedBy: null,
+    approvedDate: null,
+    createdAt: "2025-10-10T11:00:00Z",
+    updatedAt: "2025-10-10T11:00:00Z",
   },
 ];
 
