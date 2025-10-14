@@ -823,7 +823,7 @@ const Employees = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-4">
+          <div className="flex gap-4 mb-4 items-center">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -845,6 +845,20 @@ const Employees = () => {
                 <SelectItem value="inactive">Solo inactivos</SelectItem>
               </SelectContent>
             </Select>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => exportSalariesToXLS(filteredEmployees)}
+                title="Descargar XLS"
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                XLS
+              </Button>
+              <Button onClick={() => exportSalariesToPDF(filteredEmployees)} title="Descargar PDF">
+                <FileText className="h-4 w-4 mr-2" />
+                PDF
+              </Button>
+            </div>
           </div>
 
           <div className="overflow-x-auto">
