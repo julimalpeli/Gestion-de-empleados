@@ -57,6 +57,7 @@ import {
   UserCheck,
   UserX,
   FolderOpen,
+  FileSpreadsheet,
 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import {
@@ -79,6 +80,7 @@ import { employeeService } from "@/services/employeeService";
 import { AvatarInitials } from "@/components/ui/avatar-initials";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
+import { exportSalariesToPDF, exportSalariesToXLS } from "@/utils/salaryReport";
 
 const Employees = () => {
   console.log("🏢 Employees component starting to render...");
