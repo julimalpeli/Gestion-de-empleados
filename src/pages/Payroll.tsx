@@ -537,12 +537,8 @@ const Payroll = () => {
         `💰 [DEBUG] Setting whiteWage to: ${historicalSalaryData.white_wage} (from ${historicalSalaryData.source})`,
       );
 
-      // Para visualización, NO usar salario histórico - usar valores actuales del empleado
-      // Esto evita confusión y muestra los cálculos con valores actuales
-      console.log(
-        "👁️ [DEBUG] Vista en modo solo lectura - no aplicando salario histórico",
-      );
-      setHistoricalSalary(null);
+      // En vista (solo lectura) usar salario del período para evitar desfasajes al reingresar
+      setHistoricalSalary(historicalSalaryData);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
       debugSetWhiteWage(
@@ -553,7 +549,6 @@ const Payroll = () => {
       console.error("Error getting historical salary for view:", error);
       // Fallback al valor almacenado en la liquidación
       debugSetWhiteWage(record.whiteAmount?.toString() || "0", "view fallback");
-      setHistoricalSalary(null);
     }
 
     setIsEditMode(false); // Solo lectura
@@ -1000,11 +995,20 @@ const Payroll = () => {
                   {selectedEmployee && (
                     <p className="text-xs text-muted-foreground">
                       Sueldo diario:{" "}
-                      {formatCurrency(
-                        employees.find(
-                          (e) => e.id.toString() === selectedEmployee,
-                        )?.dailyWage || 0,
-                      )}
+                      {(() => {
+                        const emp = employees.find((e) => e.id.toString() === selectedEmployee);
+                        let daily = emp?.dailyWage || 0;
+                        if (
+                          historicalSalary &&
+                          historicalSalary.white_wage !== undefined &&
+                          historicalSalary.informal_wage !== undefined
+                        ) {
+                          daily = Math.round(
+                            (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+                          );
+                        }
+                        return formatCurrency(daily);
+                      })()}
                     </p>
                   )}
                 </div>
@@ -1043,11 +1047,20 @@ const Payroll = () => {
                   {selectedEmployee && (
                     <p className="text-xs text-muted-foreground">
                       Sueldo base:{" "}
-                      {formatCurrency(
-                        (employees.find(
-                          (e) => e.id.toString() === selectedEmployee,
-                        )?.dailyWage || 0) * parseInt(workDays),
-                      )}
+                      {(() => {
+                        const emp = employees.find((e) => e.id.toString() === selectedEmployee);
+                        let daily = emp?.dailyWage || 0;
+                        if (
+                          historicalSalary &&
+                          historicalSalary.white_wage !== undefined &&
+                          historicalSalary.informal_wage !== undefined
+                        ) {
+                          daily = Math.round(
+                            (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+                          );
+                        }
+                        return formatCurrency(daily * (parseInt(workDays) || 0));
+                      })()}
                     </p>
                   )}
                 </div>
@@ -1091,11 +1104,20 @@ const Payroll = () => {
                       {selectedEmployee && (
                         <p className="text-xs text-muted-foreground">
                           Tarifa por hora:{" "}
-                          {formatCurrency(
-                            (employees.find(
-                              (e) => e.id.toString() === selectedEmployee,
-                            )?.dailyWage || 0) / 8,
-                          )}
+                          {(() => {
+                            const emp = employees.find((e) => e.id.toString() === selectedEmployee);
+                            let daily = emp?.dailyWage || 0;
+                            if (
+                              historicalSalary &&
+                              historicalSalary.white_wage !== undefined &&
+                              historicalSalary.informal_wage !== undefined
+                            ) {
+                              daily = Math.round(
+                                (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+                              );
+                            }
+                            return formatCurrency(daily / 8);
+                          })()}
                         </p>
                       )}
                     </div>
