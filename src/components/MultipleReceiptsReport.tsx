@@ -132,12 +132,6 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
       doc.rect(currentX, currentY, receiptWidth, receiptHeight);
       doc.setLineDashPattern([], 0); // Reset to solid line
 
-      // Company header
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "bold");
-      const headerText = "CÁDIZ BAR DE TAPAS";
-      const headerWidth = doc.getTextWidth(headerText);
-      doc.text(headerText, currentX + (receiptWidth - headerWidth) / 2, currentY + 8);
 
       // Employee name
       doc.setFontSize(9);
@@ -182,12 +176,6 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
       const totalAmountWidth = doc.getTextWidth(totalAmountText);
       doc.text(totalAmountText, currentX + receiptWidth - totalAmountWidth - 2, totalY);
 
-      // Status
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(6);
-      const statusText = record.status === "paid" ? "Pagada" :
-                        record.status === "processed" ? "Procesada" : "Aprobada";
-      doc.text(statusText, currentX + 2, currentY + receiptHeight - 4);
 
       // Move to next position
       receiptsPerRow++;
@@ -282,7 +270,6 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
                   return (
                     <div key={record.id} className="border-2 border-dashed border-gray-300 p-3 bg-white">
                       <div className="text-center">
-                        <h3 className="font-bold text-xs mb-1">CÁDIZ BAR DE TAPAS</h3>
                         <p className="text-xs font-medium mb-2">{record.employeeName}</p>
 
                         <div className="text-xs mb-2">
@@ -309,10 +296,6 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
                             <span>{formatCurrency(totalAmount)}</span>
                           </div>
 
-                          <div className="text-xs text-gray-500">
-                            {record.status === "paid" ? "Pagada" :
-                             record.status === "processed" ? "Procesada" : "Aprobada"}
-                          </div>
                         </div>
                       </div>
                     </div>
