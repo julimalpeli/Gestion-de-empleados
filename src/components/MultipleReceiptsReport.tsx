@@ -1,10 +1,5 @@
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -41,7 +36,10 @@ interface ReceiptItem {
   isDeduction?: boolean;
 }
 
-const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps) => {
+const MultipleReceiptsReport = ({
+  isOpen,
+  onClose,
+}: MultipleReceiptsReportProps) => {
   const { payrollRecords } = usePayroll();
 
   // Get unique periods from real payroll data
@@ -77,7 +75,7 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
       advances: record.advances,
       discounts: record.discounts,
       netTotal: record.netTotal,
-      dataSource: 'Database via usePayroll hook'
+      dataSource: "Database via usePayroll hook",
     });
 
     // Solo mostrar el monto en efectivo (informal_amount) sin desglose
@@ -94,7 +92,9 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
   // Filter records by selected period and approved status
   const filteredRecords = payrollRecords
     .filter((record) => record.period === selectedPeriod)
-    .filter((record) => ["approved", "processed", "paid"].includes(record.status || ""));
+    .filter((record) =>
+      ["approved", "processed", "paid"].includes(record.status || ""),
+    );
 
   const generatePDF = () => {
     const doc = new jsPDF("portrait", "mm", "a4");
@@ -132,18 +132,33 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
       doc.rect(currentX, currentY, receiptWidth, receiptHeight);
       doc.setLineDashPattern([], 0); // Reset to solid line
 
-
       // Employee name
       doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
       const employeeName = record.employeeName || "Sin nombre";
       const nameWidth = doc.getTextWidth(employeeName);
-      doc.text(employeeName, currentX + (receiptWidth - nameWidth) / 2, currentY + 16);
+      doc.text(
+        employeeName,
+        currentX + (receiptWidth - nameWidth) / 2,
+        currentY + 16,
+      );
 
       // Period
       const [year, month] = selectedPeriod.split("-");
-      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const monthNames = [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre",
+      ];
       const periodText = `Período: ${monthNames[parseInt(month) - 1]} ${year}`;
       doc.setFontSize(7);
       doc.text(periodText, currentX + 2, currentY + 24);
@@ -156,7 +171,9 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
         if (itemY > currentY + receiptHeight - 15) return; // Skip if no space
 
         const label = item.label;
-        const amount = item.isDeduction ? `-${formatCurrency(item.amount)}` : formatCurrency(item.amount);
+        const amount = item.isDeduction
+          ? `-${formatCurrency(item.amount)}`
+          : formatCurrency(item.amount);
 
         doc.text(label, currentX + 2, itemY);
         const amountWidth = doc.getTextWidth(amount);
@@ -174,8 +191,11 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
 
       doc.text(totalText, currentX + 2, totalY);
       const totalAmountWidth = doc.getTextWidth(totalAmountText);
-      doc.text(totalAmountText, currentX + receiptWidth - totalAmountWidth - 2, totalY);
-
+      doc.text(
+        totalAmountText,
+        currentX + receiptWidth - totalAmountWidth - 2,
+        totalY,
+      );
 
       // Move to next position
       receiptsPerRow++;
@@ -220,8 +240,20 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
                   {availablePeriods.length > 0 ? (
                     availablePeriods.map((period) => {
                       const [year, month] = period.split("-");
-                      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                                         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                      const monthNames = [
+                        "Enero",
+                        "Febrero",
+                        "Marzo",
+                        "Abril",
+                        "Mayo",
+                        "Junio",
+                        "Julio",
+                        "Agosto",
+                        "Septiembre",
+                        "Octubre",
+                        "Noviembre",
+                        "Diciembre",
+                      ];
                       const monthName = monthNames[parseInt(month) - 1];
                       return (
                         <SelectItem key={period} value={period}>
@@ -259,7 +291,9 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
           {/* Preview Grid */}
           <Card>
             <CardHeader>
-              <CardTitle>Vista Previa - {filteredRecords.length} recibos</CardTitle>
+              <CardTitle>
+                Vista Previa - {filteredRecords.length} recibos
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-3 gap-4">
@@ -268,25 +302,50 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
                   const totalAmount = record.informalAmount || 0;
 
                   return (
-                    <div key={record.id} className="border-2 border-dashed border-gray-300 p-3 bg-white">
+                    <div
+                      key={record.id}
+                      className="border-2 border-dashed border-gray-300 p-3 bg-white"
+                    >
                       <div className="text-center">
-                        <p className="text-xs font-medium mb-2">{record.employeeName}</p>
+                        <p className="text-xs font-medium mb-2">
+                          {record.employeeName}
+                        </p>
 
                         <div className="text-xs mb-2">
-                          <p>Período: {(() => {
-                            const [year, month] = selectedPeriod.split("-");
-                            const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                                               "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-                            return `${monthNames[parseInt(month) - 1]} ${year}`;
-                          })()}</p>
+                          <p>
+                            Período:{" "}
+                            {(() => {
+                              const [year, month] = selectedPeriod.split("-");
+                              const monthNames = [
+                                "Enero",
+                                "Febrero",
+                                "Marzo",
+                                "Abril",
+                                "Mayo",
+                                "Junio",
+                                "Julio",
+                                "Agosto",
+                                "Septiembre",
+                                "Octubre",
+                                "Noviembre",
+                                "Diciembre",
+                              ];
+                              return `${monthNames[parseInt(month) - 1]} ${year}`;
+                            })()}
+                          </p>
                         </div>
 
                         <div className="space-y-1 text-xs">
                           {items.map((item, idx) => (
                             <div key={idx} className="flex justify-between">
                               <span>{item.label}</span>
-                              <span className={item.isDeduction ? "text-red-600" : ""}>
-                                {item.isDeduction ? "-" : ""}{formatCurrency(item.amount)}
+                              <span
+                                className={
+                                  item.isDeduction ? "text-red-600" : ""
+                                }
+                              >
+                                {item.isDeduction ? "-" : ""}
+                                {formatCurrency(item.amount)}
                               </span>
                             </div>
                           ))}
@@ -295,7 +354,6 @@ const MultipleReceiptsReport = ({ isOpen, onClose }: MultipleReceiptsReportProps
                             <span>Total:</span>
                             <span>{formatCurrency(totalAmount)}</span>
                           </div>
-
                         </div>
                       </div>
                     </div>
