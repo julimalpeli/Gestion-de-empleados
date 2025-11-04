@@ -232,9 +232,33 @@ class SalaryHistoryService {
         }
       }
 
+      console.log(`🔄 No historical data found matching period, checking latest increase overall`);
+
+      // 3. Buscar el último aumento registrado sin importar el período
+      const { data: latestChange, error: latestError } = await supabase
+        .from("salary_history")
+        .select(
+          "white_wage, informal_wage, presentismo, effective_date",
+        )
+        .eq("employee_id", employeeId)
+        .order("effective_date", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (!latestError && latestChange && latestChange.length > 0) {
+        const record = latestChange[0];
+        console.log(`✅ Using absolute latest salary change:`, record);
+        return {
+          white_wage: record.white_wage,
+          informal_wage: record.informal_wage,
+          presentismo: record.presentismo,
+          source: "history_latest",
+        };
+      }
+
       console.log(`🔄 No historical data found, using current employee values`);
 
-      // 3. Si no hay historial, usar valores actuales del empleado
+      // 4. Si no hay historial, usar valores actuales del empleado
       const { data: employeeData, error: employeeError } = await supabase
         .from("employees")
         .select("white_wage, informal_wage, presentismo")
