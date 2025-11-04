@@ -580,28 +580,19 @@ const Payroll = () => {
     const isCurrentPeriod = record.period === currentPeriod;
 
     try {
-      if (isCurrentPeriod) {
-        // Para el período actual, usar valores actuales del empleado
-        console.log(
-          `🔍 Editing current period ${record.period} - using current employee values`,
-        );
-        setHistoricalSalary(null);
-      } else {
-        // Solo para períodos pasados, usar valores históricos
-        const historicalSalaryData =
-          await salaryHistoryService.getSalaryForPeriod(
-            record.employeeId.toString(),
-            record.period,
-          );
+      // Siempre usar salario del período de la liquidación (evita desfasajes al editar)
+      const historicalSalaryData = await salaryHistoryService.getSalaryForPeriod(
+        record.employeeId.toString(),
+        record.period,
+      );
 
-        console.log(
-          `🔍 Historical salary for past period ${record.period}:`,
-          historicalSalaryData,
-        );
+      console.log(
+        `🔍 Historical salary for period ${record.period}:`,
+        historicalSalaryData,
+      );
 
-        // Guardar los valores históricos para usar en cálculos
-        setHistoricalSalary(historicalSalaryData);
-      }
+      // Guardar valores históricos para cálculos (incluye presentismo del período)
+      setHistoricalSalary(historicalSalaryData);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
       debugSetWhiteWage(
@@ -747,15 +738,11 @@ const Payroll = () => {
     const hourlyRate = dailyWageToUse / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: SIEMPRE usar el valor actual del empleado para consistencia
-    // No usar valores históricos para presentismo para evitar discrepancias
+    // Presentismo: usar el valor del período si existe historial; si no, el actual
     let presentismoToUse = employee?.presentismo || 0;
-
-    // COMENTARIO: Se removió la lógica de presentismo histórico para mantener consistencia
-    // El presentismo debe reflejar el valor actual del empleado en todos los casos
-    // if (historicalSalary && historicalSalary.presentismo !== undefined) {
-    //   presentismoToUse = historicalSalary.presentismo;
-    // }
+    if (historicalSalary && historicalSalary.presentismo !== undefined) {
+      presentismoToUse = historicalSalary.presentismo;
+    }
 
     // En modo edición, el presentismo podría ser diferente al actual
     // pero mantener la lógica de mantiene/pierde del form
