@@ -126,7 +126,30 @@ class SalaryHistoryService {
 
       console.log(`🎯 Target end-of-month for period ${period}: ${targetDateStr}`);
 
-      // 1. Buscar cambios que sean efectivos en o antes del fin del período objetivo
+      // 1. Priorizar registros cuyo impact_period coincide exactamente con el período
+      const { data: periodImpactData, error: periodImpactError } = await supabase
+        .from("salary_history")
+        .select(
+          "white_wage, informal_wage, presentismo, effective_date, impact_period",
+        )
+        .eq("employee_id", employeeId)
+        .eq("impact_period", period)
+        .order("effective_date", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (!periodImpactError && periodImpactData && periodImpactData.length > 0) {
+        const record = periodImpactData[0];
+        console.log(`✅ Using impact_period match for ${period}:`, record);
+        return {
+          white_wage: record.white_wage,
+          informal_wage: record.informal_wage,
+          presentismo: record.presentismo,
+          source: "history_impact_period",
+        };
+      }
+
+      // 2. Buscar cambios que sean efectivos en o antes del fin del período objetivo
       const { data: historyData, error: historyError } = await supabase
         .from("salary_history")
         .select(
