@@ -117,13 +117,16 @@ class SalaryHistoryService {
         `🔄 Using fallback method for employee ${employeeId}, period ${period}`,
       );
 
-      // Convertir período a fecha para comparación
-      const targetDate = new Date(`${period}-01`);
-      const targetDateStr = targetDate.toISOString().split("T")[0];
+      // Convertir período a fin de mes para comparar con la última fecha efectiva del período
+      const [yearStr, monthStr] = period.split("-");
+      const year = parseInt(yearStr, 10);
+      const monthIndex = parseInt(monthStr, 10) - 1; // 0-based
+      const endOfMonth = new Date(year, monthIndex + 1, 0); // último día del mes
+      const targetDateStr = endOfMonth.toISOString().split("T")[0];
 
-      console.log(`🎯 Target date for period ${period}: ${targetDateStr}`);
+      console.log(`🎯 Target end-of-month for period ${period}: ${targetDateStr}`);
 
-      // 1. Buscar cambios que sean efectivos en o antes del período objetivo
+      // 1. Buscar cambios que sean efectivos en o antes del fin del período objetivo
       const { data: historyData, error: historyError } = await supabase
         .from("salary_history")
         .select(
