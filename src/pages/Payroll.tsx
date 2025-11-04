@@ -639,6 +639,7 @@ const Payroll = () => {
       const updatedData = {
         baseDays: parseInt(workDays),
         holidayDays: parseInt(holidayDays) || 0,
+        baseAmount: calculation.basePay || 0,
         overtimeHours: overtimeEnabled ? parseFloat(overtimeHours) || 0 : 0,
         advances: parseFloat(advances) || 0,
         discounts: parseFloat(discounts) || 0,
