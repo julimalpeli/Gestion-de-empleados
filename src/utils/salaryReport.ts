@@ -114,6 +114,7 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
 
   autoTable(doc, {
     startY: 70,
+    margin: { left: 30, right: 30 },
     head: [[
       "Nombre",
       "Documento",
@@ -125,17 +126,17 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
       "Estado",
     ]],
     body,
-    styles: { fontSize: 9 },
+    styles: { fontSize: 9, overflow: 'linebreak', cellPadding: 3 },
     headStyles: { fillColor: [33, 33, 33] },
     columnStyles: {
-      0: { cellWidth: 180 },
-      1: { cellWidth: 80 },
-      2: { cellWidth: 120 },
-      3: { cellWidth: 90 },
-      4: { cellWidth: 120 },
-      5: { cellWidth: 100 },
-      6: { cellWidth: 100 },
-      7: { cellWidth: 80 },
+      0: { cellWidth: 160 },
+      1: { cellWidth: 70 },
+      2: { cellWidth: 110 },
+      3: { cellWidth: 80 },
+      4: { cellWidth: 100, halign: 'right' },
+      5: { cellWidth: 80, halign: 'right' },
+      6: { cellWidth: 80, halign: 'right' },
+      7: { cellWidth: 60 },
     },
     didDrawPage: (data) => {
       const pageCount = doc.getNumberOfPages();
