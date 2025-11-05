@@ -378,8 +378,9 @@ class SalaryHistoryService {
   async updateEmployeeSalaryWithHistory(
     employeeId: string,
     newSalary: {
-      white_wage: number;
-      informal_wage: number;
+      white_wage?: number;
+      informal_wage?: number;
+      base_wage?: number;
       presentismo: number;
     },
     changeInfo: {
