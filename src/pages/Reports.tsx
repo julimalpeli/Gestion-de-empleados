@@ -272,19 +272,21 @@ const Reports = () => {
       }
 
       salaryBreakdown = salaryDetails
-        .slice()
+        .concat(
+          employee.sueldoBase
+            ? [
+                {
+                  period: "Sueldo base",
+                  whiteAmount: employee.sueldoBase,
+                  informalAmount: 0,
+                  overtimeAmount: 0,
+                  holidayBonus: 0,
+                  total: employee.sueldoBase,
+                },
+              ]
+            : [],
+        )
         .sort((a, b) => b.total - a.total);
-
-      if (employee.sueldoBase) {
-        salaryBreakdown.push({
-          period: "Sueldo base",
-          whiteAmount: employee.sueldoBase,
-          informalAmount: 0,
-          overtimeAmount: 0,
-          holidayBonus: 0,
-          total: employee.sueldoBase,
-        });
-      }
 
       // Debug para todos los empleados
       console.log(
