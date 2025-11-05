@@ -62,6 +62,11 @@ export const useEmployees = () => {
 
   // Cargar empleados
   const fetchEmployees = useCallback(async () => {
+    if (!session) {
+      console.log("⏸️ Omitiendo carga de empleados: no hay sesión autenticada");
+      return;
+    }
+
     try {
       console.log("🔄 Iniciando carga de empleados...");
       setLoading(true);
@@ -85,7 +90,7 @@ export const useEmployees = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [session]);
 
   // Crear empleado
   const createEmployee = async (employee: CreateEmployeeRequest) => {
