@@ -62,6 +62,11 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
           if (error) {
             console.error("❌ Supabase query error:", error);
+
+            if (error instanceof Error) {
+              throw error;
+            }
+
             throw new Error(
               `Supabase error: ${error.message} (Code: ${error.code || "UNKNOWN"})`,
             );
