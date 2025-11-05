@@ -76,7 +76,24 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
       console.error("   - Error message:", error.message);
       console.error("   - Error details:", error.details);
       console.error("   - Error hint:", error.hint);
-      
+
+      const permissionDenied =
+        error.code === "42501" ||
+        error.code === "PGRST301" ||
+        error.message?.toLowerCase().includes("permission") ||
+        error.message?.toLowerCase().includes("rls") ||
+        error.details?.toLowerCase().includes("permission");
+
+      if (permissionDenied) {
+        console.warn(
+          "🔐 Supabase connection reachable but blocked by RLS/permissions. Treating as connected for offline banner.",
+        );
+        connectionState = "connected";
+        lastSuccessfulConnection = new Date();
+        connectionRetries = 0;
+        return true;
+      }
+
       connectionState = 'error';
       connectionRetries++;
       return false;
