@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth-simple";
 
+const ADMIN_BYPASS_ENABLED =
+  import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
+
 // Import debug utilities
 if (import.meta.env.DEV) {
   import("@/utils/vacationDebug");
