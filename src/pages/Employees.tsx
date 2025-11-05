@@ -899,17 +899,11 @@ const Employees = () => {
                     </TableCell>
                     <TableCell className="font-semibold">
                       {formatCurrency(
-                        calculateDailySalary(
-                          employee.whiteWage || 0,
-                          employee.informalWage || 0,
-                        ),
+                        employee.dailyWage || Math.round((employee.sueldoBase || 0) / 30),
                       )}
                     </TableCell>
                     <TableCell>
-                      {formatCurrency(employee.whiteWage || 0)}
-                    </TableCell>
-                    <TableCell>
-                      {formatCurrency(employee.informalWage || 0)}
+                      {formatCurrency(employee.sueldoBase || 0)}
                     </TableCell>
                     <TableCell>
                       {formatCurrency(employee.presentismo || 0)}
