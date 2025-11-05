@@ -389,9 +389,34 @@ const Payroll = () => {
     let bestSalary = employee.sueldoBase || 0; // Fallback por si no hay históricos
 
     if (employeePayrolls.length > 0) {
+      const payrollsInSemester = employeePayrolls.filter((payroll) => {
+        if (!payroll.period) {
+          return false;
+        }
+        const [recordYearStr, recordMonthStr] = payroll.period.split("-");
+        const recordYear = Number(recordYearStr);
+        const recordMonth = Number(recordMonthStr);
+        if (
+          !Number.isFinite(recordYear) ||
+          !Number.isFinite(recordMonth) ||
+          recordMonth < 1 ||
+          recordMonth > 12
+        ) {
+          return false;
+        }
+        const recordDate = new Date(recordYear, recordMonth - 1, 1);
+        return (
+          recordDate.getTime() >= semesterStart.getTime() &&
+          recordDate.getTime() <= semesterEnd.getTime()
+        );
+      });
+
+      const relevantPayrolls =
+        payrollsInSemester.length > 0 ? payrollsInSemester : employeePayrolls;
+
       // Calcular el mejor sueldo de los históricos
       // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
-      const salaryCalculations = employeePayrolls.map((payroll) => {
+      const salaryCalculations = relevantPayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
@@ -402,7 +427,7 @@ const Payroll = () => {
           whiteAmount + informalAmount + overtimeAmount + holidayBonus;
 
         console.log(
-          `🔍 Aguinaldo calc for ${payroll.employeeName} ${payroll.period}:`,
+          `🔍 Aguinaldo calc (considered) for ${payroll.employeeName} ${payroll.period}:`,
           {
             whiteAmount,
             informalAmount,
@@ -415,8 +440,27 @@ const Payroll = () => {
         return totalSalary;
       });
 
-      // Tomar el mejor sueldo de todos los períodos
-      bestSalary = Math.max(...salaryCalculations, bestSalary);
+      if (salaryCalculations.length > 0) {
+        const maxHistoricalSalary = Math.max(...salaryCalculations);
+        if (maxHistoricalSalary > bestSalary) {
+          bestSalary = maxHistoricalSalary;
+        }
+      }
+
+      console.log("📈 Aguinaldo salary evaluation", {
+        employee: employee.name,
+        baseSalary: employee.sueldoBase || 0,
+        salaryTotalsInRange: salaryCalculations,
+        consideredPayrolls: relevantPayrolls.map((p) => ({
+          period: p.period,
+          amount:
+            (p.whiteAmount || 0) +
+            (p.informalAmount || 0) +
+            (p.overtimeAmount || 0) +
+            (p.holidayBonus || 0),
+        })),
+        bestSalarySelected: bestSalary,
+      });
     }
 
     // Calcular aguinaldo
@@ -2248,7 +2292,7 @@ const Payroll = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente
+              Esta acción no se puede deshacer. Esto eliminar�� permanentemente
               la liquidación de {recordToDelete?.employeeName} para el período{" "}
               {recordToDelete ? formatPeriod(recordToDelete.period) : ""}.
             </AlertDialogDescription>
