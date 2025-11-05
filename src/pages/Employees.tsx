@@ -772,7 +772,7 @@ const Employees = () => {
                       )}
                     </span>
                     <p className="text-sm text-muted-foreground mt-1">
-                      (Sueldo Blanco + Sueldo Informal) ÷ 30
+                      (Sueldo Blanco + Sueldo Informal) �� 30
                     </p>
                   </div>
                 </div>
@@ -1507,8 +1507,7 @@ const Employees = () => {
                           <p className="text-3xl font-bold">
                             {formatCurrency(
                               calculateDailySalary(
-                                viewingEmployee.whiteWage || 0,
-                                viewingEmployee.informalWage || 0,
+                                viewingEmployee.sueldoBase || 0,
                               ),
                             )}
                           </p>
