@@ -816,9 +816,7 @@ const Reports = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            {formatCurrency(
-                              employee.whiteWage + employee.informalWage,
-                            )}
+                            {formatCurrency(employee.sueldoBase || 0)}
                           </TableCell>
                           <TableCell>{formatCurrency(whiteTotal)}</TableCell>
                           <TableCell>{formatCurrency(informalTotal)}</TableCell>
