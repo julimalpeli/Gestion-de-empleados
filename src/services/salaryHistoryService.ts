@@ -256,12 +256,7 @@ class SalaryHistoryService {
       if (!latestError && latestChange && latestChange.length > 0) {
         const record = latestChange[0];
         console.log(`✅ Using absolute latest salary change:`, record);
-        return {
-          white_wage: record.white_wage,
-          informal_wage: record.informal_wage,
-          presentismo: record.presentismo,
-          source: "history_latest",
-        };
+        return this.buildSalaryForPeriod(record, "history_latest");
       }
 
       console.log(`🔄 No historical data found, using current employee values`);
