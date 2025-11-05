@@ -781,8 +781,7 @@ const Employees = () => {
                     <span className="text-lg font-semibold">
                       {formatCurrency(
                         calculateDailySalary(
-                          parseFloat(newEmployee.whiteWage) || 0,
-                          parseFloat(newEmployee.informalWage) || 0,
+                          parseFloat(newEmployee.sueldoBase) || 0,
                         ),
                       )}
                     </span>
