@@ -58,7 +58,7 @@ export const useEmployees = () => {
   const [error, setError] = useState<string | null>(null);
   const { updateUser, users } = useUsers();
   const { auditEmployee } = useAudit();
-  const { session } = useAuth();
+  const { session, user, isAuthenticated } = useAuth();
 
   // Cargar empleados
   const fetchEmployees = useCallback(async () => {
