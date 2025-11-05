@@ -323,8 +323,6 @@ const Reports = () => {
       reason: isProportional
         ? "Aguinaldo proporcional por días trabajados"
         : "Aguinaldo completo",
-      baseSalary: employee.sueldoBase || 0,
-      salaryBreakdown,
     };
   };
 
