@@ -200,25 +200,16 @@ const Reports = () => {
     let bestSalary = employee.sueldoBase || 0; // Fallback por si no hay históricos
     let bestSalaryPeriod = "Sueldo base"; // Por defecto
 
-    let salaryBreakdown: {
-      period: string;
-      whiteAmount: number;
-      informalAmount: number;
-      overtimeAmount: number;
-      holidayBonus: number;
-      total: number;
-    }[] = [];
-
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
       // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
-      const salaryDetails = employeePayrolls.map((payroll) => {
+      const salaryCalculations = employeePayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
         const holidayBonus = payroll.holidayBonus || 0;
 
-        const total =
+        const result =
           whiteAmount + informalAmount + overtimeAmount + holidayBonus;
 
         // Debug log para DNI específico
@@ -234,69 +225,49 @@ const Reports = () => {
             informalAmount,
             overtimeAmount,
             holidayBonus,
-            total,
+            bestSalaryForAguinaldo: result,
             formula:
               "whiteAmount + informalAmount + overtimeAmount + holidayBonus",
           });
         }
 
-        return {
-          period: payroll.period,
-          whiteAmount,
-          informalAmount,
-          overtimeAmount,
-          holidayBonus,
-          total,
-        };
+        return result;
       });
 
-      const historicalTotals = salaryDetails.map((entry) => entry.total);
-      const maxHistoricalSalary =
-        historicalTotals.length > 0 ? Math.max(...historicalTotals) : 0;
-      const maxSalaryIndex =
-        maxHistoricalSalary > 0
-          ? historicalTotals.indexOf(maxHistoricalSalary)
-          : -1;
+      // Encontrar el mejor sueldo y su período
+      const maxHistoricalSalary = Math.max(...salaryCalculations);
+      const maxSalaryIndex = salaryCalculations.indexOf(maxHistoricalSalary);
 
       // Comparar con el sueldo base para determinar cuál es mejor
       const baseSalary = employee.sueldoBase || 0;
 
-      if (maxSalaryIndex >= 0 && maxHistoricalSalary > baseSalary) {
+      if (maxHistoricalSalary > baseSalary) {
         // El mejor sueldo es de un período histórico
         bestSalary = maxHistoricalSalary;
-        bestSalaryPeriod = salaryDetails[maxSalaryIndex].period;
+        bestSalaryPeriod = employeePayrolls[maxSalaryIndex].period;
       } else {
         // El sueldo base es el mejor
         bestSalary = baseSalary;
         bestSalaryPeriod = "Sueldo base";
       }
 
-      salaryBreakdown = salaryDetails
-        .concat(
-          employee.sueldoBase
-            ? [
-                {
-                  period: "Sueldo base",
-                  whiteAmount: employee.sueldoBase,
-                  informalAmount: 0,
-                  overtimeAmount: 0,
-                  holidayBonus: 0,
-                  total: employee.sueldoBase,
-                },
-              ]
-            : [],
-        )
-        .sort((a, b) => b.total - a.total);
-
       // Debug para todos los empleados
       console.log(
         `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
         {
           baseSalary: employee.sueldoBase || 0,
-          historicalSalaries: salaryDetails,
+          historicalSalaries: salaryCalculations,
           maxHistoricalSalary,
           maxSalaryIndex,
           bestPeriod: bestSalaryPeriod,
+          employeePayrolls: employeePayrolls.map((p) => ({
+            period: p.period,
+            amount:
+              p.whiteAmount +
+              p.informalAmount +
+              p.overtimeAmount +
+              p.holidayBonus,
+          })),
         },
       );
     } else {
