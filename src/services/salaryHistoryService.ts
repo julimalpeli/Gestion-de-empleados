@@ -307,6 +307,40 @@ class SalaryHistoryService {
     }
   }
 
+  private toNumber(value: unknown): number {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === "string") {
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
+  }
+
+  private buildSalaryForPeriod(
+    record: any,
+    defaultSource: SalaryForPeriod["source"],
+  ): SalaryForPeriod {
+    const white = this.toNumber(record?.white_wage ?? record?.whiteWage);
+    const informal = this.toNumber(record?.informal_wage ?? record?.informalWage);
+    const baseCandidate = record?.base_wage ?? record?.baseWage;
+    const base =
+      baseCandidate !== undefined && baseCandidate !== null
+        ? this.toNumber(baseCandidate)
+        : white + informal;
+    const presentismo = this.toNumber(record?.presentismo);
+    const source = (record?.source as SalaryForPeriod["source"]) || defaultSource;
+
+    return {
+      white_wage: white,
+      informal_wage: informal,
+      base_wage: base,
+      presentismo,
+      source,
+    };
+  }
+
   // Crear nuevo registro de historial
   async createSalaryHistory(
     request: CreateSalaryHistoryRequest,
