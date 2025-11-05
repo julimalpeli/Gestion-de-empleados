@@ -512,23 +512,46 @@ export class SupabaseEmployeeService implements IEmployeeService {
     };
   }
 
+  private toNumber(value: unknown): number {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === "string") {
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+    return 0;
+  }
+
+  private resolveSueldoBase(data: any): number {
+    const direct = data?.sueldo_base ?? data?.sueldoBase;
+    const directValue = direct !== undefined && direct !== null ? this.toNumber(direct) : null;
+    if (directValue !== null) {
+      return directValue;
+    }
+    const white = this.toNumber(data?.white_wage ?? data?.whiteWage);
+    const informal = this.toNumber(data?.informal_wage ?? data?.informalWage);
+    return white + informal;
+  }
+
   // Helper para mapear datos de Supabase a nuestro modelo
   private mapFromSupabase(data: any): Employee {
+    const sueldoBase = this.resolveSueldoBase(data);
+
     return {
       id: data.id,
       name: data.name,
       dni: data.dni,
       documentType: data.document_type,
       position: data.job_position,
-      whiteWage: data.white_wage,
-      informalWage: data.informal_wage,
-      dailyWage: data.daily_wage,
-      presentismo: data.presentismo,
-      losesPresentismo: data.loses_presentismo,
+      sueldoBase,
+      dailyWage: this.toNumber(data.daily_wage),
+      presentismo: this.toNumber(data.presentismo),
+      losesPresentismo: Boolean(data.loses_presentismo),
       status: data.status,
       startDate: data.start_date,
-      vacationDays: data.vacation_days,
-      vacationsTaken: data.vacations_taken,
+      vacationDays: this.toNumber(data.vacation_days),
+      vacationsTaken: this.toNumber(data.vacations_taken),
       address: data.address || "",
       email: data.email || "",
       createdAt: data.created_at,
