@@ -559,6 +559,26 @@ const Reports = () => {
                           <div className="text-xs text-muted-foreground">
                             {emp.aguinaldo.bestSalaryPeriod || "Sueldo base"}
                           </div>
+                          {emp.aguinaldo.salaryBreakdown?.length ? (
+                            <details className="mt-1 text-xs text-muted-foreground">
+                              <summary className="cursor-pointer select-none">
+                                Ver histórico
+                              </summary>
+                              <div className="mt-1 space-y-1">
+                                {emp.aguinaldo.salaryBreakdown
+                                  .slice(0, 6)
+                                  .map((entry) => (
+                                    <div key={`${emp.id}-${entry.period}`}>
+                                      <span className="font-medium">
+                                        {entry.period}
+                                      </span>
+                                      {": "}
+                                      {formatCurrency(entry.total)}
+                                    </div>
+                                  ))}
+                              </div>
+                            </details>
+                          ) : null}
                         </div>
                       </TableCell>
                       <TableCell>
