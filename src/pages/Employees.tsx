@@ -772,7 +772,7 @@ const Employees = () => {
                       )}
                     </span>
                     <p className="text-sm text-muted-foreground mt-1">
-                      (Sueldo Blanco + Sueldo Informal) �� 30
+                      (Sueldo Blanco + Sueldo Informal) ÷ 30
                     </p>
                   </div>
                 </div>
@@ -1521,26 +1521,12 @@ const Employees = () => {
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                           <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                            Sueldo en Blanco
+                            Sueldo Base
                           </Label>
                           <p className="text-xl font-bold text-gray-900 mt-1">
-                            {formatCurrency(viewingEmployee.whiteWage || 0)}
+                            {formatCurrency(viewingEmployee.sueldoBase || 0)}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            Registrado oficialmente
-                          </p>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-500">
-                          <Label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                            Sueldo Informal
-                          </Label>
-                          <p className="text-xl font-bold text-gray-900 mt-1">
-                            {formatCurrency(viewingEmployee.informalWage || 0)}
-                          </p>
-                          <p className="text-xs text-gray-500 mt-1">
-                            No registrado
-                          </p>
+                          <p className="text-xs text-gray-500 mt-1">Base salarial</p>
                         </div>
 
                         <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
