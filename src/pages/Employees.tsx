@@ -1159,30 +1159,15 @@ const Employees = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-whiteWage">Sueldo en Blanco</Label>
+                <Label htmlFor="edit-sueldoBase">Sueldo Base</Label>
                 <CurrencyInput
-                  id="edit-whiteWage"
+                  id="edit-sueldoBase"
                   placeholder="$ 0,00"
-                  value={editingEmployee.whiteWage}
+                  value={editingEmployee.sueldoBase}
                   onChange={(value) =>
                     setEditingEmployee({
                       ...editingEmployee,
-                      whiteWage: value,
-                    })
-                  }
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="edit-informalWage">Sueldo Informal</Label>
-                <CurrencyInput
-                  id="edit-informalWage"
-                  placeholder="$ 0,00"
-                  value={editingEmployee.informalWage}
-                  onChange={(value) =>
-                    setEditingEmployee({
-                      ...editingEmployee,
-                      informalWage: value,
+                      sueldoBase: value,
                     })
                   }
                 />
