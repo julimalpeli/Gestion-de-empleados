@@ -136,8 +136,8 @@ Los siguientes formularios han sido actualizados para usar CurrencyInput:
 
 ### Página de Empleados (`src/pages/Employees.tsx`)
 
-- ✅ Formulario crear empleado: sueldo blanco, informal, presentismo
-- ✅ Formulario editar empleado: sueldo blanco, informal, presentismo
+- ✅ Formulario crear empleado: sueldo base, presentismo
+- ✅ Formulario editar empleado: sueldo base, presentismo
 
 ### Página de Liquidaciones (`src/pages/Payroll.tsx`)
 
