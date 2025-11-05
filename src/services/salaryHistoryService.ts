@@ -275,7 +275,7 @@ class SalaryHistoryService {
       // 4. Si no hay historial, usar valores actuales del empleado
       const { data: employeeData, error: employeeError } = await supabase
         .from("employees")
-        .select("white_wage, informal_wage, presentismo")
+        .select("white_wage, informal_wage, sueldo_base, presentismo")
         .eq("id", employeeId)
         .single();
 
