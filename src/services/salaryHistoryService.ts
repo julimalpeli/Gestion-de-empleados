@@ -155,12 +155,7 @@ class SalaryHistoryService {
       ) {
         const record = periodImpactData[0];
         console.log(`✅ Using impact_period match for ${period}:`, record);
-        return {
-          white_wage: record.white_wage,
-          informal_wage: record.informal_wage,
-          presentismo: record.presentismo,
-          source: "history_impact_period",
-        };
+        return this.buildSalaryForPeriod(record, "history_impact_period");
       }
 
       // 2. Buscar cambios que sean efectivos en o antes del fin del período objetivo
