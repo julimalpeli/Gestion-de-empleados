@@ -227,12 +227,16 @@ class SalaryHistoryService {
           futureRecord.previous_presentismo !== undefined
         ) {
           console.log(`📊 Using PREVIOUS values from future change`);
-          return {
+          const previousRecord = {
             white_wage: futureRecord.previous_white_wage || 0,
             informal_wage: futureRecord.previous_informal_wage || 0,
+            base_wage:
+              futureRecord.previous_base_wage ??
+              ((futureRecord.previous_white_wage || 0) +
+                (futureRecord.previous_informal_wage || 0)),
             presentismo: futureRecord.previous_presentismo || 0,
-            source: "history_previous",
           };
+          return this.buildSalaryForPeriod(previousRecord, "history_previous");
         }
       }
 
