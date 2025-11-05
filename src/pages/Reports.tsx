@@ -43,7 +43,7 @@ import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 
 // Mock employees data - COMENTADO porque ahora usamos Supabase
-const mockEmployees = [
+/* const mockEmployees = [
   {
     id: 1,
     name: "Juan Pérez",
@@ -104,7 +104,7 @@ const mockEmployees = [
     status: "active",
     startDate: "2025-05-22",
   },
-];
+]; */
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("2024-2");
