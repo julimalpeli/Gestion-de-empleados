@@ -154,6 +154,23 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
 export const logSupabaseError = (context: string, error: any) => {
   console.group(`❌ ${context}`);
 
+  const extractedMessage =
+    error instanceof Error
+      ? error.message
+      : typeof error?.message === "string"
+        ? error.message
+        : "";
+  const normalizedMessage = extractedMessage?.toLowerCase?.() || "";
+  const isNetworkError =
+    normalizedMessage.includes("failed to fetch") ||
+    normalizedMessage.includes("networkerror") ||
+    normalizedMessage.includes("typeerror: failed to fetch");
+
+  if (isNetworkError) {
+    connectionState = "disconnected";
+    connectionRetries = Math.min(connectionRetries + 1, MAX_RETRIES + 1);
+  }
+
   if (error && typeof error === "object") {
     console.error(
       "Error details:",
