@@ -124,21 +124,28 @@ class SalaryHistoryService {
       const endOfMonth = new Date(year, monthIndex + 1, 0); // último día del mes
       const targetDateStr = endOfMonth.toISOString().split("T")[0];
 
-      console.log(`🎯 Target end-of-month for period ${period}: ${targetDateStr}`);
+      console.log(
+        `🎯 Target end-of-month for period ${period}: ${targetDateStr}`,
+      );
 
       // 1. Priorizar registros cuyo impact_period coincide exactamente con el período
-      const { data: periodImpactData, error: periodImpactError } = await supabase
-        .from("salary_history")
-        .select(
-          "white_wage, informal_wage, presentismo, effective_date, impact_period",
-        )
-        .eq("employee_id", employeeId)
-        .eq("impact_period", period)
-        .order("effective_date", { ascending: false })
-        .order("created_at", { ascending: false })
-        .limit(1);
+      const { data: periodImpactData, error: periodImpactError } =
+        await supabase
+          .from("salary_history")
+          .select(
+            "white_wage, informal_wage, presentismo, effective_date, impact_period",
+          )
+          .eq("employee_id", employeeId)
+          .eq("impact_period", period)
+          .order("effective_date", { ascending: false })
+          .order("created_at", { ascending: false })
+          .limit(1);
 
-      if (!periodImpactError && periodImpactData && periodImpactData.length > 0) {
+      if (
+        !periodImpactError &&
+        periodImpactData &&
+        periodImpactData.length > 0
+      ) {
         const record = periodImpactData[0];
         console.log(`✅ Using impact_period match for ${period}:`, record);
         return {
@@ -232,14 +239,14 @@ class SalaryHistoryService {
         }
       }
 
-      console.log(`🔄 No historical data found matching period, checking latest increase overall`);
+      console.log(
+        `🔄 No historical data found matching period, checking latest increase overall`,
+      );
 
       // 3. Buscar el último aumento registrado sin importar el período
       const { data: latestChange, error: latestError } = await supabase
         .from("salary_history")
-        .select(
-          "white_wage, informal_wage, presentismo, effective_date",
-        )
+        .select("white_wage, informal_wage, presentismo, effective_date")
         .eq("employee_id", employeeId)
         .order("effective_date", { ascending: false })
         .order("created_at", { ascending: false })

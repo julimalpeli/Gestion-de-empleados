@@ -577,10 +577,11 @@ const Payroll = () => {
 
     try {
       // Siempre usar salario del período de la liquidación (evita desfasajes al editar)
-      const historicalSalaryData = await salaryHistoryService.getSalaryForPeriod(
-        record.employeeId.toString(),
-        record.period,
-      );
+      const historicalSalaryData =
+        await salaryHistoryService.getSalaryForPeriod(
+          record.employeeId.toString(),
+          record.period,
+        );
 
       console.log(
         `🔍 Historical salary for period ${record.period}:`,
@@ -998,13 +999,17 @@ const Payroll = () => {
                     <p className="text-xs text-muted-foreground">
                       Sueldo diario:{" "}
                       {(() => {
-                        const emp = employees.find((e) => e.id.toString() === selectedEmployee);
+                        const emp = employees.find(
+                          (e) => e.id.toString() === selectedEmployee,
+                        );
                         let daily = emp?.dailyWage || 0;
 
                         if (editingRecord && editingRecord.baseAmount != null) {
                           const baseDays = editingRecord.baseDays || 0;
                           if (baseDays > 0) {
-                            daily = Math.round(editingRecord.baseAmount / baseDays);
+                            daily = Math.round(
+                              editingRecord.baseAmount / baseDays,
+                            );
                           }
                         } else if (
                           historicalSalary &&
@@ -1012,7 +1017,9 @@ const Payroll = () => {
                           historicalSalary.informal_wage !== undefined
                         ) {
                           daily = Math.round(
-                            (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+                            (historicalSalary.white_wage +
+                              historicalSalary.informal_wage) /
+                              30,
                           );
                         }
 
@@ -1061,7 +1068,9 @@ const Payroll = () => {
                           return formatCurrency(editingRecord.baseAmount || 0);
                         }
 
-                        const emp = employees.find((e) => e.id.toString() === selectedEmployee);
+                        const emp = employees.find(
+                          (e) => e.id.toString() === selectedEmployee,
+                        );
                         let daily = emp?.dailyWage || 0;
                         if (
                           historicalSalary &&
@@ -1069,10 +1078,14 @@ const Payroll = () => {
                           historicalSalary.informal_wage !== undefined
                         ) {
                           daily = Math.round(
-                            (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+                            (historicalSalary.white_wage +
+                              historicalSalary.informal_wage) /
+                              30,
                           );
                         }
-                        return formatCurrency(daily * (parseInt(workDays) || 0));
+                        return formatCurrency(
+                          daily * (parseInt(workDays) || 0),
+                        );
                       })()}
                     </p>
                   )}
@@ -1120,15 +1133,22 @@ const Payroll = () => {
                           {(() => {
                             let daily: number | undefined;
 
-                            if (editingRecord && editingRecord.baseAmount != null) {
+                            if (
+                              editingRecord &&
+                              editingRecord.baseAmount != null
+                            ) {
                               const baseDays = editingRecord.baseDays || 0;
                               if (baseDays > 0) {
-                                daily = Math.round(editingRecord.baseAmount / baseDays);
+                                daily = Math.round(
+                                  editingRecord.baseAmount / baseDays,
+                                );
                               }
                             }
 
                             if (daily === undefined) {
-                              const emp = employees.find((e) => e.id.toString() === selectedEmployee);
+                              const emp = employees.find(
+                                (e) => e.id.toString() === selectedEmployee,
+                              );
                               daily = emp?.dailyWage || 0;
                               if (
                                 historicalSalary &&
@@ -1136,7 +1156,9 @@ const Payroll = () => {
                                 historicalSalary.informal_wage !== undefined
                               ) {
                                 daily = Math.round(
-                                  (historicalSalary.white_wage + historicalSalary.informal_wage) / 30,
+                                  (historicalSalary.white_wage +
+                                    historicalSalary.informal_wage) /
+                                    30,
                                 );
                               }
                             }
