@@ -448,8 +448,9 @@ class SalaryHistoryService {
       const { data: updatedEmployee, error: updateError } = await supabase
         .from("employees")
         .update({
-          white_wage: newSalary.white_wage,
-          informal_wage: newSalary.informal_wage,
+          sueldo_base: baseWage,
+          white_wage: whiteWage,
+          informal_wage: informalWage,
           presentismo: newSalary.presentismo,
           updated_at: new Date().toISOString(),
         })
