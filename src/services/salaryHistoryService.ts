@@ -213,7 +213,7 @@ class SalaryHistoryService {
       const { data: futureChanges, error: futureError } = await supabase
         .from("salary_history")
         .select(
-          "white_wage, informal_wage, presentismo, effective_date, previous_white_wage, previous_informal_wage, previous_presentismo",
+          "white_wage, informal_wage, base_wage, presentismo, effective_date, previous_white_wage, previous_informal_wage, previous_base_wage, previous_presentismo",
         )
         .eq("employee_id", employeeId)
         .gt("effective_date", targetDateStr)
