@@ -395,7 +395,7 @@ class SalaryHistoryService {
       // 1. Obtener valores actuales del empleado
       const { data: currentEmployee, error: fetchError } = await supabase
         .from("employees")
-        .select("white_wage, informal_wage, presentismo")
+        .select("white_wage, informal_wage, sueldo_base, presentismo")
         .eq("id", employeeId)
         .single();
 
