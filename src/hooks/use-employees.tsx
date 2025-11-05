@@ -7,7 +7,32 @@ import type {
   UpdateEmployeeRequest,
 } from "@/services/interfaces";
 import { useUsers } from "@/hooks/use-users";
-import { getFallbackEmployeeData } from "@/utils/offlineFallback";
+
+const toNumber = (value: unknown): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return 0;
+};
+
+const normalizeEmployeeRecord = (employee: Employee): Employee => {
+  const sueldoBase = toNumber(employee.sueldoBase);
+  const dailyWageValue = toNumber(employee.dailyWage);
+  const dailyWage =
+    dailyWageValue > 0 ? dailyWageValue : Math.round(sueldoBase / 30);
+
+  return {
+    ...employee,
+    sueldoBase,
+    dailyWage,
+  };
+};
 
 export const useEmployees = () => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -25,7 +50,7 @@ export const useEmployees = () => {
 
       const data = await employeeService.getAllEmployees();
       console.log("✅ Empleados cargados exitosamente:", data.length);
-      setEmployees(data);
+      setEmployees(data.map(normalizeEmployeeRecord));
 
     } catch (err) {
       console.error("❌ Error cargando empleados:", err);
@@ -49,7 +74,8 @@ export const useEmployees = () => {
   const createEmployee = async (employee: CreateEmployeeRequest) => {
     try {
       setError(null);
-      const newEmployee = await employeeService.createEmployee(employee);
+      const createdEmployee = await employeeService.createEmployee(employee);
+      const newEmployee = normalizeEmployeeRecord(createdEmployee);
       setEmployees((prev) => [newEmployee, ...prev]);
       return newEmployee;
     } catch (err) {
@@ -63,7 +89,7 @@ export const useEmployees = () => {
   // Función auxiliar para sincronizar datos del usuario cuando se actualiza un empleado
   const syncUserDataWithEmployee = async (
     employeeId: string,
-    employeeData: any,
+    employeeData: Partial<Employee>,
   ) => {
     try {
       const associatedUser = users.find(
@@ -110,10 +136,11 @@ export const useEmployees = () => {
   ) => {
     try {
       setError(null);
-      const updatedEmployee = await employeeService.updateEmployee(
+      const updatedEmployeeRaw = await employeeService.updateEmployee(
         id,
         employee,
       );
+      const updatedEmployee = normalizeEmployeeRecord(updatedEmployeeRaw);
       setEmployees((prev) =>
         prev.map((emp) => (emp.id === id ? updatedEmployee : emp)),
       );
@@ -152,7 +179,8 @@ export const useEmployees = () => {
   const toggleEmployeeStatus = async (id: string) => {
     try {
       setError(null);
-      const updatedEmployee = await employeeService.toggleEmployeeStatus(id);
+      const toggledEmployeeRaw = await employeeService.toggleEmployeeStatus(id);
+      const updatedEmployee = normalizeEmployeeRecord(toggledEmployeeRaw);
       setEmployees((prev) =>
         prev.map((emp) => (emp.id === id ? updatedEmployee : emp)),
       );
@@ -174,7 +202,7 @@ export const useEmployees = () => {
         return;
       }
       const results = await employeeService.searchEmployees(query);
-      setEmployees(results);
+      setEmployees(results.map(normalizeEmployeeRecord));
     } catch (err) {
       const errorMsg =
         err instanceof Error ? err.message : "Error searching employees";
@@ -187,7 +215,7 @@ export const useEmployees = () => {
     try {
       setError(null);
       const activeEmployees = await employeeService.getActiveEmployees();
-      return activeEmployees;
+      return activeEmployees.map(normalizeEmployeeRecord);
     } catch (err) {
       const errorMsg =
         err instanceof Error ? err.message : "Error fetching active employees";
@@ -240,7 +268,7 @@ export const useEmployee = (id: string) => {
       setLoading(true);
       setError(null);
       const data = await employeeService.getEmployeeById(id);
-      setEmployee(data);
+      setEmployee(data ? normalizeEmployeeRecord(data) : null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error loading employee");
     } finally {
