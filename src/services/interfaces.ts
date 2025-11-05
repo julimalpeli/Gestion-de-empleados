@@ -94,8 +94,7 @@ export interface Employee {
   dni: string;
   documentType?: string;
   position: string;
-  whiteWage: number;
-  informalWage: number;
+  sueldoBase: number;
   dailyWage: number;
   presentismo: number;
   losesPresentismo: boolean;
@@ -114,8 +113,7 @@ export interface CreateEmployeeRequest {
   dni: string;
   documentType?: string;
   position: string;
-  whiteWage: number;
-  informalWage: number;
+  sueldoBase: number;
   presentismo: number;
   startDate: string;
   address?: string;
