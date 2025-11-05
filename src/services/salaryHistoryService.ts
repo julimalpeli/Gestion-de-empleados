@@ -344,9 +344,15 @@ class SalaryHistoryService {
           impact_period: request.impact_period,
           white_wage: request.white_wage,
           informal_wage: request.informal_wage,
+          base_wage:
+            request.base_wage ?? request.white_wage + request.informal_wage,
           presentismo: request.presentismo,
           previous_white_wage: request.previous_white_wage,
           previous_informal_wage: request.previous_informal_wage,
+          previous_base_wage:
+            request.previous_base_wage ??
+            ((request.previous_white_wage || 0) +
+              (request.previous_informal_wage || 0)),
           previous_presentismo: request.previous_presentismo,
           change_type: request.change_type,
           reason: request.reason,
