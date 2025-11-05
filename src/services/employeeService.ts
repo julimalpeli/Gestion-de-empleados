@@ -66,7 +66,16 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const { getFallbackEmployeesData } = await import("@/utils/offlineFallback");
       const fallbackData = getFallbackEmployeesData();
       console.log("✅ Using fallback employees:", fallbackData.length, "employees");
-      return fallbackData.map(this.mapFromSupabase);
+      return fallbackData.map((employee) =>
+        this.mapFromSupabase({
+          ...employee,
+          sueldo_base:
+            employee.sueldoBase ??
+            (employee.whiteWage ?? 0) + (employee.informalWage ?? 0),
+          white_wage: employee.whiteWage ?? employee.sueldoBase ?? 0,
+          informal_wage: employee.informalWage ?? 0,
+        }),
+      );
     } catch (fallbackError) {
       console.error("❌ Critical: Fallback employee data failed:", fallbackError);
       // Return minimal fallback as last resort
@@ -76,8 +85,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         dni: "00000000",
         documentType: "dni",
         position: "Empleado",
-        whiteWage: 0,
-        informalWage: 500000,
+        sueldoBase: 500000,
         dailyWage: 16667,
         presentismo: 0,
         losesPresentismo: false,
