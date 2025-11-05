@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { employeeService } from "@/services/employeeService";
 import { useAudit } from "@/hooks/use-audit";
 import type {
@@ -7,6 +7,7 @@ import type {
   UpdateEmployeeRequest,
 } from "@/services/interfaces";
 import { useUsers } from "@/hooks/use-users";
+import { useAuth } from "@/hooks/use-auth";
 
 const toNumber = (value: unknown): number => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -57,9 +58,10 @@ export const useEmployees = () => {
   const [error, setError] = useState<string | null>(null);
   const { updateUser, users } = useUsers();
   const { auditEmployee } = useAudit();
+  const { session } = useAuth();
 
   // Cargar empleados
-  const fetchEmployees = async () => {
+  const fetchEmployees = useCallback(async () => {
     try {
       console.log("🔄 Iniciando carga de empleados...");
       setLoading(true);
@@ -83,7 +85,7 @@ export const useEmployees = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // Crear empleado
   const createEmployee = async (employee: CreateEmployeeRequest) => {
@@ -244,10 +246,17 @@ export const useEmployees = () => {
     return employeeService.calculateVacationDays(startDate);
   };
 
-  // Cargar datos al montar el componente
+  // Cargar datos cuando haya sesión autenticada
   useEffect(() => {
+    if (!session) {
+      console.log("🔒 Sin sesión, esperando para cargar empleados");
+      setEmployees([]);
+      setLoading(false);
+      return;
+    }
+
     fetchEmployees();
-  }, []);
+  }, [session?.access_token, fetchEmployees]);
 
   return {
     // Estado
