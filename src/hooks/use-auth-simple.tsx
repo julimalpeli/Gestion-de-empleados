@@ -10,6 +10,9 @@ import { auditService } from "@/services/auditService";
 import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
 import { checkEmergencyAuth } from "@/utils/emergencyAuth";
 
+const ADMIN_BYPASS_ENABLED =
+  import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
+
 interface User {
   id: string;
   username: string;
@@ -71,8 +74,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Initialize admin bypass immediately
+  // Initialize admin bypass immediately (only if enabled)
   useState(() => {
+    if (!ADMIN_BYPASS_ENABLED) {
+      localStorage.removeItem("admin-bypass");
+      return;
+    }
+
     const adminBypass = localStorage.getItem("admin-bypass");
     if (adminBypass) {
       try {
@@ -398,8 +406,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log(`🔐 Login attempt for: ${email.trim()}`);
 
-      // Special bypass for admin user to avoid email confirmation issues
-      if (email.trim() === "julimalpeli@gmail.com") {
+      // Special bypass for admin user is controlled via env flag
+      if (ADMIN_BYPASS_ENABLED && email.trim() === "julimalpeli@gmail.com") {
         console.log("🔓 Admin login detected - using bypass");
 
         // Create admin user directly without Supabase auth verification
