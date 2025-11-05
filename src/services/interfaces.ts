@@ -277,7 +277,7 @@ export interface PayrollCalculationData {
   holidayDays: number;
   presentismoStatus: "mantiene" | "pierde";
   advances: number;
-  whiteWage: number;
+  whiteAmount: number;
   overtimeHours?: number;
   bonusAmount?: number;
 }
