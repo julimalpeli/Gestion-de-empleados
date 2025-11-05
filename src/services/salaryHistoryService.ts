@@ -23,8 +23,16 @@ export interface SalaryHistoryRecord {
 export interface SalaryForPeriod {
   white_wage: number;
   informal_wage: number;
+  base_wage: number;
   presentismo: number;
-  source: "history" | "current" | "not_found";
+  source:
+    | "history"
+    | "history_new"
+    | "history_previous"
+    | "history_latest"
+    | "history_impact_period"
+    | "current"
+    | "not_found";
 }
 
 export interface CreateSalaryHistoryRequest {
@@ -33,9 +41,11 @@ export interface CreateSalaryHistoryRequest {
   impact_period: string;
   white_wage: number;
   informal_wage: number;
+  base_wage: number;
   presentismo: number;
   previous_white_wage?: number;
   previous_informal_wage?: number;
+  previous_base_wage?: number;
   previous_presentismo?: number;
   change_type: "aumento" | "correccion";
   reason?: string;
