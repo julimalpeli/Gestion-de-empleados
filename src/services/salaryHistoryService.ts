@@ -233,8 +233,8 @@ class SalaryHistoryService {
             informal_wage: futureRecord.previous_informal_wage || 0,
             base_wage:
               futureRecord.previous_base_wage ??
-              ((futureRecord.previous_white_wage || 0) +
-                (futureRecord.previous_informal_wage || 0)),
+              (futureRecord.previous_white_wage || 0) +
+                (futureRecord.previous_informal_wage || 0),
             presentismo: futureRecord.previous_presentismo || 0,
           };
           return this.buildSalaryForPeriod(previousRecord, "history_previous");
@@ -305,7 +305,9 @@ class SalaryHistoryService {
       // 3. Buscar el último aumento registrado sin importar el período
       const { data: latestChange, error: latestError } = await supabase
         .from("salary_history")
-        .select("white_wage, informal_wage, base_wage, presentismo, effective_date")
+        .select(
+          "white_wage, informal_wage, base_wage, presentismo, effective_date",
+        )
         .eq("employee_id", employeeId)
         .order("effective_date", { ascending: false })
         .order("created_at", { ascending: false })
@@ -337,7 +339,7 @@ class SalaryHistoryService {
         informal_wage: employeeData.informal_wage || 0,
         base_wage:
           employeeData.sueldo_base ??
-          ((employeeData.white_wage || 0) + (employeeData.informal_wage || 0)),
+          (employeeData.white_wage || 0) + (employeeData.informal_wage || 0),
         presentismo: employeeData.presentismo || 0,
       };
       return this.buildSalaryForPeriod(currentRecord, "current");
@@ -369,14 +371,17 @@ class SalaryHistoryService {
     defaultSource: SalaryForPeriod["source"],
   ): SalaryForPeriod {
     const white = this.toNumber(record?.white_wage ?? record?.whiteWage);
-    const informal = this.toNumber(record?.informal_wage ?? record?.informalWage);
+    const informal = this.toNumber(
+      record?.informal_wage ?? record?.informalWage,
+    );
     const baseCandidate = record?.base_wage ?? record?.baseWage;
     const base =
       baseCandidate !== undefined && baseCandidate !== null
         ? this.toNumber(baseCandidate)
         : white + informal;
     const presentismo = this.toNumber(record?.presentismo);
-    const source = (record?.source as SalaryForPeriod["source"]) || defaultSource;
+    const source =
+      (record?.source as SalaryForPeriod["source"]) || defaultSource;
 
     return {
       white_wage: white,
@@ -409,8 +414,8 @@ class SalaryHistoryService {
           previous_informal_wage: request.previous_informal_wage,
           previous_base_wage:
             request.previous_base_wage ??
-            ((request.previous_white_wage || 0) +
-              (request.previous_informal_wage || 0)),
+            (request.previous_white_wage || 0) +
+              (request.previous_informal_wage || 0),
           previous_presentismo: request.previous_presentismo,
           change_type: request.change_type,
           reason: request.reason,
