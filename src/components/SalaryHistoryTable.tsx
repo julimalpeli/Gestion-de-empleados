@@ -70,7 +70,7 @@ const SalaryHistoryTable = ({
   };
 
   const calculateTotalSalary = (record: SalaryHistoryRecord) => {
-    return record.white_wage + record.informal_wage;
+    return (record as any).base_wage ?? record.white_wage + record.informal_wage;
   };
 
   const calculatePreviousTotalSalary = (record: SalaryHistoryRecord) => {
