@@ -41,15 +41,15 @@ import { CurrencyInput } from "@/components/ui/currency-input";
 
 ```tsx
 <div className="space-y-2">
-  <Label htmlFor="whiteWage">Sueldo en Blanco</Label>
+  <Label htmlFor="sueldoBase">Sueldo Base</Label>
   <CurrencyInput
-    id="whiteWage"
+    id="sueldoBase"
     placeholder="$ 0"
-    value={employee.whiteWage}
+    value={employee.sueldoBase}
     onChange={(value) =>
       setEmployee({
         ...employee,
-        whiteWage: value,
+        sueldoBase: value,
       })
     }
   />
