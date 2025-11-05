@@ -14,8 +14,9 @@ CREATE TABLE employees (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     job_position VARCHAR(100) NOT NULL,
-    white_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo en blanco mensual
-    informal_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo informal mensual
+    sueldo_base DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo base mensual
+    white_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Forma de pago (depósito) - compatibilidad
+    informal_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Forma de pago (efectivo) - compatibilidad
     daily_wage DECIMAL(10,2) NOT NULL DEFAULT 0, -- Calculado automáticamente
     presentismo DECIMAL(10,2) NOT NULL DEFAULT 0, -- Monto presentismo
     loses_presentismo BOOLEAN DEFAULT false, -- Si pierde presentismo este período
