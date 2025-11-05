@@ -6,6 +6,77 @@ import {
   CreateSalaryHistoryRequest,
 } from "@/services/salaryHistoryService";
 
+const toOptionalNumber = (value: unknown): number | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return undefined;
+};
+
+const toNumber = (value: unknown): number => {
+  const parsed = toOptionalNumber(value);
+  return parsed ?? 0;
+};
+
+const normalizeSalaryHistoryRecord = (
+  record: SalaryHistoryRecord,
+): SalaryHistoryRecord => {
+  const raw = record as Record<string, unknown>;
+
+  const white = toNumber(raw.white_wage);
+  const informal = toNumber(raw.informal_wage);
+  const base = toOptionalNumber(raw.base_wage) ?? white + informal;
+  const previousWhite = toOptionalNumber(raw.previous_white_wage);
+  const previousInformal = toOptionalNumber(raw.previous_informal_wage);
+  const previousBase =
+    toOptionalNumber(raw.previous_base_wage) ??
+    (previousWhite !== undefined || previousInformal !== undefined
+      ? (previousWhite ?? 0) + (previousInformal ?? 0)
+      : undefined);
+  const presentismo = toNumber(raw.presentismo);
+  const previousPresentismo = toOptionalNumber(raw.previous_presentismo);
+
+  return {
+    ...record,
+    white_wage: white,
+    informal_wage: informal,
+    base_wage: base,
+    presentismo,
+    previous_white_wage: previousWhite,
+    previous_informal_wage: previousInformal,
+    previous_base_wage: previousBase,
+    previous_presentismo: previousPresentismo,
+  };
+};
+
+const normalizeSalaryForPeriod = (
+  salary: SalaryForPeriod | null,
+): SalaryForPeriod | null => {
+  if (!salary) {
+    return null;
+  }
+
+  const raw = salary as Record<string, unknown>;
+  const white = toNumber(raw.white_wage);
+  const informal = toNumber(raw.informal_wage);
+  const base = toOptionalNumber(raw.base_wage) ?? white + informal;
+  const presentismo = toNumber(raw.presentismo);
+
+  return {
+    ...salary,
+    white_wage: white,
+    informal_wage: informal,
+    base_wage: base,
+    presentismo,
+  };
+};
+
 export const useSalaryHistory = (employeeId?: string) => {
   const [salaryHistory, setSalaryHistory] = useState<SalaryHistoryRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -25,8 +96,9 @@ export const useSalaryHistory = (employeeId?: string) => {
 
       const history =
         await salaryHistoryService.getEmployeeSalaryHistory(targetEmployeeId);
-      setSalaryHistory(history);
-      console.log(`✅ Loaded ${history.length} salary history records`);
+      const normalizedHistory = history.map(normalizeSalaryHistoryRecord);
+      setSalaryHistory(normalizedHistory);
+      console.log(`✅ Loaded ${normalizedHistory.length} salary history records`);
     } catch (err) {
       console.error("❌ Error loading salary history:", err);
       setError(err instanceof Error ? err.message : "Error loading history");
@@ -47,8 +119,9 @@ export const useSalaryHistory = (employeeId?: string) => {
         empId,
         period,
       );
-      console.log(`✅ Salary for period found:`, salary);
-      return salary;
+      const normalizedSalary = normalizeSalaryForPeriod(salary);
+      console.log(`✅ Salary for period found:`, normalizedSalary);
+      return normalizedSalary;
     } catch (err) {
       console.error("❌ Error getting salary for period:", err);
       return null;
@@ -87,7 +160,12 @@ export const useSalaryHistory = (employeeId?: string) => {
       }
 
       console.log("✅ Employee salary updated successfully");
-      return result;
+      return {
+        ...result,
+        history: result.history
+          ? normalizeSalaryHistoryRecord(result.history)
+          : result.history,
+      };
     } catch (err) {
       console.error("❌ Error updating salary with history:", err);
       setError(err instanceof Error ? err.message : "Error updating salary");
@@ -105,6 +183,7 @@ export const useSalaryHistory = (employeeId?: string) => {
       console.log("📝 Creating salary history record");
 
       const newRecord = await salaryHistoryService.createSalaryHistory(request);
+      const normalizedRecord = normalizeSalaryHistoryRecord(newRecord);
 
       // Recargar historial si estamos viendo el mismo empleado
       if (request.employee_id === employeeId) {
@@ -112,7 +191,7 @@ export const useSalaryHistory = (employeeId?: string) => {
       }
 
       console.log("✅ Salary history record created");
-      return newRecord;
+      return normalizedRecord;
     } catch (err) {
       console.error("❌ Error creating salary history:", err);
       setError(
@@ -171,7 +250,11 @@ export const useSalaryForPeriod = () => {
     try {
       setLoading(true);
       setError(null);
-      return await salaryHistoryService.getSalaryForPeriod(employeeId, period);
+      const salary = await salaryHistoryService.getSalaryForPeriod(
+        employeeId,
+        period,
+      );
+      return normalizeSalaryForPeriod(salary);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error loading salary");
       return null;
