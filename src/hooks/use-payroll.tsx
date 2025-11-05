@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAudit } from "@/hooks/use-audit";
+import { useAuth } from "@/hooks/use-auth-simple";
 import type {
   PayrollRecord,
   CreatePayrollRequest,
