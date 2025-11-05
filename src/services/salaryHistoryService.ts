@@ -190,12 +190,7 @@ class SalaryHistoryService {
           console.log(
             `🎯 Using NEW values for period ${period} (change effective in ${recordYearMonth})`,
           );
-          return {
-            white_wage: record.white_wage,
-            informal_wage: record.informal_wage,
-            presentismo: record.presentismo,
-            source: "history_new",
-          };
+          return this.buildSalaryForPeriod(record, "history_new");
         }
       }
 
