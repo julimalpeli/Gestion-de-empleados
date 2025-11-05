@@ -310,8 +310,7 @@ const Employees = () => {
   const handleEditEmployee = (employee) => {
     // Guardar valores originales para detectar cambios salariales
     setOriginalEmployee({
-      whiteWage: employee.whiteWage?.toString() || "",
-      informalWage: employee.informalWage?.toString() || "",
+      sueldoBase: employee.sueldoBase?.toString() || "",
       presentismo: employee.presentismo?.toString() || "",
     });
 
@@ -1382,7 +1381,7 @@ const Employees = () => {
                 >
                   <TabsList className="grid w-full grid-cols-2 rounded-none border-b bg-gray-50">
                     <TabsTrigger value="info" className="text-xs sm:text-sm">
-                      <span className="hidden sm:inline">Información</span>
+                      <span className="hidden sm:inline">Informaci��n</span>
                       <span className="sm:hidden">Info</span>
                     </TabsTrigger>
                     <TabsTrigger
