@@ -48,13 +48,13 @@ const toNumber = (value: unknown): number => {
 const normalizePayrollRecord = (record: any): PayrollRecord => {
   const employeeData = readField(record, "employee", "employee") as any;
 
-  const whiteAmountSource =
-    toOptionalNumber(readField(record, "white_amount", "whiteAmount")) ??
-    toOptionalNumber(readField(employeeData, "white_wage", "whiteWage"));
+  const whiteAmountSource = toOptionalNumber(
+    readField(record, "white_amount", "whiteAmount"),
+  );
 
-  const informalAmountSource =
-    toOptionalNumber(readField(record, "informal_amount", "informalAmount")) ??
-    toOptionalNumber(readField(employeeData, "informal_wage", "informalWage"));
+  const informalAmountSource = toOptionalNumber(
+    readField(record, "informal_amount", "informalAmount"),
+  );
 
   const resolvedWhiteAmount = whiteAmountSource ?? 0;
   const resolvedInformalAmount = informalAmountSource ?? 0;
