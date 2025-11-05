@@ -59,6 +59,7 @@ export const useEmployees = () => {
   const { updateUser, users } = useUsers();
   const { auditEmployee } = useAudit();
   const { session, user, isAuthenticated } = useAuth();
+  const canLoadEmployees = isAuthenticated || !!session || !!user;
 
   // Cargar empleados
   const fetchEmployees = useCallback(async () => {
