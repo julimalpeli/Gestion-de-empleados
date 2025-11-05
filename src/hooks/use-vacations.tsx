@@ -79,6 +79,7 @@ export const useVacations = (employeeId?: string) => {
 
     const hasSupabaseSession = !!session?.user;
     const bypassActive =
+      ADMIN_BYPASS_ENABLED &&
       !hasSupabaseSession &&
       !!user &&
       typeof window !== "undefined" &&
