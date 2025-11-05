@@ -155,12 +155,76 @@ export const usePayroll = () => {
 
   // Cargar registros de liquidaciones
   const fetchPayrollRecords = async () => {
-    try {
-      console.log("🔄 Payroll: Starting to load records...");
-      setLoading(true);
-      setError(null);
+    console.log("🔄 Payroll: Starting to load records...");
+    setLoading(true);
+    setError(null);
 
-      // Test Supabase connection first
+    const loadFallbackPayroll = async (reason: string) => {
+      console.log(`🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 🚨 🚨`);
+      console.log("🔄 Loading cached payroll data...");
+
+      try {
+        const { getFallbackPayrollData } = await import(
+          "@/utils/offlineFallback"
+        );
+        const fallbackData = getFallbackPayrollData();
+
+        if (fallbackData && fallbackData.length > 0) {
+          setPayrollRecords(fallbackData.map(normalizePayrollRecord));
+          console.log("🎉 �� 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
+          console.log(`✅ ${fallbackData.length} payroll records loaded`);
+          console.log("📶 OFFLINE MODE ACTIVE - You can work normally!");
+          setError(null);
+
+          if (
+            typeof window !== "undefined" &&
+            (window.location.pathname.includes("liquidaciones") ||
+              window.location.pathname.includes("payroll"))
+          ) {
+            setTimeout(() => {
+              console.log(
+                "💡 TIP: All payroll features available in offline mode",
+              );
+            }, 1000);
+          }
+
+          return true;
+        }
+
+        throw new Error("Fallback data is empty");
+      } catch (fallbackError) {
+        console.error("💥 FALLBACK FAILED:", fallbackError);
+        setError("Error crítico: No se pueden cargar las liquidaciones");
+        setPayrollRecords([]);
+        return false;
+      }
+    };
+
+    const hasSupabaseSession = !!session?.user;
+    const bypassActive =
+      !hasSupabaseSession &&
+      !!user &&
+      typeof window !== "undefined" &&
+      (localStorage.getItem("admin-bypass") ||
+        localStorage.getItem("emergency-auth"));
+
+    if (!hasSupabaseSession) {
+      if (bypassActive) {
+        console.log(
+          "🚪 No Supabase session but bypass active - using fallback payroll data",
+        );
+        await loadFallbackPayroll("no-session-bypass");
+      } else {
+        console.log(
+          "⏸️ No Supabase session available, skipping payroll load until login completes",
+        );
+        setPayrollRecords([]);
+      }
+      setLoading(false);
+      return;
+    }
+
+    try {
       console.log("🔄 Testing Supabase connection for payroll...");
       console.log("🔧 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
       console.log(
@@ -184,13 +248,18 @@ export const usePayroll = () => {
 
       if (error) throw error;
 
+      if (!data || data.length === 0) {
+        console.warn("⚠️ Supabase returned 0 payroll records.");
+        setPayrollRecords([]);
+        return;
+      }
+
       const mappedRecords = (data ?? []).map(normalizePayrollRecord);
 
       setPayrollRecords(mappedRecords);
     } catch (err) {
       console.error("❌ PAYROLL ERROR DETECTED:", err);
 
-      // Detailed error logging
       if (err && typeof err === "object") {
         console.error(
           "❌ Payroll error details:",
@@ -210,47 +279,7 @@ export const usePayroll = () => {
         console.error("❌ Full error object:", err);
       }
 
-      // IMMEDIATE FALLBACK - NO QUESTIONS ASKED
-      console.log("🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK 🚨 🚨 🚨");
-      console.log("🔄 Loading cached payroll data...");
-
-      try {
-        // Import and use fallback data immediately
-        const { getFallbackPayrollData } = await import(
-          "@/utils/offlineFallback"
-        );
-        const fallbackData = getFallbackPayrollData();
-
-        if (fallbackData && fallbackData.length > 0) {
-          setPayrollRecords(fallbackData.map(normalizePayrollRecord));
-          console.log("🎉 🎉 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
-          console.log(`✅ ${fallbackData.length} payroll records loaded`);
-          console.log("📶 OFFLINE MODE ACTIVE - You can work normally!");
-
-          // Clear any error state
-          setError(null);
-
-          // Show success in UI
-          if (
-            window.location.pathname.includes("liquidaciones") ||
-            window.location.pathname.includes("payroll")
-          ) {
-            setTimeout(() => {
-              console.log(
-                "💡 TIP: All payroll features available in offline mode",
-              );
-            }, 1000);
-          }
-
-          return;
-        } else {
-          throw new Error("Fallback data is empty");
-        }
-      } catch (fallbackError) {
-        console.error("💥 FALLBACK FAILED:", fallbackError);
-        setError("Error crítico: No se pueden cargar las liquidaciones");
-        setPayrollRecords([]); // Set empty array as last resort
-      }
+      await loadFallbackPayroll("query-error");
     } finally {
       setLoading(false);
     }
