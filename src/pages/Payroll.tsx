@@ -386,7 +386,7 @@ const Payroll = () => {
       (p) => p.employeeId === employee.id,
     );
 
-    let bestSalary = employee.whiteWage + employee.informalWage; // Fallback por si no hay históricos
+    let bestSalary = employee.sueldoBase || 0; // Fallback por si no hay históricos
 
     if (employeePayrolls.length > 0) {
       // Calcular el mejor sueldo de los históricos
@@ -773,8 +773,8 @@ const Payroll = () => {
         realWhiteAmount = historicalSalary.white_wage;
         realInformalAmount = historicalSalary.informal_wage;
       } else {
-        realWhiteAmount = employee.whiteWage || 0;
-        realInformalAmount = employee.informalWage || 0;
+        realWhiteAmount = employee.sueldoBase || 0;
+        realInformalAmount = 0;
       }
     }
 

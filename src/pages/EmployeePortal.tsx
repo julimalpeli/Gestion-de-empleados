@@ -887,13 +887,9 @@ const EmployeePortal = () => {
                                 }
 
                                 // Si nada funciona, calcular desde empleado actual
-                                if (
-                                  currentEmployee?.whiteWage ||
-                                  currentEmployee?.informalWage
-                                ) {
+                                if (currentEmployee?.sueldoBase) {
                                   return formatCurrency(
-                                    (currentEmployee.whiteWage || 0) +
-                                      (currentEmployee.informalWage || 0),
+                                    currentEmployee.sueldoBase || 0,
                                   );
                                 }
 

@@ -23,17 +23,15 @@ const formatDate = (dateStr?: string) => {
 
 const buildRows = (employees: Employee[]) => {
   return employees.map((e) => {
-    const white = Number(e.whiteWage || 0);
-    const informal = Number(e.informalWage || 0);
-    const present = Number(e.presentismo || 0);
-    const daily = (white + informal) / 30;
+    const base = Number((e as any).sueldoBase || 0);
+    const present = Number((e as any).presentismo || 0);
+    const daily = base / 30;
     return {
       name: e.name,
       dni: e.dni || "",
       position: e.position || "",
       startDate: formatDate(e.startDate),
-      white, 
-      informal, 
+      base,
       present,
       daily,
       status: e.status === "active" ? "Activo" : "Inactivo",
@@ -49,8 +47,7 @@ export const exportSalariesToXLS = (employees: Employee[], fileName?: string) =>
     "Documento",
     "Puesto",
     "Fecha Ingreso",
-    "Mensual Blanco",
-    "Mensual Informal",
+    "Sueldo Base",
     "Presentismo",
     "Sueldo Diario",
     "Estado",
@@ -63,8 +60,7 @@ export const exportSalariesToXLS = (employees: Employee[], fileName?: string) =>
       r.dni,
       r.position,
       r.startDate,
-      r.white,
-      r.informal,
+      r.base,
       r.present,
       Math.round(r.daily),
       r.status,
@@ -78,8 +74,7 @@ export const exportSalariesToXLS = (employees: Employee[], fileName?: string) =>
     { wch: 12 }, // Documento
     { wch: 18 }, // Puesto
     { wch: 12 }, // Fecha Ingreso
-    { wch: 16 }, // Blanco
-    { wch: 18 }, // Informal
+    { wch: 18 }, // Sueldo Base
     { wch: 14 }, // Presentismo
     { wch: 14 }, // Diario
     { wch: 10 }, // Estado
@@ -111,8 +106,7 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
     r.dni,
     r.position,
     r.startDate,
-    formatCurrency(r.white),
-    formatCurrency(r.informal),
+    formatCurrency(r.base),
     formatCurrency(r.present),
     formatCurrency(Math.round(r.daily)),
     r.status,
@@ -125,8 +119,7 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
       "Documento",
       "Puesto",
       "Fecha Ingreso",
-      "Mensual Blanco",
-      "Mensual Informal",
+      "Sueldo Base",
       "Presentismo",
       "Sueldo Diario",
       "Estado",
@@ -139,11 +132,10 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
       1: { cellWidth: 80 },
       2: { cellWidth: 120 },
       3: { cellWidth: 90 },
-      4: { cellWidth: 110 },
-      5: { cellWidth: 120 },
+      4: { cellWidth: 120 },
+      5: { cellWidth: 100 },
       6: { cellWidth: 100 },
-      7: { cellWidth: 100 },
-      8: { cellWidth: 80 },
+      7: { cellWidth: 80 },
     },
     didDrawPage: (data) => {
       const pageCount = doc.getNumberOfPages();
