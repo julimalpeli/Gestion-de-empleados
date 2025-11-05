@@ -159,25 +159,13 @@ const Employees = () => {
     const changes = [];
 
     if (
-      parseFloat(original.whiteWage || 0) !== parseFloat(edited.whiteWage || 0)
+      parseFloat(original.sueldoBase || 0) !== parseFloat(edited.sueldoBase || 0)
     ) {
       changes.push({
-        field: "whiteWage",
-        oldValue: parseFloat(original.whiteWage || 0),
-        newValue: parseFloat(edited.whiteWage || 0),
-        label: "Sueldo Blanco",
-      });
-    }
-
-    if (
-      parseFloat(original.informalWage || 0) !==
-      parseFloat(edited.informalWage || 0)
-    ) {
-      changes.push({
-        field: "informalWage",
-        oldValue: parseFloat(original.informalWage || 0),
-        newValue: parseFloat(edited.informalWage || 0),
-        label: "Sueldo Informal",
+        field: "sueldoBase",
+        oldValue: parseFloat(original.sueldoBase || 0),
+        newValue: parseFloat(edited.sueldoBase || 0),
+        label: "Sueldo Base",
       });
     }
 
@@ -1381,7 +1369,7 @@ const Employees = () => {
                 >
                   <TabsList className="grid w-full grid-cols-2 rounded-none border-b bg-gray-50">
                     <TabsTrigger value="info" className="text-xs sm:text-sm">
-                      <span className="hidden sm:inline">Informaci��n</span>
+                      <span className="hidden sm:inline">Información</span>
                       <span className="sm:hidden">Info</span>
                     </TabsTrigger>
                     <TabsTrigger
