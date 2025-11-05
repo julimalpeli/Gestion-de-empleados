@@ -103,12 +103,7 @@ class SalaryHistoryService {
 
       if (data && data.length > 0) {
         const result = data[0];
-        return {
-          white_wage: parseFloat(result.white_wage) || 0,
-          informal_wage: parseFloat(result.informal_wage) || 0,
-          presentismo: parseFloat(result.presentismo) || 0,
-          source: result.source || "current",
-        };
+        return this.buildSalaryForPeriod(result, "current");
       }
 
       // Si no hay datos, usar fallback
