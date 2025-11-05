@@ -44,24 +44,35 @@ const toNumber = (value: unknown): number => {
 const normalizePayrollRecord = (record: any): PayrollRecord => {
   const employeeData = readField(record, "employee", "employee") as any;
 
-  const whiteAmount =
+  const whiteAmountSource =
     toOptionalNumber(readField(record, "white_amount", "whiteAmount")) ??
-    toOptionalNumber(readField(employeeData, "white_wage", "whiteWage")) ??
-    0;
+    toOptionalNumber(readField(employeeData, "white_wage", "whiteWage"));
 
-  const informalAmount =
+  const informalAmountSource =
     toOptionalNumber(readField(record, "informal_amount", "informalAmount")) ??
-    toOptionalNumber(readField(employeeData, "informal_wage", "informalWage")) ??
-    0;
+    toOptionalNumber(readField(employeeData, "informal_wage", "informalWage"));
 
-  const employeeBase =
-    toOptionalNumber(readField(employeeData, "sueldo_base", "sueldoBase")) ??
-    (whiteAmount || informalAmount ? whiteAmount + informalAmount : undefined);
+  const resolvedWhiteAmount = whiteAmountSource ?? 0;
+  const resolvedInformalAmount = informalAmountSource ?? 0;
 
-  const baseAmount =
+  const employeeBaseSource = toOptionalNumber(
+    readField(employeeData, "sueldo_base", "sueldoBase"),
+  );
+  const resolvedEmployeeBase =
+    employeeBaseSource !== undefined
+      ? employeeBaseSource
+      : whiteAmountSource !== undefined || informalAmountSource !== undefined
+        ? (whiteAmountSource ?? 0) + (informalAmountSource ?? 0)
+        : undefined;
+
+  const baseAmountSource =
     toOptionalNumber(readField(record, "base_amount", "baseAmount")) ??
-    employeeBase ??
-    whiteAmount + informalAmount;
+    resolvedEmployeeBase;
+
+  const resolvedBaseAmount =
+    baseAmountSource !== undefined
+      ? baseAmountSource
+      : (whiteAmountSource ?? 0) + (informalAmountSource ?? 0);
 
   const baseDays = toNumber(readField(record, "base_days", "baseDays"));
   const holidayDays = toNumber(readField(record, "holiday_days", "holidayDays"));
@@ -83,8 +94,8 @@ const normalizePayrollRecord = (record: any): PayrollRecord => {
   const bonusAmount = toNumber(readField(record, "bonus_amount", "bonusAmount"));
   const netTotal =
     toOptionalNumber(readField(record, "net_total", "netTotal")) ??
-    whiteAmount +
-      informalAmount +
+    resolvedWhiteAmount +
+      resolvedInformalAmount +
       presentismoAmount +
       holidayBonus +
       aguinaldo +
@@ -109,13 +120,13 @@ const normalizePayrollRecord = (record: any): PayrollRecord => {
     period: (readField(record, "period", "period") as string) ?? "",
     baseDays,
     holidayDays,
-    baseAmount,
+    baseAmount: resolvedBaseAmount,
     holidayBonus,
     aguinaldo,
     discounts,
     advances,
-    whiteAmount,
-    informalAmount,
+    whiteAmount: resolvedWhiteAmount,
+    informalAmount: resolvedInformalAmount,
     presentismoAmount,
     overtimeHours: overtimeHours ?? 0,
     overtimeAmount,
