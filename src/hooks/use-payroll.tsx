@@ -5,7 +5,134 @@ import type {
   PayrollRecord,
   CreatePayrollRequest,
 } from "@/services/interfaces";
-import { getFallbackEmployeeData } from "@/utils/offlineFallback";
+
+const hasOwn = Object.prototype.hasOwnProperty;
+
+const readField = (source: any, snake: string, camel: string) => {
+  if (!source) {
+    return undefined;
+  }
+  if (hasOwn.call(source, snake)) {
+    const value = source[snake];
+    return value ?? undefined;
+  }
+  if (hasOwn.call(source, camel)) {
+    const value = source[camel];
+    return value ?? undefined;
+  }
+  return undefined;
+};
+
+const toOptionalNumber = (value: unknown): number | undefined => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return undefined;
+};
+
+const toNumber = (value: unknown): number => {
+  const parsed = toOptionalNumber(value);
+  return parsed ?? 0;
+};
+
+const normalizePayrollRecord = (record: any): PayrollRecord => {
+  const employeeData = readField(record, "employee", "employee") as any;
+
+  const whiteAmount =
+    toOptionalNumber(readField(record, "white_amount", "whiteAmount")) ??
+    toOptionalNumber(readField(employeeData, "white_wage", "whiteWage")) ??
+    0;
+
+  const informalAmount =
+    toOptionalNumber(readField(record, "informal_amount", "informalAmount")) ??
+    toOptionalNumber(readField(employeeData, "informal_wage", "informalWage")) ??
+    0;
+
+  const employeeBase =
+    toOptionalNumber(readField(employeeData, "sueldo_base", "sueldoBase")) ??
+    (whiteAmount || informalAmount ? whiteAmount + informalAmount : undefined);
+
+  const baseAmount =
+    toOptionalNumber(readField(record, "base_amount", "baseAmount")) ??
+    employeeBase ??
+    whiteAmount + informalAmount;
+
+  const baseDays = toNumber(readField(record, "base_days", "baseDays"));
+  const holidayDays = toNumber(readField(record, "holiday_days", "holidayDays"));
+  const holidayBonus = toNumber(
+    readField(record, "holiday_bonus", "holidayBonus"),
+  );
+  const aguinaldo = toNumber(readField(record, "aguinaldo", "aguinaldo"));
+  const discounts = toNumber(readField(record, "discounts", "discounts"));
+  const advances = toNumber(readField(record, "advances", "advances"));
+  const presentismoAmount = toNumber(
+    readField(record, "presentismo_amount", "presentismoAmount"),
+  );
+  const overtimeHours = toOptionalNumber(
+    readField(record, "overtime_hours", "overtimeHours"),
+  );
+  const overtimeAmount = toNumber(
+    readField(record, "overtime_amount", "overtimeAmount"),
+  );
+  const bonusAmount = toNumber(readField(record, "bonus_amount", "bonusAmount"));
+  const netTotal =
+    toOptionalNumber(readField(record, "net_total", "netTotal")) ??
+    whiteAmount +
+      informalAmount +
+      presentismoAmount +
+      holidayBonus +
+      aguinaldo +
+      overtimeAmount +
+      bonusAmount -
+      advances -
+      discounts;
+
+  const processedDate = readField(record, "processed_date", "processedDate");
+  const processedBy = readField(record, "processed_by", "processedBy");
+  const notes = readField(record, "notes", "notes");
+  const now = new Date().toISOString();
+
+  return {
+    id: (readField(record, "id", "id") as string) ?? "",
+    employeeId:
+      (readField(record, "employee_id", "employeeId") as string) ?? "",
+    employeeName:
+      (readField(employeeData, "name", "name") as string) ??
+      (readField(record, "employeeName", "employeeName") as string) ??
+      "Empleado no encontrado",
+    period: (readField(record, "period", "period") as string) ?? "",
+    baseDays,
+    holidayDays,
+    baseAmount,
+    holidayBonus,
+    aguinaldo,
+    discounts,
+    advances,
+    whiteAmount,
+    informalAmount,
+    presentismoAmount,
+    overtimeHours: overtimeHours ?? 0,
+    overtimeAmount,
+    bonusAmount,
+    netTotal,
+    status:
+      (readField(record, "status", "status") as PayrollRecord["status"]) ??
+      "draft",
+    processedDate: processedDate as string | undefined,
+    processedBy: processedBy as string | undefined,
+    notes: notes as string | undefined,
+    createdAt:
+      (readField(record, "created_at", "createdAt") as string) ?? now,
+    updatedAt:
+      (readField(record, "updated_at", "updatedAt") as string) ?? now,
+  };
+};
 
 export const usePayroll = () => {
   const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>([]);
@@ -33,7 +160,7 @@ export const usePayroll = () => {
         .select(
           `
           *,
-          employee:employees(name, job_position)
+          employee:employees(name, job_position, sueldo_base, white_wage, informal_wage)
         `,
         )
         .order("period", { ascending: false });
@@ -44,33 +171,7 @@ export const usePayroll = () => {
 
       if (error) throw error;
 
-      const mappedRecords =
-        data?.map((record) => ({
-          id: record.id,
-          employeeId: record.employee_id,
-          employeeName: record.employee?.name || "Empleado no encontrado",
-          period: record.period,
-          baseDays: record.base_days,
-          holidayDays: record.holiday_days || 0,
-          baseAmount: record.base_amount,
-          holidayBonus: record.holiday_bonus || 0,
-          aguinaldo: record.aguinaldo || 0,
-          discounts: record.discounts || 0,
-          advances: record.advances || 0,
-          whiteAmount: record.white_amount,
-          informalAmount: record.informal_amount,
-          presentismoAmount: record.presentismo_amount || 0,
-          overtimeHours: record.overtime_hours || 0,
-          overtimeAmount: record.overtime_amount || 0,
-          bonusAmount: record.bonus_amount || 0,
-          netTotal: record.net_total,
-          status: record.status,
-          processedDate: record.processed_date,
-          processedBy: record.processed_by,
-          notes: record.notes,
-          createdAt: record.created_at,
-          updatedAt: record.updated_at,
-        })) || [];
+      const mappedRecords = (data ?? []).map(normalizePayrollRecord);
 
       setPayrollRecords(mappedRecords);
     } catch (err) {
@@ -108,7 +209,7 @@ export const usePayroll = () => {
         const fallbackData = getFallbackPayrollData();
 
         if (fallbackData && fallbackData.length > 0) {
-          setPayrollRecords(fallbackData);
+          setPayrollRecords(fallbackData.map(normalizePayrollRecord));
           console.log("🎉 🎉 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
           console.log(`✅ ${fallbackData.length} payroll records loaded`);
           console.log("📶 OFFLINE MODE ACTIVE - You can work normally!");
