@@ -1579,8 +1579,7 @@ const Employees = () => {
               await updateEmployeeSalaryWithHistory(
                 editingEmployee.id,
                 {
-                  white_wage: employeeData.whiteWage,
-                  informal_wage: employeeData.informalWage,
+                  base_wage: employeeData.sueldoBase,
                   presentismo: employeeData.presentismo,
                 },
                 {
