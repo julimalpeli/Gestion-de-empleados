@@ -254,15 +254,15 @@ export const useEmployees = () => {
 
   // Cargar datos cuando haya sesión autenticada
   useEffect(() => {
-    if (!session) {
-      console.log("🔒 Sin sesión, esperando para cargar empleados");
+    if (!canLoadEmployees) {
+      console.log("🔒 Sin sesión ni usuario, esperando para cargar empleados");
       setEmployees([]);
       setLoading(false);
       return;
     }
 
     fetchEmployees();
-  }, [session?.access_token, fetchEmployees]);
+  }, [canLoadEmployees, fetchEmployees]);
 
   return {
     // Estado
