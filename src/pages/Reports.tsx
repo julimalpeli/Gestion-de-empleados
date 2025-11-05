@@ -171,23 +171,25 @@ const Reports = () => {
     }
 
     // Fecha efectiva de inicio (la mayor entre inicio de semestre e inicio de trabajo)
-    // Importante: se cuenta desde el día POSTERIOR a la fecha de ingreso
-    const effectiveStartDate = new Date(startDate);
-    effectiveStartDate.setDate(effectiveStartDate.getDate() + 1);
-
+    const DAY_MS = 1000 * 60 * 60 * 24;
     const effectiveStart =
-      effectiveStartDate > semesterStart ? effectiveStartDate : semesterStart;
+      startDate > semesterStart ? startDate : semesterStart;
 
-    // Calcular días trabajados
+    // Calcular días trabajados (conteo inclusivo)
     const totalSemesterDays =
-      Math.ceil(
-        (semesterEnd.getTime() - semesterStart.getTime()) /
-          (1000 * 60 * 60 * 24),
-      ) + 1;
-    const daysWorked = Math.ceil(
-      (semesterEnd.getTime() - effectiveStart.getTime()) /
-        (1000 * 60 * 60 * 24),
-    );
+      Math.floor((semesterEnd.getTime() - semesterStart.getTime()) / DAY_MS) +
+      1;
+    let daysWorked =
+      Math.floor((semesterEnd.getTime() - effectiveStart.getTime()) / DAY_MS) +
+      1;
+
+    if (daysWorked < 0) {
+      daysWorked = 0;
+    }
+
+    if (daysWorked > totalSemesterDays) {
+      daysWorked = totalSemesterDays;
+    }
 
     // Calcular mejor sueldo basado en históricos de liquidaciones
     // Buscar liquidaciones del empleado para el cálculo del mejor sueldo
