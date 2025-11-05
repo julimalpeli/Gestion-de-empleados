@@ -241,6 +241,63 @@ class SalaryHistoryService {
         }
       }
 
+      // 2b. Buscar una liquidación registrada para el período que permita reconstruir el sueldo
+      const { data: payrollRecordData, error: payrollRecordError } =
+        await supabase
+          .from("payroll_records")
+          .select(
+            "white_amount, informal_amount, base_amount, base_days, presentismo_amount",
+          )
+          .eq("employee_id", employeeId)
+          .eq("period", period)
+          .order("created_at", { ascending: false })
+          .limit(1);
+
+      if (
+        !payrollRecordError &&
+        payrollRecordData &&
+        payrollRecordData.length > 0
+      ) {
+        const payrollRecord = payrollRecordData[0];
+        const baseAmountValue = this.toNumber(
+          payrollRecord.base_amount ?? payrollRecord.baseAmount,
+        );
+        const baseDaysValue = this.toNumber(
+          payrollRecord.base_days ?? payrollRecord.baseDays,
+        );
+        const dailyFromBase =
+          baseDaysValue > 0 ? baseAmountValue / baseDaysValue : undefined;
+        const computedBase =
+          dailyFromBase !== undefined
+            ? Math.round(dailyFromBase * 30)
+            : baseAmountValue;
+        const whiteFromRecord = this.toNumber(
+          payrollRecord.white_amount ?? payrollRecord.whiteAmount,
+        );
+        const informalFromRecord = this.toNumber(
+          payrollRecord.informal_amount ?? payrollRecord.informalAmount,
+        );
+        const presentismoFromRecord = this.toNumber(
+          payrollRecord.presentismo_amount ?? payrollRecord.presentismoAmount,
+        );
+
+        console.log(
+          `📄 Using payroll record for historical salary of period ${period}:`,
+          payrollRecord,
+        );
+
+        return this.buildSalaryForPeriod(
+          {
+            white_wage: whiteFromRecord || computedBase || 0,
+            informal_wage: informalFromRecord,
+            base_wage: computedBase || whiteFromRecord || 0,
+            presentismo: presentismoFromRecord,
+            source: "payroll_record",
+          },
+          "payroll_record",
+        );
+      }
+
       console.log(
         `🔄 No historical data found matching period, checking latest increase overall`,
       );
