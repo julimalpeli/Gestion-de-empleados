@@ -92,11 +92,44 @@ export class SupabaseEmployeeService implements IEmployeeService {
       return fallbackData.map((employee) =>
         this.mapFromSupabase({
           ...employee,
+          job_position: employee.job_position ?? employee.position ?? "",
+          document_type: employee.document_type ?? employee.documentType ?? "dni",
           sueldo_base:
             employee.sueldoBase ??
             (employee.whiteWage ?? 0) + (employee.informalWage ?? 0),
           white_wage: employee.whiteWage ?? employee.sueldoBase ?? 0,
           informal_wage: employee.informalWage ?? 0,
+          daily_wage:
+            employee.daily_wage ??
+            employee.dailyWage ??
+            Math.round(
+              ((employee.whiteWage ?? 0) + (employee.informalWage ?? 0)) / 30,
+            ),
+          presentismo:
+            employee.presentismo ??
+            employee.presentismoAmount ??
+            0,
+          loses_presentismo:
+            employee.loses_presentismo ??
+            employee.losesPresentismo ??
+            employee.losesPresent ??
+            false,
+          status: employee.status ?? "active",
+          start_date: employee.start_date ?? employee.startDate ?? "",
+          vacation_days:
+            employee.vacation_days ??
+            employee.vacationDays ??
+            0,
+          vacations_taken:
+            employee.vacations_taken ??
+            employee.vacationsTaken ??
+            0,
+          address: employee.address ?? "",
+          email: employee.email ?? "",
+          created_at:
+            employee.created_at ?? employee.createdAt ?? new Date().toISOString(),
+          updated_at:
+            employee.updated_at ?? employee.updatedAt ?? new Date().toISOString(),
         }),
       );
     } catch (fallbackError) {
