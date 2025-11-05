@@ -318,8 +318,7 @@ const Employees = () => {
     setEditingEmployee({
       ...employee,
       documentType: employee.documentType || "dni",
-      whiteWage: employee.whiteWage?.toString() || "",
-      informalWage: employee.informalWage?.toString() || "",
+      sueldoBase: employee.sueldoBase?.toString() || "",
       presentismo: employee.presentismo?.toString() || "",
       address: employee.address || "",
       email: employee.email || "",
