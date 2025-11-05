@@ -865,8 +865,7 @@ const Employees = () => {
                   <TableHead>Puesto</TableHead>
                   <TableHead>Fecha Ingreso</TableHead>
                   <TableHead>Sueldo Diario</TableHead>
-                  <TableHead>Mensual Blanco</TableHead>
-                  <TableHead>Mensual Informal</TableHead>
+                  <TableHead>Sueldo Base</TableHead>
                   <TableHead>Presentismo</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead className="text-right">Acciones</TableHead>
