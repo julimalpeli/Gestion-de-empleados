@@ -443,30 +443,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      // For non-admin users, check if they exist in database first
-      console.log("🔍 Checking user in database...");
-      const { data: dbUser, error: dbError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email.trim())
-        .single();
-
-      if (dbError || !dbUser) {
-        console.error("❌ User not found in database:", dbError);
-        throw new Error(
-          "Usuario no encontrado. Contacte al administrador para crear su cuenta.",
-        );
-      }
-
-      if (!dbUser.is_active) {
-        console.error("❌ User is inactive");
-        throw new Error("Usuario inactivo. Contacte al administrador.");
-      }
+      const normalizedEmail = email.trim();
 
       console.log("📧 Attempting Supabase auth login...");
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password: password,
+        email: normalizedEmail,
+        password,
       });
 
       if (error) {
@@ -475,33 +457,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("   - Error message:", error.message);
         console.error("   - Full error:", error);
 
-        // Provide specific error messages based on error type
         if (error.message.includes("Invalid login credentials")) {
-          console.log(
-            "🔍 Invalid credentials - checking user status in auth...",
+          throw new Error(
+            "Credenciales incorrectas. Verifique su email y contraseña.",
           );
+        }
 
-          // Check if this is an employee user that might not have been created in auth
-          if (dbUser.role === "employee") {
-            throw new Error(
-              "Credenciales incorrectas o cuenta no configurada en el sistema de autenticación. Contacte al administrador.",
-            );
-          } else {
-            // For non-employee users, provide more specific guidance
-            throw new Error(
-              `Credenciales incorrectas para ${email}.\n\n` +
-                `Posibles causas:\n` +
-                `1. La contraseña no es correcta\n` +
-                `2. El usuario no está confirmado en Supabase\n` +
-                `3. El usuario está deshabilitado\n\n` +
-                `Solución: Ve a Gestión de Usuarios y resetea la contraseña del usuario.`,
-            );
-          }
-        } else if (error.message.includes("Email not confirmed")) {
+        if (error.message.includes("Email not confirmed")) {
           throw new Error(
             "El email del usuario no está confirmado. Contacte al administrador para confirmar la cuenta.",
           );
-        } else if (error.message.includes("User not found")) {
+        }
+
+        if (error.message.includes("User not found")) {
           throw new Error(
             "Usuario no encontrado en el sistema de autenticación. Contacte al administrador.",
           );
@@ -510,28 +478,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw new Error(`Error de autenticación: ${error.message}`);
       }
 
-      // Additional check: Verify user is active in database before allowing login
-      if (data.user) {
-        // Skip database check for admin user to avoid issues
-        if (email.trim() === "julimalpeli@gmail.com") {
-          console.log("🔓 Admin user, skipping database check");
-        } else {
-          const { data: userCheck, error: userCheckError } = await supabase
-            .from("users")
-            .select("is_active, name")
-            .eq("email", email.trim())
-            .single();
+      if (!data || !data.user) {
+        throw new Error("No se pudo autenticar al usuario. Intente nuevamente.");
+      }
 
-          if (userCheckError) {
-            console.warn("Could not verify user status:", userCheckError);
-            // Continue with normal flow - will be caught later
-          } else if (userCheck && !userCheck.is_active) {
-            // User exists but is inactive - force logout and redirect
-            await supabase.auth.signOut();
-            window.location.href = "/inactive";
-            return;
-          }
-        }
+      const { data: userRecord, error: userRecordError } = await supabase
+        .from("users")
+        .select("id, is_active, role, name")
+        .eq("id", data.user.id)
+        .single();
+
+      if (userRecordError) {
+        console.warn(
+          "⚠️ No se pudo verificar el registro del usuario antes de continuar:",
+          userRecordError,
+        );
+      }
+
+      if (!userRecord) {
+        await supabase.auth.signOut();
+        throw new Error(
+          "Usuario no encontrado en la base de datos interna. Contacte al administrador.",
+        );
+      }
+
+      if (!userRecord.is_active) {
+        await supabase.auth.signOut();
+        throw new Error("Usuario inactivo. Contacte al administrador.");
       }
 
       // Set session and load user profile directly
