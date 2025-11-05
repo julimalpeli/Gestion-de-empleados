@@ -132,8 +132,9 @@ export const useSalaryHistory = (employeeId?: string) => {
   const updateEmployeeSalaryWithHistory = async (
     empId: string,
     newSalary: {
-      white_wage: number;
-      informal_wage: number;
+      base_wage?: number;
+      white_wage?: number;
+      informal_wage?: number;
       presentismo: number;
     },
     changeInfo: {
