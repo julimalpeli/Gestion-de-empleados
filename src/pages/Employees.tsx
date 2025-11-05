@@ -787,8 +787,8 @@ const Employees = () => {
                       )}
                     </span>
                     <p className="text-sm text-muted-foreground mt-1">
-                    Sueldo Base ÷ 30
-                  </p>
+                      Sueldo Base ÷ 30
+                    </p>
                   </div>
                 </div>
               </div>

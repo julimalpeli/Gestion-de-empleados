@@ -39,7 +39,10 @@ const buildRows = (employees: Employee[]) => {
   });
 };
 
-export const exportSalariesToXLS = (employees: Employee[], fileName?: string) => {
+export const exportSalariesToXLS = (
+  employees: Employee[],
+  fileName?: string,
+) => {
   const rows = buildRows(employees);
 
   const header = [
@@ -79,16 +82,20 @@ export const exportSalariesToXLS = (employees: Employee[], fileName?: string) =>
     { wch: 14 }, // Diario
     { wch: 10 }, // Estado
   ];
-  (ws as any)['!cols'] = colWidths;
+  (ws as any)["!cols"] = colWidths;
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Sueldos");
 
-  const safeName = fileName || `reporte_sueldos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+  const safeName =
+    fileName || `reporte_sueldos_${new Date().toISOString().slice(0, 10)}.xlsx`;
   XLSX.writeFile(wb, safeName);
 };
 
-export const exportSalariesToPDF = (employees: Employee[], fileName?: string) => {
+export const exportSalariesToPDF = (
+  employees: Employee[],
+  fileName?: string,
+) => {
   const rows = buildRows(employees);
 
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
@@ -115,27 +122,29 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
   autoTable(doc, {
     startY: 70,
     margin: { left: 30, right: 30 },
-    head: [[
-      "Nombre",
-      "Documento",
-      "Puesto",
-      "Fecha Ingreso",
-      "Sueldo Base",
-      "Presentismo",
-      "Sueldo Diario",
-      "Estado",
-    ]],
+    head: [
+      [
+        "Nombre",
+        "Documento",
+        "Puesto",
+        "Fecha Ingreso",
+        "Sueldo Base",
+        "Presentismo",
+        "Sueldo Diario",
+        "Estado",
+      ],
+    ],
     body,
-    styles: { fontSize: 9, overflow: 'linebreak', cellPadding: 3 },
+    styles: { fontSize: 9, overflow: "linebreak", cellPadding: 3 },
     headStyles: { fillColor: [33, 33, 33] },
     columnStyles: {
       0: { cellWidth: 160 },
       1: { cellWidth: 70 },
       2: { cellWidth: 110 },
       3: { cellWidth: 80 },
-      4: { cellWidth: 100, halign: 'right' },
-      5: { cellWidth: 80, halign: 'right' },
-      6: { cellWidth: 80, halign: 'right' },
+      4: { cellWidth: 100, halign: "right" },
+      5: { cellWidth: 80, halign: "right" },
+      6: { cellWidth: 80, halign: "right" },
       7: { cellWidth: 60 },
     },
     didDrawPage: (data) => {
@@ -143,12 +152,15 @@ export const exportSalariesToPDF = (employees: Employee[], fileName?: string) =>
       const pageSize = doc.internal.pageSize;
       const pageWidth = pageSize.getWidth();
       doc.setFontSize(9);
-      doc.text(`Página ${data.pageNumber} de ${pageCount}`,
+      doc.text(
+        `Página ${data.pageNumber} de ${pageCount}`,
         pageWidth - 120,
-        pageSize.getHeight() - 20);
+        pageSize.getHeight() - 20,
+      );
     },
   });
 
-  const safeName = fileName || `reporte_sueldos_${new Date().toISOString().slice(0, 10)}.pdf`;
+  const safeName =
+    fileName || `reporte_sueldos_${new Date().toISOString().slice(0, 10)}.pdf`;
   doc.save(safeName);
 };
