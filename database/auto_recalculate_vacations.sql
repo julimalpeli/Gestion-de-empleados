@@ -2,8 +2,8 @@
 CREATE OR REPLACE FUNCTION update_daily_wage()
 RETURNS TRIGGER AS $$
 BEGIN
-    -- Calcular salario diario: (sueldo_blanco + informal) / 30
-    NEW.daily_wage := ROUND((NEW.white_wage + NEW.informal_wage) / 30.0, 2);
+    -- Calcular salario diario: sueldo_base / 30 (o fallback a blanco+informal)
+    NEW.daily_wage := ROUND((COALESCE(NEW.sueldo_base, COALESCE(NEW.white_wage, 0) + COALESCE(NEW.informal_wage, 0))) / 30.0, 2);
 
     -- Calcular días de vacaciones según antigüedad (sistema acumulativo: 14 días por año)
     NEW.vacation_days := GREATEST(EXTRACT(YEAR FROM AGE(CURRENT_DATE, NEW.start_date))::INTEGER, 0) * 14;
