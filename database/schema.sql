@@ -31,8 +31,9 @@ CREATE TABLE employees (
     id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     job_position VARCHAR(100) NOT NULL,
-    white_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo en blanco mensual
-    informal_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo informal mensual
+    sueldo_base DECIMAL(12,2) NOT NULL DEFAULT 0, -- Sueldo base mensual
+    white_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Forma de pago (depósito) - compatibilidad
+    informal_wage DECIMAL(12,2) NOT NULL DEFAULT 0, -- Forma de pago (efectivo) - compatibilidad
     daily_wage DECIMAL(10,2) NOT NULL DEFAULT 0, -- Calculado automáticamente
     presentismo DECIMAL(10,2) NOT NULL DEFAULT 0, -- Monto presentismo
     loses_presentismo BOOLEAN DEFAULT false, -- Si pierde presentismo este período
@@ -155,13 +156,13 @@ CREATE TRIGGER update_vacation_requests_updated_at BEFORE UPDATE ON vacation_req
 CREATE OR REPLACE FUNCTION calculate_daily_wage()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.daily_wage = ROUND((NEW.white_wage + NEW.informal_wage) / 30, 2);
+    NEW.daily_wage = ROUND((COALESCE(NEW.sueldo_base, COALESCE(NEW.white_wage, 0) + COALESCE(NEW.informal_wage, 0))) / 30, 2);
     RETURN NEW;
 END;
 $$ language 'plpgsql';
 
 CREATE TRIGGER trigger_calculate_daily_wage
-    BEFORE INSERT OR UPDATE OF white_wage, informal_wage ON employees
+    BEFORE INSERT OR UPDATE OF sueldo_base, white_wage, informal_wage ON employees
     FOR EACH ROW EXECUTE FUNCTION calculate_daily_wage();
 
 -- Calcular días de vacaciones por antigüedad
