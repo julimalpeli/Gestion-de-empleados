@@ -274,12 +274,15 @@ class SalaryHistoryService {
       }
 
       console.log(`✅ Using current employee salary:`, employeeData);
-      return {
-        white_wage: employeeData.white_wage,
-        informal_wage: employeeData.informal_wage,
-        presentismo: employeeData.presentismo,
-        source: "current",
+      const currentRecord = {
+        white_wage: employeeData.white_wage || 0,
+        informal_wage: employeeData.informal_wage || 0,
+        base_wage:
+          employeeData.sueldo_base ??
+          ((employeeData.white_wage || 0) + (employeeData.informal_wage || 0)),
+        presentismo: employeeData.presentismo || 0,
       };
+      return this.buildSalaryForPeriod(currentRecord, "current");
     } catch (error) {
       console.error("Fallback method failed:", error);
       return {
