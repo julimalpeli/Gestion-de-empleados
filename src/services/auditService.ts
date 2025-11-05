@@ -210,6 +210,16 @@ class AuditService {
       if (error) {
         console.error("Error fetching audit logs:", error);
 
+        // Graceful network handling
+        if (
+          typeof error.message === "string" &&
+          (error.message.includes("Failed to fetch") ||
+            error.message.toLowerCase().includes("fetch"))
+        ) {
+          console.warn("🌐 Network issue fetching audit logs - returning []");
+          return [];
+        }
+
         // Si es un error de esquema, devolver array vacío en lugar de fallar
         if (
           error.message?.includes("schema cache") ||
@@ -230,11 +240,21 @@ class AuditService {
     } catch (error) {
       console.error("Error getting audit logs:", error);
 
+      // Manejo graceful de errores de red
+      if (
+        error instanceof Error &&
+        (error.message.includes("Failed to fetch") ||
+          error.message.toLowerCase().includes("network"))
+      ) {
+        console.warn("🌐 Network error on audit logs - returning []");
+        return [];
+      }
+
       // Manejo graceful de errores de esquema
       if (
-        error.message?.includes("schema cache") ||
-        error.message?.includes("audit_log") ||
-        error.message?.includes("relation")
+        (error as any)?.message?.includes("schema cache") ||
+        (error as any)?.message?.includes("audit_log") ||
+        (error as any)?.message?.includes("relation")
       ) {
         console.warn("🔧 Database schema issue - returning empty audit logs");
         return [];
