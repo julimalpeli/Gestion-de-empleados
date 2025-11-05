@@ -40,14 +40,65 @@ export const useVacations = (employeeId?: string) => {
 
   // Cargar solicitudes de vacaciones
   const fetchVacations = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+    console.log("🔄 Loading vacations...");
+    setLoading(true);
+    setError(null);
 
-      console.log("🔄 Loading vacations...");
+    const loadFallbackVacations = async (reason: string) => {
+      console.log(`🔁 Activating vacation fallback (${reason})`);
+      try {
+        const { fallbackVacationData } = await import(
+          "@/utils/offlineFallback"
+        );
+
+        let filteredData = fallbackVacationData;
+        if (employeeId) {
+          filteredData = fallbackVacationData.filter(
+            (v) => v.employeeId === employeeId,
+          );
+        }
+
+        setVacations(filteredData);
+        console.log(
+          "✅ Fallback vacation data loaded:",
+          filteredData.length,
+          "records",
+        );
+        setError(null);
+        return true;
+      } catch (fallbackError) {
+        console.warn(
+          "⚠️ Could not load fallback vacation data:",
+          fallbackError,
+        );
+        return false;
+      }
+    };
+
+    const hasSupabaseSession = !!session?.user;
+    const bypassActive =
+      !hasSupabaseSession &&
+      !!user &&
+      typeof window !== "undefined" &&
+      (localStorage.getItem("admin-bypass") ||
+        localStorage.getItem("emergency-auth"));
+
+    if (!hasSupabaseSession) {
+      if (bypassActive) {
+        await loadFallbackVacations("no-session-bypass");
+      } else {
+        console.log(
+          "⏸️ No Supabase session available, skipping vacation load until login completes",
+        );
+        setVacations([]);
+      }
+      setLoading(false);
+      return;
+    }
+
+    try {
       console.log("   - Employee ID filter:", employeeId || "all employees");
 
-      // Test simple connection first
       console.log("🔍 Testing vacation_requests table access...");
       const { data: testData, error: testError } = await supabase
         .from("vacation_requests")
@@ -73,7 +124,6 @@ export const useVacations = (employeeId?: string) => {
         )
         .order("created_at", { ascending: false });
 
-      // Si se especifica employeeId, filtrar por empleado
       if (employeeId) {
         query = query.eq("employee_id", employeeId);
       }
@@ -112,7 +162,6 @@ export const useVacations = (employeeId?: string) => {
     } catch (err) {
       console.group("❌ Error loading vacations");
 
-      // Enhanced error logging
       if (err && typeof err === "object") {
         console.error("Error details:", {
           message: (err as any).message,
@@ -129,11 +178,14 @@ export const useVacations = (employeeId?: string) => {
 
       const errorMessage = err instanceof Error ? err.message : String(err);
 
-      // Check for specific Supabase errors
+      const fallbackLoaded = await loadFallbackVacations("query-error");
+      if (fallbackLoaded) {
+        return;
+      }
+
       if (err && typeof err === "object") {
         const supabaseError = err as any;
 
-        // RLS Policy error
         if (supabaseError.code === "PGRST301") {
           console.error(
             "🔒 RLS POLICY ERROR: Row Level Security is blocking vacation queries",
@@ -149,65 +201,28 @@ export const useVacations = (employeeId?: string) => {
           setError(
             "Sin permisos para acceder a las vacaciones. Contacte al administrador.",
           );
-        }
-        // Permission error
-        else if (supabaseError.code === "42501") {
+        } else if (supabaseError.code === "42501") {
           console.error(
             "🔒 PERMISSION ERROR: Insufficient database permissions",
           );
           setError("Permisos insuficientes para acceder a las vacaciones.");
-        }
-        // Table not found
-        else if (supabaseError.code === "PGRST116") {
+        } else if (supabaseError.code === "PGRST116") {
           console.error(
             "📊 TABLE ERROR: vacation_requests table may not exist",
           );
           setError("Tabla de vacaciones no encontrada en la base de datos.");
-        }
-        // Network/Connection errors OR any unhandled error
-        else {
-          console.log(
-            "🔄 Error detected, attempting fallback vacation data...",
-          );
-          try {
-            const { fallbackVacationData } = await import(
-              "@/utils/offlineFallback"
+        } else {
+          if (
+            errorMessage.includes("Failed to fetch") ||
+            errorMessage.includes("fetch") ||
+            errorMessage.includes("TypeError") ||
+            errorMessage.includes("network")
+          ) {
+            setError(
+              "Error de conectividad. No se pudieron cargar las vacaciones.",
             );
-
-            // Filter fallback data by employeeId if needed
-            let filteredData = fallbackVacationData;
-            if (employeeId) {
-              filteredData = fallbackVacationData.filter(
-                (v) => v.employeeId === employeeId,
-              );
-            }
-
-            setVacations(filteredData);
-            console.log(
-              "✅ Fallback vacation data loaded:",
-              filteredData.length,
-              "records",
-            );
-            setError(null); // Clear error since we have fallback data
-            return;
-          } catch (fallbackError) {
-            console.warn(
-              "⚠️ Could not load fallback vacation data:",
-              fallbackError,
-            );
-
-            if (
-              errorMessage.includes("Failed to fetch") ||
-              errorMessage.includes("fetch") ||
-              errorMessage.includes("TypeError") ||
-              errorMessage.includes("network")
-            ) {
-              setError(
-                "Error de conectividad. No se pudieron cargar las vacaciones.",
-              );
-            } else {
-              setError(`Error de base de datos: ${errorMessage}`);
-            }
+          } else {
+            setError(`Error de base de datos: ${errorMessage}`);
           }
         }
       } else {
