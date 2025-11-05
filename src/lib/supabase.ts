@@ -282,8 +282,7 @@ export interface Employee {
   id: string;
   name: string;
   job_position: string;
-  white_wage: number;
-  informal_wage: number;
+  sueldo_base: number;
   daily_wage: number;
   presentismo: number;
   loses_presentismo: boolean;
