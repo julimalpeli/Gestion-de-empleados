@@ -253,7 +253,7 @@ class SalaryHistoryService {
       // 3. Buscar el último aumento registrado sin importar el período
       const { data: latestChange, error: latestError } = await supabase
         .from("salary_history")
-        .select("white_wage, informal_wage, presentismo, effective_date")
+        .select("white_wage, informal_wage, base_wage, presentismo, effective_date")
         .eq("employee_id", employeeId)
         .order("effective_date", { ascending: false })
         .order("created_at", { ascending: false })
