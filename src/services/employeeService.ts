@@ -138,7 +138,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
     try {
       console.log("Creating employee with input:", employee);
 
-      const dailyWage = (employee.whiteWage + employee.informalWage) / 30;
+      const sueldoBase = this.toNumber(employee.sueldoBase);
+      const dailyWage = sueldoBase / 30;
       const vacationInfo = this.calculateVacationDays(employee.startDate);
 
       const newEmployee = {
@@ -146,8 +147,9 @@ export class SupabaseEmployeeService implements IEmployeeService {
         dni: employee.dni,
         document_type: employee.documentType || "dni",
         job_position: employee.position,
-        white_wage: employee.whiteWage,
-        informal_wage: employee.informalWage,
+        sueldo_base: sueldoBase,
+        white_wage: sueldoBase,
+        informal_wage: 0,
         daily_wage: Math.round(dailyWage),
         presentismo: employee.presentismo,
         loses_presentismo: false,
@@ -183,8 +185,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
             name: mappedEmployee.name,
             dni: mappedEmployee.dni,
             position: mappedEmployee.position,
-            whiteWage: mappedEmployee.whiteWage,
-            informalWage: mappedEmployee.informalWage,
+            sueldoBase: mappedEmployee.sueldoBase,
             presentismo: mappedEmployee.presentismo,
             status: mappedEmployee.status,
             startDate: mappedEmployee.startDate,
