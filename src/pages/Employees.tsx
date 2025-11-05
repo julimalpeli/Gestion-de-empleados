@@ -473,8 +473,8 @@ const Employees = () => {
     }).format(amount);
   };
 
-  const calculateDailySalary = (whiteWage, informalWage) => {
-    const totalSalary = (whiteWage || 0) + (informalWage || 0);
+  const calculateDailySalary = (sueldoBase) => {
+    const totalSalary = sueldoBase || 0;
     return totalSalary / 30;
   };
 
