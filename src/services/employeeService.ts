@@ -247,10 +247,13 @@ export class SupabaseEmployeeService implements IEmployeeService {
       if (employee.documentType)
         updateData.document_type = employee.documentType;
       if (employee.position) updateData.job_position = employee.position;
-      if (employee.whiteWage !== undefined)
-        updateData.white_wage = employee.whiteWage;
-      if (employee.informalWage !== undefined)
-        updateData.informal_wage = employee.informalWage;
+      if (employee.sueldoBase !== undefined) {
+        const sueldoBase = this.toNumber(employee.sueldoBase);
+        updateData.sueldo_base = sueldoBase;
+        updateData.white_wage = sueldoBase;
+        updateData.informal_wage = 0;
+        updateData.daily_wage = Math.round(sueldoBase / 30);
+      }
       if (employee.presentismo !== undefined)
         updateData.presentismo = employee.presentismo;
       if (employee.losesPresentismo !== undefined)
@@ -259,19 +262,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
       if (employee.startDate) updateData.start_date = employee.startDate;
       if (employee.address !== undefined) updateData.address = employee.address;
       if (employee.email !== undefined) updateData.email = employee.email;
-
-      // Recalcular sueldo diario si cambiaron los sueldos
-      if (
-        employee.whiteWage !== undefined ||
-        employee.informalWage !== undefined
-      ) {
-        const current = await this.getEmployeeById(id);
-        if (current) {
-          const whiteWage = employee.whiteWage ?? current.whiteWage;
-          const informalWage = employee.informalWage ?? current.informalWage;
-          updateData.daily_wage = Math.round((whiteWage + informalWage) / 30);
-        }
-      }
 
       // Recalcular automáticamente vacaciones si cambió la fecha de inicio
       if (employee.startDate) {
