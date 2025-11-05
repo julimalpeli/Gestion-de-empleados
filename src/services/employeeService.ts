@@ -49,7 +49,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       }, "getAllEmployees", 2);
 
       console.log(`✅ Successfully fetched ${result.length} employees`);
-      return result.map(this.mapFromSupabase);
+      return result.map((record) => this.mapFromSupabase(record));
 
     } catch (error) {
       console.error("❌ getAllEmployees final error:", error);
@@ -462,7 +462,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       if (error) throw error;
 
-      return data.map(this.mapFromSupabase);
+      return data.map((employee) => this.mapFromSupabase(employee));
     } catch (error) {
       console.error("Error searching employees:", error);
       throw new Error("Failed to search employees");
