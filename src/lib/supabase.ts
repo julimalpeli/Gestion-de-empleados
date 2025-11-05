@@ -114,7 +114,21 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
       error instanceof Error ? error.message : String(error),
     );
     console.error("   - Error constructor:", error?.constructor?.name);
-    
+
+    if (
+      error instanceof Error &&
+      (error.message.toLowerCase().includes("permission") ||
+        error.message.toLowerCase().includes("rls"))
+    ) {
+      console.warn(
+        "🔐 Supabase reachable but blocked by permissions during test. Treating as connected.",
+      );
+      connectionState = "connected";
+      lastSuccessfulConnection = new Date();
+      connectionRetries = 0;
+      return true;
+    }
+
     // Check for specific network errors
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
@@ -126,7 +140,7 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
         console.error("   - 🌐 NETWORK ERROR: Network request failed");
       }
     }
-    
+
     connectionState = 'disconnected';
     connectionRetries++;
     return false;
