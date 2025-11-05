@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth-simple";
-import { getFallbackEmployeeData } from "@/utils/offlineFallback";
 
 // Import debug utilities
 if (import.meta.env.DEV) {
