@@ -160,7 +160,7 @@ export const usePayroll = () => {
     setError(null);
 
     const loadFallbackPayroll = async (reason: string) => {
-      console.log(`🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 🚨 🚨`);
+      console.log(`🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 ���� 🚨`);
       console.log("🔄 Loading cached payroll data...");
 
       try {
@@ -171,7 +171,7 @@ export const usePayroll = () => {
 
         if (fallbackData && fallbackData.length > 0) {
           setPayrollRecords(fallbackData.map(normalizePayrollRecord));
-          console.log("🎉 �� 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
+          console.log("🎉 🎉 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
           console.log(`✅ ${fallbackData.length} payroll records loaded`);
           console.log("📶 OFFLINE MODE ACTIVE - You can work normally!");
           setError(null);
@@ -533,7 +533,6 @@ export const usePayroll = () => {
   useEffect(() => {
     fetchPayrollRecords();
 
-    // Listen for emergency fallback activation
     const handleEmergencyFallback = (event: any) => {
       if (event.detail?.data) {
         console.log("🚨 Emergency fallback received!");
@@ -555,7 +554,7 @@ export const usePayroll = () => {
         handleEmergencyFallback,
       );
     };
-  }, []);
+  }, [session?.access_token, user?.id]);
 
   return {
     payrollRecords,
