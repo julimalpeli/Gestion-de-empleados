@@ -25,8 +25,10 @@ import { usePayroll } from "@/hooks/use-payroll";
 import { useVacations } from "@/hooks/use-vacations";
 import AuditStatus from "@/components/AuditStatus";
 import usePermissions from "@/hooks/use-permissions";
+import { useMemo, useState } from "react";
 
 const Dashboard = () => {
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false);
   const currentMonth = new Date().toLocaleDateString("es-AR", {
     month: "long",
     year: "numeric",
@@ -177,6 +179,15 @@ const Dashboard = () => {
   });
 
   console.log("  - Upcoming vacations found:", upcomingVacations.length);
+
+  const sortedUpcomingVacations = useMemo(
+    () =>
+      [...upcomingVacations].sort(
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
+      ),
+    [upcomingVacations],
+  );
 
   // Get employee names for vacations
   const getEmployeeName = (employeeId: string) => {
@@ -464,7 +475,10 @@ const Dashboard = () => {
             </p>
             {upcomingVacations.length > 0 && (
               <div className="mt-2 space-y-1">
-                {upcomingVacations.slice(0, 2).map((vacation) => {
+                {(showAllUpcoming
+                  ? sortedUpcomingVacations
+                  : sortedUpcomingVacations.slice(0, 2)
+                ).map((vacation) => {
                   const startDate = new Date(vacation.startDate);
                   const endDate = new Date(vacation.endDate);
                   const daysDiff =
@@ -493,10 +507,16 @@ const Dashboard = () => {
                     </div>
                   );
                 })}
-                {upcomingVacations.length > 2 && (
-                  <p className="text-xs text-muted-foreground">
-                    y {upcomingVacations.length - 2} más...
-                  </p>
+                {sortedUpcomingVacations.length > 2 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllUpcoming((v) => !v)}
+                    className="text-xs text-muted-foreground underline"
+                  >
+                    {showAllUpcoming
+                      ? "Ver menos"
+                      : `Ver ${sortedUpcomingVacations.length - 2} más`}
+                  </button>
                 )}
               </div>
             )}
