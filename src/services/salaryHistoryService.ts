@@ -31,6 +31,7 @@ export interface SalaryForPeriod {
     | "history_previous"
     | "history_latest"
     | "history_impact_period"
+    | "payroll_record"
     | "current"
     | "not_found";
 }
