@@ -22,10 +22,25 @@ const toNumber = (value: unknown): number => {
 };
 
 const normalizeEmployeeRecord = (employee: Employee): Employee => {
-  const sueldoBase = toNumber(employee.sueldoBase);
+  const anyEmp = employee as any;
+  const directBase = toNumber(anyEmp.sueldo_base);
+  const fromSnake = toNumber(anyEmp.white_wage) + toNumber(anyEmp.informal_wage);
+  const fromCamel = toNumber(anyEmp.whiteWage) + toNumber(anyEmp.informalWage);
+
+  const primaryBase = toNumber(employee.sueldoBase);
+  const sueldoBase =
+    primaryBase > 0
+      ? primaryBase
+      : directBase > 0
+        ? directBase
+        : fromSnake > 0
+          ? fromSnake
+          : fromCamel > 0
+            ? fromCamel
+            : 0;
+
   const dailyWageValue = toNumber(employee.dailyWage);
-  const dailyWage =
-    dailyWageValue > 0 ? dailyWageValue : Math.round(sueldoBase / 30);
+  const dailyWage = dailyWageValue > 0 ? dailyWageValue : Math.round(sueldoBase / 30);
 
   return {
     ...employee,
