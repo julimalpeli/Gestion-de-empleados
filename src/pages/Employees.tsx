@@ -216,7 +216,15 @@ const Employees = () => {
         return;
       }
       if (
+        newEmployee.documentType === "cuit" &&
+        !/^\d{11}$/.test(newEmployee.dni.trim())
+      ) {
+        alert("El CUIT debe tener 11 dígitos (solo números)");
+        return;
+      }
+      if (
         newEmployee.documentType !== "dni" &&
+        newEmployee.documentType !== "cuit" &&
         newEmployee.dni.trim().length < 3
       ) {
         alert("El número de documento debe tener al menos 3 caracteres");
@@ -332,7 +340,15 @@ const Employees = () => {
         return;
       }
       if (
+        editingEmployee.documentType === "cuit" &&
+        !/^\d{11}$/.test(editingEmployee.dni.trim())
+      ) {
+        alert("El CUIT debe tener 11 dígitos (solo números)");
+        return;
+      }
+      if (
         editingEmployee.documentType !== "dni" &&
+        editingEmployee.documentType !== "cuit" &&
         editingEmployee.dni.trim().length < 3
       ) {
         alert("El número de documento debe tener al menos 3 caracteres");
@@ -591,6 +607,7 @@ const Employees = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="dni">DNI</SelectItem>
+                      <SelectItem value="cuit">CUIT</SelectItem>
                       <SelectItem value="passport">Pasaporte</SelectItem>
                       <SelectItem value="ce">Cédula de Extranjería</SelectItem>
                       <SelectItem value="ci">Cédula de Identidad</SelectItem>
@@ -608,15 +625,26 @@ const Employees = () => {
                     placeholder={
                       newEmployee.documentType === "dni"
                         ? "Ej: 12345678"
-                        : newEmployee.documentType === "passport"
-                          ? "Ej: ABC123456"
-                          : "Número de documento"
+                        : newEmployee.documentType === "cuit"
+                          ? "Ej: 20301234567"
+                          : newEmployee.documentType === "passport"
+                            ? "Ej: ABC123456"
+                            : "Número de documento"
                     }
-                    maxLength={newEmployee.documentType === "dni" ? 8 : 20}
+                    maxLength={
+                      newEmployee.documentType === "dni"
+                        ? 8
+                        : newEmployee.documentType === "cuit"
+                          ? 11
+                          : 20
+                    }
                     value={newEmployee.dni}
                     onChange={(e) => {
                       let value = e.target.value;
-                      if (newEmployee.documentType === "dni") {
+                      if (
+                        newEmployee.documentType === "dni" ||
+                        newEmployee.documentType === "cuit"
+                      ) {
                         value = value.replace(/\D/g, "");
                       }
                       setNewEmployee({ ...newEmployee, dni: value });
@@ -626,9 +654,11 @@ const Employees = () => {
                   <p className="text-xs text-muted-foreground">
                     {newEmployee.documentType === "dni"
                       ? "Solo números, sin puntos ni espacios"
-                      : newEmployee.documentType === "passport"
-                        ? "Letras y números según formato del pasaporte"
-                        : "Según formato del documento"}
+                      : newEmployee.documentType === "cuit"
+                        ? "11 dígitos, sin guiones"
+                        : newEmployee.documentType === "passport"
+                          ? "Letras y números según formato del pasaporte"
+                          : "Según formato del documento"}
                   </p>
                 </div>
 
@@ -757,8 +787,8 @@ const Employees = () => {
                       )}
                     </span>
                     <p className="text-sm text-muted-foreground mt-1">
-                      (Sueldo Blanco + Sueldo Informal) ÷ 30
-                    </p>
+                    Sueldo Base ÷ 30
+                  </p>
                   </div>
                 </div>
               </div>
@@ -1071,6 +1101,7 @@ const Employees = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="dni">DNI</SelectItem>
+                    <SelectItem value="cuit">CUIT</SelectItem>
                     <SelectItem value="passport">Pasaporte</SelectItem>
                     <SelectItem value="ce">Cédula de Extranjería</SelectItem>
                     <SelectItem value="ci">Cédula de Identidad</SelectItem>
@@ -1219,7 +1250,7 @@ const Employees = () => {
                     )}
                   </span>
                   <p className="text-sm text-muted-foreground mt-1">
-                    (Sueldo Blanco + Sueldo Informal) ÷ 30
+                    Sueldo Base ÷ 30
                   </p>
                 </div>
               </div>
