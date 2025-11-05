@@ -7,7 +7,7 @@ import type {
   UpdateEmployeeRequest,
 } from "@/services/interfaces";
 import { useUsers } from "@/hooks/use-users";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth-simple";
 
 const toNumber = (value: unknown): number => {
   if (typeof value === "number" && Number.isFinite(value)) {
