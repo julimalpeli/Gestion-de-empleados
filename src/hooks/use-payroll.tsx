@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, withRetry } from "@/lib/supabase";
 import { useAudit } from "@/hooks/use-audit";
 import { useAuth } from "@/hooks/use-auth-simple";
 import type {
@@ -240,15 +240,23 @@ export const usePayroll = () => {
         !!import.meta.env.VITE_SUPABASE_ANON_KEY,
       );
 
-      const { data, error } = await supabase
-        .from("payroll_records")
-        .select(
-          `
-          *,
-          employee:employees(name, job_position, sueldo_base, white_wage, informal_wage)
-        `,
-        )
-        .order("period", { ascending: false });
+      const { data, error } = await withRetry(
+        async () => {
+          const res = await supabase
+            .from("payroll_records")
+            .select(
+              `
+              *,
+              employee:employees(name, job_position, sueldo_base, white_wage, informal_wage)
+            `,
+            )
+            .order("period", { ascending: false });
+          if (res.error) throw res.error;
+          return res;
+        },
+        "fetchPayrollRecords",
+        2,
+      );
 
       console.log("🔄 Supabase payroll query result:");
       console.log("  - Data:", data);
@@ -287,7 +295,14 @@ export const usePayroll = () => {
         console.error("❌ Full error object:", err);
       }
 
-      await loadFallbackPayroll("query-error");
+      if (bypassActive) {
+        await loadFallbackPayroll("query-error-bypass");
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Error cargando liquidaciones",
+        );
+        setPayrollRecords([]);
+      }
     } finally {
       setLoading(false);
     }
