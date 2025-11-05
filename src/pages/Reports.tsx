@@ -201,9 +201,34 @@ const Reports = () => {
     let bestSalaryPeriod = "Sueldo base"; // Por defecto
 
     if (employeePayrolls.length > 0) {
+      const payrollsInSemester = employeePayrolls.filter((payroll) => {
+        if (!payroll.period) {
+          return false;
+        }
+        const [recordYearStr, recordMonthStr] = payroll.period.split("-");
+        const recordYear = Number(recordYearStr);
+        const recordMonth = Number(recordMonthStr);
+        if (
+          !Number.isFinite(recordYear) ||
+          !Number.isFinite(recordMonth) ||
+          recordMonth < 1 ||
+          recordMonth > 12
+        ) {
+          return false;
+        }
+        const recordDate = new Date(recordYear, recordMonth - 1, 1);
+        return (
+          recordDate.getTime() >= semesterStart.getTime() &&
+          recordDate.getTime() <= semesterEnd.getTime()
+        );
+      });
+
+      const relevantPayrolls =
+        payrollsInSemester.length > 0 ? payrollsInSemester : employeePayrolls;
+
       // Calcular el mejor sueldo de los históricos
       // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
-      const salaryCalculations = employeePayrolls.map((payroll) => {
+      const salaryCalculations = relevantPayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
@@ -235,16 +260,20 @@ const Reports = () => {
       });
 
       // Encontrar el mejor sueldo y su período
-      const maxHistoricalSalary = Math.max(...salaryCalculations);
-      const maxSalaryIndex = salaryCalculations.indexOf(maxHistoricalSalary);
+      const maxHistoricalSalary =
+        salaryCalculations.length > 0 ? Math.max(...salaryCalculations) : 0;
+      const maxSalaryIndex =
+        salaryCalculations.length > 0
+          ? salaryCalculations.indexOf(maxHistoricalSalary)
+          : -1;
 
       // Comparar con el sueldo base para determinar cuál es mejor
       const baseSalary = employee.sueldoBase || 0;
 
-      if (maxHistoricalSalary > baseSalary) {
+      if (maxSalaryIndex >= 0 && maxHistoricalSalary > baseSalary) {
         // El mejor sueldo es de un período histórico
         bestSalary = maxHistoricalSalary;
-        bestSalaryPeriod = employeePayrolls[maxSalaryIndex].period;
+        bestSalaryPeriod = relevantPayrolls[maxSalaryIndex].period;
       } else {
         // El sueldo base es el mejor
         bestSalary = baseSalary;
@@ -256,17 +285,17 @@ const Reports = () => {
         `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
         {
           baseSalary: employee.sueldoBase || 0,
-          historicalSalaries: salaryCalculations,
+          salaryTotalsInRange: salaryCalculations,
           maxHistoricalSalary,
           maxSalaryIndex,
           bestPeriod: bestSalaryPeriod,
-          employeePayrolls: employeePayrolls.map((p) => ({
+          consideredPayrolls: relevantPayrolls.map((p) => ({
             period: p.period,
             amount:
-              p.whiteAmount +
-              p.informalAmount +
-              p.overtimeAmount +
-              p.holidayBonus,
+              (p.whiteAmount || 0) +
+              (p.informalAmount || 0) +
+              (p.overtimeAmount || 0) +
+              (p.holidayBonus || 0),
           })),
         },
       );
