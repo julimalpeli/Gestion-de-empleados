@@ -75,6 +75,7 @@ const SalaryHistoryTable = ({
 
   const calculatePreviousTotalSalary = (record: SalaryHistoryRecord) => {
     return (
+      (record as any).previous_base_wage ??
       (record.previous_white_wage || 0) + (record.previous_informal_wage || 0)
     );
   };
