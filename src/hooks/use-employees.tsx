@@ -64,7 +64,9 @@ export const useEmployees = () => {
   // Cargar empleados
   const fetchEmployees = useCallback(async () => {
     if (!canLoadEmployees) {
-      console.log("⏸️ Omitiendo carga de empleados: no hay sesión ni usuario autenticado");
+      console.log(
+        "⏸️ Omitiendo carga de empleados: no hay sesión ni usuario autenticado",
+      );
       return;
     }
 

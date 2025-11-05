@@ -79,7 +79,9 @@ const normalizePayrollRecord = (record: any): PayrollRecord => {
       : (whiteAmountSource ?? 0) + (informalAmountSource ?? 0);
 
   const baseDays = toNumber(readField(record, "base_days", "baseDays"));
-  const holidayDays = toNumber(readField(record, "holiday_days", "holidayDays"));
+  const holidayDays = toNumber(
+    readField(record, "holiday_days", "holidayDays"),
+  );
   const holidayBonus = toNumber(
     readField(record, "holiday_bonus", "holidayBonus"),
   );
@@ -95,7 +97,9 @@ const normalizePayrollRecord = (record: any): PayrollRecord => {
   const overtimeAmount = toNumber(
     readField(record, "overtime_amount", "overtimeAmount"),
   );
-  const bonusAmount = toNumber(readField(record, "bonus_amount", "bonusAmount"));
+  const bonusAmount = toNumber(
+    readField(record, "bonus_amount", "bonusAmount"),
+  );
   const netTotal =
     toOptionalNumber(readField(record, "net_total", "netTotal")) ??
     resolvedWhiteAmount +
@@ -142,10 +146,8 @@ const normalizePayrollRecord = (record: any): PayrollRecord => {
     processedDate: processedDate as string | undefined,
     processedBy: processedBy as string | undefined,
     notes: notes as string | undefined,
-    createdAt:
-      (readField(record, "created_at", "createdAt") as string) ?? now,
-    updatedAt:
-      (readField(record, "updated_at", "updatedAt") as string) ?? now,
+    createdAt: (readField(record, "created_at", "createdAt") as string) ?? now,
+    updatedAt: (readField(record, "updated_at", "updatedAt") as string) ?? now,
   };
 };
 
@@ -163,7 +165,9 @@ export const usePayroll = () => {
     setError(null);
 
     const loadFallbackPayroll = async (reason: string) => {
-      console.log(`🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 🚨 🚨`);
+      console.log(
+        `🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 🚨 🚨`,
+      );
       console.log("🔄 Loading cached payroll data...");
 
       try {

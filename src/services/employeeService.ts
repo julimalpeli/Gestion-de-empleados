@@ -1,4 +1,9 @@
-import { supabase, logSupabaseError, withRetry, getConnectionHealth } from "@/lib/supabase";
+import {
+  supabase,
+  logSupabaseError,
+  withRetry,
+  getConnectionHealth,
+} from "@/lib/supabase";
 import { auditService } from "@/services/auditService";
 import type {
   IEmployeeService,
@@ -41,39 +46,46 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const health = getConnectionHealth();
       console.log("💊 Connection health:", health);
 
-      if (health.state === 'disconnected' && health.retries >= 3) {
+      if (health.state === "disconnected" && health.retries >= 3) {
         console.log("🚨 Connection unhealthy, using fallback immediately");
         return this.getFallbackEmployees();
       }
 
-      const result = await withRetry(async () => {
-        console.log("🔍 Executing employees query...");
+      const result = await withRetry(
+        async () => {
+          console.log("🔍 Executing employees query...");
 
-        const { data, error } = await supabase
-          .from("employees")
-          .select("*")
-          .order("created_at", { ascending: false });
+          const { data, error } = await supabase
+            .from("employees")
+            .select("*")
+            .order("created_at", { ascending: false });
 
-        if (error) {
-          console.error("❌ Supabase query error:", error);
-          throw new Error(`Supabase error: ${error.message} (Code: ${error.code || 'UNKNOWN'})`);
-        }
+          if (error) {
+            console.error("❌ Supabase query error:", error);
+            throw new Error(
+              `Supabase error: ${error.message} (Code: ${error.code || "UNKNOWN"})`,
+            );
+          }
 
-        console.log(`✅ Supabase returned ${data?.length || 0} employees`);
+          console.log(`✅ Supabase returned ${data?.length || 0} employees`);
 
-        // Check if we got empty results (possible RLS issue)
-        if (!data || data.length === 0) {
-          console.warn("⚠️ Empty result from Supabase - this might be an RLS issue");
-          console.log("🔄 Attempting fallback due to empty results");
-          throw new Error("Empty results from database - possible RLS issue");
-        }
+          // Check if we got empty results (possible RLS issue)
+          if (!data || data.length === 0) {
+            console.warn(
+              "⚠️ Empty result from Supabase - this might be an RLS issue",
+            );
+            console.log("🔄 Attempting fallback due to empty results");
+            throw new Error("Empty results from database - possible RLS issue");
+          }
 
-        return data;
-      }, "getAllEmployees", 2);
+          return data;
+        },
+        "getAllEmployees",
+        2,
+      );
 
       console.log(`✅ Successfully fetched ${result.length} employees`);
       return result.map((record) => this.mapFromSupabase(record));
-
     } catch (error) {
       console.error("❌ getAllEmployees final error:", error);
       logSupabaseError("getAllEmployees - Final error", error);
@@ -86,14 +98,21 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
   private async getFallbackEmployees(): Promise<Employee[]> {
     try {
-      const { getFallbackEmployeesData } = await import("@/utils/offlineFallback");
+      const { getFallbackEmployeesData } = await import(
+        "@/utils/offlineFallback"
+      );
       const fallbackData = getFallbackEmployeesData();
-      console.log("✅ Using fallback employees:", fallbackData.length, "employees");
+      console.log(
+        "✅ Using fallback employees:",
+        fallbackData.length,
+        "employees",
+      );
       return fallbackData.map((employee) =>
         this.mapFromSupabase({
           ...employee,
           job_position: employee.job_position ?? employee.position ?? "",
-          document_type: employee.document_type ?? employee.documentType ?? "dni",
+          document_type:
+            employee.document_type ?? employee.documentType ?? "dni",
           sueldo_base:
             employee.sueldoBase ??
             (employee.whiteWage ?? 0) + (employee.informalWage ?? 0),
@@ -105,10 +124,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
             Math.round(
               ((employee.whiteWage ?? 0) + (employee.informalWage ?? 0)) / 30,
             ),
-          presentismo:
-            employee.presentismo ??
-            employee.presentismoAmount ??
-            0,
+          presentismo: employee.presentismo ?? employee.presentismoAmount ?? 0,
           loses_presentismo:
             employee.loses_presentismo ??
             employee.losesPresentismo ??
@@ -116,44 +132,48 @@ export class SupabaseEmployeeService implements IEmployeeService {
             false,
           status: employee.status ?? "active",
           start_date: employee.start_date ?? employee.startDate ?? "",
-          vacation_days:
-            employee.vacation_days ??
-            employee.vacationDays ??
-            0,
+          vacation_days: employee.vacation_days ?? employee.vacationDays ?? 0,
           vacations_taken:
-            employee.vacations_taken ??
-            employee.vacationsTaken ??
-            0,
+            employee.vacations_taken ?? employee.vacationsTaken ?? 0,
           address: employee.address ?? "",
           email: employee.email ?? "",
           created_at:
-            employee.created_at ?? employee.createdAt ?? new Date().toISOString(),
+            employee.created_at ??
+            employee.createdAt ??
+            new Date().toISOString(),
           updated_at:
-            employee.updated_at ?? employee.updatedAt ?? new Date().toISOString(),
+            employee.updated_at ??
+            employee.updatedAt ??
+            new Date().toISOString(),
         }),
       );
     } catch (fallbackError) {
-      console.error("❌ Critical: Fallback employee data failed:", fallbackError);
+      console.error(
+        "❌ Critical: Fallback employee data failed:",
+        fallbackError,
+      );
       // Return minimal fallback as last resort
-      return [{
-        id: "fallback-employee-1",
-        name: "Empleado de Ejemplo",
-        dni: "00000000",
-        documentType: "dni",
-        position: "Empleado",
-        sueldoBase: 500000,
-        dailyWage: 16667,
-        presentismo: 0,
-        losesPresentismo: false,
-        status: "active",
-        startDate: "2024-01-01",
-        vacationDays: 14,
-        vacationsTaken: 0,
-        address: "",
-        email: "",
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }];
+      return [
+        {
+          id: "fallback-employee-1",
+          name: "Empleado de Ejemplo",
+          dni: "00000000",
+          documentType: "dni",
+          position: "Empleado",
+          sueldoBase: 500000,
+          dailyWage: 16667,
+          presentismo: 0,
+          losesPresentismo: false,
+          status: "active",
+          startDate: "2024-01-01",
+          vacationDays: 14,
+          vacationsTaken: 0,
+          address: "",
+          email: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        },
+      ];
     }
   }
 
@@ -581,7 +601,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
   private resolveSueldoBase(data: any): number {
     const direct = data?.sueldo_base ?? data?.sueldoBase;
-    const directValue = direct !== undefined && direct !== null ? this.toNumber(direct) : null;
+    const directValue =
+      direct !== undefined && direct !== null ? this.toNumber(direct) : null;
     if (directValue !== null) {
       return directValue;
     }

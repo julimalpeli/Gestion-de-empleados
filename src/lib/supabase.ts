@@ -29,22 +29,23 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: false
+    detectSessionInUrl: false,
   },
   global: {
     headers: {
-      'x-client-info': 'cadiz-bar-tapas-app'
-    }
+      "x-client-info": "cadiz-bar-tapas-app",
+    },
   },
   realtime: {
     params: {
-      eventsPerSecond: 10
-    }
-  }
+      eventsPerSecond: 10,
+    },
+  },
 });
 
 // Connection state management
-let connectionState: 'testing' | 'connected' | 'disconnected' | 'error' = 'testing';
+let connectionState: "testing" | "connected" | "disconnected" | "error" =
+  "testing";
 let lastSuccessfulConnection: Date | null = null;
 let connectionRetries = 0;
 const MAX_RETRIES = 3;
@@ -57,8 +58,8 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
     console.log("   - Key length:", supabaseAnonKey?.length || 0);
     console.log("   - Key prefix:", supabaseAnonKey?.slice(0, 20) + "...");
 
-    connectionState = 'testing';
-    
+    connectionState = "testing";
+
     // Simple health check query with timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -94,15 +95,15 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
         return true;
       }
 
-      connectionState = 'error';
+      connectionState = "error";
       connectionRetries++;
       return false;
     }
 
     console.log("✅ Supabase connection test successful");
     console.log("   - Count data:", data);
-    
-    connectionState = 'connected';
+
+    connectionState = "connected";
     lastSuccessfulConnection = new Date();
     connectionRetries = 0;
     return true;
@@ -131,17 +132,19 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
 
     // Check for specific network errors
     if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        console.error("   - 🕐 CONNECTION TIMEOUT: Request took longer than 10 seconds");
-      } else if (error.message.includes('Failed to fetch')) {
+      if (error.name === "AbortError") {
+        console.error(
+          "   - 🕐 CONNECTION TIMEOUT: Request took longer than 10 seconds",
+        );
+      } else if (error.message.includes("Failed to fetch")) {
         console.error("   - 🌐 NETWORK ERROR: Cannot reach Supabase server");
         console.error("   - 🔗 Check internet connection and Supabase URL");
-      } else if (error.message.includes('NetworkError')) {
+      } else if (error.message.includes("NetworkError")) {
         console.error("   - 🌐 NETWORK ERROR: Network request failed");
       }
     }
 
-    connectionState = 'disconnected';
+    connectionState = "disconnected";
     connectionRetries++;
     return false;
   }
@@ -179,18 +182,23 @@ export const logSupabaseError = (context: string, error: any) => {
     console.error("   - Supabase URL is incorrect");
     console.error("   - Firewall blocking the request");
     console.error("   - CORS configuration issues");
-  } else if (error?.code === 'PGRST301') {
-    console.error("🔒 RLS POLICY ERROR: Row Level Security is blocking the query");
-  } else if (error?.code === '42501') {
+  } else if (error?.code === "PGRST301") {
+    console.error(
+      "🔒 RLS POLICY ERROR: Row Level Security is blocking the query",
+    );
+  } else if (error?.code === "42501") {
     console.error("🔒 PERMISSION ERROR: Insufficient database permissions");
-  } else if (error?.code === 'PGRST116') {
+  } else if (error?.code === "PGRST116") {
     console.error("📊 QUERY ERROR: Malformed query or missing table");
   }
-  
+
   console.error("🌍 Connection state:", connectionState);
-  console.error("📅 Last successful connection:", lastSuccessfulConnection?.toISOString() || 'Never');
+  console.error(
+    "📅 Last successful connection:",
+    lastSuccessfulConnection?.toISOString() || "Never",
+  );
   console.error("🔄 Connection retries:", connectionRetries);
-  
+
   console.groupEnd();
 };
 
@@ -200,7 +208,8 @@ export const getConnectionHealth = () => {
     state: connectionState,
     lastSuccessfulConnection,
     retries: connectionRetries,
-    isHealthy: connectionState === 'connected' && connectionRetries < MAX_RETRIES
+    isHealthy:
+      connectionState === "connected" && connectionRetries < MAX_RETRIES,
   };
 };
 
@@ -208,62 +217,66 @@ export const getConnectionHealth = () => {
 export const withRetry = async <T>(
   operation: () => Promise<T>,
   operationName: string,
-  maxRetries: number = 2
+  maxRetries: number = 2,
 ): Promise<T> => {
   let lastError;
-  
+
   for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
     try {
       console.log(`🔄 ${operationName} (attempt ${attempt}/${maxRetries + 1})`);
-      
+
       const result = await operation();
-      
+
       if (attempt > 1) {
-        console.log(`✅ ${operationName} succeeded on retry attempt ${attempt}`);
+        console.log(
+          `✅ ${operationName} succeeded on retry attempt ${attempt}`,
+        );
       }
-      
+
       return result;
     } catch (error) {
       lastError = error;
       logSupabaseError(`${operationName} - Attempt ${attempt}`, error);
-      
+
       // Don't retry on certain types of errors
-      if (error && typeof error === 'object') {
+      if (error && typeof error === "object") {
         const errorCode = (error as any).code;
         const errorMessage = (error as any).message;
-        
+
         // Don't retry on authentication/permission errors
-        if (errorCode === '42501' || errorCode === 'PGRST301') {
-          console.log(`❌ ${operationName} - Not retrying auth/permission error`);
+        if (errorCode === "42501" || errorCode === "PGRST301") {
+          console.log(
+            `❌ ${operationName} - Not retrying auth/permission error`,
+          );
           break;
         }
-        
+
         // Don't retry on malformed queries
-        if (errorCode === 'PGRST116') {
+        if (errorCode === "PGRST116") {
           console.log(`❌ ${operationName} - Not retrying query error`);
           break;
         }
       }
-      
+
       // Check if it's a network error that we can retry
-      const isNetworkError = 
-        error instanceof TypeError && 
-        (error.message.includes("Failed to fetch") || 
-         error.message.includes("NetworkError") ||
-         error.message.includes("AbortError"));
-      
+      const isNetworkError =
+        error instanceof TypeError &&
+        (error.message.includes("Failed to fetch") ||
+          error.message.includes("NetworkError") ||
+          error.message.includes("AbortError"));
+
       if (attempt <= maxRetries && isNetworkError) {
         const delay = attempt * 1000; // Progressive delay: 1s, 2s, 3s
         console.log(`⏳ ${operationName} - Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         continue;
       }
-      
+
       // If it's not a network error or we're out of retries, break
       break;
     }
   }
-  
+
   throw lastError;
 };
 

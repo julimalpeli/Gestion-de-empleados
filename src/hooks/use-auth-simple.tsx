@@ -479,7 +479,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
 
       if (!data || !data.user) {
-        throw new Error("No se pudo autenticar al usuario. Intente nuevamente.");
+        throw new Error(
+          "No se pudo autenticar al usuario. Intente nuevamente.",
+        );
       }
 
       const { data: userRecord, error: userRecordError } = await supabase
