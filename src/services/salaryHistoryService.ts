@@ -7,9 +7,11 @@ export interface SalaryHistoryRecord {
   impact_period: string;
   white_wage: number;
   informal_wage: number;
+  base_wage: number;
   presentismo: number;
   previous_white_wage?: number;
   previous_informal_wage?: number;
+  previous_base_wage?: number;
   previous_presentismo?: number;
   change_type: "aumento" | "correccion";
   reason?: string;
