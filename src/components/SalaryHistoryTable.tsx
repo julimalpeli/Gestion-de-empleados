@@ -223,7 +223,7 @@ const SalaryHistoryTable = ({
                       <TableCell>
                         <div className="space-y-1">
                           <div className="text-sm text-muted-foreground">
-                            Total:{" "}
+                            Base:{" "}
                             {formatCurrency(
                               calculatePreviousTotalSalary(record),
                             )}
