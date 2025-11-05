@@ -24,7 +24,8 @@ const toNumber = (value: unknown): number => {
 const normalizeEmployeeRecord = (employee: Employee): Employee => {
   const anyEmp = employee as any;
   const directBase = toNumber(anyEmp.sueldo_base);
-  const fromSnake = toNumber(anyEmp.white_wage) + toNumber(anyEmp.informal_wage);
+  const fromSnake =
+    toNumber(anyEmp.white_wage) + toNumber(anyEmp.informal_wage);
   const fromCamel = toNumber(anyEmp.whiteWage) + toNumber(anyEmp.informalWage);
 
   const primaryBase = toNumber(employee.sueldoBase);
@@ -40,7 +41,8 @@ const normalizeEmployeeRecord = (employee: Employee): Employee => {
             : 0;
 
   const dailyWageValue = toNumber(employee.dailyWage);
-  const dailyWage = dailyWageValue > 0 ? dailyWageValue : Math.round(sueldoBase / 30);
+  const dailyWage =
+    dailyWageValue > 0 ? dailyWageValue : Math.round(sueldoBase / 30);
 
   return {
     ...employee,
@@ -66,7 +68,6 @@ export const useEmployees = () => {
       const data = await employeeService.getAllEmployees();
       console.log("✅ Empleados cargados exitosamente:", data.length);
       setEmployees(data.map(normalizeEmployeeRecord));
-
     } catch (err) {
       console.error("❌ Error cargando empleados:", err);
       const errorMessage = err instanceof Error ? err.message : String(err);
@@ -79,7 +80,6 @@ export const useEmployees = () => {
       setTimeout(() => {
         fetchEmployees();
       }, 2000);
-
     } finally {
       setLoading(false);
     }

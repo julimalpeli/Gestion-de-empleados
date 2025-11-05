@@ -6,7 +6,7 @@ export interface Employee {
   name: string;
   position: string;
   sueldoBase: number;
-  
+
   dailyWage: number;
   presentismo: number;
   losesPresentismo: boolean;
@@ -52,7 +52,7 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     name: "Juan Pérez",
     position: "Cocinero",
     sueldoBase: 450000,
-    
+
     dailyWage: 15000,
     presentismo: 25000,
     losesPresentismo: false,
@@ -70,7 +70,7 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     name: "María González",
     position: "Mesera",
     sueldoBase: 360000,
-    
+
     dailyWage: 12000,
     presentismo: 20000,
     losesPresentismo: true,
@@ -88,7 +88,7 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     name: "Carlos López",
     position: "Cajero",
     sueldoBase: 405000,
-    
+
     dailyWage: 13500,
     presentismo: 22000,
     losesPresentismo: false,
@@ -106,7 +106,7 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     name: "Ana Martínez",
     position: "Ayudante de Cocina",
     sueldoBase: 330000,
-    
+
     dailyWage: 11000,
     presentismo: 18000,
     losesPresentismo: false,
@@ -124,7 +124,7 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     name: "Luis Fernández",
     position: "Encargado",
     sueldoBase: 750000,
-    
+
     dailyWage: 25000,
     presentismo: 35000,
     losesPresentismo: false,

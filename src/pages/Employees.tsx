@@ -159,7 +159,8 @@ const Employees = () => {
     const changes = [];
 
     if (
-      parseFloat(original.sueldoBase || 0) !== parseFloat(edited.sueldoBase || 0)
+      parseFloat(original.sueldoBase || 0) !==
+      parseFloat(edited.sueldoBase || 0)
     ) {
       changes.push({
         field: "sueldoBase",
@@ -819,7 +820,10 @@ const Employees = () => {
                 <FileSpreadsheet className="h-4 w-4 mr-2" />
                 XLS
               </Button>
-              <Button onClick={() => exportSalariesToPDF(filteredEmployees)} title="Descargar PDF">
+              <Button
+                onClick={() => exportSalariesToPDF(filteredEmployees)}
+                title="Descargar PDF"
+              >
                 <FileText className="h-4 w-4 mr-2" />
                 PDF
               </Button>
@@ -869,7 +873,8 @@ const Employees = () => {
                     </TableCell>
                     <TableCell className="font-semibold">
                       {formatCurrency(
-                        employee.dailyWage || Math.round((employee.sueldoBase || 0) / 30),
+                        employee.dailyWage ||
+                          Math.round((employee.sueldoBase || 0) / 30),
                       )}
                     </TableCell>
                     <TableCell>
@@ -1494,7 +1499,9 @@ const Employees = () => {
                           <p className="text-xl font-bold text-gray-900 mt-1">
                             {formatCurrency(viewingEmployee.sueldoBase || 0)}
                           </p>
-                          <p className="text-xs text-gray-500 mt-1">Base salarial</p>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Base salarial
+                          </p>
                         </div>
 
                         <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-green-500">
