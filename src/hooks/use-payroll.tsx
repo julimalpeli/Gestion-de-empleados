@@ -295,14 +295,34 @@ export const usePayroll = () => {
         console.error("❌ Full error object:", err);
       }
 
-      if (bypassActive) {
-        await loadFallbackPayroll("query-error-bypass");
-      } else {
-        setError(
-          err instanceof Error ? err.message : "Error cargando liquidaciones",
-        );
-        setPayrollRecords([]);
+      const normalizedMessage =
+        err instanceof Error
+          ? err.message
+          : typeof (err as any)?.message === "string"
+            ? (err as any).message
+            : "";
+      const isNetworkError =
+        normalizedMessage.toLowerCase().includes("failed to fetch") ||
+        normalizedMessage.toLowerCase().includes("networkerror") ||
+        err instanceof TypeError;
+
+      const shouldFallbackToOffline = bypassActive || isNetworkError;
+      if (shouldFallbackToOffline) {
+        const fallbackReason = bypassActive
+          ? "query-error-bypass"
+          : isNetworkError
+            ? "network-error"
+            : "query-error";
+        const fallbackActivated = await loadFallbackPayroll(fallbackReason);
+        if (fallbackActivated) {
+          return;
+        }
       }
+
+      setError(
+        err instanceof Error ? err.message : "Error cargando liquidaciones",
+      );
+      setPayrollRecords([]);
     } finally {
       setLoading(false);
     }
