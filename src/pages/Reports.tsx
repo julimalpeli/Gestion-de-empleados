@@ -195,7 +195,7 @@ const Reports = () => {
       (p) => p.employeeId === employee.id,
     );
 
-    let bestSalary = employee.whiteWage + employee.informalWage; // Fallback por si no hay históricos
+    let bestSalary = employee.sueldoBase || 0; // Fallback por si no hay históricos
     let bestSalaryPeriod = "Sueldo base"; // Por defecto
 
     if (employeePayrolls.length > 0) {
@@ -237,7 +237,7 @@ const Reports = () => {
       const maxSalaryIndex = salaryCalculations.indexOf(maxHistoricalSalary);
 
       // Comparar con el sueldo base para determinar cuál es mejor
-      const baseSalary = employee.whiteWage + employee.informalWage;
+      const baseSalary = employee.sueldoBase || 0;
 
       if (maxHistoricalSalary > baseSalary) {
         // El mejor sueldo es de un período histórico
@@ -253,7 +253,7 @@ const Reports = () => {
       console.log(
         `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
         {
-          baseSalary: employee.whiteWage + employee.informalWage,
+          baseSalary: employee.sueldoBase || 0,
           historicalSalaries: salaryCalculations,
           maxHistoricalSalary,
           maxSalaryIndex,
