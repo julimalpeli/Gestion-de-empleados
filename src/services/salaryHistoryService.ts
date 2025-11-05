@@ -140,7 +140,7 @@ class SalaryHistoryService {
         await supabase
           .from("salary_history")
           .select(
-            "white_wage, informal_wage, presentismo, effective_date, impact_period",
+            "white_wage, informal_wage, base_wage, presentismo, effective_date, impact_period",
           )
           .eq("employee_id", employeeId)
           .eq("impact_period", period)
