@@ -350,8 +350,6 @@ const Reports = () => {
           <TabsTrigger value="aguinaldos">
             Calculadora de Aguinaldos
           </TabsTrigger>
-          <TabsTrigger value="costos">Reportes de Costos</TabsTrigger>
-          <TabsTrigger value="asistencia">Reportes de Asistencia</TabsTrigger>
         </TabsList>
 
         <TabsContent value="liquidaciones" className="space-y-6">
