@@ -288,6 +288,7 @@ class SalaryHistoryService {
       return {
         white_wage: 0,
         informal_wage: 0,
+        base_wage: 0,
         presentismo: 0,
         source: "not_found",
       };
