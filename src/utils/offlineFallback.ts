@@ -1,7 +1,7 @@
 // Offline fallback data when Supabase is not available
 
 // Real employees data for fallback - ALL 8 employees from Supabase
-export const fallbackEmployeesData = [
+const rawFallbackEmployeesData = [
   {
     id: "d6f06332-1d49-4935-b931-5d7657d58468",
     name: "Porras Daiana Ayelen",
@@ -156,6 +156,10 @@ export const fallbackEmployeesData = [
   },
 ];
 
+export const fallbackEmployeesData = rawFallbackEmployeesData.map((e) => ({
+  ...e,
+  sueldoBase: (e.whiteWage || 0) + (e.informalWage || 0),
+}));
 export const fallbackEmployeeData = fallbackEmployeesData[0]; // Keep for compatibility
 
 export const fallbackPayrollData = [
