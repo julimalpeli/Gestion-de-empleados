@@ -406,6 +406,24 @@ class SalaryHistoryService {
         );
       }
 
+      const whiteWage =
+        newSalary.white_wage !== undefined
+          ? this.toNumber(newSalary.white_wage)
+          : this.toNumber(newSalary.base_wage ?? 0);
+      const informalWage =
+        newSalary.informal_wage !== undefined
+          ? this.toNumber(newSalary.informal_wage)
+          : 0;
+      const baseWage =
+        newSalary.base_wage !== undefined
+          ? this.toNumber(newSalary.base_wage)
+          : whiteWage + informalWage;
+      const previousBaseWage = this.toNumber(
+        currentEmployee.sueldo_base ??
+          (currentEmployee.white_wage || 0) +
+            (currentEmployee.informal_wage || 0),
+      );
+
       // 2. Solo crear historial si es un aumento (las correcciones no van al historial)
       let historyRecord = null;
       if (changeInfo.change_type === "aumento") {
