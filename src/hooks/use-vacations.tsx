@@ -36,6 +36,7 @@ export const useVacations = (employeeId?: string) => {
   const [vacations, setVacations] = useState<VacationRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { session, user } = useAuth();
 
   // Cargar solicitudes de vacaciones
   const fetchVacations = async () => {
