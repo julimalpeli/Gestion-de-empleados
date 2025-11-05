@@ -689,30 +689,15 @@ const Employees = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="whiteWage">Sueldo en Blanco</Label>
+                  <Label htmlFor="sueldoBase">Sueldo Base</Label>
                   <CurrencyInput
-                    id="whiteWage"
+                    id="sueldoBase"
                     placeholder="$ 0,00"
-                    value={newEmployee.whiteWage}
+                    value={newEmployee.sueldoBase}
                     onChange={(value) =>
                       setNewEmployee({
                         ...newEmployee,
-                        whiteWage: value,
-                      })
-                    }
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="informalWage">Sueldo Informal</Label>
-                  <CurrencyInput
-                    id="informalWage"
-                    placeholder="$ 0,00"
-                    value={newEmployee.informalWage}
-                    onChange={(value) =>
-                      setNewEmployee({
-                        ...newEmployee,
-                        informalWage: value,
+                        sueldoBase: value,
                       })
                     }
                   />
