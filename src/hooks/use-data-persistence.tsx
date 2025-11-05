@@ -5,8 +5,8 @@ export interface Employee {
   id: number;
   name: string;
   position: string;
-  whiteWage: number;
-  informalWage: number;
+  sueldoBase: number;
+  
   dailyWage: number;
   presentismo: number;
   losesPresentismo: boolean;
@@ -51,8 +51,8 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     id: 1,
     name: "Juan Pérez",
     position: "Cocinero",
-    whiteWage: 300000,
-    informalWage: 150000,
+    sueldoBase: 450000,
+    
     dailyWage: 15000,
     presentismo: 25000,
     losesPresentismo: false,
@@ -69,8 +69,8 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     id: 2,
     name: "María González",
     position: "Mesera",
-    whiteWage: 240000,
-    informalWage: 120000,
+    sueldoBase: 360000,
+    
     dailyWage: 12000,
     presentismo: 20000,
     losesPresentismo: true,
@@ -87,8 +87,8 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     id: 3,
     name: "Carlos López",
     position: "Cajero",
-    whiteWage: 285000,
-    informalWage: 120000,
+    sueldoBase: 405000,
+    
     dailyWage: 13500,
     presentismo: 22000,
     losesPresentismo: false,
@@ -105,8 +105,8 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     id: 4,
     name: "Ana Martínez",
     position: "Ayudante de Cocina",
-    whiteWage: 210000,
-    informalWage: 120000,
+    sueldoBase: 330000,
+    
     dailyWage: 11000,
     presentismo: 18000,
     losesPresentismo: false,
@@ -123,8 +123,8 @@ const DEFAULT_EMPLOYEES: Employee[] = [
     id: 5,
     name: "Luis Fernández",
     position: "Encargado",
-    whiteWage: 525000,
-    informalWage: 225000,
+    sueldoBase: 750000,
+    
     dailyWage: 25000,
     presentismo: 35000,
     losesPresentismo: false,
