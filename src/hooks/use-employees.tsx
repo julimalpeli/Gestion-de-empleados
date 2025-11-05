@@ -91,7 +91,7 @@ export const useEmployees = () => {
     } finally {
       setLoading(false);
     }
-  }, [session]);
+  }, [canLoadEmployees]);
 
   // Crear empleado
   const createEmployee = async (employee: CreateEmployeeRequest) => {
