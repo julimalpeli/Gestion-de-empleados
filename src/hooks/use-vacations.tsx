@@ -552,7 +552,7 @@ export const useVacations = (employeeId?: string) => {
   // Cargar datos al montar el componente
   useEffect(() => {
     fetchVacations();
-  }, [employeeId]);
+  }, [employeeId, session?.access_token, user?.id]);
 
   return {
     vacations,
