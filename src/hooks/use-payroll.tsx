@@ -7,6 +7,9 @@ import type {
   CreatePayrollRequest,
 } from "@/services/interfaces";
 
+const ADMIN_BYPASS_ENABLED =
+  import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
+
 const hasOwn = Object.prototype.hasOwnProperty;
 
 const readField = (source: any, snake: string, camel: string) => {
@@ -160,7 +163,7 @@ export const usePayroll = () => {
     setError(null);
 
     const loadFallbackPayroll = async (reason: string) => {
-      console.log(`🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 ���� 🚨`);
+      console.log(`🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 🚨 🚨`);
       console.log("🔄 Loading cached payroll data...");
 
       try {
@@ -202,6 +205,7 @@ export const usePayroll = () => {
 
     const hasSupabaseSession = !!session?.user;
     const bypassActive =
+      ADMIN_BYPASS_ENABLED &&
       !hasSupabaseSession &&
       !!user &&
       typeof window !== "undefined" &&
