@@ -1664,7 +1664,7 @@ const Payroll = () => {
                   <TableHead>Aguinaldo</TableHead>
                   <TableHead>Presentismo</TableHead>
                   <TableHead>Depósito</TableHead>
-                  <TableHead>Informal</TableHead>
+                  <TableHead>Efectivo</TableHead>
                   <TableHead>Total Neto</TableHead>
                   <TableHead>Estado</TableHead>
                   <TableHead>Acciones</TableHead>
