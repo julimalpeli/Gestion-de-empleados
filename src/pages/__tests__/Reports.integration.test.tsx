@@ -49,6 +49,13 @@ vi.mock('@/hooks/use-payroll', () => ({
   }),
 }));
 
+// Mock sidebar provider & hook used by app chrome
+vi.mock('@/components/ui/sidebar', () => ({
+  SidebarTrigger: () => <div>SidebarTriggerStub</div>,
+  SidebarProvider: ({ children }: any) => <div>{children}</div>,
+  useSidebar: () => ({ isOpen: true, toggle: () => {} }),
+}));
+
 // Stub heavy child components to avoid executing their module-level code
 vi.mock('@/components/LiquidationsReport', () => ({ default: () => <div>LiquidationsReportStub</div> }));
 vi.mock('@/components/SimpleLiquidationsReport', () => ({ default: () => <div>SimpleLiquidationsReportStub</div> }));
