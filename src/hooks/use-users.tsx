@@ -461,7 +461,7 @@ export const useUsers = () => {
 
             // Luego eliminamos el temporal y creamos el real
             // (Esto es un workaround para Supabase sin admin API)
-            console.log("���️ Workaround applied - user should be able to login with new password");
+            console.log("⚠️ Workaround applied - user should be able to login with new password");
             return { success: true, method: "workaround" };
           } catch (workaroundError) {
             console.error("❌ Workaround failed:", workaroundError);
@@ -472,7 +472,7 @@ export const useUsers = () => {
         }
       }
 
-      console.log("✅ Auth user created/updated successfully");
+      console.log("��� Auth user created/updated successfully");
       return { success: true, method: "direct", authUser: signUpData.user };
     } catch (error) {
       console.error("❌ Error recreating auth user:", error);
@@ -528,7 +528,7 @@ export const useUsers = () => {
       }
 
       console.log("✅ Direct password update successful");
-      return { success: true, message: "Contrase��a actualizada directamente" };
+      return { success: true, message: "Contraseña actualizada directamente" };
 
     } catch (error) {
       console.error("❌ Direct password update failed:", error);
@@ -537,13 +537,14 @@ export const useUsers = () => {
   };
 
   // Blanquear contraseña (resetear al DNI) - método directo sin email
-  const resetPassword = async (userId: string, newPassword: string) => {
+  const resetPassword = async (
+    userId: string,
+    newPassword: string,
+    options?: { markNeedsPasswordChange?: boolean },
+  ) => {
     try {
-      console.log(
-        `🔄 Resetting password for user ${userId} with password: ${newPassword}`,
-      );
+      console.log("🔄 Resetting password for user", userId);
 
-      // Primero obtener los datos del usuario para el email
       const { data: userData, error: fetchError } = await supabase
         .from("users")
         .select("email, username, name")
@@ -554,51 +555,43 @@ export const useUsers = () => {
         throw new Error("Usuario no encontrado");
       }
 
-      console.log(`📧 User email: ${userData.email}`);
+      const directResult = await directPasswordUpdate(
+        userData.email,
+        newPassword,
+      );
 
-      // Método directo: Intentar actualizar contraseña sin email
-      console.log("🔑 Using direct password update method...");
-      const directResult = await directPasswordUpdate(userData.email, newPassword);
-
-      if (directResult.success) {
-        console.log("✅ Direct password update successful");
-
-        // Marcar en la base de datos que necesita cambiar contraseña
-        const { error: updateError } = await supabase
-          .from("users")
-          .update({
-            needs_password_change: false, // No necesita cambio ya que acabamos de establecerla
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", userId);
-
-        if (updateError) {
-          console.warn("⚠️ Could not update needs_password_change flag:", updateError);
-        }
-
-        alert(`✅ Contraseña actualizada exitosamente!\n\n` +
-              `Email: ${userData.email}\n` +
-              `Nueva contraseña: ${newPassword}\n\n` +
-              `El usuario ya puede hacer login con estas credenciales.`);
-
-      } else {
+      if (!directResult.success) {
         console.error("❌ Direct method failed:", directResult.error);
+        return {
+          success: false,
+          error: directResult.error,
+          suggestion: directResult.suggestion,
+          email: userData.email,
+        };
+      }
 
-        if (directResult.suggestion) {
-          alert(`❌ No se pudo actualizar la contraseña automáticamente.\n\n` +
-                `Error: ${directResult.error}\n\n` +
-                `Solución manual:\n` +
-                `1. Ve al dashboard de Supabase\n` +
-                `2. Sección Authentication > Users\n` +
-                `3. Busca ${userData.email}\n` +
-                `4. Actualiza la contraseña a: ${newPassword}\n\n` +
-                `O contacta al administrador del sistema.`);
-        } else {
-          throw new Error(directResult.error);
-        }
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({
+          needs_password_change:
+            options?.markNeedsPasswordChange ?? false,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", userId);
+
+      if (updateError) {
+        console.warn(
+          "⚠️ Could not update needs_password_change flag:",
+          updateError,
+        );
       }
 
       await fetchUsers();
+
+      return {
+        success: true,
+        email: userData.email,
+      };
     } catch (err) {
       console.error("❌ Full error:", err);
       throw new Error(
