@@ -147,10 +147,60 @@ const UserManagement = () => {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
+
+    const originalUser = users.find((u) => u.id === selectedUser.id);
+
+    if (!originalUser) {
+      alert("No se encontró el usuario original");
+      return;
+    }
+
+    const trimmedEmail = selectedUser.email.trim();
+    const trimmedName = selectedUser.name.trim();
+
+    if (!trimmedName) {
+      alert("El nombre es obligatorio");
+      return;
+    }
+
+    if (!trimmedEmail) {
+      alert("El email es obligatorio");
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      alert("El email no es válido");
+      return;
+    }
+
+    const activeAdmins = users.filter(
+      (user) => user.role === "admin" && user.isActive,
+    );
+
+    if (
+      originalUser.role === "admin" &&
+      originalUser.isActive &&
+      selectedUser.role !== "admin" &&
+      activeAdmins.length <= 1
+    ) {
+      alert("No se puede quitar el rol del último administrador activo");
+      return;
+    }
+
+    if (
+      originalUser.role === "admin" &&
+      originalUser.isActive &&
+      !selectedUser.isActive &&
+      activeAdmins.length <= 1
+    ) {
+      alert("No se puede desactivar al último administrador activo");
+      return;
+    }
+
     try {
       await updateUser(selectedUser.id, {
-        email: selectedUser.email,
-        name: selectedUser.name,
+        email: trimmedEmail,
+        name: trimmedName,
         role: selectedUser.role,
         isActive: selectedUser.isActive,
       });
@@ -158,7 +208,11 @@ const UserManagement = () => {
       setSelectedUser(null);
     } catch (error) {
       console.error("Error updating user:", error);
-      alert("Error al actualizar usuario");
+      alert(
+        error instanceof Error
+          ? `Error al actualizar usuario: ${error.message}`
+          : "Error al actualizar usuario",
+      );
     }
   };
 
