@@ -1516,7 +1516,7 @@ const Employees = () => {
                             )}
                           </p>
                           <p className="text-xs text-gray-400 mt-1">
-                            Calculado como (Blanco + Efectivo) ÷ 30
+                            Calculado como (Depósito + Efectivo) ÷ 30
                           </p>
                         </div>
                       </div>
