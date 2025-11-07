@@ -104,14 +104,24 @@ const UserManagement = () => {
   });
 
   const handleCreateUser = async () => {
+    const username = newUser.username.trim();
+    const email = newUser.email.trim();
+    const name = newUser.name.trim();
+    const password = newUser.password.trim();
+
+    if (!username || !email || !name || !password) {
+      alert("Completa usuario, email, nombre y contraseña");
+      return;
+    }
+
     try {
       await createUser({
-        username: newUser.username,
-        email: newUser.email,
-        name: newUser.name,
+        username,
+        email,
+        name,
         role: newUser.role as any,
         employeeId: newUser.employeeId || undefined,
-        password: newUser.password,
+        password,
         needsPasswordChange: false,
       });
 
@@ -127,7 +137,11 @@ const UserManagement = () => {
       });
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Error al crear usuario");
+      alert(
+        error instanceof Error
+          ? `Error al crear usuario: ${error.message}`
+          : "Error al crear usuario",
+      );
     }
   };
 
@@ -261,7 +275,7 @@ const UserManagement = () => {
         `✅ ADMINISTRADOR DE EMERGENCIA CREADO\n\n` +
           `Usuario: emergency_admin\n` +
           `Contraseña: Emergency2025!\n\n` +
-          `⚠️ CAMBIA LA CONTRASE��A INMEDIATAMENTE después del primer login.\n\n` +
+          `⚠️ CAMBIA LA CONTRASEÑA INMEDIATAMENTE después del primer login.\n\n` +
           `🔐 Este usuario queda registrado en los logs de seguridad.`,
       );
 
