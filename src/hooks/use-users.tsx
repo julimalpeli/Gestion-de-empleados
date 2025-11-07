@@ -343,9 +343,6 @@ export const useUsers = () => {
         (u) => u.role === "admin" && u.isActive,
       );
       const isTargetAdmin = targetUser.role === "admin";
-      const remainingAdmins = isTargetAdmin && targetUser.isActive
-        ? activeAdmins.length - 1
-        : activeAdmins.length;
 
       if (isTargetAdmin && targetUser.isActive) {
         if (updates.role && updates.role !== "admin") {
@@ -464,7 +461,7 @@ export const useUsers = () => {
 
             // Luego eliminamos el temporal y creamos el real
             // (Esto es un workaround para Supabase sin admin API)
-            console.log("⚠️ Workaround applied - user should be able to login with new password");
+            console.log("���️ Workaround applied - user should be able to login with new password");
             return { success: true, method: "workaround" };
           } catch (workaroundError) {
             console.error("❌ Workaround failed:", workaroundError);
@@ -531,7 +528,7 @@ export const useUsers = () => {
       }
 
       console.log("✅ Direct password update successful");
-      return { success: true, message: "Contraseña actualizada directamente" };
+      return { success: true, message: "Contrase��a actualizada directamente" };
 
     } catch (error) {
       console.error("❌ Direct password update failed:", error);
