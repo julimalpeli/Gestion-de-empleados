@@ -49,6 +49,11 @@ vi.mock('@/hooks/use-payroll', () => ({
   }),
 }));
 
+// Stub heavy child components to avoid executing their module-level code
+vi.mock('@/components/LiquidationsReport', () => ({ default: () => <div>LiquidationsReportStub</div> }));
+vi.mock('@/components/SimpleLiquidationsReport', () => ({ default: () => <div>SimpleLiquidationsReportStub</div> }));
+vi.mock('@/components/MultipleReceiptsReport', () => ({ default: () => <div>MultipleReceiptsReportStub</div> }));
+
 // Import component under test
 import Reports from '../Reports';
 
