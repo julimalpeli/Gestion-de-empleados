@@ -200,18 +200,38 @@ export const useUsers = () => {
     dni: string;
     email?: string;
   }) => {
-    if (!employee.email) {
-      console.warn("Employee has no email, skipping user creation");
-      return;
+    const username = employee.dni?.trim();
+
+    if (!username) {
+      throw new Error("El empleado no tiene DNI, no se puede crear el usuario");
+    }
+
+    const existing = users.find((u) => u.employeeId === employee.id);
+    if (existing) {
+      console.log("ℹ️ Employee user already linked", existing);
+      return { success: true, emailUsed: existing.email, alreadyExisted: true };
+    }
+
+    let normalizedEmail = employee.email?.trim()
+      ? normalizeEmail(employee.email)
+      : "";
+    let fallbackEmailUsed = false;
+
+    if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
+      normalizedEmail = `${username}@${EMAIL_FALLBACK_DOMAIN}`;
+      fallbackEmailUsed = true;
+      console.warn(
+        "⚠️ Using fallback email for employee user creation",
+        normalizedEmail,
+      );
     }
 
     try {
-      // Create user in Supabase Auth using signUp (client-safe method)
-      const { data: authUser, error: authError } = await supabase.auth.signUp({
-        email: employee.email,
-        password: employee.dni, // Password = DNI
+      const { data: authUserData, error: authError } = await supabase.auth.signUp({
+        email: normalizedEmail,
+        password: username,
         options: {
-          emailRedirectTo: undefined, // Skip email confirmation
+          emailRedirectTo: undefined,
           data: {
             name: employee.name,
             role: "employee",
@@ -220,48 +240,76 @@ export const useUsers = () => {
         },
       });
 
+      let authUserId = authUserData?.user?.id ?? null;
+
       if (authError) {
-        // Check if user already exists
         if (authError.message.includes("already registered")) {
-          console.log("ℹ️ Employee auth user already exists");
-          // Try to get existing user - this is expected behavior
+          console.log("ℹ️ Employee auth user already exists, continuing");
         } else {
           throw authError;
         }
       }
 
-      if (!authUser.user) {
-        throw new Error("No user returned from auth signup");
+      if (!authUserId) {
+        const { data: lookup, error: lookupError } = await supabase
+          .from("users")
+          .select("id")
+          .eq("email", normalizedEmail)
+          .maybeSingle();
+
+        if (lookupError) {
+          throw lookupError;
+        }
+
+        authUserId = lookup?.id || authUserId;
       }
 
-      console.log("✅ Supabase Auth user created:", authUser.user.email);
+      if (!authUserId) {
+        throw new Error("No se pudo obtener el usuario de autenticación empleado");
+      }
 
-      // Create user in public.users table
+      const nowIso = new Date().toISOString();
       const { error: dbError } = await supabase.from("users").insert({
-        id: authUser.user.id,
-        username: employee.dni,
-        email: employee.email,
+        id: authUserId,
+        username,
+        email: normalizedEmail,
         name: employee.name,
         role: "employee",
         employee_id: employee.id,
         is_active: true,
-        password_hash: "$supabase$auth$handled",
-        needs_password_change: true, // Force password change on first login
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        password_hash: PASSWORD_PLACEHOLDER,
+        needs_password_change: true,
+        created_at: nowIso,
+        updated_at: nowIso,
       });
 
       if (dbError) {
-        console.error("❌ Database user creation failed:", dbError.message);
-        // Note: Cannot cleanup auth user from client (requires admin API)
-        // The auth user will remain but won't have database entry
+        if (dbError.message?.includes("duplicate key")) {
+          console.warn("ℹ️ Employee user already exists in database");
+          return {
+            success: true,
+            emailUsed: normalizedEmail,
+            alreadyExisted: true,
+            fallbackEmailUsed,
+          };
+        }
         throw dbError;
       }
 
-      console.log("✅ Employee user created successfully:", employee.name);
+      console.log("✅ Employee user created successfully", {
+        employee: employee.name,
+        email: normalizedEmail,
+        fallbackEmailUsed,
+      });
+
+      await fetchUsers();
+
+      return { success: true, emailUsed: normalizedEmail, fallbackEmailUsed };
     } catch (err) {
       console.error("❌ Error creating employee user:", err);
-      // Don't throw error to not interfere with employee creation
+      throw new Error(
+        err instanceof Error ? err.message : "Error creando usuario empleado",
+      );
     }
   };
 
@@ -412,7 +460,7 @@ export const useUsers = () => {
           return { success: true, message: "La contraseña ya está configurada correctamente" };
         }
 
-        // Si llega aqu��, la contraseña no es correcta y necesitamos actualizar
+        // Si llega aquí, la contraseña no es correcta y necesitamos actualizar
         console.log("❌ Password doesn't match, manual intervention required");
         return {
           success: false,
