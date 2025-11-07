@@ -70,7 +70,9 @@ const SalaryHistoryTable = ({
   };
 
   const calculateTotalSalary = (record: SalaryHistoryRecord) => {
-    return (record as any).base_wage ?? record.white_wage + record.informal_wage;
+    return (
+      (record as any).base_wage ?? record.white_wage + record.informal_wage
+    );
   };
 
   const calculatePreviousTotalSalary = (record: SalaryHistoryRecord) => {
@@ -241,8 +243,7 @@ const SalaryHistoryTable = ({
                       <TableCell>
                         <div className="space-y-1">
                           <div className="text-sm font-medium">
-                            Base:{" "}
-                            {formatCurrency(calculateTotalSalary(record))}
+                            Base: {formatCurrency(calculateTotalSalary(record))}
                           </div>
                           <div className="text-xs">
                             Depósito: {formatCurrency(record.white_wage)}
