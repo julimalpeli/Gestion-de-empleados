@@ -261,25 +261,32 @@ const Employees = () => {
       const newEmployeeRecord = await createEmployee(employeeData);
 
       let userCreated = false;
+      let fallbackEmailUsed = false;
+      let generatedEmail: string | undefined;
       try {
-        await createEmployeeUser({
+        const result = await createEmployeeUser({
           id: newEmployeeRecord.id,
           name: newEmployeeRecord.name,
           dni: newEmployeeRecord.dni,
           email: newEmployeeRecord.email,
         });
-        userCreated = true;
+        userCreated = !!result?.success;
+        fallbackEmailUsed = !!result?.fallbackEmailUsed;
+        generatedEmail = result?.emailUsed;
       } catch (userError) {
         console.error("Error creando usuario:", userError);
       }
 
       if (userCreated) {
+        const extra = fallbackEmailUsed && generatedEmail
+          ? ` (email generado: ${generatedEmail})`
+          : "";
         showSuccessMessage(
-          `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}`,
+          `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}${extra}`,
         );
       } else {
         showSuccessMessage(
-          "Empleado creado exitosamente, pero hubo un error al crear el usuario. Contacte al administrador.",
+          "Empleado creado exitosamente, pero hubo un problema creando el usuario asociado. Contacte al administrador.",
         );
       }
 
