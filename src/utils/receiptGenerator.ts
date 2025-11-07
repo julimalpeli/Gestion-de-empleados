@@ -200,88 +200,91 @@ export const generatePayrollReceiptPDF = async (data: ReceiptData) => {
   }
 };
 
+export const buildPayrollReceiptCsv = (data: ReceiptData): string => {
+  return [
+    ["RECIBO DE SUELDO"],
+    [""],
+    ["Empresa:", data.company.name],
+    ["Dirección:", data.company.address],
+    [""],
+    ["DATOS DEL EMPLEADO"],
+    ["Nombre:", data.employee.name],
+    ["DNI:", data.employee.dni],
+    ["Puesto:", data.employee.position],
+    ["Período:", formatPeriodForDisplay(data.period)],
+    [
+      "Fecha de Ingreso:",
+      new Date(data.employee.startDate).toLocaleDateString("es-AR"),
+    ],
+    ["Fecha de Emisión:", new Date().toLocaleDateString("es-AR")],
+    [""],
+    ["DETALLE DE LIQUIDACIÓN"],
+    ["Concepto", "Cantidad/Días", "Importe"],
+    [
+      "Sueldo Depósito",
+      data.payroll.baseDays + " días",
+      "$" + formatAmount(data.payroll.whiteAmount),
+    ],
+    [
+      "Sueldo Efectivo",
+      data.payroll.baseDays + " días",
+      "$" + formatAmount(data.payroll.informalAmount),
+    ],
+    ...(data.payroll.holidayDays > 0
+      ? [
+          [
+            "Días Feriados",
+            data.payroll.holidayDays + " días",
+            "$" + formatAmount(data.payroll.holidayBonus),
+          ],
+        ]
+      : []),
+    ...(data.payroll.presentismoAmount > 0
+      ? [
+          [
+            "Presentismo",
+            "-",
+            "$" + formatAmount(data.payroll.presentismoAmount),
+          ],
+        ]
+      : []),
+    ...(data.payroll.overtimeHours > 0
+      ? [
+          [
+            "Horas Extras",
+            data.payroll.overtimeHours + " horas",
+            "$" + formatAmount(data.payroll.overtimeAmount),
+          ],
+        ]
+      : []),
+    ...(data.payroll.bonusAmount > 0
+      ? [
+          [
+            "Bonificaciones",
+            "-",
+            "$" + formatAmount(data.payroll.bonusAmount),
+          ],
+        ]
+      : []),
+    ...(data.payroll.aguinaldo > 0
+      ? [["Aguinaldo", "-", "$" + formatAmount(data.payroll.aguinaldo)]]
+      : []),
+    ...(data.payroll.advances > 0
+      ? [["Adelantos", "-", "-$" + formatAmount(data.payroll.advances)]]
+      : []),
+    ...(data.payroll.discounts > 0
+      ? [["Descuentos", "-", "-$" + formatAmount(data.payroll.discounts)]]
+      : []),
+    [""],
+    ["TOTAL NETO A COBRAR:", "", "$" + formatAmount(data.payroll.netTotal)],
+  ]
+    .map((row) => row.join(","))
+    .join("\n");
+};
+
 export const generatePayrollReceiptExcel = async (data: ReceiptData) => {
   try {
-    // Create CSV content (Excel-compatible)
-    const csvContent = [
-      ["RECIBO DE SUELDO"],
-      [""],
-      ["Empresa:", data.company.name],
-      ["Dirección:", data.company.address],
-      [""],
-      ["DATOS DEL EMPLEADO"],
-      ["Nombre:", data.employee.name],
-      ["DNI:", data.employee.dni],
-      ["Puesto:", data.employee.position],
-      ["Período:", formatPeriodForDisplay(data.period)],
-      [
-        "Fecha de Ingreso:",
-        new Date(data.employee.startDate).toLocaleDateString("es-AR"),
-      ],
-      ["Fecha de Emisión:", new Date().toLocaleDateString("es-AR")],
-      [""],
-      ["DETALLE DE LIQUIDACIÓN"],
-      ["Concepto", "Cantidad/Días", "Importe"],
-      [
-        "Sueldo Depósito",
-        data.payroll.baseDays + " días",
-        "$" + formatAmount(data.payroll.whiteAmount),
-      ],
-      [
-        "Sueldo Efectivo",
-        data.payroll.baseDays + " días",
-        "$" + formatAmount(data.payroll.informalAmount),
-      ],
-      ...(data.payroll.holidayDays > 0
-        ? [
-            [
-              "Días Feriados",
-              data.payroll.holidayDays + " días",
-              "$" + formatAmount(data.payroll.holidayBonus),
-            ],
-          ]
-        : []),
-      ...(data.payroll.presentismoAmount > 0
-        ? [
-            [
-              "Presentismo",
-              "-",
-              "$" + formatAmount(data.payroll.presentismoAmount),
-            ],
-          ]
-        : []),
-      ...(data.payroll.overtimeHours > 0
-        ? [
-            [
-              "Horas Extras",
-              data.payroll.overtimeHours + " horas",
-              "$" + formatAmount(data.payroll.overtimeAmount),
-            ],
-          ]
-        : []),
-      ...(data.payroll.bonusAmount > 0
-        ? [
-            [
-              "Bonificaciones",
-              "-",
-              "$" + formatAmount(data.payroll.bonusAmount),
-            ],
-          ]
-        : []),
-      ...(data.payroll.aguinaldo > 0
-        ? [["Aguinaldo", "-", "$" + formatAmount(data.payroll.aguinaldo)]]
-        : []),
-      ...(data.payroll.advances > 0
-        ? [["Adelantos", "-", "-$" + formatAmount(data.payroll.advances)]]
-        : []),
-      ...(data.payroll.discounts > 0
-        ? [["Descuentos", "-", "-$" + formatAmount(data.payroll.discounts)]]
-        : []),
-      [""],
-      ["TOTAL NETO A COBRAR:", "", "$" + formatAmount(data.payroll.netTotal)],
-    ]
-      .map((row) => row.join(","))
-      .join("\n");
+    const csvContent = buildPayrollReceiptCsv(data);
 
     // Create and download CSV file
     const blob = new Blob(["\ufeff" + csvContent], {
