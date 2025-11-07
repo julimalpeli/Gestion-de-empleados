@@ -218,15 +218,43 @@ const UserManagement = () => {
 
   const handleResetPassword = async () => {
     if (!selectedUser || !newPassword) return;
+
+    if (newPassword.length < 6) {
+      alert("La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
     try {
-      await resetPassword(selectedUser.id, newPassword);
+      const result = await resetPassword(selectedUser.id, newPassword);
+
+      if (!result.success) {
+        if (result.suggestion) {
+          alert(
+            `No se pudo actualizar automáticamente. Intenta manualmente en Supabase:\n${result.suggestion}`,
+          );
+        } else {
+          alert(
+            result.error
+              ? `Error al blanquear contraseña: ${result.error}`
+              : "Error al blanquear contraseña",
+          );
+        }
+        return;
+      }
+
       setIsResetPasswordOpen(false);
       setSelectedUser(null);
       setNewPassword("");
-      alert("Contraseña blanqueada exitosamente");
+      alert(
+        `Contraseña actualizada para ${result.email}. Comparte las credenciales de forma segura.`,
+      );
     } catch (error) {
       console.error("Error resetting password:", error);
-      alert("Error al blanquear contraseña");
+      alert(
+        error instanceof Error
+          ? `Error al blanquear contraseña: ${error.message}`
+          : "Error al blanquear contraseña",
+      );
     }
   };
 
