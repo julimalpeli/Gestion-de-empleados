@@ -88,7 +88,8 @@ const UserManagement = () => {
   } = useUsers();
 
   const { employees } = useEmployees();
-  const { isAdmin } = usePermissions();
+  const { isAdmin: canAccessAdmin } = usePermissions();
+  const isAdmin = canAccessAdmin();
 
   // Filtrar usuarios
   const filteredUsers = users.filter((user) => {
@@ -260,7 +261,7 @@ const UserManagement = () => {
         `✅ ADMINISTRADOR DE EMERGENCIA CREADO\n\n` +
           `Usuario: emergency_admin\n` +
           `Contraseña: Emergency2025!\n\n` +
-          `⚠️ CAMBIA LA CONTRASEÑA INMEDIATAMENTE después del primer login.\n\n` +
+          `⚠️ CAMBIA LA CONTRASE��A INMEDIATAMENTE después del primer login.\n\n` +
           `🔐 Este usuario queda registrado en los logs de seguridad.`,
       );
 
