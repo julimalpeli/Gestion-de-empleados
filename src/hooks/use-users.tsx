@@ -86,39 +86,55 @@ export const useUsers = () => {
   // Crear usuario
   const createUser = async (userRequest: CreateUserRequest) => {
     try {
-      console.log("🔄 Creating user in Supabase Auth...", userRequest.email);
+      const username = sanitizeUsername(userRequest.username);
+      const email = normalizeEmail(userRequest.email);
+      const password = userRequest.password?.trim();
 
-      // Step 1: Create user in Supabase Auth first
-      const { data: authUser, error: authError } = await supabase.auth.signUp({
-        email: userRequest.email,
-        password: userRequest.password,
+      if (!username) {
+        throw new Error("El nombre de usuario es obligatorio");
+      }
+      if (!email) {
+        throw new Error("El email es obligatorio");
+      }
+      if (!isValidEmail(email)) {
+        throw new Error("El email no tiene un formato válido");
+      }
+      if (!password) {
+        throw new Error("La contraseña es obligatoria");
+      }
+
+      console.log("🔄 Creating user in Supabase Auth...", email);
+
+      const { data: authUserData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
         options: {
-          emailRedirectTo: undefined, // Skip email confirmation
+          emailRedirectTo: undefined,
           data: {
             name: userRequest.name,
             role: userRequest.role,
-            username: userRequest.username,
+            username,
           },
         },
       });
 
+      let authUserId = authUserData?.user?.id ?? null;
+
       if (authError) {
         console.error("❌ Auth creation failed:", authError.message);
 
-        // Check if user already exists in auth
         if (authError.message.includes("already registered")) {
           console.log("ℹ️ User already exists in auth, trying to sign in...");
-
           const { data: signInData, error: signInError } =
             await supabase.auth.signInWithPassword({
-              email: userRequest.email,
-              password: userRequest.password,
+              email,
+              password,
             });
 
           if (!signInError && signInData.user) {
-            console.log("✅ User exists in auth, using existing user");
-            authUser.user = signInData.user;
+            authUserId = signInData.user.id;
             await supabase.auth.signOut();
+            console.log("✅ User exists in auth, using existing user");
           } else {
             throw new Error(`Auth error: ${authError.message}`);
           }
@@ -127,50 +143,43 @@ export const useUsers = () => {
         }
       }
 
-      if (!authUser.user) {
-        throw new Error("No user returned from auth signup");
+      if (!authUserId) {
+        throw new Error("No se pudo obtener el identificador del usuario de autenticación");
       }
 
-      console.log("✅ Auth user created/found:", authUser.user.email);
+      console.log("✅ Auth user created/found:", email);
 
-      // Step 2: Create user in database
-      const passwordHash = btoa(userRequest.password);
-
+      const nowIso = new Date().toISOString();
       const { data, error } = await supabase
         .from("users")
         .insert({
-          id: authUser.user.id, // Use the Auth user ID
-          username: userRequest.username,
-          email: userRequest.email,
+          id: authUserId,
+          username,
+          email,
           name: userRequest.name,
           role: userRequest.role,
           employee_id: userRequest.employeeId || null,
           is_active: true,
-          password_hash: passwordHash,
-          needs_password_change: userRequest.needsPasswordChange || false,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
+          password_hash: PASSWORD_PLACEHOLDER,
+          needs_password_change: userRequest.needsPasswordChange ?? false,
+          created_at: nowIso,
+          updated_at: nowIso,
         })
         .select()
         .single();
 
       if (error) {
         console.error("❌ Database creation failed:", error);
-
-        // Note: Cannot cleanup auth user from client (requires admin API)
-        console.warn("⚠️ Auth user created but database insertion failed");
-        console.warn(
-          "⚠️ Manual cleanup may be required for:",
-          authUser.user.email,
-        );
-
+        console.warn("⚠️ Auth user created but database insertion failed", {
+          email,
+          username,
+        });
         throw error;
       }
 
-      console.log("✅ Database user created successfully");
-      console.log("🎉 Complete user created:", {
-        email: userRequest.email,
-        username: userRequest.username,
+      console.log("✅ Database user created successfully", {
+        email,
+        username,
         role: userRequest.role,
       });
 
@@ -403,7 +412,7 @@ export const useUsers = () => {
           return { success: true, message: "La contraseña ya está configurada correctamente" };
         }
 
-        // Si llega aquí, la contraseña no es correcta y necesitamos actualizar
+        // Si llega aqu��, la contraseña no es correcta y necesitamos actualizar
         console.log("❌ Password doesn't match, manual intervention required");
         return {
           success: false,
