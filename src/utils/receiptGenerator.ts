@@ -258,13 +258,7 @@ export const buildPayrollReceiptCsv = (data: ReceiptData): string => {
         ]
       : []),
     ...(data.payroll.bonusAmount > 0
-      ? [
-          [
-            "Bonificaciones",
-            "-",
-            "$" + formatAmount(data.payroll.bonusAmount),
-          ],
-        ]
+      ? [["Bonificaciones", "-", "$" + formatAmount(data.payroll.bonusAmount)]]
       : []),
     ...(data.payroll.aguinaldo > 0
       ? [["Aguinaldo", "-", "$" + formatAmount(data.payroll.aguinaldo)]]

@@ -80,21 +80,27 @@ describe("salaryHistoryService.getSalaryForPeriod - additional cases", () => {
   });
 
   it("uses previous values from a future change when no history exists", async () => {
-    vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: { message: "rpc disabled" } });
+    vi.mocked(supabase.rpc).mockResolvedValue({
+      data: null,
+      error: { message: "rpc disabled" },
+    });
 
     // salary_history: impact_period none, history empty -> futureChanges returns a record with previous_*
     tableResponses.set("salary_history", [
       { data: [], error: null }, // impact_period query
       { data: [], error: null }, // historyData (lte)
-      { data: [
-        {
-          effective_date: "2025-10-01",
-          previous_white_wage: 200000,
-          previous_informal_wage: 80000,
-          previous_base_wage: 280000,
-          previous_presentismo: 12000,
-        },
-      ], error: null }, // futureChanges
+      {
+        data: [
+          {
+            effective_date: "2025-10-01",
+            previous_white_wage: 200000,
+            previous_informal_wage: 80000,
+            previous_base_wage: 280000,
+            previous_presentismo: 12000,
+          },
+        ],
+        error: null,
+      }, // futureChanges
     ]);
 
     const salary = await salaryHistoryService.getSalaryForPeriod(
@@ -109,21 +115,27 @@ describe("salaryHistoryService.getSalaryForPeriod - additional cases", () => {
   });
 
   it("falls back to the latest change when nothing else found", async () => {
-    vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: { message: "rpc disabled" } });
+    vi.mocked(supabase.rpc).mockResolvedValue({
+      data: null,
+      error: { message: "rpc disabled" },
+    });
 
     tableResponses.set("salary_history", [
       { data: [], error: null }, // impact_period
       { data: [], error: null }, // historyData
       { data: [], error: null }, // futureChanges
-      { data: [
-        {
-          effective_date: "2025-08-01",
-          white_wage: 350000,
-          informal_wage: 150000,
-          base_wage: 500000,
-          presentismo: 30000,
-        },
-      ], error: null }, // latestChange
+      {
+        data: [
+          {
+            effective_date: "2025-08-01",
+            white_wage: 350000,
+            informal_wage: 150000,
+            base_wage: 500000,
+            presentismo: 30000,
+          },
+        ],
+        error: null,
+      }, // latestChange
     ]);
 
     const salary = await salaryHistoryService.getSalaryForPeriod(
