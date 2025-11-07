@@ -244,24 +244,41 @@ export const useUsers = () => {
 
       if (authError) {
         if (authError.message.includes("already registered")) {
-          console.log("ℹ️ Employee auth user already exists, continuing");
+          console.log("ℹ️ Employee auth user already exists, attempting sign-in");
+          const { data: signInData, error: signInError } =
+            await supabase.auth.signInWithPassword({
+              email: normalizedEmail,
+              password: username,
+            });
+
+          if (!signInError && signInData.user) {
+            authUserId = signInData.user.id;
+            await supabase.auth.signOut();
+          } else {
+            console.warn(
+              "⚠️ Could not sign in existing employee user, attempting database lookup",
+              signInError,
+            );
+          }
         } else {
           throw authError;
         }
       }
 
       if (!authUserId) {
-        const { data: lookup, error: lookupError } = await supabase
+        const { data: lookupRows, error: lookupError } = await supabase
           .from("users")
           .select("id")
           .eq("email", normalizedEmail)
-          .maybeSingle();
+          .limit(1);
 
         if (lookupError) {
           throw lookupError;
         }
 
-        authUserId = lookup?.id || authUserId;
+        if (lookupRows && lookupRows.length > 0) {
+          authUserId = lookupRows[0].id;
+        }
       }
 
       if (!authUserId) {
