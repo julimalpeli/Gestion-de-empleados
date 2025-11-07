@@ -84,7 +84,7 @@ describe('Reports integration (UI)', () => {
       throw renderError;
     }
 
-    expect(screen.getByText(/Reportes/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Reportes/i })).toBeInTheDocument();
 
     // The table headers should include Depósito and Efectivo
     expect(screen.getByText(/Depósito/i)).toBeInTheDocument();
