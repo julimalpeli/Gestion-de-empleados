@@ -233,7 +233,7 @@ const SalaryHistoryTable = ({
                             {formatCurrency(record.previous_white_wage || 0)}
                           </div>
                           <div className="text-xs">
-                            Informal:{" "}
+                            Efectivo:{" "}
                             {formatCurrency(record.previous_informal_wage || 0)}
                           </div>
                         </div>
@@ -248,7 +248,7 @@ const SalaryHistoryTable = ({
                             Blanco: {formatCurrency(record.white_wage)}
                           </div>
                           <div className="text-xs">
-                            Informal: {formatCurrency(record.informal_wage)}
+                            Efectivo: {formatCurrency(record.informal_wage)}
                           </div>
                         </div>
                       </TableCell>
