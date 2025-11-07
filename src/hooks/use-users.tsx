@@ -333,7 +333,7 @@ export const useUsers = () => {
   };
 
   // Actualizar usuario
-  const updateUser = async (id: string, updates: Partial<User>) => {
+  const updateUser = async (id: string, updates: UpdateUserInput) => {
     try {
       const targetUser = users.find((u) => u.id === id);
 
