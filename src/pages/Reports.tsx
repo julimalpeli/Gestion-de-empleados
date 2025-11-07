@@ -227,15 +227,15 @@ const Reports = () => {
         payrollsInSemester.length > 0 ? payrollsInSemester : employeePayrolls;
 
       // Calcular el mejor sueldo de los históricos
-      // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
+      // Fórmula para aguinaldo: Sueldo Depósito + Efectivo + horas extras + feriados
       const salaryCalculations = relevantPayrolls.map((payroll) => {
-        const whiteAmount = payroll.whiteAmount || 0;
-        const informalAmount = payroll.informalAmount || 0;
+        const depositoAmount = payroll.whiteAmount || 0;
+        const efectivoAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
         const holidayBonus = payroll.holidayBonus || 0;
 
         const result =
-          whiteAmount + informalAmount + overtimeAmount + holidayBonus;
+          depositoAmount + efectivoAmount + overtimeAmount + holidayBonus;
 
         // Debug log para DNI específico
         if (
@@ -246,13 +246,13 @@ const Reports = () => {
         ) {
           console.log(`🔍 Aguinaldo debug para ${employee.name}:`, {
             period: payroll.period,
-            whiteAmount,
-            informalAmount,
+            depositoAmount,
+            efectivoAmount,
             overtimeAmount,
             holidayBonus,
             bestSalaryForAguinaldo: result,
             formula:
-              "whiteAmount + informalAmount + overtimeAmount + holidayBonus",
+              "depositoAmount + efectivoAmount + overtimeAmount + holidayBonus",
           });
         }
 
@@ -509,7 +509,7 @@ const Reports = () => {
                     </strong>
                   </p>
                   <ul className="list-disc list-inside mt-2 text-blue-600 space-y-1">
-                    <li>Se incluye: Sueldo en blanco + Efectivo</li>
+                    <li>Se incluye: Sueldo Depósito + Efectivo</li>
                     <li>NO se incluye: Presentismo (no remunerativo)</li>
                     <li>Proporcional para empleados con menos de 6 meses</li>
                   </ul>
@@ -717,7 +717,7 @@ const Reports = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Sueldos en Blanco
+                  Sueldo Depósito
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -796,7 +796,7 @@ const Reports = () => {
                     <TableRow>
                       <TableHead>Empleado</TableHead>
                       <TableHead>Sueldo Base</TableHead>
-                      <TableHead>En Blanco</TableHead>
+                      <TableHead>Depósito</TableHead>
                       <TableHead>Efectivo</TableHead>
                       <TableHead>Presentismo</TableHead>
                       <TableHead>Horas Extras</TableHead>
@@ -813,7 +813,7 @@ const Reports = () => {
                         (sum, record) => sum + record.netTotal,
                         0,
                       );
-                      const whiteTotal = employeePayrolls.reduce(
+                      const depositoTotal = employeePayrolls.reduce(
                         (sum, record) => sum + record.whiteAmount,
                         0,
                       );
@@ -847,7 +847,7 @@ const Reports = () => {
                           <TableCell>
                             {formatCurrency(employee.sueldoBase || 0)}
                           </TableCell>
-                          <TableCell>{formatCurrency(whiteTotal)}</TableCell>
+                          <TableCell>{formatCurrency(depositoTotal)}</TableCell>
                           <TableCell>{formatCurrency(informalTotal)}</TableCell>
                           <TableCell>
                             {formatCurrency(presentismoTotal)}
