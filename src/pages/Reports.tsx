@@ -509,7 +509,7 @@ const Reports = () => {
                     </strong>
                   </p>
                   <ul className="list-disc list-inside mt-2 text-blue-600 space-y-1">
-                    <li>Se incluye: Sueldo en blanco + Sueldo informal</li>
+                    <li>Se incluye: Sueldo en blanco + Efectivo</li>
                     <li>NO se incluye: Presentismo (no remunerativo)</li>
                     <li>Proporcional para empleados con menos de 6 meses</li>
                   </ul>
@@ -736,7 +736,7 @@ const Reports = () => {
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Sueldos Informales
+                  Sueldo en Efectivo
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -797,7 +797,7 @@ const Reports = () => {
                       <TableHead>Empleado</TableHead>
                       <TableHead>Sueldo Base</TableHead>
                       <TableHead>En Blanco</TableHead>
-                      <TableHead>Informal</TableHead>
+                      <TableHead>Efectivo</TableHead>
                       <TableHead>Presentismo</TableHead>
                       <TableHead>Horas Extras</TableHead>
                       <TableHead>Bonos</TableHead>
