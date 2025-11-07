@@ -333,19 +333,63 @@ export const useUsers = () => {
   // Actualizar usuario
   const updateUser = async (id: string, updates: Partial<User>) => {
     try {
-      const updateData: any = {};
+      const targetUser = users.find((u) => u.id === id);
+
+      if (!targetUser) {
+        throw new Error("Usuario no encontrado");
+      }
+
+      const activeAdmins = users.filter(
+        (u) => u.role === "admin" && u.isActive,
+      );
+      const isTargetAdmin = targetUser.role === "admin";
+      const remainingAdmins = isTargetAdmin && targetUser.isActive
+        ? activeAdmins.length - 1
+        : activeAdmins.length;
+
+      if (isTargetAdmin && targetUser.isActive) {
+        if (updates.role && updates.role !== "admin") {
+          if (activeAdmins.length <= 1) {
+            throw new Error(
+              "No se puede cambiar el rol del último administrador activo",
+            );
+          }
+        }
+
+        if (updates.isActive === false && activeAdmins.length <= 1) {
+          throw new Error(
+            "No se puede desactivar el último administrador activo del sistema",
+          );
+        }
+      }
+
+      if (updates.role === "admin" && targetUser.role !== "admin") {
+        console.log("🔐 Promoting user to admin", targetUser.username);
+      }
+
+      const nowIso = new Date().toISOString();
+      const updateData: Record<string, unknown> = {
+        updated_at: nowIso,
+      };
 
       if (updates.username !== undefined)
-        updateData.username = updates.username;
-      if (updates.email !== undefined) updateData.email = updates.email;
+        updateData.username = sanitizeUsername(updates.username);
+      if (updates.email !== undefined) {
+        const email = normalizeEmail(updates.email);
+        if (!isValidEmail(email)) {
+          throw new Error("El email no tiene un formato válido");
+        }
+        updateData.email = email;
+      }
       if (updates.name !== undefined) updateData.name = updates.name;
       if (updates.role !== undefined) updateData.role = updates.role;
       if (updates.isActive !== undefined)
         updateData.is_active = updates.isActive;
       if (updates.needsPasswordChange !== undefined)
         updateData.needs_password_change = updates.needsPasswordChange;
+      if ((updates as any).passwordHash !== undefined)
+        updateData.password_hash = (updates as any).passwordHash;
 
-      // Actualizar tabla users
       const { error: userError } = await supabase
         .from("users")
         .update(updateData)
@@ -353,9 +397,7 @@ export const useUsers = () => {
 
       if (userError) throw userError;
 
-      // Si se está actualizando el estado activo, sincronizar con tabla employees
       if (updates.isActive !== undefined) {
-        // Obtener el employee_id del usuario
         const { data: userData, error: userFetchError } = await supabase
           .from("users")
           .select("employee_id")
@@ -367,18 +409,16 @@ export const useUsers = () => {
             `🔄 Syncing employee status: ${userData.employee_id} -> ${updates.isActive ? "active" : "inactive"}`,
           );
 
-          // Actualizar el campo status en la tabla employees
           const { error: employeeError } = await supabase
             .from("employees")
             .update({
               status: updates.isActive ? "active" : "inactive",
-              updated_at: new Date().toISOString(),
+              updated_at: nowIso,
             })
             .eq("id", userData.employee_id);
 
           if (employeeError) {
             console.error("❌ Error syncing employee status:", employeeError);
-            // No lanzar error para no bloquear la actualización del usuario
           } else {
             console.log("✅ Employee status synced successfully");
           }
