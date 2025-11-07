@@ -428,24 +428,27 @@ const UserManagement = () => {
         return;
       }
 
-      // Restablecer contraseña usando base64 encoding (mismo formato que empleados)
-      const newPasswordEncoded = btoa("Jmalpeli3194"); // Base64 encoding
-
-      await updateUser(adminUser.id, {
-        passwordHash: newPasswordEncoded,
-        needsPasswordChange: false,
-        updatedAt: new Date().toISOString(),
+      const result = await resetPassword(adminUser.id, "Jmalpeli3194", {
+        markNeedsPasswordChange: false,
       });
+
+      if (!result.success) {
+        alert(
+          result.error
+            ? `No se pudo restablecer la contraseña automática: ${result.error}`
+            : "No se pudo restablecer la contraseña automática",
+        );
+        return;
+      }
 
       alert(
         `✅ CONTRASEÑA RESTABLECIDA\n\n` +
           `Usuario: admin\n` +
           `Nueva contraseña: Jmalpeli3194\n` +
-          `Email: julimalpeli@gmail.com\n\n` +
+          `Email: ${result.email}\n\n` +
           `✅ Ahora puedes iniciar sesión con estas credenciales.`,
       );
 
-      // Log security event
       console.log(`🔐 Security Event: ADMIN_PASSWORD_RESET`, {
         targetUser: adminUser.username,
         targetEmail: adminUser.email,
