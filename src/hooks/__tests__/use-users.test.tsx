@@ -3,18 +3,22 @@ import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from "vites
 
 import { useUsers } from "../use-users";
 
-const authMock = {
-  signUp: vi.fn(),
-  signInWithPassword: vi.fn(),
-  signOut: vi.fn(),
-};
+const { supabaseMock, authMock, fromMock } = vi.hoisted(() => {
+  const authMock = {
+    signUp: vi.fn(),
+    signInWithPassword: vi.fn(),
+    signOut: vi.fn(),
+  };
 
-const fromMock = vi.fn();
+  const fromMock = vi.fn();
 
-const supabaseMock = {
-  from: fromMock,
-  auth: authMock,
-};
+  const supabaseMock = {
+    from: fromMock,
+    auth: authMock,
+  };
+
+  return { supabaseMock, authMock, fromMock };
+});
 
 vi.mock("@/lib/supabase", () => ({
   supabase: supabaseMock,
