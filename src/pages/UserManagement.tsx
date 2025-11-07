@@ -330,47 +330,76 @@ const UserManagement = () => {
   const createEmergencyAdmin = async () => {
     const confirmed = confirm(
       `🚨 CREAR ADMINISTRADOR DE EMERGENCIA 🚨\n\n` +
-        `Esta función creará un usuario administrador de respaldo:\n` +
-        `• Usuario: emergency_admin\n` +
-        `• Email: emergency@cadizbar.com\n` +
-        `• Contraseña: Emergency2025!\n` +
-        `• Rol: Administrador\n\n` +
+        `Esta función permite generar un administrador temporal.\n` +
+        `Debes definir usuario, email y contraseña únicos.\n\n` +
         `⚠️ ÚSALO SOLO EN EMERGENCIAS ⚠️\n\n` +
-        `¿Confirmas crear este usuario de emergencia?`,
+        `¿Deseas continuar?`,
     );
 
     if (!confirmed) return;
 
-    try {
-      const emergencyUser = {
-        username: "emergency_admin",
-        email: "emergency@cadizbar.com",
-        name: "Administrador de Emergencia",
-        role: "admin" as const,
-        password: "Emergency2025!",
-        needsPasswordChange: true,
-      };
+    const usernameInput = prompt(
+      "Ingresa el usuario para el administrador de emergencia",
+      "",
+    );
 
-      await createUser(emergencyUser);
+    const username = usernameInput?.trim();
+    if (!username || username.length < 4) {
+      alert("El usuario debe tener al menos 4 caracteres");
+      return;
+    }
+
+    const emailInput = prompt(
+      "Ingresa el email del administrador de emergencia",
+      "",
+    );
+
+    const email = emailInput?.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      alert("Debes ingresar un email válido");
+      return;
+    }
+
+    const password = prompt(
+      "Ingresa una contraseña temporal (mínimo 12 caracteres)",
+      "",
+    );
+
+    if (!password || password.trim().length < 12) {
+      alert("La contraseña debe tener al menos 12 caracteres");
+      return;
+    }
+
+    try {
+      await createUser({
+        username,
+        email,
+        name: "Administrador de Emergencia",
+        role: "admin",
+        password: password.trim(),
+        needsPasswordChange: true,
+      });
 
       alert(
-        `✅ ADMINISTRADOR DE EMERGENCIA CREADO\n\n` +
-          `Usuario: emergency_admin\n` +
-          `Contraseña: Emergency2025!\n\n` +
-          `⚠️ CAMBIA LA CONTRASEÑA INMEDIATAMENTE después del primer login.\n\n` +
-          `🔐 Este usuario queda registrado en los logs de seguridad.`,
+        `✅ Administrador de emergencia creado.\n` +
+          `Usuario: ${username}\n` +
+          `Email: ${email}\n\n` +
+          `⚠️ Guarda las credenciales en un canal seguro y elimina este usuario cuando deje de ser necesario.`,
       );
 
-      // Log security event
       console.log(`🚨 Security Event: EMERGENCY_ADMIN_CREATED`, {
-        emergencyUser: emergencyUser.username,
+        emergencyUser: username,
         createdBy: "current_admin",
         timestamp: new Date().toISOString(),
         reason: "Administrative emergency access",
       });
     } catch (error) {
       console.error("Error creating emergency admin:", error);
-      alert(`Error creando administrador de emergencia: ${error.message}`);
+      alert(
+        error instanceof Error
+          ? `Error creando administrador de emergencia: ${error.message}`
+          : "Error creando administrador de emergencia",
+      );
     }
   };
 
@@ -978,7 +1007,7 @@ const UserManagement = () => {
                   className="w-full"
                   disabled={!newPassword}
                 >
-                  Blanquear Contraseña
+                  Blanquear Contrase��a
                 </Button>
                 <Button
                   variant="outline"
