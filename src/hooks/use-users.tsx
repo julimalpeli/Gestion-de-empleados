@@ -26,6 +26,17 @@ export interface CreateUserRequest {
   needsPasswordChange?: boolean;
 }
 
+const PASSWORD_PLACEHOLDER = "$supabase$auth$managed";
+
+const EMAIL_FALLBACK_DOMAIN = "cadizbar.local";
+
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const isValidEmail = (email: string) =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
+const sanitizeUsername = (username: string) => username.trim();
+
 export const useUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
