@@ -415,14 +415,14 @@ const Payroll = () => {
         payrollsInSemester.length > 0 ? payrollsInSemester : employeePayrolls;
 
       // Calcular el mejor sueldo de los históricos
-      // Fórmula para aguinaldo: Sueldo en blanco + Sueldo informal + horas extras + feriados
+      // Fórmula para aguinaldo: Sueldo Depósito + Efectivo + horas extras + feriados
       const salaryCalculations = relevantPayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
         const holidayBonus = payroll.holidayBonus || 0;
 
-        // Fórmula correcta: blanco + informal + extras + feriados
+        // Fórmula correcta: depósito + efectivo + extras + feriados
         const totalSalary =
           whiteAmount + informalAmount + overtimeAmount + holidayBonus;
 
@@ -804,7 +804,7 @@ const Payroll = () => {
     // Total después de deducciones
     const totalAfterDeductions = grossTotal - totalAdvances - totalDiscounts;
 
-    // División entre blanco e informal para FORMAS DE PAGO (no afecta el total)
+    // División entre depósito y efectivo para FORMAS DE PAGO (no afecta el total)
     const manualWhiteWage = parseFloat(whiteWage) || 0;
 
     // Los montos reales que debe cobrar el empleado (independiente de la forma de pago)
@@ -850,7 +850,7 @@ const Payroll = () => {
       totalAfterDeductions,
       whiteAmount: manualWhiteWage, // Forma de pago (depósito)
       informalAmount: netTotal - manualWhiteWage, // Efectivo = Total Neto - Depósito
-      realWhiteAmount, // Monto real en blanco
+      realWhiteAmount, // Monto real en depósito
       realInformalAmount, // Monto real informal
       netTotal,
       holidayBonus: holidayPay,
