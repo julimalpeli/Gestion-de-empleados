@@ -86,8 +86,8 @@ describe('Reports integration (UI)', () => {
 
     expect(screen.getByRole('heading', { name: /Reportes/i })).toBeInTheDocument();
 
-    // The table headers should include Depósito and Efectivo
-    expect(screen.getByText(/Depósito/i)).toBeInTheDocument();
-    expect(screen.getByText(/Efectivo/i)).toBeInTheDocument();
+    // The table headers should include Depósito and Efectivo (as column headers)
+    expect(screen.getByRole('columnheader', { name: /Depósito/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /Efectivo/i })).toBeInTheDocument();
   });
 });
