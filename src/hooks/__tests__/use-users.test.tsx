@@ -415,17 +415,19 @@ describe("useUsers hook", () => {
 
     await waitFor(() => expect(result.current.loading).toBe(false));
 
+    let resetOutcome: any;
     await act(async () => {
-      await result.current.resetPassword("user-1", "Secret123");
+      resetOutcome = await result.current.resetPassword("user-1", "Secret123");
     });
 
+    expect(resetOutcome).toMatchObject({ success: true, email: "worker@example.com" });
     expect(authMock.signUp).toHaveBeenCalled();
     expect(usersUpdate.updateMock).toHaveBeenCalledWith({
       needs_password_change: false,
       updated_at: expect.any(String),
     });
     expect(usersUpdate.eqMock).toHaveBeenCalledWith("id", "user-1");
-    expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining("worker@example.com"));
+    expect(alertSpy).not.toHaveBeenCalled();
 
     await waitFor(() =>
       expect(result.current.users[0].needsPasswordChange).toBe(false),
