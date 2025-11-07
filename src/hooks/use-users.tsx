@@ -386,8 +386,8 @@ export const useUsers = () => {
         updateData.is_active = updates.isActive;
       if (updates.needsPasswordChange !== undefined)
         updateData.needs_password_change = updates.needsPasswordChange;
-      if ((updates as any).passwordHash !== undefined)
-        updateData.password_hash = (updates as any).passwordHash;
+      if (updates.passwordHash !== undefined)
+        updateData.password_hash = updates.passwordHash;
 
       const { error: userError } = await supabase
         .from("users")
