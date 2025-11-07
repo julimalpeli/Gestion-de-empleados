@@ -59,7 +59,18 @@ describe('Reports integration (UI)', () => {
   });
 
   it('renders Reports header and table headers including Depósito and Efectivo', () => {
-    render(<Reports />);
+    let renderError: any = null;
+    try {
+      render(<Reports />);
+    } catch (err) {
+      renderError = err;
+    }
+
+    if (renderError) {
+      // Fail the test with the render error details
+      console.error('Render error:', renderError);
+      throw renderError;
+    }
 
     expect(screen.getByText(/Reportes/i)).toBeInTheDocument();
 
