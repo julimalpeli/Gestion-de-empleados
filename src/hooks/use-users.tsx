@@ -37,6 +37,8 @@ const isValidEmail = (email: string) =>
 
 const sanitizeUsername = (username: string) => username.trim();
 
+type UpdateUserInput = Partial<User> & { passwordHash?: string };
+
 export const useUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -472,7 +474,7 @@ export const useUsers = () => {
         }
       }
 
-      console.log("��� Auth user created/updated successfully");
+      console.log("✅ Auth user created/updated successfully");
       return { success: true, method: "direct", authUser: signUpData.user };
     } catch (error) {
       console.error("❌ Error recreating auth user:", error);
