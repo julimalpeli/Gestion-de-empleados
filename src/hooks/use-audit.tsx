@@ -71,8 +71,20 @@ export const useAudit = () => {
 
   // Cargar logs automáticamente
   useEffect(() => {
+    if (isBypassModeActive()) {
+      setAuditLogs([]);
+      setError(
+        "La vista de auditoría está deshabilitada en el modo temporal o de emergencia.",
+      );
+      return;
+    }
+
+    if (!session) {
+      return;
+    }
+
     fetchAuditLogs({ limit: 100 }); // Cargar últimos 100 registros por defecto
-  }, [fetchAuditLogs]);
+  }, [fetchAuditLogs, session]);
 
   // Métodos de conveniencia para auditar diferentes acciones
   const auditEmployee = useCallback(
