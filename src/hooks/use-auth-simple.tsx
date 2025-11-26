@@ -646,6 +646,36 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  useEffect(() => {
+    if (!user?.email || user.id === "admin-emergency-id") {
+      return;
+    }
+
+    const checkUserStatus = async () => {
+      try {
+        const { data: userCheck, error } = await supabase
+          .from("users")
+          .select("is_active")
+          .eq("email", user.email)
+          .single();
+
+        if (!error && userCheck && !userCheck.is_active) {
+          console.log("🚫 User became inactive, logging out");
+          await logout();
+          window.location.href = "/inactive";
+        }
+      } catch (error) {
+        console.warn("Could not check user status:", error);
+      }
+    };
+
+    const statusCheckInterval = setInterval(checkUserStatus, 5 * 60 * 1000);
+
+    return () => {
+      clearInterval(statusCheckInterval);
+    };
+  }, [user?.email, user?.id]);
+
   // Check permissions
   const hasPermission = (permission: string): boolean => {
     if (!user) return false;
