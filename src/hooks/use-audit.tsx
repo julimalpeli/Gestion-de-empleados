@@ -36,19 +36,37 @@ export const useAudit = () => {
       end_date?: string;
       limit?: number;
     }) => {
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        setError(null);
+        if (isBypassModeActive()) {
+          setAuditLogs([]);
+          setError(
+            "La auditoría está deshabilitada mientras uses el acceso temporal o de emergencia.",
+          );
+          return;
+        }
+
+        if (!session) {
+          console.warn("No Supabase session found. Skipping audit log fetch.");
+          return;
+        }
+
         const logs = await auditService.getAuditLogs(filters);
         setAuditLogs(logs);
       } catch (err) {
-        console.error("Error fetching audit logs:", err);
-        setError(err instanceof Error ? err.message : "Error desconocido");
+        const readableMessage = getReadableErrorMessage(
+          err,
+          "No se pudieron obtener los registros de auditoría",
+        );
+        console.error("Error fetching audit logs:", readableMessage, err);
+        setError(readableMessage);
       } finally {
         setLoading(false);
       }
     },
-    [],
+    [session],
   );
 
   // Cargar logs automáticamente
