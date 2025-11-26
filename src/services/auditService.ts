@@ -22,6 +22,18 @@ export interface CreateAuditLogRequest {
 }
 
 class AuditService {
+  private disableAudit(reason?: string) {
+    if (typeof window !== "undefined") {
+      (window as any).auditDisabled = true;
+      if (reason) {
+        (window as any).auditDisabledReason = reason;
+      }
+    }
+    if (reason) {
+      console.warn(reason);
+    }
+  }
+
   constructor() {
     // Disable auditing immediately if admin bypass is active
     if (
