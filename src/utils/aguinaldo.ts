@@ -138,15 +138,12 @@ export const calculateAguinaldo = (
     const salaryCalculations = relevantPayrolls.map((payroll) => {
       const depositoAmount = payroll.whiteAmount || 0;
       const efectivoAmount = payroll.informalAmount || 0;
-      const overtimeAmount = payroll.overtimeAmount || 0;
-      const holidayBonus = payroll.holidayBonus || 0;
       const presentismoAmount = payroll.presentismoAmount || 0;
       const aguinaldoAmount = payroll.aguinaldo || 0;
 
-      const includedConcepts =
-        depositoAmount + efectivoAmount + overtimeAmount + holidayBonus;
+      const totalPaid = depositoAmount + efectivoAmount;
       const excludedConcepts = presentismoAmount + aguinaldoAmount;
-      const adjustedSalary = Math.max(includedConcepts - excludedConcepts, 0);
+      const adjustedSalary = Math.max(totalPaid - excludedConcepts, 0);
 
       if (
         employee.name?.includes("Daiana") ||
@@ -158,15 +155,12 @@ export const calculateAguinaldo = (
           period: payroll.period,
           depositoAmount,
           efectivoAmount,
-          overtimeAmount,
-          holidayBonus,
           presentismoAmount,
           aguinaldoAmount,
-          includedConcepts,
+          totalPaid,
           excludedConcepts,
           bestSalaryForAguinaldo: adjustedSalary,
-          formula:
-            "(depósito + efectivo + extras + feriados) - (presentismo + aguinaldo)",
+          formula: "(depósito + efectivo) - (presentismo + aguinaldo)",
         });
       }
 
@@ -202,9 +196,7 @@ export const calculateAguinaldo = (
           period: p.period,
           amount: Math.max(
             (p.whiteAmount || 0) +
-              (p.informalAmount || 0) +
-              (p.overtimeAmount || 0) +
-              (p.holidayBonus || 0) -
+              (p.informalAmount || 0) -
               ((p.presentismoAmount || 0) + (p.aguinaldo || 0)),
             0,
           ),
