@@ -59,8 +59,10 @@ class AuditService {
 
     // Check if we're using admin bypass (no Supabase session) - disable audit proactively
     if ((window as any).localStorage?.getItem("admin-bypass")) {
-      console.log("🔓 Admin bypass detected - disabling auditing proactively");
-      (window as any).auditDisabled = true;
+      const reason =
+        "🔓 Admin bypass detected - disabling auditing proactively";
+      console.log(reason);
+      this.disableAudit(reason);
       return {} as AuditLogEntry;
     }
 
