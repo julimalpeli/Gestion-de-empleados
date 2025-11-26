@@ -419,27 +419,22 @@ const Payroll = () => {
       const salaryCalculations = relevantPayrolls.map((payroll) => {
         const whiteAmount = payroll.whiteAmount || 0;
         const informalAmount = payroll.informalAmount || 0;
-        const overtimeAmount = payroll.overtimeAmount || 0;
-        const holidayBonus = payroll.holidayBonus || 0;
         const presentismoAmount = payroll.presentismoAmount || 0;
         const aguinaldoAmount = payroll.aguinaldo || 0;
 
-        // Fórmula correcta: (depósito + efectivo + extras + feriados) - (presentismo + aguinaldo)
-        const grossConcepts =
-          whiteAmount + informalAmount + overtimeAmount + holidayBonus;
+        // Fórmula correcta: (depósito + efectivo) - (presentismo + aguinaldo)
+        const totalPaid = whiteAmount + informalAmount;
         const excludedConcepts = presentismoAmount + aguinaldoAmount;
-        const totalSalary = Math.max(grossConcepts - excludedConcepts, 0);
+        const totalSalary = Math.max(totalPaid - excludedConcepts, 0);
 
         console.log(
           `🔍 Aguinaldo calc (considered) for ${payroll.employeeName} ${payroll.period}:`,
           {
             whiteAmount,
             informalAmount,
-            overtimeAmount,
-            holidayBonus,
             presentismoAmount,
             aguinaldoAmount,
-            grossConcepts,
+            totalPaid,
             excludedConcepts,
             totalSalary,
           },
@@ -463,9 +458,7 @@ const Payroll = () => {
           period: p.period,
           amount: Math.max(
             (p.whiteAmount || 0) +
-              (p.informalAmount || 0) +
-              (p.overtimeAmount || 0) +
-              (p.holidayBonus || 0) -
+              (p.informalAmount || 0) -
               ((p.presentismoAmount || 0) + (p.aguinaldo || 0)),
             0,
           ),
