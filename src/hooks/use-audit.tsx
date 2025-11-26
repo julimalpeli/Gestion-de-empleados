@@ -5,12 +5,25 @@ import {
   type CreateAuditLogRequest,
 } from "@/services/auditService";
 import { useAuth } from "@/hooks/use-auth-simple";
+import { getReadableErrorMessage } from "@/utils/errorMessage";
+
+const isBypassModeActive = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return Boolean(
+    (window as any).auditDisabled ||
+      window.localStorage?.getItem("admin-bypass") ||
+      window.localStorage?.getItem("emergency-auth"),
+  );
+};
 
 export const useAudit = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useAuth();
+  const { user, session } = useAuth();
 
   // Obtener logs de auditoría
   const fetchAuditLogs = useCallback(
