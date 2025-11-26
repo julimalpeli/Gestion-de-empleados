@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import { AuthProvider } from "./hooks/use-auth-simple";
 import "./index.css";
 import { testSupabaseConnection } from "./lib/supabase";
 import "./utils/autoReloadOnError"; // Initialize auto-reload error handler
@@ -24,4 +25,8 @@ testSupabaseConnection().then((success) => {
   }
 });
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <AuthProvider>
+    <App />
+  </AuthProvider>,
+);
