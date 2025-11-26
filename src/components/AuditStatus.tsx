@@ -4,10 +4,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertTriangle, CheckCircle, Database, Settings } from "lucide-react";
 import { auditService } from "@/services/auditService";
+import { getReadableErrorMessage } from "@/utils/errorMessage";
+
+const isBypassModeActive = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return Boolean(
+    (window as any).auditDisabled ||
+      window.localStorage?.getItem("admin-bypass") ||
+      window.localStorage?.getItem("emergency-auth"),
+  );
+};
 
 export const AuditStatus = () => {
   const [auditStatus, setAuditStatus] = useState<
-    "unknown" | "working" | "schema_error"
+    "unknown" | "working" | "schema_error" | "rls_error" | "network_error" | "disabled"
   >("unknown");
   const [isChecking, setIsChecking] = useState(false);
   const [lastCheck, setLastCheck] = useState<string | null>(null);
@@ -15,9 +28,16 @@ export const AuditStatus = () => {
   // Verificar estado de auditoría
   const checkAuditStatus = async () => {
     setIsChecking(true);
+
     try {
+      if (isBypassModeActive()) {
+        setAuditStatus("disabled");
+        setLastCheck(new Date().toLocaleString());
+        return;
+      }
+
       // Intentar crear una entrada de prueba
-      const testResult = await auditService.createAuditEntry({
+      await auditService.createAuditEntry({
         table_name: "test",
         record_id: "00000000-0000-0000-0000-000000000000",
         action: "INSERT",
@@ -27,24 +47,24 @@ export const AuditStatus = () => {
       });
 
       // Intentar obtener logs
-      const logs = await auditService.getAuditLogs({ limit: 1 });
+      await auditService.getAuditLogs({ limit: 1 });
 
       setAuditStatus("working");
       setLastCheck(new Date().toLocaleString());
     } catch (error) {
       // Better error logging
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error("Audit check failed:", errorMessage);
-      console.error("Full error object:", error);
+      const errorMessage = getReadableErrorMessage(error, "Error desconocido");
+      console.error("Audit check failed:", errorMessage, error);
 
       // More specific error handling
-      if (errorMessage?.includes("row-level security policy")) {
+      if (errorMessage?.includes("row-level security") || errorMessage.includes("permission denied")) {
         console.warn("⚠️ RLS policy issue detected:", errorMessage);
         setAuditStatus("rls_error");
-      } else if (errorMessage?.includes("Failed to fetch")) {
+      } else if (errorMessage?.includes("Failed to fetch") || errorMessage?.includes("network")) {
         console.warn("⚠️ Network connectivity issue:", errorMessage);
         setAuditStatus("network_error");
+      } else if (errorMessage?.includes("disabled")) {
+        setAuditStatus("disabled");
       } else {
         console.warn("⚠️ Schema or other audit error:", errorMessage);
         setAuditStatus("schema_error");
@@ -80,6 +100,29 @@ export const AuditStatus = () => {
           badge: <Badge variant="destructive">Error de Esquema</Badge>,
           message: "La tabla audit_log necesita ser creada o actualizada.",
           color: "red",
+        };
+      case "rls_error":
+        return {
+          icon: <AlertTriangle className="h-5 w-5 text-yellow-600" />,
+          badge: <Badge variant="secondary">Acceso restringido</Badge>,
+          message:
+            "Inicia sesión con un usuario Supabase con rol admin para ver los logs.",
+          color: "yellow",
+        };
+      case "network_error":
+        return {
+          icon: <AlertTriangle className="h-5 w-5 text-orange-500" />,
+          badge: <Badge variant="outline">Problema de red</Badge>,
+          message: "No pudimos conectar con Supabase. Verifica tu conexión.",
+          color: "orange",
+        };
+      case "disabled":
+        return {
+          icon: <AlertTriangle className="h-5 w-5 text-gray-600" />,
+          badge: <Badge variant="outline">Deshabilitado</Badge>,
+          message:
+            "La auditoría está deshabilitada en el modo de acceso temporal.",
+          color: "gray",
         };
       case "unknown":
       default:
