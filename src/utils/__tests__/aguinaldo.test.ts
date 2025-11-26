@@ -92,7 +92,7 @@ describe("calculateAguinaldo", () => {
     expect(result.reason).toBe("Aguinaldo completo");
   });
 
-  it("ignores presentismo and aguinaldos when determinando el mejor sueldo", () => {
+  it("ignores presentismo and aguinaldos when determining the best salary", () => {
     const employee = {
       id: "emp-4",
       name: "Daniel",
@@ -161,6 +161,33 @@ describe("calculateAguinaldo", () => {
     expect(result.amount).toBe(19250);
     expect(result.fullAguinaldo).toBe(45000);
     expect(result.reason).toBe("Aguinaldo proporcional por días trabajados");
+  });
+
+  it("does not double count feriados already included in efectivo", () => {
+    const employee = {
+      id: "emp-5",
+      name: "Elena",
+      startDate: "2019-01-10",
+      sueldoBase: 200000,
+    };
+
+    const payrollRecords: PayrollRecord[] = [
+      baseRecord({
+        id: "p-oct",
+        employeeId: "emp-5",
+        employeeName: "Elena",
+        period: "2024-10",
+        whiteAmount: 400000,
+        informalAmount: 380000,
+        holidayBonus: 30000,
+        presentismoAmount: 20000,
+      }),
+    ];
+
+    const result = calculateAguinaldo(employee, "2024-2", payrollRecords);
+
+    expect(result.bestSalary).toBe(760000);
+    expect(result.bestSalaryPeriod).toBe("2024-10");
   });
 
   it("returns zero when the employee started after the semester ended", () => {
