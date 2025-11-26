@@ -75,9 +75,9 @@ export const calculateAguinaldo = (
       corresponds: false,
       amount: 0,
       daysWorked: 0,
-      totalDays: Math.floor(
-        (semesterEnd.getTime() - semesterStart.getTime()) / DAY_MS,
-      ) + 1,
+      totalDays:
+        Math.floor((semesterEnd.getTime() - semesterStart.getTime()) / DAY_MS) +
+        1,
       proportional: false,
       bestSalary: employee.sueldoBase || 0,
       bestSalaryPeriod: "Sueldo base",
@@ -86,8 +86,7 @@ export const calculateAguinaldo = (
     };
   }
 
-  const effectiveStart =
-    startDate > semesterStart ? startDate : semesterStart;
+  const effectiveStart = startDate > semesterStart ? startDate : semesterStart;
 
   const totalSemesterDays =
     Math.floor((semesterEnd.getTime() - semesterStart.getTime()) / DAY_MS) + 1;

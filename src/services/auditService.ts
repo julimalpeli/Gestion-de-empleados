@@ -281,8 +281,10 @@ class AuditService {
       console.error("Error getting audit logs:", readableMessage, error);
 
       // Manejo graceful de errores de red
-      if (readableMessage.toLowerCase().includes("failed to fetch") ||
-        readableMessage.toLowerCase().includes("network")) {
+      if (
+        readableMessage.toLowerCase().includes("failed to fetch") ||
+        readableMessage.toLowerCase().includes("network")
+      ) {
         console.warn("🌐 Network error on audit logs - returning []");
         return [];
       }

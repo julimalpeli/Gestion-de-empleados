@@ -4,9 +4,7 @@ import { calculateAguinaldo } from "../aguinaldo";
 import type { PayrollRecord } from "@/services/interfaces";
 
 describe("calculateAguinaldo", () => {
-  const baseRecord = (
-    overrides: Partial<PayrollRecord>,
-  ): PayrollRecord => ({
+  const baseRecord = (overrides: Partial<PayrollRecord>): PayrollRecord => ({
     id: "base",
     employeeId: "emp-0",
     employeeName: "Empleado",

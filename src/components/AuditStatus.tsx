@@ -20,7 +20,12 @@ const isBypassModeActive = () => {
 
 export const AuditStatus = () => {
   const [auditStatus, setAuditStatus] = useState<
-    "unknown" | "working" | "schema_error" | "rls_error" | "network_error" | "disabled"
+    | "unknown"
+    | "working"
+    | "schema_error"
+    | "rls_error"
+    | "network_error"
+    | "disabled"
   >("unknown");
   const [isChecking, setIsChecking] = useState(false);
   const [lastCheck, setLastCheck] = useState<string | null>(null);
@@ -57,10 +62,16 @@ export const AuditStatus = () => {
       console.error("Audit check failed:", errorMessage, error);
 
       // More specific error handling
-      if (errorMessage?.includes("row-level security") || errorMessage.includes("permission denied")) {
+      if (
+        errorMessage?.includes("row-level security") ||
+        errorMessage.includes("permission denied")
+      ) {
         console.warn("⚠️ RLS policy issue detected:", errorMessage);
         setAuditStatus("rls_error");
-      } else if (errorMessage?.includes("Failed to fetch") || errorMessage?.includes("network")) {
+      } else if (
+        errorMessage?.includes("Failed to fetch") ||
+        errorMessage?.includes("network")
+      ) {
         console.warn("⚠️ Network connectivity issue:", errorMessage);
         setAuditStatus("network_error");
       } else if (errorMessage?.includes("disabled")) {
