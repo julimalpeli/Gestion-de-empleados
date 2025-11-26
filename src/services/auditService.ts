@@ -190,6 +190,18 @@ class AuditService {
       return [];
     }
 
+    const bypassActive =
+      typeof window !== "undefined" &&
+      (window.localStorage?.getItem("admin-bypass") ||
+        window.localStorage?.getItem("emergency-auth"));
+
+    if (bypassActive) {
+      this.disableAudit(
+        "🔒 Audit logs viewer disabled while admin bypass/emergency auth is active",
+      );
+      return [];
+    }
+
     try {
       // Primero intentar consulta simple sin join para evitar errores de esquema
       let query = supabase
@@ -223,59 +235,69 @@ class AuditService {
       const { data, error } = await query;
 
       if (error) {
-        console.error("Error fetching audit logs:", error);
+        const readableMessage = getReadableErrorMessage(error);
+        console.error("Error fetching audit logs:", readableMessage, error);
 
         // Graceful network handling
         if (
-          typeof error.message === "string" &&
-          (error.message.includes("Failed to fetch") ||
-            error.message.toLowerCase().includes("fetch"))
+          readableMessage.toLowerCase().includes("failed to fetch") ||
+          readableMessage.toLowerCase().includes("fetch")
         ) {
           console.warn("🌐 Network issue fetching audit logs - returning []");
           return [];
         }
 
+        const isRlsError =
+          readableMessage.toLowerCase().includes("row-level security") ||
+          readableMessage.toLowerCase().includes("permission denied") ||
+          (error as any)?.code === "42501";
+
+        if (isRlsError) {
+          this.disableAudit(
+            "🔒 RLS is blocking audit log queries - disabling client audit viewer",
+          );
+          return [];
+        }
+
         // Si es un error de esquema, devolver array vacío en lugar de fallar
         if (
-          error.message?.includes("schema cache") ||
-          error.message?.includes("column") ||
-          error.message?.includes("relationship") ||
-          error.message?.includes("relation") ||
-          error.message?.includes("audit_log")
+          readableMessage.includes("schema cache") ||
+          readableMessage.includes("column") ||
+          readableMessage.includes("relationship") ||
+          readableMessage.includes("relation") ||
+          readableMessage.includes("audit_log")
         ) {
           console.warn("🔧 Audit log table not properly configured");
           console.warn("💡 Run database/fix_audit_log_schema.sql to fix this");
           return [];
         }
 
-        throw new Error(`Failed to fetch audit logs: ${error.message}`);
+        throw new Error(`Failed to fetch audit logs: ${readableMessage}`);
       }
 
       return data || [];
     } catch (error) {
-      console.error("Error getting audit logs:", error);
+      const readableMessage = getReadableErrorMessage(error);
+      console.error("Error getting audit logs:", readableMessage, error);
 
       // Manejo graceful de errores de red
-      if (
-        error instanceof Error &&
-        (error.message.includes("Failed to fetch") ||
-          error.message.toLowerCase().includes("network"))
-      ) {
+      if (readableMessage.toLowerCase().includes("failed to fetch") ||
+        readableMessage.toLowerCase().includes("network")) {
         console.warn("🌐 Network error on audit logs - returning []");
         return [];
       }
 
       // Manejo graceful de errores de esquema
       if (
-        (error as any)?.message?.includes("schema cache") ||
-        (error as any)?.message?.includes("audit_log") ||
-        (error as any)?.message?.includes("relation")
+        readableMessage.includes("schema cache") ||
+        readableMessage.includes("audit_log") ||
+        readableMessage.includes("relation")
       ) {
-        console.warn("🔧 Database schema issue - returning empty audit logs");
+        console.warn("���� Database schema issue - returning empty audit logs");
         return [];
       }
 
-      throw error;
+      throw new Error(readableMessage);
     }
   }
 
