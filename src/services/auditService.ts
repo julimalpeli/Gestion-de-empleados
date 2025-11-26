@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { getReadableErrorMessage } from "@/utils/errorMessage";
 
 export interface AuditLogEntry {
   id?: string;
