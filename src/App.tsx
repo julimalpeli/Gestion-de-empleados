@@ -114,7 +114,7 @@ if (import.meta.env.DEV) {
         console.log("   - recreateEmployee44586777()");
         console.log("   - repairEmployeeUser('email@example.com')");
         console.log("   - diagnoseEmployeeUser('email@example.com')");
-        console.log("   🚨 EMERGENCY AUTH REPAIR:");
+        console.log("   ��� EMERGENCY AUTH REPAIR:");
         console.log("   - emergencyAuthRepair() - Complete auth diagnosis");
         console.log("   - fixSupabaseAuthSettings() - Configuration guide");
         console.log("   - testBasicAuth() - Basic signup/signin test");
@@ -176,7 +176,7 @@ import InactiveUser from "./pages/InactiveUser";
 import NotFound from "./pages/NotFound";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { AuthProvider, useAuth } from "@/hooks/use-auth-simple";
+import { useAuth } from "@/hooks/use-auth-simple";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AuthRedirect from "@/components/AuthRedirect";
 
@@ -643,9 +643,7 @@ const App = () => (
     <TooltipProvider delayDuration={200}>
       <Toaster />
       <Sonner />
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <AppContent />
     </TooltipProvider>
   </QueryClientProvider>
 );
