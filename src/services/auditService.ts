@@ -40,10 +40,10 @@ class AuditService {
       typeof window !== "undefined" &&
       window.localStorage?.getItem("admin-bypass")
     ) {
-      console.log(
-        "🔓 Admin bypass detected in constructor - disabling auditing",
-      );
-      (window as any).auditDisabled = true;
+      const reason =
+        "🔓 Admin bypass detected in constructor - disabling auditing";
+      console.log(reason);
+      this.disableAudit(reason);
     }
   }
 
