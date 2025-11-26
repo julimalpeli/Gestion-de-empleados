@@ -92,6 +92,43 @@ describe("calculateAguinaldo", () => {
     expect(result.reason).toBe("Aguinaldo completo");
   });
 
+  it("ignores presentismo and aguinaldos when determinando el mejor sueldo", () => {
+    const employee = {
+      id: "emp-4",
+      name: "Daniel",
+      startDate: "2018-02-01",
+      sueldoBase: 120000,
+    };
+
+    const payrollRecords: PayrollRecord[] = [
+      baseRecord({
+        id: "p-diciembre",
+        employeeId: "emp-4",
+        employeeName: "Daniel",
+        period: "2024-12",
+        whiteAmount: 250000,
+        informalAmount: 100000,
+        presentismoAmount: 40000,
+        aguinaldo: 120000,
+      }),
+      baseRecord({
+        id: "p-noviembre",
+        employeeId: "emp-4",
+        employeeName: "Daniel",
+        period: "2024-11",
+        whiteAmount: 220000,
+        informalAmount: 80000,
+      }),
+    ];
+
+    const result = calculateAguinaldo(employee, "2024-2", payrollRecords);
+
+    expect(result.bestSalary).toBe(300000);
+    expect(result.bestSalaryPeriod).toBe("2024-11");
+    expect(result.amount).toBe(150000);
+    expect(result.fullAguinaldo).toBe(150000);
+  });
+
   it("computes proportional aguinaldo when the employee started mid-semester", () => {
     const employee = {
       id: "emp-2",
