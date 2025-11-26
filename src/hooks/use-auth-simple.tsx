@@ -72,110 +72,120 @@ const getRolePermissions = (role: string): string[] => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  // Initialize admin bypass immediately (only if enabled)
-  useState(() => {
-    if (!ADMIN_BYPASS_ENABLED) {
-      localStorage.removeItem("admin-bypass");
-      return;
-    }
-
-    const adminBypass = localStorage.getItem("admin-bypass");
-    if (adminBypass) {
-      try {
-        const adminUser = JSON.parse(adminBypass);
-        console.log("🔓 Admin bypass initialized immediately");
-        setUser(adminUser);
-      } catch (error) {
-        console.warn("⚠️ Invalid admin bypass data");
-        localStorage.removeItem("admin-bypass");
-      }
-    }
-  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for emergency auth first
+    let isMounted = true;
+
+    const restoreAdminBypass = () => {
+      if (!ADMIN_BYPASS_ENABLED) {
+        localStorage.removeItem("admin-bypass");
+        return false;
+      }
+
+      const adminBypass = localStorage.getItem("admin-bypass");
+      if (!adminBypass) {
+        return false;
+      }
+
+      try {
+        const adminUser = JSON.parse(adminBypass);
+        console.log("🔓 Admin bypass restored from storage");
+        setUser(adminUser);
+        setSession(null);
+        setLoading(false);
+        return true;
+      } catch (error) {
+        console.warn("⚠️ Invalid admin bypass data", error);
+        localStorage.removeItem("admin-bypass");
+      }
+
+      return false;
+    };
+
     const emergencyUser = checkEmergencyAuth();
     if (emergencyUser) {
       console.log("🚨 Using emergency auth for:", emergencyUser.email);
       setUser(emergencyUser);
-      return;
+      setSession(null);
+      setLoading(false);
+      return () => {
+        isMounted = false;
+      };
     }
 
-    // Set up periodic user status check for logged-in users
-    const checkUserStatus = async () => {
-      if (user && user.email && user.isActive !== false) {
-        try {
-          const { data: userCheck, error } = await supabase
-            .from("users")
-            .select("is_active")
-            .eq("email", user.email)
-            .single();
+    if (restoreAdminBypass()) {
+      return () => {
+        isMounted = false;
+      };
+    }
 
-          if (!error && userCheck && !userCheck.is_active) {
-            console.log("🚫 User became inactive, logging out");
-            await logout();
-            window.location.href = "/inactive";
-          }
-        } catch (error) {
-          console.warn("Could not check user status:", error);
+    const loadInitialSession = async () => {
+      try {
+        const { data, error } = await supabase.auth.getSession();
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (error) {
+          console.warn("⚠️ Error getting session:", error.message);
+          setSession(null);
+          setUser(null);
+          return;
+        }
+
+        const currentSession = data?.session ?? null;
+        setSession(currentSession);
+
+        if (currentSession?.user) {
+          await loadUserProfile(currentSession.user);
+        } else {
+          setUser(null);
+        }
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        console.error("❌ Error loading initial session:", error);
+        setUser(null);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
       }
     };
 
-    // Check user status every 5 minutes for active sessions
-    const statusCheckInterval = setInterval(checkUserStatus, 5 * 60 * 1000);
+    loadInitialSession();
 
-    return () => {
-      clearInterval(statusCheckInterval);
-    };
-
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      // Only load session if it's valid and not from a recent logout
-      if (session?.user) {
-        setSession(session);
-        loadUserProfile(session.user);
-      } else {
-        setSession(null);
-        setUser(null);
-      }
-    });
-
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!isMounted) {
+        return;
+      }
+
       console.log("🔄 Auth state change:", event, session?.user?.email);
 
-      if (event === "SIGNED_OUT") {
+      if (event === "SIGNED_OUT" || !session?.user) {
         setSession(null);
-        setUser(null);
+        if (!localStorage.getItem("admin-bypass")) {
+          setUser(null);
+        }
         return;
       }
 
-      if (event === "SIGNED_IN" && session?.user) {
-        console.log("🔑 User signed in, loading profile...");
+      if (session?.user) {
         setSession(session);
         await loadUserProfile(session.user);
-        return;
-      }
-
-      if (event === "TOKEN_REFRESHED" && session?.user) {
-        setSession(session);
-        return;
-      }
-
-      // For any other event without a valid session, clear state
-      // BUT preserve admin bypass users (they don't have Supabase sessions)
-      if (!session?.user && user?.id !== "admin-emergency-id") {
-        setSession(null);
-        setUser(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   // Make debug functions available globally
