@@ -73,21 +73,18 @@ export class SupabaseEmployeeService implements IEmployeeService {
           }
 
           console.log(`✅ Supabase returned ${data?.length || 0} employees`);
-
-          if (!data || data.length === 0) {
-            console.warn(
-              "⚠️ Empty result from Supabase - potential RLS/permissions/empty table",
-            );
-            console.log("🔄 Switching to fallback employees without throwing error");
-            const fallback = await this.getFallbackEmployees();
-            return fallback.map((emp) => emp as any);
-          }
-
-          return data;
+          return data ?? [];
         },
         "getAllEmployees",
         2,
       );
+
+      if (!result || result.length === 0) {
+        console.warn(
+          "⚠️ Supabase returned no employees; loading fallback dataset instead",
+        );
+        return this.getFallbackEmployees();
+      }
 
       console.log(`✅ Successfully fetched ${result.length} employees`);
       return result.map((record) => this.mapFromSupabase(record));
