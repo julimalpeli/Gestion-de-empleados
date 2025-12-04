@@ -12,6 +12,112 @@ import { checkEmergencyAuth } from "@/utils/emergencyAuth";
 
 const ADMIN_BYPASS_ENABLED =
   import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
+const PASSWORD_PLACEHOLDER = "$supabase$auth$handled";
+
+type InternalUserRecord = {
+  id: string;
+  is_active: boolean;
+  role: string;
+  name: string;
+};
+
+const sanitizeUsername = (value: string) =>
+  value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9._-]/g, "")
+    .slice(0, 48);
+
+const ensureInternalUserRecord = async (
+  authUser: SupabaseUser,
+  normalizedEmail?: string,
+): Promise<InternalUserRecord> => {
+  const emailToUse = normalizedEmail || authUser.email?.toLowerCase();
+
+  if (!emailToUse) {
+    throw new Error(
+      "No se pudo determinar el email del usuario para sincronizar su perfil interno.",
+    );
+  }
+
+  const usernameBase =
+    (authUser.user_metadata as Record<string, string | undefined>)?.username ||
+    emailToUse.split("@")[0] ||
+    authUser.email ||
+    `user-${authUser.id.slice(0, 8)}`;
+
+  const username =
+    sanitizeUsername(`${usernameBase}-${authUser.id.slice(0, 4)}`) ||
+    `user-${authUser.id.slice(0, 8)}`;
+
+  const displayName =
+    (authUser.user_metadata as Record<string, string | undefined>)?.full_name ||
+    (authUser.user_metadata as Record<string, string | undefined>)?.name ||
+    authUser.email ||
+    username;
+
+  const insertPayload = {
+    id: authUser.id,
+    username,
+    email: emailToUse,
+    name: displayName,
+    role: "employee" as const,
+    is_active: true,
+    password_hash: PASSWORD_PLACEHOLDER,
+    needs_password_change: false,
+  };
+
+  const { data, error } = await supabase
+    .from("users")
+    .insert(insertPayload)
+    .select("id, is_active, role, name")
+    .single();
+
+  if (error) {
+    console.warn("⚠️ Could not insert internal user record directly:", error);
+
+    if (error.code === "23505") {
+      const { data: existingByEmail, error: existingError } = await supabase
+        .from("users")
+        .select("id, is_active, role, name")
+        .eq("email", emailToUse)
+        .maybeSingle();
+
+      if (existingError) {
+        throw existingError;
+      }
+
+      if (existingByEmail) {
+        if (existingByEmail.id === authUser.id) {
+          return existingByEmail;
+        }
+
+        const { data: syncedUser, error: syncError } = await supabase
+          .from("users")
+          .update({
+            id: authUser.id,
+            username,
+            password_hash: PASSWORD_PLACEHOLDER,
+            needs_password_change: false,
+            is_active: true,
+          })
+          .eq("email", emailToUse)
+          .select("id, is_active, role, name")
+          .single();
+
+        if (syncError) {
+          throw syncError;
+        }
+
+        return syncedUser;
+      }
+    }
+
+    throw error;
+  }
+
+  return data;
+};
 
 interface User {
   id: string;
@@ -453,11 +559,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      const normalizedEmail = email.trim();
+      const trimmedEmail = email.trim();
+      const normalizedEmail = trimmedEmail.toLowerCase();
 
       console.log("📧 Attempting Supabase auth login...");
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: normalizedEmail,
+        email: trimmedEmail,
         password,
       });
 
@@ -498,23 +605,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .from("users")
         .select("id, is_active, role, name")
         .eq("id", data.user.id)
-        .single();
+        .maybeSingle();
 
-      if (userRecordError) {
+      if (userRecordError && userRecordError.code !== "PGRST116") {
         console.warn(
           "⚠️ No se pudo verificar el registro del usuario antes de continuar:",
           userRecordError,
         );
       }
 
-      if (!userRecord) {
+      let resolvedUserRecord = userRecord ?? null;
+
+      if (!resolvedUserRecord) {
+        try {
+          console.log(
+            "ℹ️ Internal user record missing, attempting automatic creation...",
+          );
+          resolvedUserRecord = await ensureInternalUserRecord(
+            data.user,
+            normalizedEmail,
+          );
+          console.log("✅ Internal user record created/synced successfully");
+        } catch (syncError) {
+          console.error("❌ Could not auto-create internal user record:", syncError);
+          await supabase.auth.signOut();
+          throw new Error(
+            "Usuario no encontrado en la base de datos interna y no se pudo crear automáticamente. Contacte al administrador.",
+          );
+        }
+      }
+
+      if (!resolvedUserRecord) {
         await supabase.auth.signOut();
         throw new Error(
           "Usuario no encontrado en la base de datos interna. Contacte al administrador.",
         );
       }
 
-      if (!userRecord.is_active) {
+      if (!resolvedUserRecord.is_active) {
         await supabase.auth.signOut();
         throw new Error("Usuario inactivo. Contacte al administrador.");
       }
