@@ -28,6 +28,15 @@ const sanitizeUsername = (value: string) =>
     .replace(/[^a-zA-Z0-9._-]/g, "")
     .slice(0, 48);
 
+const logDatabaseError = (label: string, error: any) => {
+  console.error(label, {
+    message: error?.message,
+    details: error?.details,
+    hint: error?.hint,
+    code: error?.code,
+  });
+};
+
 const ensureInternalUserRecord = async (
   authUser: SupabaseUser,
   normalizedEmail?: string,
@@ -38,6 +47,27 @@ const ensureInternalUserRecord = async (
     throw new Error(
       "No se pudo determinar el email del usuario para sincronizar su perfil interno.",
     );
+  }
+
+  const fetchInternalUser = async (column: "id" | "email", value: string) => {
+    const { data, error } = await supabase
+      .from("users")
+      .select("id, is_active, role, name")
+      .eq(column, value)
+      .maybeSingle();
+
+    if (error && error.code !== "PGRST116") {
+      logDatabaseError(`⚠️ Error fetching user by ${column}`, error);
+      throw error;
+    }
+
+    return data;
+  };
+
+  // 1. Try by Supabase auth ID first
+  const existingById = await fetchInternalUser("id", authUser.id);
+  if (existingById) {
+    return existingById;
   }
 
   const usernameBase =
@@ -56,6 +86,35 @@ const ensureInternalUserRecord = async (
     authUser.email ||
     username;
 
+  // 2. Try to reuse record by email if it exists with different ID
+  const existingByEmail = await fetchInternalUser("email", emailToUse);
+  if (existingByEmail) {
+    if (existingByEmail.id === authUser.id) {
+      return existingByEmail;
+    }
+
+    const { data: syncedUser, error: syncError } = await supabase
+      .from("users")
+      .update({
+        id: authUser.id,
+        username,
+        password_hash: PASSWORD_PLACEHOLDER,
+        needs_password_change: false,
+        is_active: true,
+      })
+      .eq("email", emailToUse)
+      .select("id, is_active, role, name")
+      .single();
+
+    if (syncError) {
+      logDatabaseError("❌ Error syncing internal user record", syncError);
+      throw syncError;
+    }
+
+    return syncedUser;
+  }
+
+  // 3. Insert new internal record
   const insertPayload = {
     id: authUser.id,
     username,
@@ -74,45 +133,7 @@ const ensureInternalUserRecord = async (
     .single();
 
   if (error) {
-    console.warn("⚠️ Could not insert internal user record directly:", error);
-
-    if (error.code === "23505") {
-      const { data: existingByEmail, error: existingError } = await supabase
-        .from("users")
-        .select("id, is_active, role, name")
-        .eq("email", emailToUse)
-        .maybeSingle();
-
-      if (existingError) {
-        throw existingError;
-      }
-
-      if (existingByEmail) {
-        if (existingByEmail.id === authUser.id) {
-          return existingByEmail;
-        }
-
-        const { data: syncedUser, error: syncError } = await supabase
-          .from("users")
-          .update({
-            id: authUser.id,
-            username,
-            password_hash: PASSWORD_PLACEHOLDER,
-            needs_password_change: false,
-            is_active: true,
-          })
-          .eq("email", emailToUse)
-          .select("id, is_active, role, name")
-          .single();
-
-        if (syncError) {
-          throw syncError;
-        }
-
-        return syncedUser;
-      }
-    }
-
+    logDatabaseError("❌ Could not insert internal user record", error);
     throw error;
   }
 
