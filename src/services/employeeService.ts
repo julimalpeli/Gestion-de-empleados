@@ -74,13 +74,13 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
           console.log(`✅ Supabase returned ${data?.length || 0} employees`);
 
-          // Check if we got empty results (possible RLS issue)
           if (!data || data.length === 0) {
             console.warn(
-              "⚠️ Empty result from Supabase - this might be an RLS issue",
+              "⚠️ Empty result from Supabase - potential RLS/permissions/empty table",
             );
-            console.log("🔄 Attempting fallback due to empty results");
-            throw new Error("Empty results from database - possible RLS issue");
+            console.log("🔄 Switching to fallback employees without throwing error");
+            const fallback = await this.getFallbackEmployees();
+            return fallback.map((emp) => emp as any);
           }
 
           return data;
