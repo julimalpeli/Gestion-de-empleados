@@ -84,9 +84,12 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       const discounts = record.discounts || 0;
       const holidayBonus = record.holidayBonus || 0;
       const aguinaldo = record.aguinaldo || 0;
+      const storedBaseAmount =
+        typeof record.baseAmount === "number" && Number.isFinite(record.baseAmount)
+          ? record.baseAmount
+          : undefined;
 
-      // Calcular sueldo base aproximado
-      const baseSalary =
+      const derivedBaseSalary =
         (record.netTotal || 0) -
         presentismo -
         overtimeAmount -
@@ -95,6 +98,11 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         aguinaldo +
         advances +
         discounts;
+
+      const baseSalary =
+        storedBaseAmount !== undefined
+          ? storedBaseAmount
+          : Math.max(derivedBaseSalary, 0);
 
       return {
         id: record.id,
