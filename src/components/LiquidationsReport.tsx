@@ -85,7 +85,8 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       const holidayBonus = record.holidayBonus || 0;
       const aguinaldo = record.aguinaldo || 0;
       const storedBaseAmount =
-        typeof record.baseAmount === "number" && Number.isFinite(record.baseAmount)
+        typeof record.baseAmount === "number" &&
+        Number.isFinite(record.baseAmount)
           ? record.baseAmount
           : undefined;
 
