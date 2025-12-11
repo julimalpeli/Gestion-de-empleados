@@ -60,6 +60,7 @@ interface LiquidationsReportProps {
 
 const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
   const { payrollRecords } = usePayroll();
+  const { employees } = useEmployees();
 
   // Get unique periods from real payroll data
   const availablePeriods = [
@@ -70,6 +71,14 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
     availablePeriods[0] || "2024-12",
   );
   const [selectedType, setSelectedType] = useState("all");
+
+  // Convert month period (YYYY-MM) to semester period (YYYY-S) for aguinaldo calculation
+  const getSemesterPeriod = (monthPeriod: string): string => {
+    const [year, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month);
+    const semester = monthNum <= 6 ? "1" : "2";
+    return `${year}-${semester}`;
+  };
 
   // Filter records by selected period - real data from database
   const reportData = payrollRecords
