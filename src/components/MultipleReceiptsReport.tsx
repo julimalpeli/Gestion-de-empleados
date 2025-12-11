@@ -43,6 +43,7 @@ const MultipleReceiptsReport = ({
   onClose,
 }: MultipleReceiptsReportProps) => {
   const { payrollRecords } = usePayroll();
+  const { employees } = useEmployees();
 
   // Get unique periods from real payroll data
   const availablePeriods = [
@@ -52,6 +53,14 @@ const MultipleReceiptsReport = ({
   const [selectedPeriod, setSelectedPeriod] = useState(
     availablePeriods[0] || "2025-07",
   );
+
+  // Convert month period (YYYY-MM) to semester period (YYYY-S) for aguinaldo calculation
+  const getSemesterPeriod = (monthPeriod: string): string => {
+    const [year, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month);
+    const semester = monthNum <= 6 ? "1" : "2";
+    return `${year}-${semester}`;
+  };
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
@@ -65,6 +74,13 @@ const MultipleReceiptsReport = ({
   const getReceiptItems = (record: any): ReceiptItem[] => {
     const items: ReceiptItem[] = [];
 
+    // Calculate aguinaldo dynamically
+    const employee = employees.find((emp) => emp.id === record.employeeId);
+    const semesterPeriod = getSemesterPeriod(record.period);
+    const calculatedAguinaldo = employee
+      ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
+      : 0;
+
     // Debug logging for data verification
     console.log(`🔍 Receipt data for ${record.employeeName}:`, {
       informalAmount: record.informalAmount,
@@ -73,11 +89,11 @@ const MultipleReceiptsReport = ({
       overtimeAmount: record.overtimeAmount,
       holidayBonus: record.holidayBonus,
       bonusAmount: record.bonusAmount,
-      aguinaldo: record.aguinaldo,
+      aguinaldo: calculatedAguinaldo,
       advances: record.advances,
       discounts: record.discounts,
       netTotal: record.netTotal,
-      dataSource: "Database via usePayroll hook",
+      dataSource: "Database via usePayroll hook (aguinaldo recalculated)",
     });
 
     // Solo mostrar el monto en efectivo (informal_amount) sin desglose
