@@ -86,12 +86,23 @@ export const calculateAguinaldo = (
     };
   }
 
-  const effectiveStart = startDate > semesterStart ? startDate : semesterStart;
+  // Importante: se cuenta desde el día POSTERIOR a la fecha de ingreso
+  const effectiveStartDate = new Date(startDate);
+  effectiveStartDate.setDate(effectiveStartDate.getDate() + 1);
+
+  const effectiveStart =
+    effectiveStartDate > semesterStart ? effectiveStartDate : semesterStart;
 
   const totalSemesterDays =
-    Math.floor((semesterEnd.getTime() - semesterStart.getTime()) / DAY_MS) + 1;
-  let daysWorked =
-    Math.floor((semesterEnd.getTime() - effectiveStart.getTime()) / DAY_MS) + 1;
+    Math.ceil(
+      (semesterEnd.getTime() - semesterStart.getTime()) /
+        (1000 * 60 * 60 * 24),
+    ) + 1;
+
+  let daysWorked = Math.ceil(
+    (semesterEnd.getTime() - effectiveStart.getTime()) /
+      (1000 * 60 * 60 * 24),
+  );
 
   if (daysWorked < 0) {
     daysWorked = 0;
