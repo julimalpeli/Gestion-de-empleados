@@ -23,6 +23,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Scissors, Download, FileDown } from "lucide-react";
 import { usePayroll } from "@/hooks/use-payroll";
+import { useEmployees } from "@/hooks/use-employees";
+import { calculateAguinaldo } from "@/utils/aguinaldo";
 import jsPDF from "jspdf";
 
 interface MultipleReceiptsReportProps {
