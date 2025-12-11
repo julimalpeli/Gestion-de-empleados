@@ -44,6 +44,8 @@ import {
   FileDown,
 } from "lucide-react";
 import { usePayroll } from "@/hooks/use-payroll";
+import { useEmployees } from "@/hooks/use-employees";
+import { calculateAguinaldo } from "@/utils/aguinaldo";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
