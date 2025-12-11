@@ -94,7 +94,14 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       const advances = record.advances || 0;
       const discounts = record.discounts || 0;
       const holidayBonus = record.holidayBonus || 0;
-      const aguinaldo = record.aguinaldo || 0;
+
+      // Calculate aguinaldo dynamically to match Reports tab
+      const employee = employees.find((emp) => emp.id === record.employeeId);
+      const semesterPeriod = getSemesterPeriod(record.period);
+      const calculatedAguinaldo = employee
+        ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
+        : 0;
+
       const storedBaseAmount =
         typeof record.baseAmount === "number" &&
         Number.isFinite(record.baseAmount)
@@ -107,7 +114,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         overtimeAmount -
         bonusAmount -
         holidayBonus -
-        aguinaldo +
+        calculatedAguinaldo +
         advances +
         discounts;
 
@@ -132,7 +139,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         advances,
         discounts,
         holidayBonus,
-        aguinaldo,
+        aguinaldo: calculatedAguinaldo,
         // Totales por forma de pago - corregir efectivo cuando whiteAmount es 0
         efectivo:
           (record.whiteAmount || 0) === 0
@@ -140,7 +147,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
             : record.informalAmount || 0,
         deposito: record.whiteAmount || 0,
         totalNeto: record.netTotal || 0,
-        hasAguinaldo: aguinaldo > 0,
+        hasAguinaldo: calculatedAguinaldo > 0,
         status: record.status || "draft",
       };
     });
