@@ -59,6 +59,7 @@ const SimpleLiquidationsReport = ({
   onClose,
 }: SimpleLiquidationsReportProps) => {
   const { payrollRecords } = usePayroll();
+  const { employees } = useEmployees();
 
   // Get unique periods from real payroll data
   const availablePeriods = [
@@ -69,6 +70,14 @@ const SimpleLiquidationsReport = ({
     availablePeriods[0] || "2024-12",
   );
   const [selectedType, setSelectedType] = useState("all");
+
+  // Convert month period (YYYY-MM) to semester period (YYYY-S) for aguinaldo calculation
+  const getSemesterPeriod = (monthPeriod: string): string => {
+    const [year, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month);
+    const semester = monthNum <= 6 ? "1" : "2";
+    return `${year}-${semester}`;
+  };
 
   // Filter records by selected period - SIMPLE FORMAT (original)
   const reportData = payrollRecords
@@ -94,15 +103,22 @@ const SimpleLiquidationsReport = ({
       // Si no hay depósito (whiteAmount = 0), todo el netTotal va a efectivo
       const efectivoReal = whiteAmount === 0 ? netTotal : informalAmount;
 
+      // Calculate aguinaldo dynamically to match Reports tab
+      const employee = employees.find((emp) => emp.id === record.employeeId);
+      const semesterPeriod = getSemesterPeriod(record.period);
+      const calculatedAguinaldo = employee
+        ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
+        : 0;
+
       return {
         id: record.id,
         employeeName: record.employeeName,
         period: record.period,
         efectivo: efectivoReal,
         deposito: whiteAmount,
-        aguinaldo: record.aguinaldo || 0,
+        aguinaldo: calculatedAguinaldo,
         totalNeto: netTotal,
-        hasAguinaldo: (record.aguinaldo || 0) > 0,
+        hasAguinaldo: calculatedAguinaldo > 0,
         status: record.status || "draft",
       };
     });
