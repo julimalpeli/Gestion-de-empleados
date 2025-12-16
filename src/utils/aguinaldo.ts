@@ -54,7 +54,7 @@ export const calculateAguinaldo = (
       ? new Date(currentYear, 5, 30)
       : new Date(currentYear, 11, 31);
 
-  const startDate = new Date(employee.startDate);
+  const startDate = new Date(employee.startDate + "T00:00:00");
 
   if (Number.isNaN(startDate.getTime())) {
     return {
