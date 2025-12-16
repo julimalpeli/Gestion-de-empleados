@@ -548,7 +548,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
   }
 
   calculateVacationDays(startDate: string): VacationCalculation {
-    const start = new Date(startDate);
+    const start = new Date(startDate + "T00:00:00");
     const today = new Date();
 
     // Calcular años y meses de antigüedad
