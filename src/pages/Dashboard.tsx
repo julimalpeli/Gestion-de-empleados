@@ -422,8 +422,8 @@ const Dashboard = () => {
             {currentVacations.length > 0 && (
               <div className="mt-2 space-y-1">
                 {currentVacations.slice(0, 2).map((vacation) => {
-                  const startDate = new Date(vacation.startDate);
-                  const endDate = new Date(vacation.endDate);
+                  const startDate = new Date(vacation.startDate + "T00:00:00");
+                  const endDate = new Date(vacation.endDate + "T00:00:00");
                   const daysDiff =
                     Math.ceil(
                       (endDate.getTime() - startDate.getTime()) /
@@ -479,8 +479,8 @@ const Dashboard = () => {
                   ? sortedUpcomingVacations
                   : sortedUpcomingVacations.slice(0, 2)
                 ).map((vacation) => {
-                  const startDate = new Date(vacation.startDate);
-                  const endDate = new Date(vacation.endDate);
+                  const startDate = new Date(vacation.startDate + "T00:00:00");
+                  const endDate = new Date(vacation.endDate + "T00:00:00");
                   const daysDiff =
                     Math.ceil(
                       (endDate.getTime() - startDate.getTime()) /
