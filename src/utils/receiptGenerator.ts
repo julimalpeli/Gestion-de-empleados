@@ -214,7 +214,7 @@ export const buildPayrollReceiptCsv = (data: ReceiptData): string => {
     ["Período:", formatPeriodForDisplay(data.period)],
     [
       "Fecha de Ingreso:",
-      new Date(data.employee.startDate).toLocaleDateString("es-AR"),
+      new Date(data.employee.startDate + "T00:00:00").toLocaleDateString("es-AR"),
     ],
     ["Fecha de Emisión:", new Date().toLocaleDateString("es-AR")],
     [""],
