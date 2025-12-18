@@ -575,6 +575,8 @@ const Payroll = () => {
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
+    setAguinaldoPagoEfectivo(record.aguinaldoPagoEfectivo?.toString() || "0");
+    setAguinaldoPagoDeposito(record.aguinaldoPagoDeposito?.toString() || "0");
 
     // Obtener el sueldo histórico correcto para el período de la liquidación
     try {
@@ -624,6 +626,8 @@ const Payroll = () => {
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
+    setAguinaldoPagoEfectivo(record.aguinaldoPagoEfectivo?.toString() || "0");
+    setAguinaldoPagoDeposito(record.aguinaldoPagoDeposito?.toString() || "0");
 
     // Obtener el sueldo histórico solo para períodos pasados, no para el período actual
     const now = new Date();
@@ -704,6 +708,8 @@ const Payroll = () => {
         bonusAmount: parseFloat(bonusAmount) || 0,
         presentismoAmount: calculation.presentismoAmount || 0,
         aguinaldo: calculation.aguinaldo || 0,
+        aguinaldoPagoEfectivo: parseFloat(aguinaldoPagoEfectivo) || 0,
+        aguinaldoPagoDeposito: parseFloat(aguinaldoPagoDeposito) || 0,
         netTotal: calculation.netTotal,
         // Campos calculados adicionales
         holidayBonus: calculation.holidayPay || 0,
@@ -725,6 +731,8 @@ const Payroll = () => {
       setOvertimeEnabled(false);
       setOvertimeHours("");
       setBonusAmount("");
+      setAguinaldoPagoEfectivo("");
+      setAguinaldoPagoDeposito("");
       setHistoricalSalary(null);
       setIsNewPayrollOpen(false);
 
