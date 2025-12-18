@@ -883,7 +883,8 @@ const Payroll = () => {
     if (useStoredAguinaldo && editingRecord) {
       aguinaldoAmount = editingRecord.aguinaldo || 0;
     } else {
-      aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod)?.amount || 0;
+      const aguinaldoResult = calculateAguinaldoLocal(employee, selectedPeriod);
+      aguinaldoAmount = aguinaldoResult?.amount || 0;
     }
 
     // Total neto = todos los conceptos positivos - deducciones
