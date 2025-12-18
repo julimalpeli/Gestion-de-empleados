@@ -241,6 +241,8 @@ const SimpleLiquidationsReport = ({
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
       record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
+      record.aguinaldoPagoEfectivo > 0 ? formatCurrency(record.aguinaldoPagoEfectivo) : "-",
+      record.aguinaldoPagoDeposito > 0 ? formatCurrency(record.aguinaldoPagoDeposito) : "-",
       formatCurrency(record.totalNeto),
       record.status === "paid"
         ? "Pagada"
@@ -260,6 +262,8 @@ const SimpleLiquidationsReport = ({
       formatCurrency(totals.efectivo),
       formatCurrency(totals.deposito),
       formatCurrency(totals.aguinaldo),
+      formatCurrency(totals.aguinaldoPagoEfectivo),
+      formatCurrency(totals.aguinaldoPagoDeposito),
       formatCurrency(totals.totalNeto),
       "",
     ]);
@@ -272,6 +276,8 @@ const SimpleLiquidationsReport = ({
           "Efectivo",
           "Depósito",
           "Aguinaldo",
+          "Agu.Efectivo",
+          "Agu.Depósito",
           "Total Neto",
           "Estado",
         ],
