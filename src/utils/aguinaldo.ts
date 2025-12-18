@@ -100,7 +100,8 @@ export const calculateAguinaldo = (
 
   let daysWorked =
     Math.ceil(
-      (semesterEnd.getTime() - effectiveStart.getTime()) / (1000 * 60 * 60 * 24),
+      (semesterEnd.getTime() - effectiveStart.getTime()) /
+        (1000 * 60 * 60 * 24),
     ) + 1;
 
   if (daysWorked < 0) {

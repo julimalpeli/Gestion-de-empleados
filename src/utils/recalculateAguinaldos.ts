@@ -63,7 +63,9 @@ export const recalculateAguinaldosForPeriod = async (
       .eq("period", period);
 
     if (payrollError || !payrollRecords) {
-      throw new Error(`Failed to fetch payroll records: ${payrollError?.message}`);
+      throw new Error(
+        `Failed to fetch payroll records: ${payrollError?.message}`,
+      );
     }
 
     console.log(
@@ -175,8 +177,7 @@ export const recalculateAguinaldosForPeriod = async (
       `📋 Recalculation complete: ${result.recordsUpdated} records updated, ${result.errors.length} errors`,
     );
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`❌ Recalculation failed: ${errorMessage}`);
     result.success = false;
     result.errors.push({
@@ -190,7 +191,8 @@ export const recalculateAguinaldosForPeriod = async (
 
 // Make available globally for debugging
 if (typeof window !== "undefined") {
-  (window as any).recalculateAguinaldosForPeriod = recalculateAguinaldosForPeriod;
+  (window as any).recalculateAguinaldosForPeriod =
+    recalculateAguinaldosForPeriod;
   console.log("🔧 Aguinaldo recalculation function available:");
   console.log("   - recalculateAguinaldosForPeriod('2025-12')");
 }
