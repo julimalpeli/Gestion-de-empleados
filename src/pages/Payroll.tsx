@@ -893,7 +893,7 @@ const Payroll = () => {
     };
   };
 
-  const calculation = selectedEmployee ? calculatePayroll() : null;
+  const calculation = selectedEmployee ? calculatePayroll(!!editingRecord) : null;
 
   // Función para formatear moneda
   const formatCurrency = (amount) => {
