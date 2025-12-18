@@ -169,7 +169,7 @@ export const useAudit = () => {
           user?.id,
         );
       } catch (error) {
-        console.error("Error auditing user:", error);
+        console.error("Error auditing user:", getReadableErrorMessage(error));
       }
     },
     [user?.id],
