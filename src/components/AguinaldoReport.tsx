@@ -59,6 +59,20 @@ export default function AguinaldoReport() {
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const [selectedPeriod, setSelectedPeriod] = useState("2025-2");
 
+  // Debug: Log loaded payroll records to verify aguinaldo split data
+  useEffect(() => {
+    if (payrollRecords.length > 0) {
+      const withAguinaldoSplit = payrollRecords.filter(
+        (p) => p.aguinaldoPagoEfectivo > 0 || p.aguinaldoPagoDeposito > 0,
+      );
+      console.log("📊 Payroll records loaded:", payrollRecords.length);
+      console.log("💰 Records with aguinaldo split:", withAguinaldoSplit.length);
+      if (withAguinaldoSplit.length > 0) {
+        console.log("Sample record with split:", withAguinaldoSplit[0]);
+      }
+    }
+  }, [payrollRecords]);
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
       style: "currency",
