@@ -261,6 +261,10 @@ const Reports = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="reporte-aguinaldo" className="space-y-6">
+          <AguinaldoReport />
+        </TabsContent>
+
         <TabsContent value="aguinaldos" className="space-y-6">
           {/* Period Selector */}
           <Card>
