@@ -1326,7 +1326,13 @@ const Payroll = () => {
                           id="aguinaldoPagoEfectivo"
                           placeholder="$ 0,00"
                           value={aguinaldoPagoEfectivo}
-                          onChange={(value) => setAguinaldoPagoEfectivo(value)}
+                          onChange={(value) => {
+                            setAguinaldoPagoEfectivo(value);
+                            const efectivo = parseFloat(value) || 0;
+                            const total = calculation.aguinaldo || 0;
+                            const deposito = Math.max(0, total - efectivo);
+                            setAguinaldoPagoDeposito(deposito > 0 ? deposito.toString() : "");
+                          }}
                           disabled={editingRecord && !isEditMode}
                         />
                       </div>
@@ -1337,7 +1343,13 @@ const Payroll = () => {
                           id="aguinaldoPagoDeposito"
                           placeholder="$ 0,00"
                           value={aguinaldoPagoDeposito}
-                          onChange={(value) => setAguinaldoPagoDeposito(value)}
+                          onChange={(value) => {
+                            setAguinaldoPagoDeposito(value);
+                            const deposito = parseFloat(value) || 0;
+                            const total = calculation.aguinaldo || 0;
+                            const efectivo = Math.max(0, total - deposito);
+                            setAguinaldoPagoEfectivo(efectivo > 0 ? efectivo.toString() : "");
+                          }}
                           disabled={editingRecord && !isEditMode}
                         />
                       </div>
