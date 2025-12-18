@@ -210,7 +210,7 @@ export const useAudit = () => {
       try {
         await auditService.auditLogin(action, targetUserId, metadata);
       } catch (error) {
-        console.error("Error auditing login:", error);
+        console.error("Error auditing login:", getReadableErrorMessage(error));
       }
     },
     [],
