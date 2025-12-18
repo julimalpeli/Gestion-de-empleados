@@ -144,9 +144,11 @@ const SimpleLiquidationsReport = ({
       efectivo: acc.efectivo + record.efectivo,
       deposito: acc.deposito + record.deposito,
       aguinaldo: acc.aguinaldo + record.aguinaldo,
+      aguinaldoPagoEfectivo: acc.aguinaldoPagoEfectivo + record.aguinaldoPagoEfectivo,
+      aguinaldoPagoDeposito: acc.aguinaldoPagoDeposito + record.aguinaldoPagoDeposito,
       totalNeto: acc.totalNeto + record.totalNeto,
     }),
-    { efectivo: 0, deposito: 0, aguinaldo: 0, totalNeto: 0 },
+    { efectivo: 0, deposito: 0, aguinaldo: 0, aguinaldoPagoEfectivo: 0, aguinaldoPagoDeposito: 0, totalNeto: 0 },
   );
 
   const exportToCSV = () => {
@@ -156,6 +158,8 @@ const SimpleLiquidationsReport = ({
       "Efectivo",
       "Depósito",
       "Aguinaldo",
+      "Agu.Efectivo",
+      "Agu.Depósito",
       "Total Neto",
     ];
     const csvContent = [
@@ -167,6 +171,8 @@ const SimpleLiquidationsReport = ({
           record.efectivo,
           record.deposito,
           record.aguinaldo,
+          record.aguinaldoPagoEfectivo,
+          record.aguinaldoPagoDeposito,
           record.totalNeto,
         ].join(","),
       ),
