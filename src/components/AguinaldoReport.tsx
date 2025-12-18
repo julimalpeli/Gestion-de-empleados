@@ -465,24 +465,16 @@ export default function AguinaldoReport() {
             </Table>
           </div>
 
-          <div className="mt-6 pt-4 border-t">
-            <TableRow className="bg-gray-50 font-bold">
-              <TableCell>TOTALES</TableCell>
-              <TableCell className="text-right">
-                {formatCurrency(totals.aguinaldoTotal)}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatCurrency(totals.aguinaldoPagoEfectivo)}
-              </TableCell>
-              <TableCell className="text-right">
-                {formatCurrency(totals.aguinaldoPagoDeposito)}
-              </TableCell>
-              <TableCell />
-              <TableCell />
-              <TableCell />
-              <TableCell />
-              <TableCell />
-            </TableRow>
+          <div className="mt-6 pt-4 border-t grid grid-cols-9 gap-4 font-bold bg-gray-50 p-4 rounded">
+            <div className="col-span-1">TOTALES</div>
+            <div className="col-span-1 text-right">{formatCurrency(totals.aguinaldoTotal)}</div>
+            <div className="col-span-1 text-right">{formatCurrency(totals.aguinaldoPagoEfectivo)}</div>
+            <div className="col-span-1 text-right">{formatCurrency(totals.aguinaldoPagoDeposito)}</div>
+            <div />
+            <div />
+            <div />
+            <div />
+            <div />
           </div>
         </CardContent>
       </Card>
