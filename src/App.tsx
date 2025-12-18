@@ -31,6 +31,7 @@ if (import.meta.env.DEV) {
     import("@/utils/debugUserStatus"),
     import("@/utils/confirmEmail"),
     import("@/utils/emergencyNav"),
+    import("@/utils/recalculateAguinaldos"),
   ])
     .then(
       ([
