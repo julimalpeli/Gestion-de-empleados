@@ -82,6 +82,17 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
   const aguinaldoPagoDeposito = toNumber(
     readField(record, "aguinaldo_pago_deposito", "aguinaldoPagoDeposito"),
   );
+
+  // Debug log for aguinaldo split if values are present
+  if ((aguinaldoPagoEfectivo > 0 || aguinaldoPagoDeposito > 0) && console.log) {
+    console.debug("📋 Aguinaldo split loaded:", {
+      employee: readField(record, "employee", "employee")?.name,
+      period: readField(record, "period", "period"),
+      total: aguinaldo,
+      efectivo: aguinaldoPagoEfectivo,
+      deposito: aguinaldoPagoDeposito,
+    });
+  }
   const discounts = toNumber(readField(record, "discounts", "discounts"));
   const advances = toNumber(readField(record, "advances", "advances"));
   const presentismoAmount = toNumber(
