@@ -135,6 +135,8 @@ export interface PayrollRecord {
   baseAmount: number;
   holidayBonus: number;
   aguinaldo: number;
+  aguinaldoPagoEfectivo: number;
+  aguinaldoPagoDeposito: number;
   discounts: number;
   advances: number;
   whiteAmount: number;
@@ -160,6 +162,8 @@ export interface CreatePayrollRequest {
   baseAmount: number;
   holidayBonus: number;
   aguinaldo: number;
+  aguinaldoPagoEfectivo: number;
+  aguinaldoPagoDeposito: number;
   discounts: number;
   advances: number;
   whiteAmount: number;
