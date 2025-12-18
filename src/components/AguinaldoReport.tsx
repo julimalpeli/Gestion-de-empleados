@@ -36,7 +36,7 @@ import { useEmployees } from "@/hooks/use-employees";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface AguinaldoReportRecord {
   id: string;
