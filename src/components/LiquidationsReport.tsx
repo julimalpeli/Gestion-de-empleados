@@ -140,6 +140,8 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         discounts,
         holidayBonus,
         aguinaldo: calculatedAguinaldo,
+        aguinaldoPagoEfectivo: record.aguinaldoPagoEfectivo || 0,
+        aguinaldoPagoDeposito: record.aguinaldoPagoDeposito || 0,
         // Totales por forma de pago - corregir efectivo cuando whiteAmount es 0
         efectivo:
           (record.whiteAmount || 0) === 0
@@ -176,6 +178,8 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       discounts: acc.discounts + record.discounts,
       holidayBonus: acc.holidayBonus + record.holidayBonus,
       aguinaldo: acc.aguinaldo + record.aguinaldo,
+      aguinaldoPagoEfectivo: acc.aguinaldoPagoEfectivo + record.aguinaldoPagoEfectivo,
+      aguinaldoPagoDeposito: acc.aguinaldoPagoDeposito + record.aguinaldoPagoDeposito,
       efectivo: acc.efectivo + record.efectivo,
       deposito: acc.deposito + record.deposito,
       totalNeto: acc.totalNeto + record.totalNeto,
@@ -189,6 +193,8 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       discounts: 0,
       holidayBonus: 0,
       aguinaldo: 0,
+      aguinaldoPagoEfectivo: 0,
+      aguinaldoPagoDeposito: 0,
       efectivo: 0,
       deposito: 0,
       totalNeto: 0,
@@ -594,6 +600,8 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       <TableHead className="text-right">Descuentos</TableHead>
                       <TableHead className="text-right">Fer.Doble</TableHead>
                       <TableHead className="text-right">Aguinaldo</TableHead>
+                      <TableHead className="text-right">Agu.Efectivo</TableHead>
+                      <TableHead className="text-right">Agu.Depósito</TableHead>
                       <TableHead className="text-right">Efectivo</TableHead>
                       <TableHead className="text-right">Depósito</TableHead>
                       <TableHead className="text-right">Total Neto</TableHead>
@@ -654,6 +662,16 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                         <TableCell className="text-right text-purple-600">
                           {record.aguinaldo > 0
                             ? formatCurrency(record.aguinaldo)
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-purple-500">
+                          {record.aguinaldoPagoEfectivo > 0
+                            ? formatCurrency(record.aguinaldoPagoEfectivo)
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-purple-500">
+                          {record.aguinaldoPagoDeposito > 0
+                            ? formatCurrency(record.aguinaldoPagoDeposito)
                             : "-"}
                         </TableCell>
                         <TableCell className="text-right font-medium text-green-600">
@@ -721,6 +739,12 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       </TableCell>
                       <TableCell className="text-right text-purple-600">
                         {formatCurrency(totals.aguinaldo)}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-purple-500">
+                        {formatCurrency(totals.aguinaldoPagoEfectivo)}
+                      </TableCell>
+                      <TableCell className="text-right font-bold text-purple-500">
+                        {formatCurrency(totals.aguinaldoPagoDeposito)}
                       </TableCell>
                       <TableCell className="text-right text-green-600">
                         {formatCurrency(totals.efectivo)}
