@@ -346,8 +346,14 @@ const Payroll = () => {
   };
 
   // Función para calcular aguinaldo (tomada de Reports.tsx)
-  const calculateAguinaldo = (employee, period) => {
-    if (!isAguinaldoPeriod(period)) return 0;
+  const calculateAguinaldoLocal = (employee, period) => {
+    if (!isAguinaldoPeriod(period))
+      return {
+        amount: 0,
+        proportional: false,
+        daysWorked: 0,
+        totalDays: 0,
+      };
 
     const [year, month] = period.split("-");
     const currentYear = parseInt(year);
@@ -368,7 +374,13 @@ const Payroll = () => {
 
     // Si empezó después del semestre, no corresponde aguinaldo
     if (startDate > semesterEnd) {
-      return 0;
+      return {
+        amount: 0,
+        proportional: false,
+        daysWorked: 0,
+        totalDays:
+          Math.floor((semesterEnd.getTime() - semesterStart.getTime()) / DAY_MS) + 1,
+      };
     }
 
     // Fecha efectiva de inicio (la mayor entre inicio de semestre e inicio de trabajo)
@@ -391,6 +403,14 @@ const Payroll = () => {
         (semesterEnd.getTime() - effectiveStart.getTime()) /
           (1000 * 60 * 60 * 24),
       ) + 1;
+
+    if (daysWorked < 0) {
+      daysWorked = 0;
+    }
+
+    if (daysWorked > totalSemesterDays) {
+      daysWorked = totalSemesterDays;
+    }
 
     // Calcular mejor sueldo basado en históricos de liquidaciones
     // Buscar liquidaciones del empleado para el cálculo del mejor sueldo
@@ -486,8 +506,15 @@ const Payroll = () => {
     const isProportional = daysWorked < totalSemesterDays;
     const finalAmount = isProportional ? proportionalAguinaldo : fullAguinaldo;
 
-    return Math.round(finalAmount);
+    return {
+      amount: Math.round(finalAmount),
+      proportional: isProportional,
+      daysWorked,
+      totalDays: totalSemesterDays,
+    };
   };
+
+  const DAY_MS = 1000 * 60 * 60 * 24;
 
   // Manejo de nuevo payroll
   const handleCreatePayroll = async () => {
