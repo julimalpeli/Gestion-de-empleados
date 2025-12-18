@@ -882,9 +882,15 @@ const Payroll = () => {
     let aguinaldoAmount = 0;
     if (useStoredAguinaldo && editingRecord && editingRecord.aguinaldo) {
       aguinaldoAmount = editingRecord.aguinaldo;
+      console.log(
+        `💰 [AGUINALDO] Using STORED value: ${aguinaldoAmount} for ${employee?.name}`,
+      );
     } else {
       const aguinaldoResult = calculateAguinaldoLocal(employee, selectedPeriod);
       aguinaldoAmount = aguinaldoResult?.amount || 0;
+      console.log(
+        `💰 [AGUINALDO] CALCULATED value: ${aguinaldoAmount} (proportional: ${aguinaldoResult?.proportional}) for ${employee?.name}`,
+      );
     }
 
     // Total neto = todos los conceptos positivos - deducciones
