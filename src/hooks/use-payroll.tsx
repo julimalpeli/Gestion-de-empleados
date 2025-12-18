@@ -106,7 +106,31 @@ export const usePayroll = () => {
             .from("payroll_records")
             .select(
               `
-              *,
+              id,
+              employee_id,
+              period,
+              base_days,
+              holiday_days,
+              base_amount,
+              holiday_bonus,
+              aguinaldo,
+              aguinaldo_pago_efectivo,
+              aguinaldo_pago_deposito,
+              discounts,
+              advances,
+              white_amount,
+              informal_amount,
+              presentismo_amount,
+              overtime_hours,
+              overtime_amount,
+              bonus_amount,
+              net_total,
+              status,
+              processed_date,
+              processed_by,
+              notes,
+              created_at,
+              updated_at,
               employee:employees(name, job_position, sueldo_base, white_wage, informal_wage)
             `,
             )
