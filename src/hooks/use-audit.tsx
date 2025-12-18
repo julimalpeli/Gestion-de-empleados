@@ -125,7 +125,7 @@ export const useAudit = () => {
           user?.id,
         );
       } catch (error) {
-        console.error("Error auditing payroll:", error);
+        console.error("Error auditing payroll:", getReadableErrorMessage(error));
       }
     },
     [user?.id],
