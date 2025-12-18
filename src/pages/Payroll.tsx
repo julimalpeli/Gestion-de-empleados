@@ -768,7 +768,7 @@ const Payroll = () => {
   };
 
   // Calcular datos de liquidación
-  const calculatePayroll = () => {
+  const calculatePayroll = (useStoredAguinaldo = false) => {
     if (!selectedEmployee) return null;
 
     const employee = employees.find(
