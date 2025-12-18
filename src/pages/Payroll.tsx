@@ -880,8 +880,8 @@ const Payroll = () => {
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
     // Si está editando un registro existente, usar el valor guardado, no recalcular
     let aguinaldoAmount = 0;
-    if (useStoredAguinaldo && editingRecord) {
-      aguinaldoAmount = editingRecord.aguinaldo || 0;
+    if (useStoredAguinaldo && editingRecord && editingRecord.aguinaldo) {
+      aguinaldoAmount = editingRecord.aguinaldo;
     } else {
       const aguinaldoResult = calculateAguinaldoLocal(employee, selectedPeriod);
       aguinaldoAmount = aguinaldoResult?.amount || 0;
