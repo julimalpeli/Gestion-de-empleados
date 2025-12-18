@@ -1890,54 +1890,13 @@ const Payroll = () => {
                                 );
                                 if (!employee) return "-";
 
-                                const correctAguinaldo = calculateAguinaldo(
+                                const correctAguinaldoResult = calculateAguinaldoLocal(
                                   employee,
                                   record.period,
                                 );
-                                if (correctAguinaldo === 0) return "-";
+                                if (correctAguinaldoResult.amount === 0) return "-";
 
-                                // Determinar si es proporcional usando la lógica correcta
-                                const [year, month] = record.period.split("-");
-                                const currentYear = parseInt(year);
-                                const currentMonth = parseInt(month);
-
-                                const semesterStart =
-                                  currentMonth === 6
-                                    ? new Date(currentYear, 0, 1)
-                                    : new Date(currentYear, 6, 1);
-
-                                const semesterEnd =
-                                  currentMonth === 6
-                                    ? new Date(currentYear, 5, 30)
-                                    : new Date(currentYear, 11, 31);
-
-                                const startDate = new Date(employee.startDate);
-                                const effectiveStartDate = new Date(startDate);
-                                effectiveStartDate.setDate(
-                                  effectiveStartDate.getDate() + 1,
-                                );
-
-                                const effectiveStart =
-                                  effectiveStartDate > semesterStart
-                                    ? effectiveStartDate
-                                    : semesterStart;
-
-                                const totalSemesterDays =
-                                  Math.ceil(
-                                    (semesterEnd.getTime() -
-                                      semesterStart.getTime()) /
-                                      (1000 * 60 * 60 * 24),
-                                  ) + 1;
-
-                                const daysWorked =
-                                  Math.ceil(
-                                    (semesterEnd.getTime() -
-                                      effectiveStart.getTime()) /
-                                      (1000 * 60 * 60 * 24),
-                                  ) + 1;
-
-                                const isProportional =
-                                  daysWorked < totalSemesterDays;
+                                const isProportional = correctAguinaldoResult.proportional;
 
                                 return (
                                   <div>
