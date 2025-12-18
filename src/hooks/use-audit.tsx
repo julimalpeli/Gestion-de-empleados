@@ -60,7 +60,7 @@ export const useAudit = () => {
           err,
           "No se pudieron obtener los registros de auditoría",
         );
-        console.error("Error fetching audit logs:", readableMessage, err);
+        console.error("Error fetching audit logs:", readableMessage);
         setError(readableMessage);
       } finally {
         setLoading(false);
