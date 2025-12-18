@@ -1901,7 +1901,7 @@ const Payroll = () => {
                                 return (
                                   <div>
                                     <div>
-                                      {formatCurrency(correctAguinaldo)}
+                                      {formatCurrency(correctAguinaldoResult.amount)}
                                     </div>
                                     {isProportional && (
                                       <div className="text-xs text-green-700">
