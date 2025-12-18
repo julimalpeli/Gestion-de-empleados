@@ -138,6 +138,12 @@ if (import.meta.env.DEV) {
         console.log("   - fixEmployeeUsersQuery() - Safe employee/user query");
         console.log("   🔇 DEBUG CONTROL:");
         console.log("   - silentMode() - Turn off console noise");
+        console.log("   💰 AGUINALDO RECALCULATION:");
+        console.log(
+          "   - recalculateAguinaldosForPeriod('2025-12') - Recalculate aguinaldos for period",
+        );
+        (window as any).recalculateAguinaldosForPeriod =
+          recalculateAguinaldosModule.recalculateAguinaldosForPeriod;
         console.log("   - debugModeProduction() - Only errors");
         console.log("   - showDebugStatus() - Current debug settings");
         console.log("   🔧 USER FIXES:");
