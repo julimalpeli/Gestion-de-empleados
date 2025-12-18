@@ -315,6 +315,10 @@ export const usePayroll = () => {
         updateData.holiday_bonus = updates.holidayBonus;
       if (updates.aguinaldo !== undefined)
         updateData.aguinaldo = updates.aguinaldo;
+      if (updates.aguinaldoPagoEfectivo !== undefined)
+        updateData.aguinaldo_pago_efectivo = updates.aguinaldoPagoEfectivo;
+      if (updates.aguinaldoPagoDeposito !== undefined)
+        updateData.aguinaldo_pago_deposito = updates.aguinaldoPagoDeposito;
       if (updates.discounts !== undefined)
         updateData.discounts = updates.discounts;
       if (updates.advances !== undefined)
