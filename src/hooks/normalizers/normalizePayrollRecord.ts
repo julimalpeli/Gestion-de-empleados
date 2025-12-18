@@ -76,6 +76,12 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
     readField(record, "holiday_bonus", "holidayBonus"),
   );
   const aguinaldo = toNumber(readField(record, "aguinaldo", "aguinaldo"));
+  const aguinaldoPagoEfectivo = toNumber(
+    readField(record, "aguinaldo_pago_efectivo", "aguinaldoPagoEfectivo"),
+  );
+  const aguinaldoPagoDeposito = toNumber(
+    readField(record, "aguinaldo_pago_deposito", "aguinaldoPagoDeposito"),
+  );
   const discounts = toNumber(readField(record, "discounts", "discounts"));
   const advances = toNumber(readField(record, "advances", "advances"));
   const presentismoAmount = toNumber(
@@ -121,6 +127,8 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
     baseAmount: resolvedBaseAmount,
     holidayBonus,
     aguinaldo,
+    aguinaldoPagoEfectivo,
+    aguinaldoPagoDeposito,
     discounts,
     advances,
     whiteAmount: resolvedWhiteAmount,
