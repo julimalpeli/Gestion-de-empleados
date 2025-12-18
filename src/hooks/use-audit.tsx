@@ -147,7 +147,7 @@ export const useAudit = () => {
           user?.id,
         );
       } catch (error) {
-        console.error("Error auditing salary history:", error);
+        console.error("Error auditing salary history:", getReadableErrorMessage(error));
       }
     },
     [user?.id],
