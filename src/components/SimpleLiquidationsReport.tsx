@@ -117,6 +117,8 @@ const SimpleLiquidationsReport = ({
         efectivo: efectivoReal,
         deposito: whiteAmount,
         aguinaldo: calculatedAguinaldo,
+        aguinaldoPagoEfectivo: record.aguinaldoPagoEfectivo || 0,
+        aguinaldoPagoDeposito: record.aguinaldoPagoDeposito || 0,
         totalNeto: netTotal,
         hasAguinaldo: calculatedAguinaldo > 0,
         status: record.status || "draft",
