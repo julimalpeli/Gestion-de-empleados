@@ -1937,15 +1937,15 @@ const Payroll = () => {
                                   (e) => e.name === record.employeeName,
                                 );
                                 if (employee) {
-                                  const correctAguinaldo = calculateAguinaldo(
+                                  const correctAguinaldoResult = calculateAguinaldoLocal(
                                     employee,
                                     record.period,
                                   );
-                                  if (correctAguinaldo > 0) {
+                                  if (correctAguinaldoResult.amount > 0) {
                                     return (
                                       <div className="text-xs text-green-700">
                                         Incluye aguinaldo:{" "}
-                                        {formatCurrency(correctAguinaldo)}
+                                        {formatCurrency(correctAguinaldoResult.amount)}
                                       </div>
                                     );
                                   }
