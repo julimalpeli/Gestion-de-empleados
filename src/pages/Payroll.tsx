@@ -851,7 +851,13 @@ const Payroll = () => {
     }
 
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
-    const aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod);
+    // Si está editando un registro existente, usar el valor guardado, no recalcular
+    let aguinaldoAmount = 0;
+    if (useStoredAguinaldo && editingRecord) {
+      aguinaldoAmount = editingRecord.aguinaldo || 0;
+    } else {
+      aguinaldoAmount = calculateAguinaldo(employee, selectedPeriod)?.amount || 0;
+    }
 
     // Total neto = todos los conceptos positivos - deducciones
     // Usar el salario base proporcional a días trabajados, no el sueldo completo
