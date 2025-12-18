@@ -353,7 +353,7 @@ const Payroll = () => {
         ? new Date(currentYear, 5, 30) // 30 junio
         : new Date(currentYear, 11, 31); // 31 diciembre
 
-    const startDate = new Date(employee.startDate);
+    const startDate = new Date(employee.startDate + "T00:00:00");
 
     // Si empezó después del semestre, no corresponde aguinaldo
     if (startDate > semesterEnd) {
