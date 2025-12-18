@@ -249,8 +249,9 @@ export const useAuditStats = () => {
         const auditStats = await auditService.getAuditStats(filters);
         setStats(auditStats);
       } catch (err) {
-        console.error("Error fetching audit stats:", err);
-        setError(err instanceof Error ? err.message : "Error desconocido");
+        const readableMessage = getReadableErrorMessage(err, "Error desconocido");
+        console.error("Error fetching audit stats:", readableMessage);
+        setError(readableMessage);
       } finally {
         setLoading(false);
       }
