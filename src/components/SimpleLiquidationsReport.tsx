@@ -301,11 +301,13 @@ const SimpleLiquidationsReport = ({
       columnStyles: {
         0: { cellWidth: 50, halign: "left" }, // Empleado
         1: { cellWidth: 25, halign: "center" }, // Período
-        2: { cellWidth: 35, halign: "right" }, // Efectivo
-        3: { cellWidth: 35, halign: "right" }, // Depósito
-        4: { cellWidth: 35, halign: "right" }, // Aguinaldo
-        5: { cellWidth: 40, halign: "right" }, // Total Neto
-        6: { cellWidth: 25, halign: "center" }, // Estado
+        2: { cellWidth: 30, halign: "right" }, // Efectivo
+        3: { cellWidth: 30, halign: "right" }, // Depósito
+        4: { cellWidth: 30, halign: "right" }, // Aguinaldo
+        5: { cellWidth: 30, halign: "right" }, // Agu.Efectivo
+        6: { cellWidth: 30, halign: "right" }, // Agu.Depósito
+        7: { cellWidth: 35, halign: "right" }, // Total Neto
+        8: { cellWidth: 25, halign: "center" }, // Estado
       },
       didParseCell: function (data: any) {
         if (data.row.index === tableData.length - 1) {
