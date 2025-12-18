@@ -191,7 +191,7 @@ export const useAudit = () => {
           user?.id,
         );
       } catch (error) {
-        console.error("Error auditing vacation:", error);
+        console.error("Error auditing vacation:", getReadableErrorMessage(error));
       }
     },
     [user?.id],
