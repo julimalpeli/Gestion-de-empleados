@@ -202,32 +202,38 @@ class AuditService {
     }
 
     try {
+      // Validar que los filtros sean valores válidos antes de aplicarlos
+      if (filters && typeof filters !== 'object') {
+        console.error("Invalid filters parameter:", filters);
+        return [];
+      }
+
       // Primero intentar consulta simple sin join para evitar errores de esquema
       let query = supabase
         .from("audit_log")
         .select("*")
         .order("changed_at", { ascending: false });
 
-      // Aplicar filtros si existen
-      if (filters?.table_name) {
+      // Aplicar filtros si existen - con validación de tipo
+      if (filters?.table_name && typeof filters.table_name === 'string') {
         query = query.eq("table_name", filters.table_name);
       }
-      if (filters?.record_id) {
+      if (filters?.record_id && typeof filters.record_id === 'string') {
         query = query.eq("record_id", filters.record_id);
       }
-      if (filters?.action) {
+      if (filters?.action && typeof filters.action === 'string') {
         query = query.eq("action", filters.action);
       }
-      if (filters?.changed_by) {
+      if (filters?.changed_by && typeof filters.changed_by === 'string') {
         query = query.eq("changed_by", filters.changed_by);
       }
-      if (filters?.start_date) {
+      if (filters?.start_date && typeof filters.start_date === 'string') {
         query = query.gte("changed_at", filters.start_date);
       }
-      if (filters?.end_date) {
+      if (filters?.end_date && typeof filters.end_date === 'string') {
         query = query.lte("changed_at", filters.end_date);
       }
-      if (filters?.limit) {
+      if (filters?.limit && typeof filters.limit === 'number') {
         query = query.limit(filters.limit);
       }
 
@@ -235,7 +241,7 @@ class AuditService {
 
       if (error) {
         const readableMessage = getReadableErrorMessage(error);
-        console.error("Error fetching audit logs:", readableMessage, error);
+        console.error("Error fetching audit logs:", readableMessage);
 
         // Graceful network handling
         if (
@@ -277,7 +283,7 @@ class AuditService {
       return data || [];
     } catch (error) {
       const readableMessage = getReadableErrorMessage(error);
-      console.error("Error getting audit logs:", readableMessage, error);
+      console.error("Error getting audit logs:", readableMessage);
 
       // Manejo graceful de errores de red
       if (
