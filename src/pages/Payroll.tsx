@@ -526,6 +526,8 @@ const Payroll = () => {
         bonusAmount: parseFloat(bonusAmount) || 0,
         presentismoAmount: calculation.presentismoAmount || 0,
         aguinaldo: calculation.aguinaldo || 0,
+        aguinaldoPagoEfectivo: parseFloat(aguinaldoPagoEfectivo) || 0,
+        aguinaldoPagoDeposito: parseFloat(aguinaldoPagoDeposito) || 0,
         netTotal: calculation.netTotal,
         status: "draft",
         // Campos calculados adicionales
