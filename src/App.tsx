@@ -50,6 +50,7 @@ if (import.meta.env.DEV) {
         fixUserModule,
         userDebugModule,
         confirmEmailModule,
+        recalculateAguinaldosModule,
       ]) => {
         // Expose all functions globally
         (window as any).recreateEmployeeUsers =
