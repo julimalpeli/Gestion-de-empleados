@@ -103,7 +103,7 @@ export const useAudit = () => {
           user?.id,
         );
       } catch (error) {
-        console.error("Error auditing employee:", error);
+        console.error("Error auditing employee:", getReadableErrorMessage(error));
       }
     },
     [user?.id],
