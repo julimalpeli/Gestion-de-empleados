@@ -39,6 +39,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LiquidationsReport from "@/components/LiquidationsReport";
 import SimpleLiquidationsReport from "@/components/SimpleLiquidationsReport";
 import MultipleReceiptsReport from "@/components/MultipleReceiptsReport";
+import AguinaldoReport from "@/components/AguinaldoReport";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
@@ -193,6 +194,9 @@ const Reports = () => {
         <TabsList>
           <TabsTrigger value="liquidaciones">
             Reporte de Liquidaciones
+          </TabsTrigger>
+          <TabsTrigger value="reporte-aguinaldo">
+            Reporte de Aguinaldo
           </TabsTrigger>
           <TabsTrigger value="aguinaldos">
             Calculadora de Aguinaldos
