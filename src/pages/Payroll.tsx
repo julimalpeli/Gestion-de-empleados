@@ -116,6 +116,8 @@ const Payroll = () => {
   const [overtimeEnabled, setOvertimeEnabled] = useState(false);
   const [overtimeHours, setOvertimeHours] = useState("");
   const [bonusAmount, setBonusAmount] = useState("");
+  const [aguinaldoPagoEfectivo, setAguinaldoPagoEfectivo] = useState("");
+  const [aguinaldoPagoDeposito, setAguinaldoPagoDeposito] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // Campo de búsqueda
