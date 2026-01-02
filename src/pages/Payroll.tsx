@@ -617,7 +617,7 @@ const Payroll = () => {
   };
 
   // Calcular datos de liquidación
-  const calculatePayroll = (useStoredAguinaldo = false) => {
+  const calculatePayroll = () => {
     if (!selectedEmployee) return null;
 
     const employee = employees.find(
@@ -700,19 +700,10 @@ const Payroll = () => {
     }
 
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
-    // Si está editando un registro existente, usar el valor guardado, no recalcular
     let aguinaldoAmount = 0;
-    if (useStoredAguinaldo && editingRecord && editingRecord.aguinaldo) {
-      aguinaldoAmount = editingRecord.aguinaldo;
-      console.log(
-        `💰 [AGUINALDO] Using STORED value: ${aguinaldoAmount} for ${employee?.name}`,
-      );
-    } else {
-      const aguinaldoResult = calculateAguinaldoLocal(employee, selectedPeriod);
-      aguinaldoAmount = aguinaldoResult?.amount || 0;
-      console.log(
-        `💰 [AGUINALDO] CALCULATED value: ${aguinaldoAmount} (proportional: ${aguinaldoResult?.proportional}) for ${employee?.name}`,
-      );
+    if (isAguinaldoPeriod(selectedPeriod)) {
+      const aguinaldoResult = calculateAguinaldo(employee, selectedPeriod, payrollRecords);
+      aguinaldoAmount = aguinaldoResult.amount || 0;
     }
 
     // Total neto = todos los conceptos positivos - deducciones
