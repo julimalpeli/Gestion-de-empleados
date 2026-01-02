@@ -405,8 +405,6 @@ const Payroll = () => {
       setOvertimeEnabled(false);
       setOvertimeHours("");
       setBonusAmount("");
-      setAguinaldoPagoEfectivo("");
-      setAguinaldoPagoDeposito("");
       setHistoricalSalary(null);
       setIsNewPayrollOpen(false);
 
@@ -585,8 +583,6 @@ const Payroll = () => {
       setOvertimeEnabled(false);
       setOvertimeHours("");
       setBonusAmount("");
-      setAguinaldoPagoEfectivo("");
-      setAguinaldoPagoDeposito("");
       setHistoricalSalary(null);
       setIsNewPayrollOpen(false);
 
