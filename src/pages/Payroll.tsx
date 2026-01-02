@@ -43,6 +43,7 @@ import {
   generatePayrollReceiptPDF,
   generatePayrollReceiptExcel,
 } from "@/utils/receiptGenerator";
+import { calculateAguinaldo } from "@/utils/aguinaldo";
 import {
   Plus,
   Calculator,
