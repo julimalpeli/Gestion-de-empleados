@@ -86,13 +86,7 @@ export default function AguinaldoReport() {
   };
 
   const reportData: AguinaldoReportRecord[] = employees
-    .filter((emp) => {
-      // Mostrar empleados activos o que tengan registros de payroll en este período
-      const hasPayrollInPeriod = payrollRecords.some(
-        (p) => p.employeeId === emp.id && p.period === selectedPeriod,
-      );
-      return emp.status === "active" || hasPayrollInPeriod;
-    })
+    .filter((emp) => emp.status === "active")
     .map((emp) => {
       const aguinaldoResult = calculateAguinaldo(emp, selectedPeriod, payrollRecords);
       const payrollRecord = payrollRecords.find(
