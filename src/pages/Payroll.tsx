@@ -547,7 +547,7 @@ const Payroll = () => {
   const handleUpdatePayroll = async () => {
     if (!editingRecord) return;
 
-    const calculation = calculatePayroll(true);
+    const calculation = calculatePayroll();
 
     try {
       const updatedData = {
