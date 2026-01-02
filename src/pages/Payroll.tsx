@@ -1701,9 +1701,10 @@ const Payroll = () => {
                                 );
                                 if (!employee) return "-";
 
-                                const correctAguinaldoResult = calculateAguinaldoLocal(
+                                const correctAguinaldoResult = calculateAguinaldo(
                                   employee,
                                   record.period,
+                                  payrollRecords,
                                 );
                                 if (correctAguinaldoResult.amount === 0) return "-";
 
@@ -1748,9 +1749,10 @@ const Payroll = () => {
                                   (e) => e.name === record.employeeName,
                                 );
                                 if (employee) {
-                                  const correctAguinaldoResult = calculateAguinaldoLocal(
+                                  const correctAguinaldoResult = calculateAguinaldo(
                                     employee,
                                     record.period,
+                                    payrollRecords,
                                   );
                                   if (correctAguinaldoResult.amount > 0) {
                                     return (
