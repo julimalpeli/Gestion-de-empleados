@@ -121,8 +121,6 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
     baseAmount: resolvedBaseAmount,
     holidayBonus,
     aguinaldo,
-    aguinaldoPagoEfectivo,
-    aguinaldoPagoDeposito,
     discounts,
     advances,
     whiteAmount: resolvedWhiteAmount,
