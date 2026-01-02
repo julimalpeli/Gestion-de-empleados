@@ -13,7 +13,6 @@ export interface EmployeeDocument {
     | "sac"
     | "documentos"
     | "formularios"
-    | "certificados_medicos"
     | "otros";
   description?: string;
   uploadedAt: string;
@@ -30,7 +29,6 @@ export interface CreateDocumentRequest {
     | "sac"
     | "documentos"
     | "formularios"
-    | "certificados_medicos"
     | "otros";
   description?: string;
 }
