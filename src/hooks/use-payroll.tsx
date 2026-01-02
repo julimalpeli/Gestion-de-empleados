@@ -253,8 +253,6 @@ export const usePayroll = () => {
           base_amount: payroll.baseAmount,
           holiday_bonus: payroll.holidayBonus || 0,
           aguinaldo: payroll.aguinaldo || 0,
-          aguinaldo_pago_efectivo: payroll.aguinaldoPagoEfectivo || 0,
-          aguinaldo_pago_deposito: payroll.aguinaldoPagoDeposito || 0,
           discounts: payroll.discounts || 0,
           advances: payroll.advances || 0,
           white_amount: payroll.whiteAmount,
