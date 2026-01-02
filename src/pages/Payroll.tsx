@@ -300,14 +300,6 @@ const Payroll = () => {
     }
   }, [selectedPeriod]);
 
-  // Reset aguinaldo payment fields when opening dialog for new payroll
-  useEffect(() => {
-    if (isNewPayrollOpen && !editingRecord && !isEditMode) {
-      // Dialog opened for new payroll (not view or edit)
-      setAguinaldoPagoEfectivo("");
-      setAguinaldoPagoDeposito("");
-    }
-  }, [isNewPayrollOpen, editingRecord, isEditMode]);
 
   // Auto-seleccionar el último período solo al cargar inicialmente los datos
   // No cambiar automáticamente si el usuario ya eligió "all"
