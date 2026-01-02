@@ -51,7 +51,6 @@ const DOCUMENT_CATEGORIES = [
   { value: "sac", label: "SAC" },
   { value: "documentos", label: "Documentos" },
   { value: "formularios", label: "Formularios" },
-  { value: "certificados_medicos", label: "Certificados Médicos" },
   { value: "otros", label: "Otros Documentos" },
 ];
 
@@ -232,7 +231,6 @@ export default function DocumentManager({
       sac: "bg-blue-100 text-blue-800",
       documentos: "bg-purple-100 text-purple-800",
       formularios: "bg-orange-100 text-orange-800",
-      certificados_medicos: "bg-red-100 text-red-800",
       otros: "bg-gray-100 text-gray-800",
     };
     return colors[category] || colors.otros;
