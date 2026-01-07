@@ -1901,6 +1901,36 @@ const Payroll = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
+                            {record.status !== "paid" && (
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => handleEditRecord(record)}
+                                      disabled={
+                                        !isManager() &&
+                                        record.status !== "draft"
+                                      }
+                                      className="h-6 w-6 p-0"
+                                    >
+                                      <Edit3 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>
+                                      {record.status === "draft"
+                                        ? "Editar liquidación"
+                                        : isManager()
+                                          ? "Editar liquidación (Gerente/Admin)"
+                                          : "No tienes permiso"}
+                                    </p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            )}
+
                             <DropdownMenu>
                               <TooltipProvider>
                                 <Tooltip>
