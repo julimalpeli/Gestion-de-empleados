@@ -298,7 +298,6 @@ const Payroll = () => {
     }
   }, [selectedPeriod]);
 
-
   // Auto-seleccionar el último período solo al cargar inicialmente los datos
   // No cambiar automáticamente si el usuario ya eligió "all"
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
@@ -688,7 +687,11 @@ const Payroll = () => {
     // Calculate aguinaldo if it's an aguinaldo period (June or December)
     let aguinaldoAmount = 0;
     if (isAguinaldoPeriod(selectedPeriod)) {
-      const aguinaldoResult = calculateAguinaldo(employee, selectedPeriod, payrollRecords);
+      const aguinaldoResult = calculateAguinaldo(
+        employee,
+        selectedPeriod,
+        payrollRecords,
+      );
       aguinaldoAmount = aguinaldoResult.amount || 0;
     }
 
@@ -726,7 +729,9 @@ const Payroll = () => {
     };
   };
 
-  const calculation = selectedEmployee ? calculatePayroll(!!editingRecord) : null;
+  const calculation = selectedEmployee
+    ? calculatePayroll(!!editingRecord)
+    : null;
 
   // Función para formatear moneda
   const formatCurrency = (amount) => {
@@ -1144,7 +1149,6 @@ const Payroll = () => {
                     disabled={editingRecord && !isEditMode}
                   />
                 </div>
-
 
                 <div className="space-y-2">
                   <Label htmlFor="whiteWage">Sueldo Depósito</Label>
@@ -1619,19 +1623,24 @@ const Payroll = () => {
                                 );
                                 if (!employee) return "-";
 
-                                const correctAguinaldoResult = calculateAguinaldo(
-                                  employee,
-                                  record.period,
-                                  payrollRecords,
-                                );
-                                if (correctAguinaldoResult.amount === 0) return "-";
+                                const correctAguinaldoResult =
+                                  calculateAguinaldo(
+                                    employee,
+                                    record.period,
+                                    payrollRecords,
+                                  );
+                                if (correctAguinaldoResult.amount === 0)
+                                  return "-";
 
-                                const isProportional = correctAguinaldoResult.proportional;
+                                const isProportional =
+                                  correctAguinaldoResult.proportional;
 
                                 return (
                                   <div>
                                     <div>
-                                      {formatCurrency(correctAguinaldoResult.amount)}
+                                      {formatCurrency(
+                                        correctAguinaldoResult.amount,
+                                      )}
                                     </div>
                                     {isProportional && (
                                       <div className="text-xs text-green-700">
@@ -1667,16 +1676,19 @@ const Payroll = () => {
                                   (e) => e.name === record.employeeName,
                                 );
                                 if (employee) {
-                                  const correctAguinaldoResult = calculateAguinaldo(
-                                    employee,
-                                    record.period,
-                                    payrollRecords,
-                                  );
+                                  const correctAguinaldoResult =
+                                    calculateAguinaldo(
+                                      employee,
+                                      record.period,
+                                      payrollRecords,
+                                    );
                                   if (correctAguinaldoResult.amount > 0) {
                                     return (
                                       <div className="text-xs text-green-700">
                                         Incluye aguinaldo:{" "}
-                                        {formatCurrency(correctAguinaldoResult.amount)}
+                                        {formatCurrency(
+                                          correctAguinaldoResult.amount,
+                                        )}
                                       </div>
                                     );
                                   }
