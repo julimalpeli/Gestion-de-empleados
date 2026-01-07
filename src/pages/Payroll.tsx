@@ -427,8 +427,6 @@ const Payroll = () => {
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
-    setAguinaldoPagoEfectivo(record.aguinaldoPagoEfectivo?.toString() || "0");
-    setAguinaldoPagoDeposito(record.aguinaldoPagoDeposito?.toString() || "0");
 
     // Obtener el sueldo histórico correcto para el período de la liquidación
     try {
@@ -478,8 +476,6 @@ const Payroll = () => {
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
-    setAguinaldoPagoEfectivo(record.aguinaldoPagoEfectivo?.toString() || "0");
-    setAguinaldoPagoDeposito(record.aguinaldoPagoDeposito?.toString() || "0");
 
     // Obtener el sueldo histórico solo para períodos pasados, no para el período actual
     const now = new Date();
