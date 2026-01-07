@@ -1913,9 +1913,8 @@ const Payroll = () => {
                                         !isManager() &&
                                         record.status !== "draft"
                                       }
-                                      className="h-6 w-6 p-0 text-gray-600 hover:text-gray-700 hover:bg-gray-50"
                                     >
-                                      <Edit3 className="h-3 w-3" />
+                                      <Edit3 className="h-4 w-4" />
                                     </Button>
                                   </TooltipTrigger>
                                   <TooltipContent>
