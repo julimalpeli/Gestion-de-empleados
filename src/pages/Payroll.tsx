@@ -1901,45 +1901,6 @@ const Payroll = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => handleEditRecord(record)}
-                                    disabled={
-                                      record.status === "paid" ||
-                                      (!isManager() &&
-                                        record.status !== "draft")
-                                    }
-                                    className={
-                                      record.status === "paid"
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : ""
-                                    }
-                                  >
-                                    {record.status === "paid" ? (
-                                      <Eye className="h-4 w-4" />
-                                    ) : (
-                                      <Calculator className="h-4 w-4" />
-                                    )}
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>
-                                    {record.status === "paid"
-                                      ? "Ver liquidación"
-                                      : record.status === "draft"
-                                        ? "Editar liquidación"
-                                        : isManager()
-                                          ? "Editar liquidación (Gerente/Admin)"
-                                          : "Solo lectura"}
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-
                             <DropdownMenu>
                               <TooltipProvider>
                                 <Tooltip>
