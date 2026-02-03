@@ -154,11 +154,20 @@ const SimpleLiquidationsReport = ({
       efectivo: acc.efectivo + record.efectivo,
       deposito: acc.deposito + record.deposito,
       aguinaldo: acc.aguinaldo + record.aguinaldo,
-      aguinaldoPagoEfectivo: acc.aguinaldoPagoEfectivo + record.aguinaldoPagoEfectivo,
-      aguinaldoPagoDeposito: acc.aguinaldoPagoDeposito + record.aguinaldoPagoDeposito,
+      aguinaldoPagoEfectivo:
+        acc.aguinaldoPagoEfectivo + record.aguinaldoPagoEfectivo,
+      aguinaldoPagoDeposito:
+        acc.aguinaldoPagoDeposito + record.aguinaldoPagoDeposito,
       totalNeto: acc.totalNeto + record.totalNeto,
     }),
-    { efectivo: 0, deposito: 0, aguinaldo: 0, aguinaldoPagoEfectivo: 0, aguinaldoPagoDeposito: 0, totalNeto: 0 },
+    {
+      efectivo: 0,
+      deposito: 0,
+      aguinaldo: 0,
+      aguinaldoPagoEfectivo: 0,
+      aguinaldoPagoDeposito: 0,
+      totalNeto: 0,
+    },
   );
 
   const exportToCSV = () => {
@@ -251,8 +260,12 @@ const SimpleLiquidationsReport = ({
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
       record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
-      record.aguinaldoPagoEfectivo > 0 ? formatCurrency(record.aguinaldoPagoEfectivo) : "-",
-      record.aguinaldoPagoDeposito > 0 ? formatCurrency(record.aguinaldoPagoDeposito) : "-",
+      record.aguinaldoPagoEfectivo > 0
+        ? formatCurrency(record.aguinaldoPagoEfectivo)
+        : "-",
+      record.aguinaldoPagoDeposito > 0
+        ? formatCurrency(record.aguinaldoPagoDeposito)
+        : "-",
       formatCurrency(record.totalNeto),
       record.status === "paid"
         ? "Pagada"

@@ -188,8 +188,10 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       discounts: acc.discounts + record.discounts,
       holidayBonus: acc.holidayBonus + record.holidayBonus,
       aguinaldo: acc.aguinaldo + record.aguinaldo,
-      aguinaldoPagoEfectivo: acc.aguinaldoPagoEfectivo + record.aguinaldoPagoEfectivo,
-      aguinaldoPagoDeposito: acc.aguinaldoPagoDeposito + record.aguinaldoPagoDeposito,
+      aguinaldoPagoEfectivo:
+        acc.aguinaldoPagoEfectivo + record.aguinaldoPagoEfectivo,
+      aguinaldoPagoDeposito:
+        acc.aguinaldoPagoDeposito + record.aguinaldoPagoDeposito,
       efectivo: acc.efectivo + record.efectivo,
       deposito: acc.deposito + record.deposito,
       totalNeto: acc.totalNeto + record.totalNeto,
