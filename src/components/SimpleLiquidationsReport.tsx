@@ -79,6 +79,13 @@ const SimpleLiquidationsReport = ({
     return `${year}-${semester}`;
   };
 
+  // Check if a month is an aguinaldo month (only June and December)
+  const isAguinaldoMonth = (monthPeriod: string): boolean => {
+    const [, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month);
+    return monthNum === 6 || monthNum === 12;
+  };
+
   // Filter records by selected period - SIMPLE FORMAT (original)
   const reportData = payrollRecords
     .filter((record) => record.period === selectedPeriod)
@@ -103,12 +110,15 @@ const SimpleLiquidationsReport = ({
       // Si no hay depósito (whiteAmount = 0), todo el netTotal va a efectivo
       const efectivoReal = whiteAmount === 0 ? netTotal : informalAmount;
 
-      // Calculate aguinaldo dynamically to match Reports tab
-      const employee = employees.find((emp) => emp.id === record.employeeId);
-      const semesterPeriod = getSemesterPeriod(record.period);
-      const calculatedAguinaldo = employee
-        ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
-        : 0;
+      // Calculate aguinaldo only for June and December
+      let calculatedAguinaldo = 0;
+      if (isAguinaldoMonth(record.period)) {
+        const employee = employees.find((emp) => emp.id === record.employeeId);
+        const semesterPeriod = getSemesterPeriod(record.period);
+        calculatedAguinaldo = employee
+          ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
+          : 0;
+      }
 
       return {
         id: record.id,
