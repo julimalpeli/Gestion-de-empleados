@@ -177,8 +177,6 @@ const SimpleLiquidationsReport = ({
       "Efectivo",
       "Depósito",
       "Aguinaldo",
-      "Agu.Efectivo",
-      "Agu.Depósito",
       "Total Neto",
     ];
     const csvContent = [
@@ -190,8 +188,6 @@ const SimpleLiquidationsReport = ({
           record.efectivo,
           record.deposito,
           record.aguinaldo,
-          record.aguinaldoPagoEfectivo,
-          record.aguinaldoPagoDeposito,
           record.totalNeto,
         ].join(","),
       ),
@@ -260,12 +256,6 @@ const SimpleLiquidationsReport = ({
       formatCurrency(record.efectivo),
       formatCurrency(record.deposito),
       record.aguinaldo > 0 ? formatCurrency(record.aguinaldo) : "-",
-      record.aguinaldoPagoEfectivo > 0
-        ? formatCurrency(record.aguinaldoPagoEfectivo)
-        : "-",
-      record.aguinaldoPagoDeposito > 0
-        ? formatCurrency(record.aguinaldoPagoDeposito)
-        : "-",
       formatCurrency(record.totalNeto),
       record.status === "paid"
         ? "Pagada"
@@ -285,8 +275,6 @@ const SimpleLiquidationsReport = ({
       formatCurrency(totals.efectivo),
       formatCurrency(totals.deposito),
       formatCurrency(totals.aguinaldo),
-      formatCurrency(totals.aguinaldoPagoEfectivo),
-      formatCurrency(totals.aguinaldoPagoDeposito),
       formatCurrency(totals.totalNeto),
       "",
     ]);
@@ -299,8 +287,6 @@ const SimpleLiquidationsReport = ({
           "Efectivo",
           "Depósito",
           "Aguinaldo",
-          "Agu.Efectivo",
-          "Agu.Depósito",
           "Total Neto",
           "Estado",
         ],
@@ -327,10 +313,8 @@ const SimpleLiquidationsReport = ({
         2: { cellWidth: 30, halign: "right" }, // Efectivo
         3: { cellWidth: 30, halign: "right" }, // Depósito
         4: { cellWidth: 30, halign: "right" }, // Aguinaldo
-        5: { cellWidth: 30, halign: "right" }, // Agu.Efectivo
-        6: { cellWidth: 30, halign: "right" }, // Agu.Depósito
-        7: { cellWidth: 35, halign: "right" }, // Total Neto
-        8: { cellWidth: 25, halign: "center" }, // Estado
+        5: { cellWidth: 35, halign: "right" }, // Total Neto
+        6: { cellWidth: 25, halign: "center" }, // Estado
       },
       didParseCell: function (data: any) {
         if (data.row.index === tableData.length - 1) {
