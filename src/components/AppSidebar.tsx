@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth-simple";
+import { getVersionString } from "@/config/version";
 
 interface MenuItem {
   title: string;
