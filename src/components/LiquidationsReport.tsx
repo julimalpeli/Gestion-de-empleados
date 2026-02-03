@@ -80,6 +80,13 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
     return `${year}-${semester}`;
   };
 
+  // Check if a month is an aguinaldo month (only June and December)
+  const isAguinaldoMonth = (monthPeriod: string): boolean => {
+    const [, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month);
+    return monthNum === 6 || monthNum === 12;
+  };
+
   // Filter records by selected period - real data from database
   const reportData = payrollRecords
     .filter((record) => record.period === selectedPeriod)
@@ -95,12 +102,15 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       const discounts = record.discounts || 0;
       const holidayBonus = record.holidayBonus || 0;
 
-      // Calculate aguinaldo dynamically to match Reports tab
-      const employee = employees.find((emp) => emp.id === record.employeeId);
-      const semesterPeriod = getSemesterPeriod(record.period);
-      const calculatedAguinaldo = employee
-        ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
-        : 0;
+      // Calculate aguinaldo only for June and December
+      let calculatedAguinaldo = 0;
+      if (isAguinaldoMonth(record.period)) {
+        const employee = employees.find((emp) => emp.id === record.employeeId);
+        const semesterPeriod = getSemesterPeriod(record.period);
+        calculatedAguinaldo = employee
+          ? calculateAguinaldo(employee, semesterPeriod, payrollRecords).amount
+          : 0;
+      }
 
       const storedBaseAmount =
         typeof record.baseAmount === "number" &&
