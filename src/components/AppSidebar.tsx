@@ -143,8 +143,11 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
         {user && (
-          <div className="px-2 py-1 text-xs text-muted-foreground">
-            {user.name}
+          <div className="px-2 py-1 text-xs text-muted-foreground flex items-center justify-between">
+            <span>{user.name}</span>
+            <span className="text-xs text-gray-400 ml-2">
+              {getVersionString()}
+            </span>
           </div>
         )}
       </SidebarFooter>
