@@ -499,6 +499,7 @@ const Employees = () => {
       "Encargado/a": "Encargado/a",
       Barra: "Barra",
       "Jefe de Barra": "Jefe de Barra",
+      Gerente: "Gerente",
       // Backward compatibility for old format
       cocinero: "Cocinero",
       jefe_cocina: "Jefe de Cocina",
@@ -510,6 +511,7 @@ const Employees = () => {
       barra: "Barra",
       jefe_barra: "Jefe de Barra",
       manager: "Encargado/a",
+      gerente: "Gerente",
     };
     return positions[position] || position;
   };
@@ -703,6 +705,7 @@ const Employees = () => {
                       <SelectItem value="Jefe de Barra">
                         Jefe de Barra
                       </SelectItem>
+                      <SelectItem value="Gerente">Gerente</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1163,6 +1166,7 @@ const Employees = () => {
                     <SelectItem value="Encargado/a">Encargado/a</SelectItem>
                     <SelectItem value="Barra">Barra</SelectItem>
                     <SelectItem value="Jefe de Barra">Jefe de Barra</SelectItem>
+                    <SelectItem value="Gerente">Gerente</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
