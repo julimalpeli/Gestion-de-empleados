@@ -500,6 +500,9 @@ const Employees = () => {
       Barra: "Barra",
       "Jefe de Barra": "Jefe de Barra",
       Gerente: "Gerente",
+      Administrativo: "Administrativo",
+      Ventas: "Ventas",
+      Marketing: "Marketing",
       // Backward compatibility for old format
       cocinero: "Cocinero",
       jefe_cocina: "Jefe de Cocina",
@@ -512,6 +515,9 @@ const Employees = () => {
       jefe_barra: "Jefe de Barra",
       manager: "Encargado/a",
       gerente: "Gerente",
+      administrativo: "Administrativo",
+      ventas: "Ventas",
+      marketing: "Marketing",
     };
     return positions[position] || position;
   };
@@ -706,6 +712,9 @@ const Employees = () => {
                         Jefe de Barra
                       </SelectItem>
                       <SelectItem value="Gerente">Gerente</SelectItem>
+                      <SelectItem value="Administrativo">Administrativo</SelectItem>
+                      <SelectItem value="Ventas">Ventas</SelectItem>
+                      <SelectItem value="Marketing">Marketing</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1167,6 +1176,9 @@ const Employees = () => {
                     <SelectItem value="Barra">Barra</SelectItem>
                     <SelectItem value="Jefe de Barra">Jefe de Barra</SelectItem>
                     <SelectItem value="Gerente">Gerente</SelectItem>
+                    <SelectItem value="Administrativo">Administrativo</SelectItem>
+                    <SelectItem value="Ventas">Ventas</SelectItem>
+                    <SelectItem value="Marketing">Marketing</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
