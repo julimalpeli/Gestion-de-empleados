@@ -159,6 +159,7 @@ const rawFallbackEmployeesData = [
 export const fallbackEmployeesData = rawFallbackEmployeesData.map((e) => ({
   ...e,
   sueldoBase: (e.whiteWage || 0) + (e.informalWage || 0),
+  receives_presentismo: true, // NEW: All fallback employees receive presentismo by default
 }));
 export const fallbackEmployeeData = fallbackEmployeesData[0]; // Keep for compatibility
 

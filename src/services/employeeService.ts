@@ -230,6 +230,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         informal_wage: 0,
         daily_wage: Math.round(dailyWage),
         presentismo: employee.presentismo,
+        receives_presentismo: employee.receives_presentismo ?? true, // NEW: Default true if not specified
         loses_presentismo: false,
         status: "active" as const,
         start_date: employee.startDate,
@@ -334,6 +335,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
       }
       if (employee.presentismo !== undefined)
         updateData.presentismo = employee.presentismo;
+      if (employee.receives_presentismo !== undefined)
+        updateData.receives_presentismo = employee.receives_presentismo;
       if (employee.losesPresentismo !== undefined)
         updateData.loses_presentismo = employee.losesPresentismo;
       if (employee.status) updateData.status = employee.status;
@@ -626,6 +629,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       sueldoBase,
       dailyWage: this.toNumber(data.daily_wage),
       presentismo: this.toNumber(data.presentismo),
+      receives_presentismo: data.receives_presentismo ?? true, // NEW: Default true for backward compatibility
       losesPresentismo: Boolean(data.loses_presentismo),
       status: data.status,
       startDate: data.start_date,

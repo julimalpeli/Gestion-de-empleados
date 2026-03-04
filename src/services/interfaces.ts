@@ -116,6 +116,7 @@ export interface CreateEmployeeRequest {
   position: string;
   sueldoBase: number;
   presentismo: number;
+  receives_presentismo?: boolean; // NEW: Controls if employee receives presentismo (default: true)
   startDate: string;
   address?: string;
   email?: string;
