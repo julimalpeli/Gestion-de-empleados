@@ -220,7 +220,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const dailyWage = sueldoBase / 30;
       const vacationInfo = this.calculateVacationDays(employee.startDate);
 
-      const newEmployee = {
+      const newEmployee: any = {
         name: employee.name,
         dni: employee.dni,
         document_type: employee.documentType || "dni",
@@ -230,7 +230,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         informal_wage: 0,
         daily_wage: Math.round(dailyWage),
         presentismo: employee.presentismo,
-        receives_presentismo: employee.receives_presentismo ?? true, // NEW: Default true if not specified
+        // NOTE: receives_presentismo will be added if the column exists in DB
         loses_presentismo: false,
         status: "active" as const,
         start_date: employee.startDate,
@@ -240,13 +240,44 @@ export class SupabaseEmployeeService implements IEmployeeService {
         email: employee.email || "",
       };
 
+      // Add receives_presentismo if provided (will be ignored if column doesn't exist in DB)
+      if (employee.receives_presentismo !== undefined) {
+        newEmployee.receives_presentismo = employee.receives_presentismo;
+      }
+
       console.log("Sending to Supabase:", newEmployee);
 
-      const { data, error } = await supabase
+      let { data, error } = await supabase
         .from("employees")
         .insert(newEmployee)
         .select()
         .single();
+
+      // If column doesn't exist, retry without it
+      if (
+        error &&
+        error.message?.includes("receives_presentismo") &&
+        error.message?.includes("column")
+      ) {
+        console.warn(
+          "⚠️ Column 'receives_presentismo' not found in DB schema.",
+        );
+        console.warn(
+          "💡 To fix: Execute the SQL migration in Supabase: database/add_receives_presentismo.sql",
+        );
+        console.log("🔄 Retrying create without receives_presentismo field...");
+
+        // Remove receives_presentismo and retry
+        delete newEmployee.receives_presentismo;
+        const retryResult = await supabase
+          .from("employees")
+          .insert(newEmployee)
+          .select()
+          .single();
+
+        data = retryResult.data;
+        error = retryResult.error;
+      }
 
       console.log("Supabase response:", { data, error });
 
@@ -335,8 +366,8 @@ export class SupabaseEmployeeService implements IEmployeeService {
       }
       if (employee.presentismo !== undefined)
         updateData.presentismo = employee.presentismo;
-      if (employee.receives_presentismo !== undefined)
-        updateData.receives_presentismo = employee.receives_presentismo;
+      // NOTE: receives_presentismo will be added only if the column exists in the DB
+      // This is handled gracefully below
       if (employee.losesPresentismo !== undefined)
         updateData.loses_presentismo = employee.losesPresentismo;
       if (employee.status) updateData.status = employee.status;
@@ -358,11 +389,45 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       console.log("📝 Update data prepared:", updateData);
 
-      const { data, error } = await supabase
+      // First try to update with receives_presentismo if provided
+      let updatePayload = { ...updateData };
+      if (employee.receives_presentismo !== undefined) {
+        updatePayload.receives_presentismo = employee.receives_presentismo;
+      }
+
+      let { data, error } = await supabase
         .from("employees")
-        .update(updateData)
+        .update(updatePayload)
         .eq("id", id)
         .select();
+
+      // If we get a "column not found" error for receives_presentismo, try without it
+      if (
+        error &&
+        error.message?.includes("receives_presentismo") &&
+        error.message?.includes("column")
+      ) {
+        console.warn(
+          "⚠️ Column 'receives_presentismo' not found in DB schema. Running migration would fix this.",
+        );
+        console.warn(
+          "💡 To fix: Execute the SQL migration in Supabase: database/add_receives_presentismo.sql",
+        );
+        console.log("🔄 Retrying update without receives_presentismo field...");
+
+        // Remove receives_presentismo from payload and retry
+        const fallbackPayload = { ...updateData };
+        delete fallbackPayload.receives_presentismo;
+
+        const retryResult = await supabase
+          .from("employees")
+          .update(fallbackPayload)
+          .eq("id", id)
+          .select();
+
+        data = retryResult.data;
+        error = retryResult.error;
+      }
 
       console.log("📊 Update query result:", {
         data,
