@@ -111,6 +111,7 @@ const Employees = () => {
     position: "",
     sueldoBase: "",
     presentismo: "",
+    receives_presentismo: true,
     startDate: "",
     address: "",
     email: "",
@@ -253,6 +254,7 @@ const Employees = () => {
         position: newEmployee.position.trim(),
         sueldoBase: parseFloat(newEmployee.sueldoBase) || 0,
         presentismo: parseFloat(newEmployee.presentismo) || 0,
+        receives_presentismo: newEmployee.receives_presentismo,
         startDate: newEmployee.startDate,
         address: newEmployee.address.trim(),
         email: newEmployee.email.trim(),
@@ -298,6 +300,7 @@ const Employees = () => {
         position: "",
         sueldoBase: "",
         presentismo: "",
+        receives_presentismo: true,
         startDate: "",
         address: "",
         email: "",
@@ -393,6 +396,7 @@ const Employees = () => {
             position: editingEmployee.position.trim(),
             sueldoBase: parseFloat(editingEmployee.sueldoBase) || 0,
             presentismo: parseFloat(editingEmployee.presentismo) || 0,
+            receives_presentismo: editingEmployee.receives_presentismo,
             startDate: editingEmployee.startDate,
             address: editingEmployee.address.trim(),
             email: editingEmployee.email.trim(),
@@ -409,6 +413,7 @@ const Employees = () => {
           position: editingEmployee.position.trim(),
           sueldoBase: parseFloat(editingEmployee.sueldoBase) || 0,
           presentismo: parseFloat(editingEmployee.presentismo) || 0,
+          receives_presentismo: editingEmployee.receives_presentismo,
           startDate: editingEmployee.startDate,
           address: editingEmployee.address.trim(),
           email: editingEmployee.email.trim(),
@@ -752,8 +757,31 @@ const Employees = () => {
                   />
                 </div>
 
+                <div className="space-y-3 col-span-2 p-3 border rounded-md bg-blue-50">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="receivesPresentismo"
+                      defaultChecked={true}
+                      onChange={(e) =>
+                        setNewEmployee({
+                          ...newEmployee,
+                          receives_presentismo: e.target.checked,
+                        })
+                      }
+                      className="w-4 h-4"
+                    />
+                    <Label htmlFor="receivesPresentismo" className="mb-0 cursor-pointer font-medium">
+                      ¿Este empleado percibe presentismo?
+                    </Label>
+                  </div>
+                  <p className="text-xs text-muted-foreground ml-6">
+                    Desmarcar si el empleado no es elegible para recibir presentismo
+                  </p>
+                </div>
+
                 <div className="space-y-2">
-                  <Label htmlFor="presentismo">Presentismo</Label>
+                  <Label htmlFor="presentismo">Presentismo (Monto)</Label>
                   <CurrencyInput
                     id="presentismo"
                     placeholder="$ 0,00"
@@ -765,6 +793,9 @@ const Employees = () => {
                       })
                     }
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Monto fijo que percibe cuando "Mantiene" presentismo en una liquidación
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -1216,8 +1247,31 @@ const Employees = () => {
                 />
               </div>
 
+              <div className="space-y-3 col-span-2 p-3 border rounded-md bg-blue-50">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="edit-receivesPresentismo"
+                    checked={editingEmployee.receives_presentismo !== false}
+                    onChange={(e) =>
+                      setEditingEmployee({
+                        ...editingEmployee,
+                        receives_presentismo: e.target.checked,
+                      })
+                    }
+                    className="w-4 h-4"
+                  />
+                  <Label htmlFor="edit-receivesPresentismo" className="mb-0 cursor-pointer font-medium">
+                    ¿Este empleado percibe presentismo?
+                  </Label>
+                </div>
+                <p className="text-xs text-muted-foreground ml-6">
+                  Cambiar esto afectará liquidaciones futuras, no las pasadas
+                </p>
+              </div>
+
               <div className="space-y-2">
-                <Label htmlFor="edit-presentismo">Presentismo</Label>
+                <Label htmlFor="edit-presentismo">Presentismo (Monto)</Label>
                 <CurrencyInput
                   id="edit-presentismo"
                   placeholder="$ 0,00"
@@ -1229,6 +1283,9 @@ const Employees = () => {
                     })
                   }
                 />
+                <p className="text-xs text-muted-foreground">
+                  Monto fijo que percibe cuando "Mantiene" presentismo en una liquidación
+                </p>
               </div>
 
               <div className="space-y-2">

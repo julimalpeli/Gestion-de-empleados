@@ -97,7 +97,8 @@ export interface Employee {
   sueldoBase: number;
   dailyWage: number;
   presentismo: number;
-  losesPresentismo: boolean;
+  receives_presentismo?: boolean; // NEW: Controls if employee receives presentismo (default: true for backward compatibility)
+  losesPresentismo?: boolean; // DEPRECATED: Kept for backward compatibility, use receives_presentismo instead
   status: "active" | "inactive";
   startDate: string;
   vacationDays: number;

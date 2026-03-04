@@ -4,8 +4,9 @@
 
 ---
 
-**Versión:** 1.0  
-**Fecha:** Diciembre 2024  
+**Versión:** 1.1
+**Fecha:** Marzo 2026
+**Última Actualización:** Presentismo avanzado, nuevos puestos (Gerente, Administrativo, Ventas, Marketing)
 **Destinado a:** Administradores, Gerentes y Empleados
 
 ---
@@ -15,14 +16,15 @@
 1. [Introducción](#introducción)
 2. [Acceso al Sistema](#acceso-al-sistema)
 3. [Dashboard Principal](#dashboard-principal)
-4. [Gestión de Empleados](#gestión-de-empleados)
-5. [Sistema de Liquidaciones](#sistema-de-liquidaciones)
-6. [Gestión de Documentos](#gestión-de-documentos)
-7. [Sistema de Vacaciones](#sistema-de-vacaciones)
-8. [Portal del Empleado](#portal-del-empleado)
-9. [Gestión de Usuarios](#gestión-de-usuarios)
-10. [Reportes](#reportes)
-11. [Solución de Problemas](#solución-de-problemas)
+4. [Entendiendo el Presentismo](#entendiendo-el-presentismo)
+5. [Gestión de Empleados](#gestión-de-empleados)
+6. [Sistema de Liquidaciones](#sistema-de-liquidaciones)
+7. [Gestión de Documentos](#gestión-de-documentos)
+8. [Sistema de Vacaciones](#sistema-de-vacaciones)
+9. [Portal del Empleado](#portal-del-empleado)
+10. [Gestión de Usuarios](#gestión-de-usuarios)
+11. [Reportes](#reportes)
+12. [Solución de Problemas](#solución-de-problemas)
 
 ---
 
@@ -108,6 +110,87 @@ El dashboard es la pantalla principal del sistema y muestra información clave d
 
 ---
 
+## Entendiendo el Presentismo
+
+El presentismo es una bonificación establecida por la ley laboral argentina. Es importante entender cómo funciona en el sistema para gestionar correctamente las liquidaciones de empleados.
+
+### ¿Qué es el Presentismo?
+
+**Definición:** Es una bonificación salarial que reconoce la asistencia regular del empleado. Equivale aproximadamente al 8.33% del sueldo base mensual (promedio).
+
+**Quién lo percibe:** Empleados que cumplen requisitos de elegibilidad establecidos por ley (generalmente, trabajadores en relación de dependencia).
+
+### Dos Niveles de Control
+
+El sistema implementa dos niveles de control del presentismo:
+
+#### 1️⃣ **Primer Nivel: ¿El empleado percibe presentismo?**
+
+Cada empleado tiene un indicador: **"¿Este empleado percibe presentismo?"**
+
+- ✅ **SÍ:** El empleado es elegible para recibir presentismo
+- ❌ **NO:** El empleado NO percibe presentismo (nunca aparece en liquidaciones)
+
+**Ejemplos:**
+- Empleado nuevo: Generalmente SÍ percibe presentismo (marcado por defecto)
+- Empleado excluido: NO percibe presentismo (se desmarca al crear/editar)
+
+#### 2️⃣ **Segundo Nivel: ¿En este período, qué pasó con el presentismo?**
+
+En cada liquidación mensual, para empleados que SÍ perciben presentismo, se elige:
+
+- 🟢 **Mantiene:** El empleado trabajó completo y mantiene el presentismo → Se suma a la liquidación
+- 🔴 **Perdido:** El empleado tuvo faltas/inasistencias y pierde el presentismo → No se suma ($0)
+
+**Visualización:**
+- Badge verde "Mantiene": Empleado percibe y conservó presentismo este mes
+- Badge rojo "Perdido": Empleado percibe pero perdió presentismo este mes
+- Badge gris "No Percibe": Empleado NO percibe presentismo (nunca aparece)
+
+### Cambios Futuros del Presentismo
+
+**Importante:** El indicador "percibe presentismo" puede cambiar en cualquier momento:
+
+**Escenario 1: Empleado comienza a percibir presentismo**
+```
+1. Empleado creado sin presentismo (NO)
+2. Meses después se decide que SÍ perciba
+3. Cambiar indicador a SÍ
+4. ↓ A partir de la siguiente liquidación, aparecerá presentismo
+5. ✅ Las liquidaciones pasadas NO se modifican
+```
+
+**Escenario 2: Empleado deja de percibir presentismo**
+```
+1. Empleado que percibía presentismo (SÍ)
+2. Por cambio de legislación o política: cambia a NO
+3. Cambiar indicador a NO
+4. ↓ A partir de la siguiente liquidación, NO habrá presentismo
+5. ✅ Las liquidaciones pasadas NO se modifican
+```
+
+**Ventaja:** Flexible, permite adaptarse a cambios sin afectar histórico.
+
+### Ejemplo Práctico
+
+**Empleado: Juan Pérez**
+
+**Configuración inicial:**
+- ¿Percibe presentismo? ✅ SÍ
+- Monto de presentismo: $2000
+
+**Liquidaciones:**
+1. **Enero 2026:** Mantiene presentismo → +$2000
+2. **Febrero 2026:** Perdió presentismo (faltas) → $0
+3. **Marzo 2026:** Mantiene presentismo → +$2000
+
+**Cambio futuro:**
+- En abril, se cambia a: "¿Percibe presentismo? ❌ NO"
+- **Abril 2026:** No aparece presentismo (opción desaparece)
+- Liquidación solo muestra "No Percibe"
+
+---
+
 ## Gestión de Empleados
 
 La sección de empleados permite administrar toda la información del personal.
@@ -138,43 +221,83 @@ La sección de empleados permite administrar toda la información del personal.
 1. Clic en botón "Nuevo Empleado" (+ ícono)
 2. Completar formulario con datos obligatorios:
    - **Nombre completo** (requerido)
-   - **DNI** (requerido, único)
-   - **Posición** (requerido)
+   - **Tipo de Documento** (requerido - DNI, CUIT, Pasaporte, etc.)
+   - **Número de Documento** (requerido, único)
+   - **Puesto** (requerido)
    - **Fecha de ingreso** (requerido)
-   - **Sueldo diario** (requerido)
+   - **Sueldo Base** (requerido)
+   - **¿Este empleado percibe presentismo?** (checkbox - importante!)
+   - **Presentismo (Monto)** (solo si SÍ percibe presentismo)
    - **Email** (opcional)
-   - **Teléfono** (opcional)
-   - **Dirección** (opcional)
-3. Clic en "Guardar"
+   - **Domicilio** (opcional)
+3. Clic en "Guardar Empleado"
+
+**Campo importante: "¿Este empleado percibe presentismo?"**
+
+- ✅ **Marcado (por defecto):** El empleado SÍ percibe presentismo
+  - Se mostrará el campo "Presentismo (Monto)"
+  - En liquidaciones se podrá elegir "Mantiene" o "Perdido"
+
+- ❌ **Desmarcado:** El empleado NO percibe presentismo
+  - El monto de presentismo no se solicita
+  - Nunca aparecerá presentismo en sus liquidaciones
+  - Opción "Mantiene/Perdido" no será visible
+
+**Puestos disponibles:**
+
+- Cocinero
+- Jefe de Cocina
+- Ayudante de Cocina
+- Mesero/a
+- Jefe de Salón
+- Cajero/a
+- Tareas de Limpieza
+- Encargado/a
+- Barra
+- Jefe de Barra
+- Gerente ⭐ (nuevo)
+- Administrativo ⭐ (nuevo)
+- Ventas ⭐ (nuevo)
+- Marketing ⭐ (nuevo)
 
 **Validaciones:**
 
-- DNI debe ser único en el sistema
+- Documento debe ser único en el sistema
 - Fecha de ingreso no puede ser futura
-- Sueldo diario debe ser mayor a 0
-- Email debe tener formato válido
+- Sueldo base debe ser mayor a 0
+- Email debe tener formato válido (si se ingresa)
+- Si "Percibe Presentismo" está marcado, monto es requerido
 
 ### Editar Empleado
 
 **Campos editables:**
 
 - Nombre completo
-- Posición
+- Puesto
 - Fecha de ingreso
-- Sueldo diario
+- Sueldo Base
+- **¿Este empleado percibe presentismo?** (checkbox)
+- Presentismo (Monto)
 - Email
-- Teléfono
-- Dirección
+- Domicilio
 
 **Campos no editables:**
 
-- DNI (protegido para mantener integridad)
+- Número de Documento (protegido para mantener integridad)
 
 **Proceso de edición:**
 
 1. Clic en ícono de edición (lápiz) en la fila del empleado
 2. Modificar campos necesarios
-3. Clic en "Actualizar Empleado"
+3. **Importante:** Si cambias "Percibe Presentismo":
+   - Cambios afectan SOLO a futuras liquidaciones
+   - Liquidaciones pasadas NO se modifican
+   - Útil para cambios de política o legislación
+4. Clic en "Actualizar Empleado"
+
+**Nota de cambios de presentismo:**
+- Cuando editas un empleado activo, el sistema muestra:
+  - ℹ️ "Cambiar esto afectará liquidaciones futuras, no las pasadas"
 
 ### Gestión de Estado
 
@@ -227,11 +350,14 @@ El módulo de liquidaciones es el corazón del sistema, permitiendo gestionar su
 
 **Paso 3: Conceptos Adicionales**
 
-- **Horas extras:** Checkbox para habilitar + campo de horas
-- **Presentismo:** Estado (mantiene/perdido)
-- **Bono libre:** Monto adicional por bonificaciones
-- **Adelantos:** Montos entregados durante el mes
-- **Descuentos:** Deducciones aplicables
+- **Horas extras:** Checkbox para habilitar + campo de horas (cantidad)
+- **Presentismo:**
+  - Solo aparece si el empleado "SÍ percibe presentismo"
+  - Opciones: **Mantiene** (incluye monto) o **Perdido** ($0)
+  - El sistema muestra el monto configurado para ese empleado
+- **Bono libre:** Monto adicional por bonificaciones o incentivos
+- **Adelantos:** Montos entregados durante el mes (se descuentan)
+- **Descuentos:** Deducciones aplicables (descuentos, retenciones, etc.)
 
 **Paso 4: Configuración de Pago**
 
@@ -246,11 +372,19 @@ El módulo de liquidaciones es el corazón del sistema, permitiendo gestionar su
 1. **Sueldo base:** Días trabajados × Sueldo diario
 2. **Horas extras:** Horas × (Sueldo hora × 1.5)
 3. **Feriados:** Días feriados × Sueldo diario × 2
-4. **Presentismo:** 8.33% del sueldo base (si mantiene)
-5. **Aguinaldo:** Cálculo automático en junio y diciembre
-6. **Total bruto:** Suma de todos los conceptos positivos
-7. **Deducciones:** Adelantos + Descuentos
-8. **Total neto:** Total bruto - Deducciones
+4. **Presentismo:**
+   - ✅ Si el empleado percibe presentismo Y selecciona "Mantiene": Monto configurado
+   - ❌ Si el empleado NO percibe presentismo O selecciona "Perdido": $0
+5. **Aguinaldo:** Cálculo automático solo en junio y diciembre
+6. **Bono libre:** Monto manual agregado
+7. **Total bruto:** Suma de todos los conceptos positivos
+8. **Deducciones:** Adelantos + Descuentos
+9. **Total neto:** Total bruto - Deducciones
+
+**Nota sobre Presentismo:**
+- El cálculo de presentismo respeta SIEMPRE la configuración "¿Percibe presentismo?" del empleado
+- Si el empleado NO percibe presentismo, la opción "Mantiene/Perdido" no aparecerá
+- Si el empleado percibe pero perdió, se elige "Perdido" y presentismo = $0
 
 ### Vista Previa de Liquidación
 
@@ -671,6 +805,36 @@ El módulo de reportes proporciona información analítica del sistema.
 - Análisis de conceptos salariales
 - Tendencias de liquidaciones
 
+### Reporte de Presentismo
+
+El reporte de presentismo muestra el estado de presentismo de cada empleado:
+
+**Tabla de Presentismo:**
+
+- **Empleado:** Nombre y DNI
+- **Días Base:** Días trabajados en el período
+- **Feriados:** Días feriados trabajados
+- **Horas Extras:** Cantidad de horas extra trabajadas
+- **Presentismo:** Estado del empleado
+
+**Estados mostrados:**
+
+- 🟢 **Mantiene:** Empleado percibe presentismo y lo mantuvo este período
+- 🔴 **Perdido:** Empleado percibe presentismo pero lo perdió este período
+- ⚪ **No Percibe:** Empleado NO percibe presentismo (nunca aparecerá)
+
+**Ausencias:**
+
+- Cantidad de días ausentes respecto a días esperados (30)
+
+**% de Asistencia:**
+
+- Porcentaje de asistencia calculado automáticamente
+- Indicadores:
+  - ✅ Verde si > 90%
+  - 🟡 Amarillo si 75-90%
+  - ❌ Rojo si < 75%
+
 ---
 
 ## Solución de Problemas
@@ -718,7 +882,29 @@ El módulo de reportes proporciona información analítica del sistema.
 - Revisar configuración del empleado
 - Contactar administrador para verificación
 
-#### 4. No veo mis documentos
+#### 4. ¿Por qué aparece "Perdido" en presentismo si no cargué nada?
+
+**Explicación:**
+
+Esto ocurre cuando:
+- El empleado TIENE presentismo configurado ("¿Percibe presentismo?" = SÍ)
+- Pero en una liquidación se seleccionó "Perdido" (el empleado tuvo faltas)
+- No es un error, es una situación normal
+
+**Diferencia importante:**
+
+- **"Mantiene"** (verde): Empleado trabajó completo y recibe presentismo
+- **"Perdido"** (rojo): Empleado tuvo faltas y no recibe presentismo este mes
+- **"No Percibe"** (gris): Empleado NUNCA recibe presentismo (configuración)
+
+**Solución:**
+
+Si esto no debería ocurrir:
+1. Verificar que el empleado está configurado correctamente
+2. Revisar si la opción "¿Percibe presentismo?" está activada
+3. Para empleados que NO deben tener presentismo: desmarcar esta opción
+
+#### 5. No veo mis documentos
 
 **Posibles causas:**
 
@@ -777,6 +963,14 @@ El módulo de reportes proporciona información analítica del sistema.
 
 ---
 
-**Manual creado para Cádiz Bar de Tapas**  
-**Sistema de Gestión de RRHH v1.0**  
-**Diciembre 2024**
+**Manual creado para Cádiz Bar de Tapas**
+**Sistema de Gestión de RRHH v1.1**
+**Marzo 2026**
+
+---
+
+**Cambios en v1.1:**
+- Implementación de sistema de Presentismo avanzado (receives_presentismo)
+- Nuevos puestos: Gerente, Administrativo, Ventas, Marketing
+- Mejoras en la gestión de empleados
+- Documentación actualizada con ejemplos prácticos

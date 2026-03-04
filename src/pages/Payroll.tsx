@@ -642,16 +642,28 @@ const Payroll = () => {
     const hourlyRate = dailyWageToUse / 8;
     const overtimePay = hourlyRate * overtimeHoursNum;
 
-    // Presentismo: usar el valor del período si existe historial; si no, el actual
-    let presentismoToUse = employee?.presentismo || 0;
-    if (historicalSalary && historicalSalary.presentismo !== undefined) {
-      presentismoToUse = historicalSalary.presentismo;
-    }
+    // Presentismo: Check if employee receives presentismo at all
+    // If receives_presentismo is false, presentismoAmount is always 0
+    let presentismoAmount = 0;
 
-    // En modo edición, el presentismo podría ser diferente al actual
-    // pero mantener la lógica de mantiene/pierde del form
-    const presentismoAmount =
-      presentismoStatus === "mantiene" ? presentismoToUse : 0;
+    // First check: Does this employee receive presentismo?
+    const employeeReceivesPresentismo = employee?.receives_presentismo !== false; // Default true for backward compatibility
+
+    if (employeeReceivesPresentismo) {
+      // Employee receives presentismo, now apply mantiene/pierde status
+      let presentismoToUse = employee?.presentismo || 0;
+      if (historicalSalary && historicalSalary.presentismo !== undefined) {
+        presentismoToUse = historicalSalary.presentismo;
+      }
+
+      // En modo edición, el presentismo podría ser diferente al actual
+      // pero mantener la lógica de mantiene/pierde del form
+      presentismoAmount =
+        presentismoStatus === "mantiene" ? presentismoToUse : 0;
+    } else {
+      // Employee does NOT receive presentismo - always 0
+      presentismoAmount = 0;
+    }
 
     const bonusPay = bonusNum;
 
@@ -1087,35 +1099,48 @@ const Payroll = () => {
                   )}
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="presentismo">Presentismo</Label>
-                  <Select
-                    value={presentismoStatus}
-                    onValueChange={setPresentismoStatus}
-                    disabled={editingRecord && !isEditMode}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="mantiene">
-                        Mantiene{" "}
-                        {selectedEmployee && (
-                          <span>
-                            (
-                            {formatCurrency(
-                              employees.find(
-                                (e) => e.id.toString() === selectedEmployee,
-                              )?.presentismo || 0,
+                {selectedEmployee &&
+                  employees.find((e) => e.id.toString() === selectedEmployee)
+                    ?.receives_presentismo !== false && (
+                    <div className="space-y-2">
+                      <Label htmlFor="presentismo">Presentismo</Label>
+                      <Select
+                        value={presentismoStatus}
+                        onValueChange={setPresentismoStatus}
+                        disabled={editingRecord && !isEditMode}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="mantiene">
+                            Mantiene{" "}
+                            {selectedEmployee && (
+                              <span>
+                                (
+                                {formatCurrency(
+                                  employees.find(
+                                    (e) => e.id.toString() === selectedEmployee,
+                                  )?.presentismo || 0,
+                                )}
+                                )
+                              </span>
                             )}
-                            )
-                          </span>
-                        )}
-                      </SelectItem>
-                      <SelectItem value="perdido">Perdido</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                          </SelectItem>
+                          <SelectItem value="perdido">Perdido</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                {selectedEmployee &&
+                  employees.find((e) => e.id.toString() === selectedEmployee)
+                    ?.receives_presentismo === false && (
+                    <div className="space-y-2 p-3 bg-gray-100 rounded border border-gray-300">
+                      <p className="text-sm text-gray-700">
+                        ℹ️ Este empleado no percibe presentismo
+                      </p>
+                    </div>
+                  )}
 
                 <div className="space-y-2">
                   <Label htmlFor="bonusAmount">Bono Libre</Label>

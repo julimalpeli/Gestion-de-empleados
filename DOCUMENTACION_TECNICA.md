@@ -4,9 +4,10 @@
 
 ---
 
-**Versión:** 1.0  
-**Fecha:** Diciembre 2024  
-**Desarrollado con:** React + TypeScript + Supabase
+**Versión:** 1.1
+**Fecha:** Marzo 2026
+**Última Actualización:** Sistema de Presentismo avanzado, nuevos puestos, validaciones mejoradas
+**Desarrollado con:** React + TypeScript + Supabase + PostgreSQL
 
 ---
 
@@ -200,6 +201,8 @@ CREATE TABLE employees (
     dni VARCHAR(20) UNIQUE NOT NULL,
     position VARCHAR(255) NOT NULL,
     daily_wage DECIMAL(10,2) NOT NULL DEFAULT 0,
+    presentismo DECIMAL(10,2) DEFAULT 0,
+    receives_presentismo BOOLEAN DEFAULT true, -- NEW: Controls if employee receives presentismo bonus
     start_date DATE NOT NULL,
     status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
     email VARCHAR(255),
@@ -436,6 +439,72 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 ```
+
+---
+
+## Sistema de Presentismo
+
+El presentismo es una bonificación salarial establecida por la ley laboral argentina (8.33% del sueldo base como promedio, aunque se almacena como monto fijo en el sistema). El sistema implementa un control de dos niveles:
+
+### Niveles de Control
+
+1. **Nivel 1: `receives_presentismo` (empleado)**
+   - Campo booleano en tabla `employees`
+   - `true` (default): Empleado es elegible para recibir presentismo
+   - `false`: Empleado NO percibe presentismo (no aplica cálculo)
+
+2. **Nivel 2: Estado de Presentismo (período)**
+   - En cada liquidación, empleados elegibles pueden "Mantener" o "Perder" presentismo
+   - **Mantiene**: Se agrega el monto de presentismo a la liquidación
+   - **Perdido**: El monto de presentismo es $0 en ese período
+
+### Flujo de Cálculo
+
+```
+¿El empleado percibe presentismo? (receives_presentismo)
+├─ NO (false)
+│  └─ presentismoAmount = $0 (sin importar estado)
+│
+└─ SÍ (true)
+   └─ ¿Cuál es el estado en este período?
+      ├─ Mantiene
+      │  └─ presentismoAmount = employee.presentismo (monto configurado)
+      │
+      └─ Perdido
+         └─ presentismoAmount = $0
+```
+
+### Cambios Futuros
+
+El campo `receives_presentismo` puede cambiar en cualquier momento:
+- **De false a true**: A partir de la siguiente liquidación, el empleado comenzará a percibir presentismo
+- **De true a false**: A partir de la siguiente liquidación, el empleado no percibirá presentismo
+- **Histórico preservado**: Las liquidaciones pasadas NO se ven afectadas
+
+### Implementación en Frontend
+
+**Payroll.tsx:**
+```typescript
+// Check if employee receives presentismo at all
+const employeeReceivesPresentismo = employee?.receives_presentismo !== false;
+
+if (employeeReceivesPresentismo) {
+  // Apply mantiene/perdido logic
+  presentismoAmount = presentismoStatus === "mantiene" ? presentismoToUse : 0;
+} else {
+  // Employee doesn't receive presentismo
+  presentismoAmount = 0;
+}
+```
+
+**Employee Forms:**
+- Checkbox "¿Este empleado percibe presentismo?" durante creación/edición
+- Mensaje informativo cuando se edita a empleado activo
+
+**Reports:**
+- Badge "Mantiene" (verde): Empleado percibe presentismo y lo mantiene
+- Badge "Perdido" (rojo): Empleado percibe presentismo pero lo perdió
+- Badge "No Percibe" (gris): Empleado NO percibe presentismo
 
 ---
 

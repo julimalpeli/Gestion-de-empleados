@@ -816,6 +816,22 @@ const Reports = () => {
                       const hasPresentismo = employeePayrolls.some(
                         (record) => record.presentismoAmount > 0,
                       );
+
+                      // Check if employee receives presentismo at all
+                      const employeeReceivesPresentismo = employee.receives_presentismo !== false; // Default true for backward compatibility
+
+                      // Determine presentismo status badge
+                      let presentismoVariant: "default" | "destructive" | "secondary" | "outline" = "default";
+                      let presentismoLabel = "Mantiene";
+
+                      if (!employeeReceivesPresentismo) {
+                        presentismoVariant = "secondary";
+                        presentismoLabel = "No Percibe";
+                      } else if (!hasPresentismo) {
+                        presentismoVariant = "destructive";
+                        presentismoLabel = "Perdido";
+                      }
+
                       const expectedDays = 30; // Días esperados por mes
                       const absentDays = Math.max(
                         0,
@@ -862,12 +878,8 @@ const Reports = () => {
                             )}
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant={
-                                hasPresentismo ? "default" : "destructive"
-                              }
-                            >
-                              {hasPresentismo ? "Mantiene" : "Perdido"}
+                            <Badge variant={presentismoVariant}>
+                              {presentismoLabel}
                             </Badge>
                           </TableCell>
                           <TableCell>
