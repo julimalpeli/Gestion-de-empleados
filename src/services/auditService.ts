@@ -114,7 +114,10 @@ class AuditService {
         // Handle network errors gracefully
         if (
           error.message?.includes("Failed to fetch") ||
-          error.message?.includes("fetch")
+          error.message?.includes("fetch") ||
+          error.message?.includes("network") ||
+          error.message?.includes("connection") ||
+          error.message?.includes("timeout")
         ) {
           console.warn(
             "⚠️ Network error during audit - continuing without audit",
@@ -122,7 +125,9 @@ class AuditService {
           return {} as AuditLogEntry;
         }
 
-        throw new Error(`Failed to create audit log: ${error.message}`);
+        // For other Supabase errors, log and return empty instead of throwing
+        console.warn("⚠️ Audit entry creation failed:", error.message);
+        return {} as AuditLogEntry;
       }
 
       console.log("✅ Audit log created (returning minimal)");
@@ -241,70 +246,99 @@ class AuditService {
 
       if (error) {
         const readableMessage = getReadableErrorMessage(error);
-        console.error("Error fetching audit logs:", readableMessage);
+        const lowerMessage = readableMessage.toLowerCase();
 
-        // Graceful network handling
+        // Check for network/connection errors first (most common)
         if (
-          readableMessage.toLowerCase().includes("failed to fetch") ||
-          readableMessage.toLowerCase().includes("fetch")
+          lowerMessage.includes("failed to fetch") ||
+          lowerMessage.includes("network error") ||
+          lowerMessage.includes("network") ||
+          lowerMessage.includes("fetch") ||
+          lowerMessage.includes("connection") ||
+          lowerMessage.includes("timeout") ||
+          lowerMessage.includes("aborted")
         ) {
           console.warn("🌐 Network issue fetching audit logs - returning []");
           return [];
         }
 
+        // Check for RLS (Row-Level Security) errors
         const isRlsError =
-          readableMessage.toLowerCase().includes("row-level security") ||
-          readableMessage.toLowerCase().includes("permission denied") ||
+          lowerMessage.includes("row-level security") ||
+          lowerMessage.includes("permission denied") ||
+          lowerMessage.includes("row level security") ||
           (error as any)?.code === "42501";
 
         if (isRlsError) {
+          console.warn("🔒 RLS is blocking audit log queries - disabling client audit viewer");
           this.disableAudit(
             "🔒 RLS is blocking audit log queries - disabling client audit viewer",
           );
           return [];
         }
 
-        // Si es un error de esquema, devolver array vacío en lugar de fallar
+        // Check for schema/database configuration errors
         if (
           readableMessage.includes("schema cache") ||
           readableMessage.includes("column") ||
           readableMessage.includes("relationship") ||
           readableMessage.includes("relation") ||
-          readableMessage.includes("audit_log")
+          readableMessage.includes("audit_log") ||
+          readableMessage.includes("does not exist") ||
+          readableMessage.includes("undefined")
         ) {
           console.warn("🔧 Audit log table not properly configured");
           console.warn("💡 Run database/fix_audit_log_schema.sql to fix this");
           return [];
         }
 
-        throw new Error(`Failed to fetch audit logs: ${readableMessage}`);
+        // If we get here and still have an error, log it but don't crash - return empty array
+        console.error("Error fetching audit logs (unexpected error type):", readableMessage);
+        return [];
       }
 
       return data || [];
     } catch (error) {
       const readableMessage = getReadableErrorMessage(error);
-      console.error("Error getting audit logs:", readableMessage);
+      const lowerMessage = readableMessage.toLowerCase();
 
-      // Manejo graceful de errores de red
+      // Handle network errors gracefully
       if (
-        readableMessage.toLowerCase().includes("failed to fetch") ||
-        readableMessage.toLowerCase().includes("network")
+        lowerMessage.includes("failed to fetch") ||
+        lowerMessage.includes("network") ||
+        lowerMessage.includes("connection") ||
+        lowerMessage.includes("timeout") ||
+        lowerMessage.includes("aborted")
       ) {
         console.warn("🌐 Network error on audit logs - returning []");
         return [];
       }
 
-      // Manejo graceful de errores de esquema
+      // Handle schema/database configuration errors gracefully
       if (
-        readableMessage.includes("schema cache") ||
-        readableMessage.includes("audit_log") ||
-        readableMessage.includes("relation")
+        lowerMessage.includes("schema cache") ||
+        lowerMessage.includes("audit_log") ||
+        lowerMessage.includes("relation") ||
+        lowerMessage.includes("does not exist") ||
+        lowerMessage.includes("undefined")
       ) {
-        console.warn("���� Database schema issue - returning empty audit logs");
+        console.warn("🔧 Database schema issue - returning empty audit logs");
         return [];
       }
 
-      throw new Error(readableMessage);
+      // Handle RLS errors gracefully
+      if (
+        lowerMessage.includes("row-level security") ||
+        lowerMessage.includes("row level security") ||
+        lowerMessage.includes("permission denied")
+      ) {
+        console.warn("🔒 RLS policy blocking audit logs - returning []");
+        return [];
+      }
+
+      // For any other error, log a warning but return empty array instead of crashing
+      console.warn("⚠️ Unexpected error fetching audit logs - returning empty array:", readableMessage);
+      return [];
     }
   }
 
