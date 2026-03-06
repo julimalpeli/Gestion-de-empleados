@@ -234,7 +234,7 @@ const Payroll = () => {
   // Handle duplicate payroll record
   const handleDuplicateRecord = (record) => {
     try {
-      const employee = employees.find((e) => e.name === record.employeeName);
+      const employee = employees.find((e) => e.id === record.employeeId || e.name === record.employeeName);
       if (!employee) {
         alert("No se encontró el empleado para duplicar la liquidación");
         return;
@@ -786,7 +786,7 @@ const Payroll = () => {
   // Filtros
   const filteredRecords = payrollRecords.filter((record) => {
     // Filtro por empleado activo/inactivo
-    const employee = employees.find((e) => e.name === record.employeeName);
+    const employee = employees.find((e) => e.id === record.employeeId || e.name === record.employeeName);
     if (!employee) return false;
 
     if (employeeFilter === "active" && employee.status !== "active")
@@ -1585,7 +1585,7 @@ const Payroll = () => {
                   )
                   .map((record) => {
                     const employee = employees.find(
-                      (e) => e.name === record.employeeName,
+                      (e) => e.id === record.employeeId || e.name === record.employeeName,
                     );
                     return (
                       <TableRow key={record.id}>
@@ -1653,7 +1653,7 @@ const Payroll = () => {
                           {isAguinaldoPeriod(record.period)
                             ? (() => {
                                 const employee = employees.find(
-                                  (e) => e.name === record.employeeName,
+                                  (e) => e.id === record.employeeId || e.name === record.employeeName,
                                 );
                                 if (!employee) return "-";
 
@@ -1707,7 +1707,7 @@ const Payroll = () => {
                             {isAguinaldoPeriod(record.period) &&
                               (() => {
                                 const employee = employees.find(
-                                  (e) => e.name === record.employeeName,
+                                  (e) => e.id === record.employeeId || e.name === record.employeeName,
                                 );
                                 if (employee) {
                                   const correctAguinaldoResult =
@@ -1995,7 +1995,7 @@ const Payroll = () => {
                                 <DropdownMenuItem
                                   onClick={() => {
                                     const emp = employees.find(
-                                      (e) => e.name === record.employeeName,
+                                      (e) => e.id === record.employeeId || e.name === record.employeeName,
                                     );
                                     if (emp) {
                                       generatePayrollReceiptPDF({
@@ -2026,7 +2026,7 @@ const Payroll = () => {
                                 <DropdownMenuItem
                                   onClick={() => {
                                     const emp = employees.find(
-                                      (e) => e.name === record.employeeName,
+                                      (e) => e.id === record.employeeId || e.name === record.employeeName,
                                     );
                                     if (emp) {
                                       generatePayrollReceiptExcel({
@@ -2067,7 +2067,7 @@ const Payroll = () => {
                                     size="sm"
                                     onClick={() => {
                                       const emp = employees.find(
-                                        (e) => e.name === record.employeeName,
+                                        (e) => e.id === record.employeeId || e.name === record.employeeName,
                                       );
                                       if (emp) {
                                         setSelectedPayrollRecord(record);

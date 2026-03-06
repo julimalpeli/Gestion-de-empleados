@@ -489,7 +489,7 @@ const Employees = () => {
 
   const calculateDailySalary = (sueldoBase) => {
     const totalSalary = sueldoBase || 0;
-    return totalSalary / 30;
+    return Math.round(totalSalary / 30);
   };
 
   const formatPosition = (position) => {

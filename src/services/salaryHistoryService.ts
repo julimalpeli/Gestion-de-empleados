@@ -130,7 +130,7 @@ class SalaryHistoryService {
       const year = parseInt(yearStr, 10);
       const monthIndex = parseInt(monthStr, 10) - 1; // 0-based
       const endOfMonth = new Date(year, monthIndex + 1, 0); // último día del mes
-      const targetDateStr = endOfMonth.toISOString().split("T")[0];
+      const targetDateStr = `${year}-${String(monthIndex + 1).padStart(2, "0")}-${String(endOfMonth.getDate()).padStart(2, "0")}`;
 
       console.log(
         `🎯 Target end-of-month for period ${period}: ${targetDateStr}`,

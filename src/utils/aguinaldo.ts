@@ -44,17 +44,18 @@ export const calculateAguinaldo = (
     };
   }
 
+  // Usar hora del mediodía (12:00) para evitar problemas de DST/timezone en cálculo de días
   const semesterStart =
     currentSemester === 1
-      ? new Date(currentYear, 0, 1)
-      : new Date(currentYear, 6, 1);
+      ? new Date(currentYear, 0, 1, 12, 0, 0)
+      : new Date(currentYear, 6, 1, 12, 0, 0);
 
   const semesterEnd =
     currentSemester === 1
-      ? new Date(currentYear, 5, 30)
-      : new Date(currentYear, 11, 31);
+      ? new Date(currentYear, 5, 30, 12, 0, 0)
+      : new Date(currentYear, 11, 31, 12, 0, 0);
 
-  const startDate = new Date(employee.startDate + "T00:00:00");
+  const startDate = new Date(employee.startDate + "T12:00:00");
 
   if (Number.isNaN(startDate.getTime())) {
     return {
@@ -94,12 +95,12 @@ export const calculateAguinaldo = (
     effectiveStartDate > semesterStart ? effectiveStartDate : semesterStart;
 
   const totalSemesterDays =
-    Math.ceil(
+    Math.round(
       (semesterEnd.getTime() - semesterStart.getTime()) / (1000 * 60 * 60 * 24),
     ) + 1;
 
   let daysWorked =
-    Math.ceil(
+    Math.round(
       (semesterEnd.getTime() - effectiveStart.getTime()) /
         (1000 * 60 * 60 * 24),
     ) + 1;

@@ -529,7 +529,7 @@ const Reports = () => {
                 <p className="text-2xl font-bold text-primary">
                   {formatCurrency(
                     payrollRecords.reduce(
-                      (sum, record) => sum + record.netTotal,
+                      (sum, record) => sum + (record.netTotal || 0),
                       0,
                     ),
                   )}
@@ -548,7 +548,7 @@ const Reports = () => {
                 <p className="text-2xl font-bold text-green-600">
                   {formatCurrency(
                     payrollRecords.reduce(
-                      (sum, record) => sum + record.whiteAmount,
+                      (sum, record) => sum + (record.whiteAmount || 0),
                       0,
                     ),
                   )}
@@ -567,7 +567,7 @@ const Reports = () => {
                 <p className="text-2xl font-bold text-orange-600">
                   {formatCurrency(
                     payrollRecords.reduce(
-                      (sum, record) => sum + record.informalAmount,
+                      (sum, record) => sum + (record.informalAmount || 0),
                       0,
                     ),
                   )}
@@ -588,7 +588,7 @@ const Reports = () => {
                     payrollRecords.length > 0
                       ? Math.round(
                           payrollRecords.reduce(
-                            (sum, record) => sum + record.netTotal,
+                            (sum, record) => sum + (record.netTotal || 0),
                             0,
                           ) / payrollRecords.length,
                         )
@@ -631,30 +631,30 @@ const Reports = () => {
                   <TableBody>
                     {employees.map((employee) => {
                       const employeePayrolls = payrollRecords.filter(
-                        (record) => record.employeeName === employee.name,
+                        (record) => record.employeeId === employee.id || record.employeeName === employee.name,
                       );
                       const totalPayroll = employeePayrolls.reduce(
-                        (sum, record) => sum + record.netTotal,
+                        (sum, record) => sum + (record.netTotal || 0),
                         0,
                       );
                       const depositoTotal = employeePayrolls.reduce(
-                        (sum, record) => sum + record.whiteAmount,
+                        (sum, record) => sum + (record.whiteAmount || 0),
                         0,
                       );
                       const informalTotal = employeePayrolls.reduce(
-                        (sum, record) => sum + record.informalAmount,
+                        (sum, record) => sum + (record.informalAmount || 0),
                         0,
                       );
                       const presentismoTotal = employeePayrolls.reduce(
-                        (sum, record) => sum + record.presentismoAmount,
+                        (sum, record) => sum + (record.presentismoAmount || 0),
                         0,
                       );
                       const overtimeTotal = employeePayrolls.reduce(
-                        (sum, record) => sum + record.overtimeAmount,
+                        (sum, record) => sum + (record.overtimeAmount || 0),
                         0,
                       );
                       const bonusTotal = employeePayrolls.reduce(
-                        (sum, record) => sum + record.bonusAmount,
+                        (sum, record) => sum + (record.bonusAmount || 0),
                         0,
                       );
 
@@ -703,7 +703,7 @@ const Reports = () => {
               <CardContent>
                 <p className="text-2xl font-bold text-primary">
                   {payrollRecords.reduce(
-                    (sum, record) => sum + record.baseDays,
+                    (sum, record) => sum + (record.baseDays || 0),
                     0,
                   )}
                 </p>
@@ -720,7 +720,7 @@ const Reports = () => {
               <CardContent>
                 <p className="text-2xl font-bold text-orange-600">
                   {payrollRecords.reduce(
-                    (sum, record) => sum + record.holidayDays,
+                    (sum, record) => sum + (record.holidayDays || 0),
                     0,
                   )}
                 </p>
@@ -737,7 +737,7 @@ const Reports = () => {
               <CardContent>
                 <p className="text-2xl font-bold text-blue-600">
                   {payrollRecords.reduce(
-                    (sum, record) => sum + record.overtimeHours,
+                    (sum, record) => sum + (record.overtimeHours || 0),
                     0,
                   )}
                 </p>
@@ -758,7 +758,7 @@ const Reports = () => {
                   {payrollRecords.length > 0
                     ? Math.round(
                         payrollRecords.reduce(
-                          (sum, record) => sum + record.baseDays,
+                          (sum, record) => sum + (record.baseDays || 0),
                           0,
                         ) / payrollRecords.length,
                       )
@@ -799,18 +799,18 @@ const Reports = () => {
                   <TableBody>
                     {employees.map((employee) => {
                       const employeePayrolls = payrollRecords.filter(
-                        (record) => record.employeeName === employee.name,
+                        (record) => record.employeeId === employee.id || record.employeeName === employee.name,
                       );
                       const totalBaseDays = employeePayrolls.reduce(
-                        (sum, record) => sum + record.baseDays,
+                        (sum, record) => sum + (record.baseDays || 0),
                         0,
                       );
                       const totalHolidayDays = employeePayrolls.reduce(
-                        (sum, record) => sum + record.holidayDays,
+                        (sum, record) => sum + (record.holidayDays || 0),
                         0,
                       );
                       const totalOvertimeHours = employeePayrolls.reduce(
-                        (sum, record) => sum + record.overtimeHours,
+                        (sum, record) => sum + (record.overtimeHours || 0),
                         0,
                       );
                       const hasPresentismo = employeePayrolls.some(

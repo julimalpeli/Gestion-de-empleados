@@ -132,7 +132,7 @@ const Dashboard = () => {
 
   // Vacation calculations
   const today = new Date();
-  const todayStr = today.toISOString().split("T")[0];
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
   // Current vacations (employees on vacation today)
   const currentVacations = vacations.filter((vacation) => {
@@ -145,7 +145,7 @@ const Dashboard = () => {
   // Upcoming vacations (next 3 months)
   const threeMonthsFromNow = new Date();
   threeMonthsFromNow.setMonth(today.getMonth() + 3); // Add 3 months
-  const threeMonthsFromNowStr = threeMonthsFromNow.toISOString().split("T")[0];
+  const threeMonthsFromNowStr = `${threeMonthsFromNow.getFullYear()}-${String(threeMonthsFromNow.getMonth() + 1).padStart(2, "0")}-${String(threeMonthsFromNow.getDate()).padStart(2, "0")}`;
 
   // Debug vacation data
   console.log("🏖️ Vacation debug info:");
