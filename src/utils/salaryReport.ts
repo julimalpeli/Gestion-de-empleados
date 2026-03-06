@@ -8,7 +8,8 @@ const formatCurrency = (amount: number) => {
     style: "currency",
     currency: "ARS",
     minimumFractionDigits: 0,
-  }).format(amount || 0);
+    maximumFractionDigits: 0,
+  }).format(Math.round(amount || 0));
 };
 
 const formatDate = (dateStr?: string) => {

@@ -78,7 +78,8 @@ export default function AguinaldoReport() {
       style: "currency",
       currency: "ARS",
       minimumFractionDigits: 0,
-    }).format(amount);
+      maximumFractionDigits: 0,
+    }).format(Math.round(amount || 0));
   };
 
   const formatDate = (dateString: string) => {

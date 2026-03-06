@@ -11,5 +11,6 @@ export const formatCurrency = (amount: number): string => {
     style: "currency",
     currency: "ARS",
     minimumFractionDigits: 0,
-  }).format(amount);
+    maximumFractionDigits: 0,
+  }).format(Math.round(amount || 0));
 };
