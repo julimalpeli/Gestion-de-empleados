@@ -4,7 +4,7 @@
  * Follow semantic versioning: MAJOR.MINOR.PATCH
  */
 
-export const APP_VERSION = "1.1.4";
+export const APP_VERSION = "1.1.5";
 
 export const getVersionString = (): string => {
   return `v${APP_VERSION}`;
