@@ -4,7 +4,7 @@
 
 ---
 
-**Versión:** 1.1
+**Versión:** 1.1.0
 **Fecha:** Marzo 2026
 **Última Actualización:** Sistema de Presentismo avanzado, nuevos puestos, validaciones mejoradas
 **Desarrollado con:** React + TypeScript + Supabase + PostgreSQL

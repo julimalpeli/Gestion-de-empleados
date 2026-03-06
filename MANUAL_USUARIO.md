@@ -4,7 +4,7 @@
 
 ---
 
-**Versión:** 1.1
+**Versión:** 1.1.0
 **Fecha:** Marzo 2026
 **Última Actualización:** Presentismo avanzado, nuevos puestos (Gerente, Administrativo, Ventas, Marketing)
 **Destinado a:** Administradores, Gerentes y Empleados
