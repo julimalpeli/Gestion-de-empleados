@@ -265,7 +265,7 @@ const Payroll = () => {
       if (record.presentismoAmount > 0) {
         setPresentismoStatus("mantiene");
       } else {
-        setPresentismoStatus("pierde");
+        setPresentismoStatus("perdido");
       }
 
       // Set current period as default for the duplicate
@@ -638,9 +638,9 @@ const Payroll = () => {
     // Pago por feriados (doble)
     const holidayPay = dailyWageToUse * holidayDaysNum;
 
-    // Horas extra (50% adicional)
+    // Horas extra (50% adicional sobre la hora normal)
     const hourlyRate = dailyWageToUse / 8;
-    const overtimePay = hourlyRate * overtimeHoursNum;
+    const overtimePay = hourlyRate * 1.5 * overtimeHoursNum;
 
     // Presentismo: Check if employee receives presentismo at all
     // If receives_presentismo is false, presentismoAmount is always 0
