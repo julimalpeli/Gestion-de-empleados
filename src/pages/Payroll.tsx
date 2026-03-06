@@ -331,8 +331,17 @@ const Payroll = () => {
 
   // Función para verificar si un período es de aguinaldo (junio o diciembre)
   const isAguinaldoPeriod = (period: string) => {
-    const [year, month] = period.split("-");
-    return month === "06" || month === "12";
+    const [, month] = period.split("-");
+    const monthNum = parseInt(month, 10);
+    return monthNum === 6 || monthNum === 12;
+  };
+
+  // Convierte período mensual (YYYY-MM) a formato semestre (YYYY-S) para calculateAguinaldo
+  const toSemesterPeriod = (monthPeriod: string): string => {
+    const [year, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month, 10);
+    const semester = monthNum <= 6 ? "1" : "2";
+    return `${year}-${semester}`;
   };
 
   // Manejo de nuevo payroll
@@ -701,7 +710,7 @@ const Payroll = () => {
     if (isAguinaldoPeriod(selectedPeriod)) {
       const aguinaldoResult = calculateAguinaldo(
         employee,
-        selectedPeriod,
+        toSemesterPeriod(selectedPeriod),
         payrollRecords,
       );
       aguinaldoAmount = aguinaldoResult.amount || 0;
@@ -1651,7 +1660,7 @@ const Payroll = () => {
                                 const correctAguinaldoResult =
                                   calculateAguinaldo(
                                     employee,
-                                    record.period,
+                                    toSemesterPeriod(record.period),
                                     payrollRecords,
                                   );
                                 if (correctAguinaldoResult.amount === 0)
@@ -1704,7 +1713,7 @@ const Payroll = () => {
                                   const correctAguinaldoResult =
                                     calculateAguinaldo(
                                       employee,
-                                      record.period,
+                                      toSemesterPeriod(record.period),
                                       payrollRecords,
                                     );
                                   if (correctAguinaldoResult.amount > 0) {
