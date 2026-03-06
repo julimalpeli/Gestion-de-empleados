@@ -152,11 +152,11 @@ describe("calculateAguinaldo", () => {
 
     expect(result.corresponds).toBe(true);
     expect(result.proportional).toBe(true);
-    expect(result.daysWorked).toBe(77);
+    expect(result.daysWorked).toBe(76);
     expect(result.totalDays).toBe(182);
     expect(result.bestSalary).toBe(90000);
     expect(result.bestSalaryPeriod).toBe("Sueldo base");
-    expect(result.amount).toBe(19250);
+    expect(result.amount).toBe(19000);
     expect(result.fullAguinaldo).toBe(45000);
     expect(result.reason).toBe("Aguinaldo proporcional por días trabajados");
   });

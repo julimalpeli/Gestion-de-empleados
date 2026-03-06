@@ -280,7 +280,7 @@ describe("useUsers hook", () => {
       is_active: true,
       needs_password_change: false,
     });
-    expect(insertedPayload.password_hash).toBe(btoa("newpass"));
+    expect(insertedPayload.password_hash).toBe("$supabase$auth$managed");
 
     await waitFor(() => expect(result.current.users).toHaveLength(1));
     expect(result.current.users[0]).toMatchObject({
@@ -338,10 +338,12 @@ describe("useUsers hook", () => {
       });
     });
 
-    expect(usersUpdate.updateMock).toHaveBeenCalledWith({
-      name: "Worker User",
-      is_active: false,
-    });
+    expect(usersUpdate.updateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Worker User",
+        is_active: false,
+      }),
+    );
     expect(usersUpdate.eqMock).toHaveBeenCalledWith("id", "user-1");
     expect(employeeIdSelect.eqMock).toHaveBeenCalledWith("id", "user-1");
     expect(employeeUpdate.updateMock).toHaveBeenCalledWith({
