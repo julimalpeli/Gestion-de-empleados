@@ -60,16 +60,10 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
 
     connectionState = "testing";
 
-    // Simple health check query with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
-
+    // Simple health check query (no artificial timeout - let fetch handle it)
     const { data, error } = await supabase
       .from("employees")
-      .select("count", { count: "exact", head: true })
-      .abortSignal(controller.signal);
-
-    clearTimeout(timeoutId);
+      .select("count", { count: "exact", head: true });
 
     if (error) {
       console.error("❌ Supabase connection test failed:");

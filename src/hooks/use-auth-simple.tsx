@@ -271,46 +271,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Load user profile from the database - no hardcoded fallbacks
+  // Load user profile from the database
   const loadUserProfile = async (supabaseUser: SupabaseUser, retryCount = 0) => {
     const MAX_RETRIES = 2;
-    const QUERY_TIMEOUT = 15000; // 15 seconds
 
     try {
       console.log("🔄 Querying database for user profile...", retryCount > 0 ? `(retry ${retryCount})` : "");
 
-      // Single query: find by ID or email in one request
-      const queryPromise = supabase
+      // Simple query by ID (primary key = fastest)
+      let result = await supabase
         .from("users")
         .select("*")
-        .or(`id.eq.${supabaseUser.id},email.ilike.${supabaseUser.email?.toLowerCase() || ""}`)
-        .limit(1);
+        .eq("id", supabaseUser.id)
+        .maybeSingle();
 
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Database query timeout")), QUERY_TIMEOUT),
-      );
+      // If not found by ID, try by email
+      if (!result.data && (!result.error || result.error.code === "PGRST116")) {
+        console.log("🔄 User not found by ID, trying by email...");
+        const emailResult = await supabase
+          .from("users")
+          .select("*")
+          .eq("email", supabaseUser.email?.toLowerCase() || "")
+          .limit(1);
 
-      let users, error;
-      try {
-        const result = await Promise.race([queryPromise, timeoutPromise]);
-        users = result.data;
-        error = result.error;
-      } catch (timeoutError) {
-        console.warn("⏰ Database query timed out");
-        users = null;
-        error = timeoutError;
+        result = {
+          data: emailResult.data?.[0] || null,
+          error: emailResult.error,
+        } as any;
       }
 
+      const userProfile = result.data;
+      const error = result.error;
+
       console.log("📊 Database query result:", {
-        users: users?.length,
+        found: !!userProfile,
         error: error?.message,
       });
 
       if (error) {
         const errMsg = error.message || String(error);
         const isTransientError =
-          errMsg.includes("timeout") ||
           errMsg.includes("Failed to fetch") ||
           errMsg.includes("network") ||
           errMsg.includes("connection") ||
@@ -319,14 +319,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           error.name === "AbortError";
 
         if (isTransientError && retryCount < MAX_RETRIES) {
-          const delay = (retryCount + 1) * 2000; // 2s, 4s
-          console.warn(`⏳ Transient error, retrying in ${delay / 1000}s...`);
+          const delay = (retryCount + 1) * 3000; // 3s, 6s
+          console.warn(`⏳ Network error, retrying in ${delay / 1000}s...`);
           await new Promise((resolve) => setTimeout(resolve, delay));
           return loadUserProfile(supabaseUser, retryCount + 1);
         }
 
-        console.error("❌ Database error loading user profile:", error.message);
-        // Only sign out on persistent errors, not transient network issues
+        console.error("❌ Database error loading user profile:", errMsg);
+        // Don't sign out on network errors - user might recover
         if (!isTransientError) {
           await supabase.auth.signOut();
           setUser(null);
@@ -335,8 +335,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      if (!users?.[0]) {
-        console.warn("⚠️ No active user found in database for:", supabaseUser.email);
+      if (!userProfile) {
+        console.warn("⚠️ No user found in database for:", supabaseUser.email);
         // Try to auto-create internal user record
         try {
           const newRecord = await ensureInternalUserRecord(
@@ -371,7 +371,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      const userProfile = users[0];
       console.log(
         "✅ User found in database:",
         userProfile.name,
