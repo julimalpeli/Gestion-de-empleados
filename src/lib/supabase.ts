@@ -62,7 +62,7 @@ export const testSupabaseConnection = async (): Promise<boolean> => {
 
     // Simple health check query with timeout
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // 20 second timeout
 
     const { data, error } = await supabase
       .from("employees")
@@ -297,17 +297,19 @@ export const withRetry = async <T>(
   throw lastError;
 };
 
-// Test connection on module load in development
+// Test connection on module load in development (non-blocking, delayed)
 if (import.meta.env.DEV) {
   setTimeout(() => {
     testSupabaseConnection().then((success) => {
       if (!success) {
         console.warn(
-          "⚠️ Supabase connection failed - app will fall back to offline mode",
+          "⚠️ Supabase connection test failed - auth will retry on login",
         );
       }
+    }).catch(() => {
+      console.warn("⚠️ Supabase connection test threw - will retry later");
     });
-  }, 1000);
+  }, 3000); // Delay 3s to let the app initialize first
 }
 
 // Database Types - Estas se generarán automáticamente después

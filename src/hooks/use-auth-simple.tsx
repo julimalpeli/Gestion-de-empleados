@@ -274,32 +274,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Load user profile from the database - no hardcoded fallbacks
   const loadUserProfile = async (supabaseUser: SupabaseUser, retryCount = 0) => {
     const MAX_RETRIES = 2;
-    const QUERY_TIMEOUT = 10000; // 10 seconds
+    const QUERY_TIMEOUT = 15000; // 15 seconds
 
     try {
       console.log("🔄 Querying database for user profile...", retryCount > 0 ? `(retry ${retryCount})` : "");
 
-      // Try by auth ID first (most reliable), then fall back to email
-      const userEmail = supabaseUser.email?.toLowerCase() || "";
-      const queryPromise = (async () => {
-        // 1. Try by Supabase auth ID
-        const byId = await supabase
-          .from("users")
-          .select("*")
-          .eq("id", supabaseUser.id)
-          .limit(1);
-
-        if (byId.data && byId.data.length > 0) {
-          return byId;
-        }
-
-        // 2. Fall back to email (case-insensitive via ilike)
-        return supabase
-          .from("users")
-          .select("*")
-          .ilike("email", userEmail)
-          .limit(1);
-      })();
+      // Single query: find by ID or email in one request
+      const queryPromise = supabase
+        .from("users")
+        .select("*")
+        .or(`id.eq.${supabaseUser.id},email.ilike.${supabaseUser.email?.toLowerCase() || ""}`)
+        .limit(1);
 
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) =>
@@ -323,12 +308,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
+        const errMsg = error.message || String(error);
         const isTransientError =
-          error.message?.includes("timeout") ||
-          error.message?.includes("Failed to fetch") ||
-          error.message?.includes("network") ||
-          error.message?.includes("connection") ||
-          error.message?.includes("aborted");
+          errMsg.includes("timeout") ||
+          errMsg.includes("Failed to fetch") ||
+          errMsg.includes("network") ||
+          errMsg.includes("connection") ||
+          errMsg.includes("aborted") ||
+          errMsg.includes("AbortError") ||
+          error.name === "AbortError";
 
         if (isTransientError && retryCount < MAX_RETRIES) {
           const delay = (retryCount + 1) * 2000; // 2s, 4s
