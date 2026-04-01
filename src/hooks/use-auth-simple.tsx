@@ -272,20 +272,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   // Load user profile from the database - no hardcoded fallbacks
-  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
-    try {
-      console.log("🔄 Querying database for user profile...");
+  const loadUserProfile = async (supabaseUser: SupabaseUser, retryCount = 0) => {
+    const MAX_RETRIES = 2;
+    const QUERY_TIMEOUT = 10000; // 10 seconds
 
-      const queryPromise = supabase
-        .from("users")
-        .select("*")
-        .eq("email", supabaseUser.email)
-        .eq("is_active", true)
-        .limit(1);
+    try {
+      console.log("🔄 Querying database for user profile...", retryCount > 0 ? `(retry ${retryCount})` : "");
+
+      // Try by auth ID first (most reliable), then fall back to email
+      const userEmail = supabaseUser.email?.toLowerCase() || "";
+      const queryPromise = (async () => {
+        // 1. Try by Supabase auth ID
+        const byId = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", supabaseUser.id)
+          .limit(1);
+
+        if (byId.data && byId.data.length > 0) {
+          return byId;
+        }
+
+        // 2. Fall back to email (case-insensitive via ilike)
+        return supabase
+          .from("users")
+          .select("*")
+          .ilike("email", userEmail)
+          .limit(1);
+      })();
 
       // Add timeout to prevent hanging
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Database query timeout")), 8000),
+        setTimeout(() => reject(new Error("Database query timeout")), QUERY_TIMEOUT),
       );
 
       let users, error;
@@ -305,11 +323,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
+        const isTransientError =
+          error.message?.includes("timeout") ||
+          error.message?.includes("Failed to fetch") ||
+          error.message?.includes("network") ||
+          error.message?.includes("connection") ||
+          error.message?.includes("aborted");
+
+        if (isTransientError && retryCount < MAX_RETRIES) {
+          const delay = (retryCount + 1) * 2000; // 2s, 4s
+          console.warn(`⏳ Transient error, retrying in ${delay / 1000}s...`);
+          await new Promise((resolve) => setTimeout(resolve, delay));
+          return loadUserProfile(supabaseUser, retryCount + 1);
+        }
+
         console.error("❌ Database error loading user profile:", error.message);
-        // On DB error, sign out the user for security
-        await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
+        // Only sign out on persistent errors, not transient network issues
+        if (!isTransientError) {
+          await supabase.auth.signOut();
+          setUser(null);
+          setSession(null);
+        }
         return;
       }
 
@@ -406,10 +440,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     } catch (error) {
       console.error("❌ Error loading user profile:", error);
-      // On any error, don't create fallback users - sign out for security
-      await supabase.auth.signOut();
-      setUser(null);
-      setSession(null);
+      const errMsg = error?.message || String(error);
+      const isTransient =
+        errMsg.includes("timeout") ||
+        errMsg.includes("Failed to fetch") ||
+        errMsg.includes("network") ||
+        errMsg.includes("connection");
+
+      if (isTransient) {
+        console.warn("⚠️ Transient error loading profile, will retry on next auth event");
+      } else {
+        // Only sign out on definitive errors (e.g. permission denied)
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
+      }
     }
   };
 
