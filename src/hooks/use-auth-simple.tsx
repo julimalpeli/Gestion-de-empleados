@@ -244,6 +244,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     loadInitialSession();
 
+    // Safety net: force loading=false after 5s to prevent UI lockup
+    const safetyTimeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn("⚠️ Auth loading safety timeout - forcing loading=false");
+        setLoading(false);
+      }
+    }, 5000);
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -267,6 +275,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       isMounted = false;
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, []);

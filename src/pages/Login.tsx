@@ -264,7 +264,6 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
-                    disabled={loading}
                     required
                   />
                 </div>
