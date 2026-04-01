@@ -280,113 +280,95 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Load user profile from the database
-  const loadUserProfile = async (supabaseUser: SupabaseUser, retryCount = 0) => {
-    const MAX_RETRIES = 2;
-
+  // Load user profile from the database using RPC (bypasses RLS evaluation)
+  const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      console.log("🔄 Querying database for user profile...", retryCount > 0 ? `(retry ${retryCount})` : "");
+      console.log("🔄 Loading user profile via RPC...");
 
-      // Simple query by ID (primary key = fastest)
-      let result = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", supabaseUser.id)
-        .maybeSingle();
+      // Use RPC function that runs as SECURITY DEFINER - fast and bypasses RLS
+      const rpcPromise = supabase.rpc("get_my_profile");
 
-      // If not found by ID, try by email
-      if (!result.data && (!result.error || result.error.code === "PGRST116")) {
-        console.log("🔄 User not found by ID, trying by email...");
-        const emailResult = await supabase
-          .from("users")
-          .select("*")
-          .eq("email", supabaseUser.email?.toLowerCase() || "")
-          .limit(1);
+      // Safety timeout: if RPC doesn't respond in 10s, use auth session data
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Profile query timeout")), 10000),
+      );
 
-        result = {
-          data: emailResult.data?.[0] || null,
-          error: emailResult.error,
-        } as any;
+      let userProfile = null;
+      let profileError = null;
+
+      try {
+        const { data, error } = await Promise.race([rpcPromise, timeoutPromise]) as any;
+        if (error) {
+          profileError = error;
+        } else if (data && data.length > 0) {
+          userProfile = data[0];
+        }
+      } catch (err) {
+        profileError = err;
       }
 
-      const userProfile = result.data;
-      const error = result.error;
+      if (profileError) {
+        console.warn("⚠️ RPC profile load failed:", profileError.message || profileError);
+        // Fallback: try direct query
+        try {
+          console.log("🔄 Trying direct query fallback...");
+          const directPromise = supabase
+            .from("users")
+            .select("id, username, email, name, role, employee_id, is_active, needs_password_change")
+            .eq("id", supabaseUser.id)
+            .maybeSingle();
 
-      console.log("📊 Database query result:", {
-        found: !!userProfile,
-        error: error?.message,
-      });
+          const directTimeout = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Direct query timeout")), 8000),
+          );
 
-      if (error) {
-        const errMsg = error.message || String(error);
-        const isTransientError =
-          errMsg.includes("Failed to fetch") ||
-          errMsg.includes("network") ||
-          errMsg.includes("connection") ||
-          errMsg.includes("aborted") ||
-          errMsg.includes("AbortError") ||
-          error.name === "AbortError";
-
-        if (isTransientError && retryCount < MAX_RETRIES) {
-          const delay = (retryCount + 1) * 3000; // 3s, 6s
-          console.warn(`⏳ Network error, retrying in ${delay / 1000}s...`);
-          await new Promise((resolve) => setTimeout(resolve, delay));
-          return loadUserProfile(supabaseUser, retryCount + 1);
+          const { data, error } = await Promise.race([directPromise, directTimeout]) as any;
+          if (!error && data) {
+            userProfile = data;
+          }
+        } catch (directErr) {
+          console.warn("⚠️ Direct query also failed:", directErr.message || directErr);
         }
-
-        console.error("❌ Database error loading user profile:", errMsg);
-        // Don't sign out on network errors - user might recover
-        if (!isTransientError) {
-          await supabase.auth.signOut();
-          setUser(null);
-          setSession(null);
-        }
-        return;
       }
 
+      // If we still don't have a profile, try ensureInternalUserRecord
       if (!userProfile) {
-        console.warn("⚠️ No user found in database for:", supabaseUser.email);
-        // Try to auto-create internal user record
+        console.warn("⚠️ Could not load profile from DB, trying auto-create...");
         try {
           const newRecord = await ensureInternalUserRecord(
             supabaseUser,
             supabaseUser.email?.toLowerCase(),
           );
           if (newRecord) {
-            const userData: User = {
+            userProfile = {
               id: newRecord.id,
               username: supabaseUser.email?.split("@")[0] || "user",
               name: newRecord.name || "Usuario",
-              role: newRecord.role as User["role"],
-              email: supabaseUser.email || "",
-              permissions: getRolePermissions(newRecord.role),
-              loginTime: new Date().toISOString(),
-              needsPasswordChange: false,
-              isActive: newRecord.is_active,
-              supabaseUser,
+              role: newRecord.role,
+              email: supabaseUser.email,
+              employee_id: null,
+              is_active: newRecord.is_active,
+              needs_password_change: false,
             };
-            setUser(userData);
-            console.log("✅ User profile auto-created:", userData.name, userData.role);
-            return;
           }
         } catch (syncError) {
-          console.error("❌ Could not auto-create user profile:", syncError);
+          console.warn("⚠️ Auto-create also failed:", syncError);
         }
+      }
 
-        // If we can't find or create a profile, sign out
+      if (!userProfile) {
+        console.error("❌ Could not load user profile by any method");
         await supabase.auth.signOut();
         setUser(null);
         setSession(null);
         return;
       }
 
-      console.log(
-        "✅ User found in database:",
-        userProfile.name,
-        userProfile.role,
-        "Active:",
-        userProfile.is_active,
-      );
+      console.log("📊 Profile loaded:", {
+        name: userProfile.name,
+        role: userProfile.role,
+        active: userProfile.is_active,
+      });
 
       // 🚫 CRITICAL: Check if user is active before proceeding
       if (!userProfile.is_active) {
@@ -425,15 +407,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         userData.role,
       );
 
-      // Update last login timestamp
-      try {
-        await supabase
-          .from("users")
-          .update({ last_login: new Date().toISOString() })
-          .eq("id", userProfile.id);
-      } catch (updateError) {
-        console.warn("⚠️ Could not update last login:", updateError);
-      }
+      // Update last login timestamp (fire and forget - don't block login)
+      supabase
+        .from("users")
+        .update({ last_login: new Date().toISOString() })
+        .eq("id", userProfile.id)
+        .then(() => console.log("✅ Last login updated"))
+        .catch((err) => console.warn("⚠️ Could not update last login:", err));
     } catch (error) {
       console.error("❌ Error loading user profile:", error);
       const errMsg = error?.message || String(error);
