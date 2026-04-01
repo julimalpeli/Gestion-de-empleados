@@ -280,112 +280,73 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Load user profile - tries multiple methods, falls back to JWT data
+  // Build user profile from JWT/auth data (instant, no DB needed)
+  const buildProfileFromAuth = (supabaseUser: SupabaseUser): any => {
+    // Extract role from user_metadata (set during user creation)
+    const metadata = supabaseUser.user_metadata as Record<string, any> || {};
+    const appMetadata = supabaseUser.app_metadata as Record<string, any> || {};
+    const role = metadata.role || appMetadata.role || "employee";
+    const name = metadata.name || metadata.full_name || supabaseUser.email?.split("@")[0] || "Usuario";
+
+    return {
+      id: supabaseUser.id,
+      username: supabaseUser.email?.split("@")[0] || "user",
+      email: supabaseUser.email || "",
+      name,
+      role,
+      employee_id: metadata.employee_id || null,
+      is_active: true,
+      needs_password_change: false,
+    };
+  };
+
+  // Try to load full profile from DB (non-blocking, enriches JWT profile)
+  const tryLoadDbProfile = (supabaseUser: SupabaseUser) => {
+    // Fire and forget - don't block login
+    supabase.rpc("get_my_profile").then(({ data, error }) => {
+      if (!error && data && data.length > 0) {
+        const dbProfile = data[0];
+        console.log("✅ DB profile loaded in background:", dbProfile.name, dbProfile.role);
+
+        // Update user state with full DB profile
+        const userData: User = {
+          id: dbProfile.id,
+          username: dbProfile.username,
+          name: dbProfile.name,
+          role: dbProfile.role,
+          email: dbProfile.email,
+          employeeId: dbProfile.employee_id,
+          permissions: getRolePermissions(dbProfile.role),
+          loginTime: new Date().toISOString(),
+          needsPasswordChange: dbProfile.needs_password_change || false,
+          isActive: dbProfile.is_active,
+          supabaseUser,
+        };
+        setUser(userData);
+
+        // Update last login (fire and forget)
+        supabase
+          .from("users")
+          .update({ last_login: new Date().toISOString() })
+          .eq("id", dbProfile.id)
+          .then(() => {})
+          .catch(() => {});
+      } else {
+        console.warn("⚠️ Background DB profile load failed:", error?.message || "no data");
+      }
+    }).catch((err) => {
+      console.warn("⚠️ Background DB profile load error:", err);
+    });
+  };
+
+  // Load user profile - instant from JWT, then enrich from DB in background
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
       console.log("🔄 Loading user profile...");
 
-      let userProfile = null;
-      const TIMEOUT = 8000;
-
-      // Method 1: RPC function (fastest, bypasses RLS)
-      try {
-        console.log("📡 Method 1: RPC get_my_profile...");
-        const { data, error } = await Promise.race([
-          supabase.rpc("get_my_profile"),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("RPC timeout")), TIMEOUT)),
-        ]) as any;
-        if (!error && data && data.length > 0) {
-          userProfile = data[0];
-          console.log("✅ Profile loaded via RPC");
-        } else if (error) {
-          console.warn("⚠️ RPC failed:", error.message);
-        }
-      } catch (err: any) {
-        console.warn("⚠️ RPC timeout/error:", err.message);
-      }
-
-      // Method 2: Raw fetch to PostgREST (bypasses Supabase JS client)
-      if (!userProfile) {
-        try {
-          console.log("📡 Method 2: Raw fetch to PostgREST...");
-          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-          const session = await supabase.auth.getSession();
-          const accessToken = session.data?.session?.access_token;
-
-          if (accessToken) {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
-
-            const response = await fetch(
-              `${supabaseUrl}/rest/v1/rpc/get_my_profile`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                  "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
-                  "Authorization": `Bearer ${accessToken}`,
-                },
-                body: "{}",
-                signal: controller.signal,
-              },
-            );
-
-            clearTimeout(timeoutId);
-
-            if (response.ok) {
-              const data = await response.json();
-              if (Array.isArray(data) && data.length > 0) {
-                userProfile = data[0];
-                console.log("✅ Profile loaded via raw fetch");
-              }
-            } else {
-              console.warn("⚠️ Raw fetch failed:", response.status, response.statusText);
-            }
-          }
-        } catch (err: any) {
-          console.warn("⚠️ Raw fetch timeout/error:", err.message);
-        }
-      }
-
-      // Method 3: Build profile from JWT (user IS authenticated, we just can't reach PostgREST)
-      if (!userProfile) {
-        console.warn("⚠️ All DB methods failed. Building profile from authenticated session...");
-
-        // Extract what we can from the Supabase auth user
-        const sessionData = await supabase.auth.getSession();
-        const jwt = sessionData.data?.session?.access_token;
-        let jwtRole = "employee"; // Safe default
-
-        // Try to decode JWT to get any custom claims
-        if (jwt) {
-          try {
-            const payload = JSON.parse(atob(jwt.split(".")[1]));
-            if (payload.user_metadata?.role) {
-              jwtRole = payload.user_metadata.role;
-            }
-            if (payload.app_metadata?.role) {
-              jwtRole = payload.app_metadata.role;
-            }
-          } catch {
-            // JWT decode failed, keep default
-          }
-        }
-
-        userProfile = {
-          id: supabaseUser.id,
-          username: supabaseUser.email?.split("@")[0] || "user",
-          email: supabaseUser.email || "",
-          name: supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.full_name || supabaseUser.email?.split("@")[0] || "Usuario",
-          role: jwtRole,
-          employee_id: null,
-          is_active: true,
-          needs_password_change: false,
-        };
-
-        console.log("✅ Profile built from JWT session:", userProfile.name, "role:", userProfile.role);
-        console.warn("⚠️ Role may be default ('employee'). Full profile will load when DB is reachable.");
-      }
+      // INSTANT: Build profile from authenticated session data (JWT)
+      const userProfile = buildProfileFromAuth(supabaseUser);
+      console.log("✅ Profile built from auth session:", userProfile.name, "role:", userProfile.role);
 
       console.log("📊 Profile ready:", {
         name: userProfile.name,
@@ -430,30 +391,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         userData.role,
       );
 
-      // Update last login timestamp (fire and forget - don't block login)
-      supabase
-        .from("users")
-        .update({ last_login: new Date().toISOString() })
-        .eq("id", userProfile.id)
-        .then(() => console.log("✅ Last login updated"))
-        .catch((err) => console.warn("⚠️ Could not update last login:", err));
+      // Try to enrich with full DB profile in the background (non-blocking)
+      tryLoadDbProfile(supabaseUser);
     } catch (error) {
       console.error("❌ Error loading user profile:", error);
-      const errMsg = error?.message || String(error);
-      const isTransient =
-        errMsg.includes("timeout") ||
-        errMsg.includes("Failed to fetch") ||
-        errMsg.includes("network") ||
-        errMsg.includes("connection");
-
-      if (isTransient) {
-        console.warn("⚠️ Transient error loading profile, will retry on next auth event");
-      } else {
-        // Only sign out on definitive errors (e.g. permission denied)
-        await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
-      }
     }
   };
 
@@ -502,67 +443,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         );
       }
 
-      const { data: userRecord, error: userRecordError } = await supabase
-        .from("users")
-        .select("id, is_active, role, name")
-        .eq("id", data.user.id)
-        .maybeSingle();
-
-      if (userRecordError && userRecordError.code !== "PGRST116") {
-        console.warn(
-          "⚠️ No se pudo verificar el registro del usuario antes de continuar:",
-          userRecordError,
-        );
-      }
-
-      let resolvedUserRecord = userRecord ?? null;
-
-      if (!resolvedUserRecord) {
-        try {
-          console.log(
-            "ℹ️ Internal user record missing, attempting automatic creation...",
-          );
-          resolvedUserRecord = await ensureInternalUserRecord(
-            data.user,
-            normalizedEmail,
-          );
-          console.log("✅ Internal user record created/synced successfully");
-        } catch (syncError) {
-          console.error("❌ Could not auto-create internal user record:", syncError);
-          await supabase.auth.signOut();
-          throw new Error(
-            "Usuario no encontrado en la base de datos interna y no se pudo crear automáticamente. Contacte al administrador.",
-          );
-        }
-      }
-
-      if (!resolvedUserRecord) {
-        await supabase.auth.signOut();
-        throw new Error(
-          "Usuario no encontrado en la base de datos interna. Contacte al administrador.",
-        );
-      }
-
-      if (!resolvedUserRecord.is_active) {
-        await supabase.auth.signOut();
-        throw new Error("Usuario inactivo. Contacte al administrador.");
-      }
-
-      // Set session and load user profile directly
+      // Auth succeeded! Set session and load profile from JWT immediately
+      // The onAuthStateChange listener will also fire, but we handle it here first
       if (data.session) {
-        console.log("🔑 Setting session and loading user profile directly");
+        console.log("🔑 Auth successful, setting session and loading profile...");
         setSession(data.session);
         await loadUserProfile(data.user);
 
-        // Auditar login exitoso
-        try {
-          await auditService.auditLogin("LOGIN", data.user.id, {
-            ip_address: "unknown",
-            user_agent: navigator.userAgent,
-          });
-        } catch (auditError) {
-          console.error("Error auditing login:", auditError);
-        }
+        // Audit login in background (don't block)
+        auditService.auditLogin("LOGIN", data.user.id, {
+          ip_address: "unknown",
+          user_agent: navigator.userAgent,
+        }).catch((err) => console.warn("⚠️ Audit login failed:", err));
       }
     } catch (error) {
       console.error("Login error details:", error);
