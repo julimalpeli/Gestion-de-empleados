@@ -7,16 +7,11 @@ import {
 import { useAuth } from "@/hooks/use-auth-simple";
 import { getReadableErrorMessage } from "@/utils/errorMessage";
 
-const isBypassModeActive = () => {
+const isAuditDisabled = () => {
   if (typeof window === "undefined") {
     return false;
   }
-
-  return Boolean(
-    (window as any).auditDisabled ||
-      window.localStorage?.getItem("admin-bypass") ||
-      window.localStorage?.getItem("emergency-auth"),
-  );
+  return Boolean((window as any).auditDisabled);
 };
 
 export const useAudit = () => {
@@ -40,10 +35,10 @@ export const useAudit = () => {
       setError(null);
 
       try {
-        if (isBypassModeActive()) {
+        if (isAuditDisabled()) {
           setAuditLogs([]);
           setError(
-            "La auditoría está deshabilitada mientras uses el acceso temporal o de emergencia.",
+            "La auditoría está temporalmente deshabilitada.",
           );
           return;
         }
@@ -71,10 +66,10 @@ export const useAudit = () => {
 
   // Cargar logs automáticamente
   useEffect(() => {
-    if (isBypassModeActive()) {
+    if (isAuditDisabled()) {
       setAuditLogs([]);
       setError(
-        "La vista de auditoría está deshabilitada en el modo temporal o de emergencia.",
+        "La auditoría está temporalmente deshabilitada.",
       );
       return;
     }

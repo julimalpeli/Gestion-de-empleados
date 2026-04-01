@@ -402,63 +402,7 @@ const UserManagement = () => {
     }
   };
 
-  // 🔐 Restablecer contraseña del administrador principal
-  const resetAdminPassword = async () => {
-    const confirmed = confirm(
-      `🔐 RESTABLECER CONTRASEÑA ADMINISTRADOR 🔐\n\n` +
-        `Esta función restablecerá la contraseña del usuario "admin":\n\n` +
-        `• Usuario: admin\n` +
-        `• Nueva contraseña: Jmalpeli3194\n` +
-        `• Email: julimalpeli@gmail.com\n\n` +
-        `⚠️ Esta acción queda registrada en los logs de seguridad.\n\n` +
-        `¿Confirmas restablecer la contraseña del administrador?`,
-    );
-
-    if (!confirmed) return;
-
-    try {
-      // Buscar el usuario admin
-      const adminUser = users.find(
-        (u) => u.username === "admin" || u.email === "julimalpeli@gmail.com",
-      );
-
-      if (!adminUser) {
-        alert("❌ Usuario administrador no encontrado en el sistema.");
-        return;
-      }
-
-      const result = await resetPassword(adminUser.id, "Jmalpeli3194", {
-        markNeedsPasswordChange: false,
-      });
-
-      if (!result.success) {
-        alert(
-          result.error
-            ? `No se pudo restablecer la contraseña automática: ${result.error}`
-            : "No se pudo restablecer la contraseña automática",
-        );
-        return;
-      }
-
-      alert(
-        `✅ CONTRASEÑA RESTABLECIDA\n\n` +
-          `Usuario: admin\n` +
-          `Nueva contraseña: Jmalpeli3194\n` +
-          `Email: ${result.email}\n\n` +
-          `✅ Ahora puedes iniciar sesión con estas credenciales.`,
-      );
-
-      console.log(`🔐 Security Event: ADMIN_PASSWORD_RESET`, {
-        targetUser: adminUser.username,
-        targetEmail: adminUser.email,
-        resetBy: "system_admin",
-        timestamp: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error("Error resetting admin password:", error);
-      alert(`Error restableciendo contraseña: ${error.message}`);
-    }
-  };
+  // Password reset for any user is handled through the table actions (Key icon)
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
@@ -562,16 +506,6 @@ const UserManagement = () => {
               Admin Emergencia
             </Button>
 
-            {/* Botón restablecer admin */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetAdminPassword}
-              className="border-red-300 text-red-700 hover:bg-red-50"
-            >
-              <Key className="h-4 w-4 mr-2" />
-              Reset Admin
-            </Button>
 
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>

@@ -30,16 +30,11 @@ export class SupabaseEmployeeService implements IEmployeeService {
         console.warn("⚠️ No se pudo obtener la sesión actual:", sessionError);
       }
 
-      const hasLocalBypass =
-        typeof window !== "undefined" &&
-        (localStorage.getItem("admin-bypass") ||
-          localStorage.getItem("emergency-auth"));
-
-      if (!activeSession?.user && hasLocalBypass) {
+      if (!activeSession?.user) {
         console.log(
-          "🚪 Sesión ausente pero hay bypass local activo - usando datos locales de empleados",
+          "⏸️ No Supabase session available, skipping employee load",
         );
-        return this.getFallbackEmployees();
+        return [];
       }
 
       // Check connection health first

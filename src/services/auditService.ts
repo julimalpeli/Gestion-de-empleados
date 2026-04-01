@@ -35,16 +35,7 @@ class AuditService {
   }
 
   constructor() {
-    // Disable auditing immediately if admin bypass is active
-    if (
-      typeof window !== "undefined" &&
-      window.localStorage?.getItem("admin-bypass")
-    ) {
-      const reason =
-        "🔓 Admin bypass detected in constructor - disabling auditing";
-      console.log(reason);
-      this.disableAudit(reason);
-    }
+    // Auditing is always active when authenticated
   }
 
   // Crear entrada de auditoría
@@ -54,15 +45,6 @@ class AuditService {
     // Check if auditing is disabled due to RLS issues
     if ((window as any).auditDisabled) {
       console.log("⏭️ Auditing disabled - skipping entry");
-      return {} as AuditLogEntry;
-    }
-
-    // Check if we're using admin bypass (no Supabase session) - disable audit proactively
-    if ((window as any).localStorage?.getItem("admin-bypass")) {
-      const reason =
-        "🔓 Admin bypass detected - disabling auditing proactively";
-      console.log(reason);
-      this.disableAudit(reason);
       return {} as AuditLogEntry;
     }
 
@@ -191,18 +173,6 @@ class AuditService {
     // Check if auditing is disabled due to RLS issues
     if ((window as any).auditDisabled) {
       console.log("⏭️ Auditing disabled - returning empty audit logs");
-      return [];
-    }
-
-    const bypassActive =
-      typeof window !== "undefined" &&
-      (window.localStorage?.getItem("admin-bypass") ||
-        window.localStorage?.getItem("emergency-auth"));
-
-    if (bypassActive) {
-      this.disableAudit(
-        "🔒 Audit logs viewer disabled while admin bypass/emergency auth is active",
-      );
       return [];
     }
 

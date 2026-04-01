@@ -6,16 +6,11 @@ import { AlertTriangle, CheckCircle, Database, Settings } from "lucide-react";
 import { auditService } from "@/services/auditService";
 import { getReadableErrorMessage } from "@/utils/errorMessage";
 
-const isBypassModeActive = () => {
+const isAuditDisabled = () => {
   if (typeof window === "undefined") {
     return false;
   }
-
-  return Boolean(
-    (window as any).auditDisabled ||
-      window.localStorage?.getItem("admin-bypass") ||
-      window.localStorage?.getItem("emergency-auth"),
-  );
+  return Boolean((window as any).auditDisabled);
 };
 
 export const AuditStatus = () => {
@@ -35,7 +30,7 @@ export const AuditStatus = () => {
     setIsChecking(true);
 
     try {
-      if (isBypassModeActive()) {
+      if (isAuditDisabled()) {
         setAuditStatus("disabled");
         setLastCheck(new Date().toLocaleString());
         return;

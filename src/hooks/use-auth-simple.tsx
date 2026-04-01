@@ -8,10 +8,7 @@ import {
 import { supabase } from "@/lib/supabase";
 import { auditService } from "@/services/auditService";
 import type { User as SupabaseUser, Session } from "@supabase/supabase-js";
-import { checkEmergencyAuth } from "@/utils/emergencyAuth";
 
-const ADMIN_BYPASS_ENABLED =
-  import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
 const PASSWORD_PLACEHOLDER = "$supabase$auth$handled";
 
 type InternalUserRecord = {
@@ -204,48 +201,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
 
-    const restoreAdminBypass = () => {
-      if (!ADMIN_BYPASS_ENABLED) {
-        localStorage.removeItem("admin-bypass");
-        return false;
-      }
-
-      const adminBypass = localStorage.getItem("admin-bypass");
-      if (!adminBypass) {
-        return false;
-      }
-
-      try {
-        const adminUser = JSON.parse(adminBypass);
-        console.log("🔓 Admin bypass restored from storage");
-        setUser(adminUser);
-        setSession(null);
-        setLoading(false);
-        return true;
-      } catch (error) {
-        console.warn("⚠️ Invalid admin bypass data", error);
-        localStorage.removeItem("admin-bypass");
-      }
-
-      return false;
-    };
-
-    const emergencyUser = checkEmergencyAuth();
-    if (emergencyUser) {
-      console.log("🚨 Using emergency auth for:", emergencyUser.email);
-      setUser(emergencyUser);
-      setSession(null);
-      setLoading(false);
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    if (restoreAdminBypass()) {
-      return () => {
-        isMounted = false;
-      };
-    }
+    // Clean up any old bypass data from previous versions
+    localStorage.removeItem("admin-bypass");
+    localStorage.removeItem("emergency-auth");
 
     const loadInitialSession = async () => {
       try {
@@ -297,9 +255,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (event === "SIGNED_OUT" || !session?.user) {
         setSession(null);
-        if (!localStorage.getItem("admin-bypass")) {
-          setUser(null);
-        }
+        setUser(null);
         return;
       }
 
@@ -315,79 +271,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Make debug functions available globally
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      (window as any).checkAuthContext = checkAuthContext;
-      (window as any).checkSession = checkSession;
-      console.log("🔧 Auth debug functions available:");
-      console.log("   - checkAuthContext()");
-      console.log("   - checkSession()");
-    }
-  }, []);
-
-  // Load user profile
+  // Load user profile from the database - no hardcoded fallbacks
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      // Admin fallback
-      if (supabaseUser.email === "julimalpeli@gmail.com") {
-        const adminUser: User = {
-          id: supabaseUser.id,
-          username: "admin",
-          name: "Julian Malpeli (Admin)",
-          role: "admin",
-          email: supabaseUser.email,
-          employeeId: undefined,
-          permissions: ["all"],
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-          supabaseUser,
-        };
-        setUser(adminUser);
-        return;
-      }
-
-      // Known employee fallback to prevent database issues
-      if (supabaseUser.email === "daianaayelen0220@gmail.com") {
-        const employeeUser: User = {
-          id: "d6f06332-1d49-4935-b931-5d7657d58468", // Known employee ID
-          username: "daiana",
-          name: "Porras Daiana Ayelen",
-          role: "employee",
-          email: supabaseUser.email,
-          employeeId: "d6f06332-1d49-4935-b931-5d7657d58468",
-          permissions: getRolePermissions("employee"),
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-          supabaseUser,
-        };
-        setUser(employeeUser);
-        return;
-      }
-
-      // Skip database query for admin user entirely
-      if (supabaseUser.email === "julimalpeli@gmail.com") {
-        console.log("🔓 Admin detected, using admin fallback");
-        const adminUser: User = {
-          id: supabaseUser.id,
-          username: "admin",
-          name: "Julian Malpeli (Admin)",
-          role: "admin",
-          email: supabaseUser.email,
-          employeeId: undefined,
-          permissions: ["all"],
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-          supabaseUser,
-        };
-        setUser(adminUser);
-        return;
-      }
-
-      // Try to load from database with timeout
       console.log("🔄 Querying database for user profile...");
 
       const queryPromise = supabase
@@ -408,7 +294,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         users = result.data;
         error = result.error;
       } catch (timeoutError) {
-        console.warn("⏰ Database query timed out, using fallback");
+        console.warn("⏰ Database query timed out");
         users = null;
         error = timeoutError;
       }
@@ -419,40 +305,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        console.warn("⚠️ Database error, using fallback user:", error.message);
-        // Fallback for database errors
-        const fallbackUser: User = {
-          id: supabaseUser.id,
-          username: supabaseUser.email?.split("@")[0] || "user",
-          name: supabaseUser.user_metadata?.name || "Usuario",
-          role: "employee",
-          email: supabaseUser.email || "",
-          permissions: getRolePermissions("employee"),
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-          supabaseUser,
-        };
-        setUser(fallbackUser);
+        console.error("❌ Database error loading user profile:", error.message);
+        // On DB error, sign out the user for security
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
         return;
       }
 
       if (!users?.[0]) {
-        console.warn("⚠️ No user found in database, using fallback");
-        // Fallback for users not found in database
-        const fallbackUser: User = {
-          id: supabaseUser.id,
-          username: supabaseUser.email?.split("@")[0] || "user",
-          name: supabaseUser.user_metadata?.name || "Usuario",
-          role: "employee",
-          email: supabaseUser.email || "",
-          permissions: getRolePermissions("employee"),
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-          supabaseUser,
-        };
-        setUser(fallbackUser);
+        console.warn("⚠️ No active user found in database for:", supabaseUser.email);
+        // Try to auto-create internal user record
+        try {
+          const newRecord = await ensureInternalUserRecord(
+            supabaseUser,
+            supabaseUser.email?.toLowerCase(),
+          );
+          if (newRecord) {
+            const userData: User = {
+              id: newRecord.id,
+              username: supabaseUser.email?.split("@")[0] || "user",
+              name: newRecord.name || "Usuario",
+              role: newRecord.role as User["role"],
+              email: supabaseUser.email || "",
+              permissions: getRolePermissions(newRecord.role),
+              loginTime: new Date().toISOString(),
+              needsPasswordChange: false,
+              isActive: newRecord.is_active,
+              supabaseUser,
+            };
+            setUser(userData);
+            console.log("✅ User profile auto-created:", userData.name, userData.role);
+            return;
+          }
+        } catch (syncError) {
+          console.error("❌ Could not auto-create user profile:", syncError);
+        }
+
+        // If we can't find or create a profile, sign out
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
         return;
       }
 
@@ -508,77 +401,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .from("users")
           .update({ last_login: new Date().toISOString() })
           .eq("id", userProfile.id);
-        console.log("✅ Last login updated for user:", userProfile.name);
       } catch (updateError) {
         console.warn("⚠️ Could not update last login:", updateError);
       }
     } catch (error) {
       console.error("❌ Error loading user profile:", error);
-
-      // Even if there's an error, try to create a fallback user so login doesn't completely fail
-      try {
-        const emergencyFallback: User = {
-          id: supabaseUser.id,
-          username: supabaseUser.email?.split("@")[0] || "user",
-          name: "Usuario",
-          role: "employee",
-          email: supabaseUser.email || "",
-          permissions: getRolePermissions("employee"),
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-          supabaseUser,
-        };
-        setUser(emergencyFallback);
-        console.log("🆘 Emergency fallback user created");
-      } catch (fallbackError) {
-        console.error("❌ Even fallback failed:", fallbackError);
-      }
+      // On any error, don't create fallback users - sign out for security
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
     }
   };
 
-  // Login
+  // Login - always through Supabase Auth
   const login = async (email: string, password: string) => {
     setLoading(true);
     try {
       console.log(`🔐 Login attempt for: ${email.trim()}`);
-
-      // Special bypass for admin user is controlled via env flag
-      if (ADMIN_BYPASS_ENABLED && email.trim() === "julimalpeli@gmail.com") {
-        console.log("🔓 Admin login detected - using bypass");
-
-        // Create admin user directly without Supabase auth verification
-        const adminUser: User = {
-          id: "admin-emergency-id",
-          username: "admin",
-          name: "Julian Malpeli (Admin)",
-          role: "admin",
-          email: email.trim(),
-          employeeId: undefined,
-          permissions: ["all"],
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          isActive: true,
-        };
-
-        setUser(adminUser);
-        // Persist admin bypass in localStorage
-        localStorage.setItem("admin-bypass", JSON.stringify(adminUser));
-
-        // Update last login for admin too
-        try {
-          await supabase
-            .from("users")
-            .update({ last_login: new Date().toISOString() })
-            .eq("email", email.trim());
-          console.log("✅ Last login updated for admin");
-        } catch (updateError) {
-          console.warn("⚠️ Could not update admin last login:", updateError);
-        }
-
-        console.log("✅ Admin user created with bypass");
-        return;
-      }
 
       const trimmedEmail = email.trim();
       const normalizedEmail = trimmedEmail.toLowerCase();
@@ -590,10 +429,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
 
       if (error) {
-        console.error("❌ Supabase auth error details:");
-        console.error("   - Error code:", error.status);
-        console.error("   - Error message:", error.message);
-        console.error("   - Full error:", error);
+        console.error("❌ Supabase auth error:", error.message);
 
         if (error.message.includes("Invalid login credentials")) {
           throw new Error(
@@ -677,7 +513,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Auditar login exitoso
         try {
           await auditService.auditLogin("LOGIN", data.user.id, {
-            ip_address: "unknown", // Podríamos obtener la IP si es necesario
+            ip_address: "unknown",
             user_agent: navigator.userAgent,
           });
         } catch (auditError) {
@@ -687,18 +523,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error("Login error details:", error);
 
-      // Auditar login fallido (skip audit for failed logins - no valid user ID available)
-      try {
-        // Skip audit for failed logins since we don't have a valid user ID
-        console.log("⚠️ Skipping audit for failed login - no valid user ID");
-      } catch (auditError) {
-        console.error("Error auditing failed login:", auditError);
-      }
-
       // Handle email confirmation error
       if (error.message?.includes("Email not confirmed")) {
         throw new Error(
-          "Email no confirmado. Usa las funciones de confirmación en la consola del navegador: confirmUserEmail('tu@email.com')",
+          "Email no confirmado. Contacte al administrador para confirmar la cuenta.",
         );
       }
 
@@ -783,7 +611,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           "⚠️ Could not check session status:",
           sessionError.message,
         );
-        // Continue with local logout even if session check fails
       }
 
       console.log("✅ Logout completed");
@@ -795,8 +622,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Periodic user status check
   useEffect(() => {
-    if (!user?.email || user.id === "admin-emergency-id") {
+    if (!user?.email) {
       return;
     }
 
@@ -823,7 +651,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       clearInterval(statusCheckInterval);
     };
-  }, [user?.email, user?.id]);
+  }, [user?.email]);
 
   // Check permissions
   const hasPermission = (permission: string): boolean => {
@@ -856,9 +684,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               `1. Ve al dashboard de Supabase\n` +
               `2. Authentication > Users\n` +
               `3. Busca el usuario: ${email}\n` +
-              `4. Actualiza la contraseña manualmente\n\n` +
-              `O usa el método SQL:\n` +
-              `UPDATE auth.users SET encrypted_password = crypt('nueva_password', gen_salt('bf')) WHERE email = '${email}';`,
+              `4. Actualiza la contraseña manualmente`,
           );
         }
 
@@ -885,7 +711,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Export security logs
   const exportSecurityLogs = () => {
-    // Simple implementation
     console.log("Security logs export requested");
   };
 
@@ -895,7 +720,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading,
     login,
     logout,
-    isAuthenticated: !!user, // Simplified: just check if user exists (works with both normal login and admin bypass)
+    isAuthenticated: !!session?.user && !!user,
     hasPermission,
     changePassword,
     resetPassword,
@@ -912,79 +737,3 @@ export const useAuth = () => {
   }
   return context;
 };
-
-// Direct auth debugging function
-const checkAuthContext = async () => {
-  try {
-    console.log("🔐 Checking authentication context...");
-
-    // Check client-side session
-    const {
-      data: { session },
-      error: sessionError,
-    } = await supabase.auth.getSession();
-    console.log("�� Client session:", {
-      session: !!session,
-      user: session?.user?.id,
-      email: session?.user?.email,
-      error: sessionError,
-    });
-
-    // Try a simple authenticated query
-    const { data: testQuery, error: testError } = await supabase
-      .from("vacation_requests")
-      .select("id")
-      .limit(1);
-
-    console.log("🎯 Test vacation query result:", {
-      data: testQuery,
-      error: testError,
-    });
-
-    // Test auth context with a simpler query
-    const { data: authTest, error: authError } =
-      await supabase.rpc("get_auth_context");
-
-    console.log("🛡️ Auth context test:", {
-      data: authTest,
-      error: authError,
-    });
-
-    return {
-      session: !!session,
-      userId: session?.user?.id,
-      email: session?.user?.email,
-      canQueryVacations: !testError,
-      sessionError,
-      queryError: testError,
-      authError,
-    };
-  } catch (error) {
-    console.error("❌ Error checking auth context:", error);
-    return { error };
-  }
-};
-
-// Simple session check
-const checkSession = async () => {
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  console.log("Current session:", session);
-  return session;
-};
-
-// Export for global access
-export { checkAuthContext, checkSession };
-
-// Make immediately available on module load
-if (typeof window !== "undefined") {
-  (window as any).checkAuthContext = checkAuthContext;
-  (window as any).checkSession = checkSession;
-  (window as any).authDebug = { checkAuthContext, checkSession };
-  console.log("��� Auth debug functions loaded:");
-  console.log("   - checkAuthContext()");
-  console.log("   - checkSession()");
-  console.log("   - authDebug.checkAuthContext()");
-  console.log("   - authDebug.checkSession()");
-}

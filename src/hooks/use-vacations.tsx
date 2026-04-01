@@ -2,9 +2,6 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/use-auth-simple";
 
-const ADMIN_BYPASS_ENABLED =
-  import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
-
 // Import debug utilities
 if (import.meta.env.DEV) {
   import("@/utils/vacationDebug");
@@ -78,23 +75,12 @@ export const useVacations = (employeeId?: string) => {
     };
 
     const hasSupabaseSession = !!session?.user;
-    const bypassActive =
-      ADMIN_BYPASS_ENABLED &&
-      !hasSupabaseSession &&
-      !!user &&
-      typeof window !== "undefined" &&
-      (localStorage.getItem("admin-bypass") ||
-        localStorage.getItem("emergency-auth"));
 
     if (!hasSupabaseSession) {
-      if (bypassActive) {
-        await loadFallbackVacations("no-session-bypass");
-      } else {
-        console.log(
-          "⏸️ No Supabase session available, skipping vacation load until login completes",
-        );
-        setVacations([]);
-      }
+      console.log(
+        "⏸️ No Supabase session available, skipping vacation load until login completes",
+      );
+      setVacations([]);
       setLoading(false);
       return;
     }

@@ -168,27 +168,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       console.log("🔍 Loading user profile for:", supabaseUser.email);
 
-      // Immediate fallback for admin user to bypass database issues
-      if (supabaseUser.email === "julimalpeli@gmail.com") {
-        console.log("🚀 Using immediate admin fallback");
-        const adminUser: User = {
-          id: supabaseUser.id,
-          username: "admin",
-          name: "Julian Malpeli (Admin)",
-          role: "admin",
-          email: supabaseUser.email,
-          employeeId: undefined,
-          permissions: ["all"],
-          loginTime: new Date().toISOString(),
-          needsPasswordChange: false,
-          supabaseUser,
-        };
-
-        setUser(adminUser);
-        console.log("✅ Admin user set");
-        return;
-      }
-
       // Add timeout to prevent hanging
       const queryPromise = supabase
         .from("users")
@@ -230,28 +209,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           email: supabaseUser.email,
         });
 
-        // Create fallback admin user for julimalpeli@gmail.com
-        if (supabaseUser.email === "julimalpeli@gmail.com") {
-          console.log("🔧 Creating fallback admin user");
-          const fallbackUser: User = {
-            id: supabaseUser.id,
-            username: "admin",
-            name: "Julian Malpeli (Admin)",
-            role: "admin",
-            email: supabaseUser.email,
-            employeeId: undefined,
-            permissions: ["all"],
-            loginTime: new Date().toISOString(),
-            needsPasswordChange: false,
-            supabaseUser,
-          };
-
-          setUser(fallbackUser);
-          console.log("✅ Fallback admin user set");
-          return;
-        }
-
-        // For other users, sign them out
+        // User not found in database - sign them out
         await supabase.auth.signOut();
         throw new Error(
           `Usuario no autorizado: ${error?.message || "Usuario no encontrado"}`,

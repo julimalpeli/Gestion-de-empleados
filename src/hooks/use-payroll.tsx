@@ -8,9 +8,6 @@ import type {
   CreatePayrollRequest,
 } from "@/services/interfaces";
 
-const ADMIN_BYPASS_ENABLED =
-  import.meta.env.VITE_ENABLE_ADMIN_BYPASS === "true";
-
 export const usePayroll = () => {
   const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,26 +65,12 @@ export const usePayroll = () => {
     };
 
     const hasSupabaseSession = !!session?.user;
-    const bypassActive =
-      ADMIN_BYPASS_ENABLED &&
-      !hasSupabaseSession &&
-      !!user &&
-      typeof window !== "undefined" &&
-      (localStorage.getItem("admin-bypass") ||
-        localStorage.getItem("emergency-auth"));
 
     if (!hasSupabaseSession) {
-      if (bypassActive) {
-        console.log(
-          "🚪 No Supabase session but bypass active - using fallback payroll data",
-        );
-        await loadFallbackPayroll("no-session-bypass");
-      } else {
-        console.log(
-          "⏸️ No Supabase session available, skipping payroll load until login completes",
-        );
-        setPayrollRecords([]);
-      }
+      console.log(
+        "⏸️ No Supabase session available, skipping payroll load until login completes",
+      );
+      setPayrollRecords([]);
       setLoading(false);
       return;
     }
