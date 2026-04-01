@@ -280,91 +280,114 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Load user profile from the database using RPC (bypasses RLS evaluation)
+  // Load user profile - tries multiple methods, falls back to JWT data
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      console.log("🔄 Loading user profile via RPC...");
-
-      // Use RPC function that runs as SECURITY DEFINER - fast and bypasses RLS
-      const rpcPromise = supabase.rpc("get_my_profile");
-
-      // Safety timeout: if RPC doesn't respond in 10s, use auth session data
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Profile query timeout")), 10000),
-      );
+      console.log("🔄 Loading user profile...");
 
       let userProfile = null;
-      let profileError = null;
+      const TIMEOUT = 8000;
 
+      // Method 1: RPC function (fastest, bypasses RLS)
       try {
-        const { data, error } = await Promise.race([rpcPromise, timeoutPromise]) as any;
-        if (error) {
-          profileError = error;
-        } else if (data && data.length > 0) {
+        console.log("📡 Method 1: RPC get_my_profile...");
+        const { data, error } = await Promise.race([
+          supabase.rpc("get_my_profile"),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("RPC timeout")), TIMEOUT)),
+        ]) as any;
+        if (!error && data && data.length > 0) {
           userProfile = data[0];
+          console.log("✅ Profile loaded via RPC");
+        } else if (error) {
+          console.warn("⚠️ RPC failed:", error.message);
         }
-      } catch (err) {
-        profileError = err;
+      } catch (err: any) {
+        console.warn("⚠️ RPC timeout/error:", err.message);
       }
 
-      if (profileError) {
-        console.warn("⚠️ RPC profile load failed:", profileError.message || profileError);
-        // Fallback: try direct query
-        try {
-          console.log("🔄 Trying direct query fallback...");
-          const directPromise = supabase
-            .from("users")
-            .select("id, username, email, name, role, employee_id, is_active, needs_password_change")
-            .eq("id", supabaseUser.id)
-            .maybeSingle();
-
-          const directTimeout = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("Direct query timeout")), 8000),
-          );
-
-          const { data, error } = await Promise.race([directPromise, directTimeout]) as any;
-          if (!error && data) {
-            userProfile = data;
-          }
-        } catch (directErr) {
-          console.warn("⚠️ Direct query also failed:", directErr.message || directErr);
-        }
-      }
-
-      // If we still don't have a profile, try ensureInternalUserRecord
+      // Method 2: Raw fetch to PostgREST (bypasses Supabase JS client)
       if (!userProfile) {
-        console.warn("⚠️ Could not load profile from DB, trying auto-create...");
         try {
-          const newRecord = await ensureInternalUserRecord(
-            supabaseUser,
-            supabaseUser.email?.toLowerCase(),
-          );
-          if (newRecord) {
-            userProfile = {
-              id: newRecord.id,
-              username: supabaseUser.email?.split("@")[0] || "user",
-              name: newRecord.name || "Usuario",
-              role: newRecord.role,
-              email: supabaseUser.email,
-              employee_id: null,
-              is_active: newRecord.is_active,
-              needs_password_change: false,
-            };
+          console.log("📡 Method 2: Raw fetch to PostgREST...");
+          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+          const session = await supabase.auth.getSession();
+          const accessToken = session.data?.session?.access_token;
+
+          if (accessToken) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), TIMEOUT);
+
+            const response = await fetch(
+              `${supabaseUrl}/rest/v1/rpc/get_my_profile`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "apikey": import.meta.env.VITE_SUPABASE_ANON_KEY,
+                  "Authorization": `Bearer ${accessToken}`,
+                },
+                body: "{}",
+                signal: controller.signal,
+              },
+            );
+
+            clearTimeout(timeoutId);
+
+            if (response.ok) {
+              const data = await response.json();
+              if (Array.isArray(data) && data.length > 0) {
+                userProfile = data[0];
+                console.log("✅ Profile loaded via raw fetch");
+              }
+            } else {
+              console.warn("⚠️ Raw fetch failed:", response.status, response.statusText);
+            }
           }
-        } catch (syncError) {
-          console.warn("⚠️ Auto-create also failed:", syncError);
+        } catch (err: any) {
+          console.warn("⚠️ Raw fetch timeout/error:", err.message);
         }
       }
 
+      // Method 3: Build profile from JWT (user IS authenticated, we just can't reach PostgREST)
       if (!userProfile) {
-        console.error("❌ Could not load user profile by any method");
-        await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
-        return;
+        console.warn("⚠️ All DB methods failed. Building profile from authenticated session...");
+
+        // Extract what we can from the Supabase auth user
+        const sessionData = await supabase.auth.getSession();
+        const jwt = sessionData.data?.session?.access_token;
+        let jwtRole = "employee"; // Safe default
+
+        // Try to decode JWT to get any custom claims
+        if (jwt) {
+          try {
+            const payload = JSON.parse(atob(jwt.split(".")[1]));
+            if (payload.user_metadata?.role) {
+              jwtRole = payload.user_metadata.role;
+            }
+            if (payload.app_metadata?.role) {
+              jwtRole = payload.app_metadata.role;
+            }
+          } catch {
+            // JWT decode failed, keep default
+          }
+        }
+
+        userProfile = {
+          id: supabaseUser.id,
+          username: supabaseUser.email?.split("@")[0] || "user",
+          email: supabaseUser.email || "",
+          name: supabaseUser.user_metadata?.name || supabaseUser.user_metadata?.full_name || supabaseUser.email?.split("@")[0] || "Usuario",
+          role: jwtRole,
+          employee_id: null,
+          is_active: true,
+          needs_password_change: false,
+        };
+
+        console.log("✅ Profile built from JWT session:", userProfile.name, "role:", userProfile.role);
+        console.warn("⚠️ Role may be default ('employee'). Full profile will load when DB is reachable.");
       }
 
-      console.log("📊 Profile loaded:", {
+      console.log("📊 Profile ready:", {
         name: userProfile.name,
         role: userProfile.role,
         active: userProfile.is_active,
