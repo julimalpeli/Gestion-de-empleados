@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase, withRetry } from "@/lib/supabase";
 import { useAudit } from "@/hooks/use-audit";
 import { useAuth } from "@/hooks/use-auth-simple";
+import { usePermissions } from "@/hooks/use-permissions";
 import { normalizePayrollRecord } from "@/hooks/normalizers/normalizePayrollRecord";
 import type {
   PayrollRecord,
@@ -14,6 +15,7 @@ export const usePayroll = () => {
   const [error, setError] = useState<string | null>(null);
   const { auditPayroll } = useAudit();
   const { session, user } = useAuth();
+  const { hasPermission } = usePermissions();
 
   // Cargar registros de liquidaciones
   const fetchPayrollRecords = async () => {
@@ -225,6 +227,9 @@ export const usePayroll = () => {
 
   // Crear registro de liquidación
   const createPayrollRecord = async (payroll: CreatePayrollRequest) => {
+    if (!hasPermission("payroll", "create")) {
+      throw new Error("No tenés permiso para crear liquidaciones. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       const { data, error } = await supabase
         .from("payroll_records")
@@ -305,6 +310,9 @@ export const usePayroll = () => {
     id: string,
     updates: Partial<PayrollRecord>,
   ) => {
+    if (!hasPermission("payroll", "edit")) {
+      throw new Error("No tenés permiso para editar liquidaciones. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       const updateData: any = {};
 
@@ -398,6 +406,9 @@ export const usePayroll = () => {
 
   // Eliminar registro de liquidación
   const deletePayrollRecord = async (id: string) => {
+    if (!hasPermission("payroll", "delete")) {
+      throw new Error("No tenés permiso para eliminar liquidaciones. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       // Obtener datos del registro antes de eliminarlo para auditoría
       const recordToDelete = payrollRecords.find((record) => record.id === id);

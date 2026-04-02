@@ -8,6 +8,7 @@ import type {
 } from "@/services/interfaces";
 import { useUsers } from "@/hooks/use-users";
 import { useAuth } from "@/hooks/use-auth-simple";
+import { usePermissions } from "@/hooks/use-permissions";
 
 const toNumber = (value: unknown): number => {
   if (typeof value === "number" && Number.isFinite(value)) {
@@ -59,6 +60,7 @@ export const useEmployees = () => {
   const { updateUser, users } = useUsers();
   const { auditEmployee } = useAudit();
   const { session, user, isAuthenticated } = useAuth();
+  const { hasPermission } = usePermissions();
   const canLoadEmployees = isAuthenticated || !!session || !!user;
 
   // Cargar empleados
@@ -97,6 +99,9 @@ export const useEmployees = () => {
 
   // Crear empleado
   const createEmployee = async (employee: CreateEmployeeRequest) => {
+    if (!hasPermission("employees", "create")) {
+      throw new Error("No tenés permiso para crear empleados. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       setError(null);
       const createdEmployee = await employeeService.createEmployee(employee);
@@ -159,6 +164,9 @@ export const useEmployees = () => {
     id: string,
     employee: UpdateEmployeeRequest,
   ) => {
+    if (!hasPermission("employees", "edit")) {
+      throw new Error("No tenés permiso para editar empleados. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       setError(null);
       const updatedEmployeeRaw = await employeeService.updateEmployee(
@@ -187,6 +195,9 @@ export const useEmployees = () => {
 
   // Eliminar empleado
   const deleteEmployee = async (id: string) => {
+    if (!hasPermission("employees", "delete")) {
+      throw new Error("No tenés permiso para eliminar empleados. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       setError(null);
       await employeeService.deleteEmployee(id);
@@ -202,6 +213,9 @@ export const useEmployees = () => {
 
   // Cambiar estado
   const toggleEmployeeStatus = async (id: string) => {
+    if (!hasPermission("employees", "edit")) {
+      throw new Error("No tenés permiso para cambiar el estado de empleados. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
     try {
       setError(null);
       const toggledEmployeeRaw = await employeeService.toggleEmployeeStatus(id);

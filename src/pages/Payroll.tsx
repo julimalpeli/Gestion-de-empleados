@@ -79,6 +79,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import FileUpload from "@/components/FileUpload";
 import DocumentManager from "@/components/DocumentManager";
+import PermissionGate from "@/components/PermissionGate";
 import usePermissions from "@/hooks/use-permissions";
 import { useAuth } from "@/hooks/use-auth-simple";
 import {
@@ -151,11 +152,15 @@ const Payroll = () => {
     error: employeesError,
   } = useEmployees();
 
-  const { isAdmin, isManager, canEditModule } = usePermissions();
+  const { isAdmin, isManager, canEditModule, hasPermission } = usePermissions();
   const { user } = useAuth();
 
   // Handle status changes
   const handleStatusChange = async (recordId: string, newStatus: string) => {
+    if (!hasPermission("payroll", "edit")) {
+      alert("No tenés permiso para cambiar el estado de liquidaciones.");
+      return;
+    }
     try {
       const record = payrollRecords.find((r) => r.id === recordId);
       if (!record) {
@@ -882,12 +887,14 @@ const Payroll = () => {
         </div>
 
         <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Nueva Liquidación
-            </Button>
-          </DialogTrigger>
+          <PermissionGate module="payroll" action="create">
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Nueva Liquidación
+              </Button>
+            </DialogTrigger>
+          </PermissionGate>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
@@ -1941,34 +1948,26 @@ const Payroll = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            {record.status !== "paid" && (
-                              <TooltipProvider>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleEditRecord(record)}
-                                      disabled={
-                                        !isManager() &&
-                                        record.status !== "draft"
-                                      }
-                                    >
-                                      <Edit3 className="h-4 w-4" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>
-                                      {record.status === "draft"
-                                        ? "Editar liquidación"
-                                        : isManager()
-                                          ? "Editar liquidación (Gerente/Admin)"
-                                          : "No tienes permiso"}
-                                    </p>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TooltipProvider>
-                            )}
+                            <PermissionGate module="payroll" action="edit">
+                              {record.status !== "paid" && (
+                                <TooltipProvider>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEditRecord(record)}
+                                      >
+                                        <Edit3 className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Editar liquidación</p>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TooltipProvider>
+                              )}
+                            </PermissionGate>
 
                             <DropdownMenu>
                               <TooltipProvider>
@@ -2083,57 +2082,50 @@ const Payroll = () => {
                               </Tooltip>
                             </TooltipProvider>
 
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() =>
-                                      handleDuplicateRecord(record)
-                                    }
-                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                  >
-                                    <Copy className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Duplicar liquidación</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                            <PermissionGate module="payroll" action="create">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() =>
+                                        handleDuplicateRecord(record)
+                                      }
+                                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                    >
+                                      <Copy className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Duplicar liquidación</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </PermissionGate>
 
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setRecordToDelete(record);
-                                      setDeleteConfirmOpen(true);
-                                    }}
-                                    disabled={
-                                      record.status === "paid" && !isManager()
-                                    }
-                                    className={
-                                      record.status === "paid" && !isManager()
-                                        ? "opacity-50 cursor-not-allowed text-gray-400"
-                                        : "text-red-600 hover:text-red-700 hover:bg-red-50"
-                                    }
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>
-                                    {record.status === "paid" && !isManager()
-                                      ? "Solo gerentes/admins pueden eliminar liquidaciones pagadas"
-                                      : "Eliminar liquidación"}
-                                  </p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
+                            <PermissionGate module="payroll" action="delete">
+                              <TooltipProvider>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setRecordToDelete(record);
+                                        setDeleteConfirmOpen(true);
+                                      }}
+                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Eliminar liquidación</p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TooltipProvider>
+                            </PermissionGate>
                           </div>
                         </TableCell>
                       </TableRow>

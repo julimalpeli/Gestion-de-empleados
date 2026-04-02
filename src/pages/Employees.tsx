@@ -139,7 +139,7 @@ const Employees = () => {
 
   const { updateEmployeeSalaryWithHistory } = useSalaryHistory();
 
-  const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule } =
+  const { canViewModule, canCreateInModule, canEditModule, canDeleteInModule, hasPermission } =
     usePermissions();
 
   useEffect(() => {
@@ -200,6 +200,10 @@ const Employees = () => {
   };
 
   const handleAddEmployee = async () => {
+    if (!hasPermission("employees", "create")) {
+      alert("No tenés permiso para crear empleados.");
+      return;
+    }
     try {
       if (!newEmployee.name.trim()) {
         alert("El nombre es requerido");
@@ -333,6 +337,10 @@ const Employees = () => {
   };
 
   const handleUpdateEmployee = async () => {
+    if (!hasPermission("employees", "edit")) {
+      alert("No tenés permiso para editar empleados.");
+      return;
+    }
     try {
       if (!editingEmployee.name.trim()) {
         alert("El nombre es requerido");
@@ -438,7 +446,10 @@ const Employees = () => {
 
   const handleDeleteEmployee = async () => {
     if (!employeeToDelete) return;
-
+    if (!hasPermission("employees", "delete")) {
+      alert("No tenés permiso para eliminar empleados.");
+      return;
+    }
     try {
       await deleteEmployee(employeeToDelete.id);
       showSuccessMessage(
