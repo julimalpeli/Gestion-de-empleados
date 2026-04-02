@@ -173,20 +173,13 @@ const Login = () => {
       } else {
         const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
 
-        // Set error message based on error type
-        if (error.message?.includes("Invalid login credentials")) {
-          setError(
-            `Email o contraseña incorrectos. ${remainingAttempts} intentos restantes.`,
-          );
-        } else if (error.message?.includes("Email not confirmed")) {
-          setError("Por favor confirma tu email antes de iniciar sesión");
-        } else if (error.message?.includes("Usuario no autorizado")) {
-          setError("Usuario no autorizado en el sistema");
+        // Set error message - use the specific message from the auth hook
+        const baseMessage = error.message || "Error de autenticación.";
+
+        if (remainingAttempts <= 2) {
+          setError(`${baseMessage} \u26a0\ufe0f Solo te quedan ${remainingAttempts} intento(s) antes del bloqueo.`);
         } else {
-          setError(
-            error.message ||
-              `Error de autenticación. ${remainingAttempts} intentos restantes.`,
-          );
+          setError(baseMessage);
         }
       }
     }
@@ -309,20 +302,9 @@ const Login = () => {
                 </Button>
               </div>
 
-              {/* Security Status Indicators - Only show in production */}
-              {failedAttempts > 0 && !isBlocked && import.meta.env.PROD && (
+              {error && !isBlocked && (
                 <Alert variant="destructive">
                   <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    ⚠️ {failedAttempts} intento(s) fallido(s). El acceso se
-                    bloqueará tras {MAX_FAILED_ATTEMPTS - failedAttempts}{" "}
-                    intentos más.
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {error && failedAttempts === 0 && (
-                <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}

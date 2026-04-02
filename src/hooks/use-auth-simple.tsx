@@ -417,8 +417,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("❌ Supabase auth error:", error.message);
 
         if (error.message.includes("Invalid login credentials")) {
+          // Check if the email exists in the system to give a more specific message
+          const { data: userExists } = await supabase
+            .from("users")
+            .select("email, is_active")
+            .eq("email", normalizedEmail)
+            .maybeSingle();
+
+          if (!userExists) {
+            throw new Error(
+              "El email ingresado no está registrado en el sistema. Verificá que esté bien escrito o contactá al administrador.",
+            );
+          }
+
+          if (userExists && !userExists.is_active) {
+            throw new Error(
+              "Tu cuenta está desactivada. Contactá al administrador para reactivarla.",
+            );
+          }
+
+          // Check if the user exists in Supabase Auth
+          // If email exists in users table but auth fails, it's a password issue
           throw new Error(
-            "Credenciales incorrectas. Verifique su email y contraseña.",
+            "La contraseña es incorrecta. Intentá de nuevo o usá '¿Olvidaste tu contraseña?' para restablecerla.",
           );
         }
 
