@@ -99,8 +99,6 @@ import { salaryHistoryService } from "@/services/salaryHistoryService";
 // Data is now loaded from Supabase via hooks
 
 const Payroll = () => {
-  console.log("💰 Payroll component starting to render...");
-  console.log("🔍 Payroll component: Loading hooks...");
   const [isNewPayrollOpen, setIsNewPayrollOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState("");
   const [workDays, setWorkDays] = useState("30");
@@ -109,9 +107,7 @@ const Payroll = () => {
   const [discounts, setDiscounts] = useState("");
   const [whiteWage, setWhiteWage] = useState("");
 
-  // Debug logging para whiteWage
-  const debugSetWhiteWage = (value, source = "unknown") => {
-    console.log(`🔍 Setting whiteWage: "${value}" from: ${source}`);
+  const updateWhiteWage = (value: string) => {
     setWhiteWage(value);
   };
   const [presentismoStatus, setPresentismoStatus] = useState("mantiene");
@@ -251,10 +247,7 @@ const Payroll = () => {
       setHolidayDays(record.holidayDays?.toString() || "");
       setAdvances(record.advances?.toString() || "");
       setDiscounts(record.discounts?.toString() || "");
-      debugSetWhiteWage(
-        record.whiteAmount?.toString() || "",
-        "edit form setup",
-      );
+      updateWhiteWage(record.whiteAmount?.toString() || "");
       setBonusAmount(record.bonusAmount?.toString() || "");
 
       // Set overtime data
@@ -327,7 +320,6 @@ const Payroll = () => {
 
       if (sortedPeriods.length > 0) {
         const latestPeriod = sortedPeriods[0];
-        console.log(`🔍 Auto-selecting latest period: ${latestPeriod}`);
         setPeriodFilter(latestPeriod);
         setHasAutoSelected(true);
       }
@@ -402,7 +394,6 @@ const Payroll = () => {
         overtimeAmount: calculation.overtimePay || 0,
       };
 
-      console.log("Creating payroll with data:", payrollData);
       await createPayrollRecord(payrollData);
 
       // Reset form
@@ -411,7 +402,7 @@ const Payroll = () => {
       setHolidayDays("");
       setAdvances("");
       setDiscounts("");
-      debugSetWhiteWage("", "reset after create");
+      updateWhiteWage("");
       setPresentismoStatus("mantiene");
       setOvertimeEnabled(false);
       setOvertimeHours("");
@@ -443,33 +434,21 @@ const Payroll = () => {
 
     // Obtener el sueldo histórico correcto para el período de la liquidación
     try {
-      console.log(
-        `🔍 [DEBUG] Getting historical salary for employee ${record.employeeId}, period ${record.period}`,
-      );
-
       const historicalSalaryData =
         await salaryHistoryService.getSalaryForPeriod(
           record.employeeId.toString(),
           record.period,
         );
 
-      console.log(`📊 [DEBUG] Historical data received:`, historicalSalaryData);
-      console.log(
-        `💰 [DEBUG] Setting whiteWage to: ${historicalSalaryData.white_wage} (from ${historicalSalaryData.source})`,
-      );
-
       // En vista (solo lectura) usar salario del período para evitar desfasajes al reingresar
       setHistoricalSalary(historicalSalaryData);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
-      debugSetWhiteWage(
-        record.whiteAmount?.toString() || "",
-        "view record load",
-      );
+      updateWhiteWage(record.whiteAmount?.toString() || "");
     } catch (error) {
       console.error("Error getting historical salary for view:", error);
       // Fallback al valor almacenado en la liquidación
-      debugSetWhiteWage(record.whiteAmount?.toString() || "0", "view fallback");
+      updateWhiteWage(record.whiteAmount?.toString() || "0");
     }
 
     setIsEditMode(false); // Solo lectura
@@ -503,19 +482,11 @@ const Payroll = () => {
           record.period,
         );
 
-      console.log(
-        `🔍 Historical salary for period ${record.period}:`,
-        historicalSalaryData,
-      );
-
       // Guardar valores históricos para cálculos (incluye presentismo del período)
       setHistoricalSalary(historicalSalaryData);
 
       // Mantener el valor original de whiteAmount (forma de pago) como estaba guardado
-      debugSetWhiteWage(
-        record.whiteAmount?.toString() || "",
-        "edit record load",
-      );
+      updateWhiteWage(record.whiteAmount?.toString() || "");
 
       // También actualizar el presentismo histórico si es necesario
       const employee = employees.find(
@@ -530,19 +501,15 @@ const Payroll = () => {
             record.period,
           );
 
-          if (salaryData && salaryData.presentismo !== employee.presentismo) {
-            console.log(
-              `📊 Using historical presentismo: ${salaryData.presentismo} vs current: ${employee.presentismo}`,
-            );
-          }
+          // Historical presentismo differs from current - use historical for accuracy
         } catch (err) {
-          console.log("Could not verify historical presentismo:", err.message);
+          // Could not verify historical presentismo
         }
       }
     } catch (error) {
       console.error("Error getting historical salary:", error);
       // Fallback al valor almacenado en la liquidación
-      debugSetWhiteWage(record.whiteAmount?.toString() || "0", "edit fallback");
+      updateWhiteWage(record.whiteAmount?.toString() || "0");
       setHistoricalSalary(null);
     }
 
@@ -585,7 +552,7 @@ const Payroll = () => {
       setHolidayDays("");
       setAdvances("");
       setDiscounts("");
-      debugSetWhiteWage("", "reset after edit");
+      updateWhiteWage("");
       setPresentismoStatus("mantiene");
       setOvertimeEnabled(false);
       setOvertimeHours("");
@@ -1191,7 +1158,7 @@ const Payroll = () => {
                     id="whiteWage"
                     placeholder="$ 0,00"
                     value={whiteWage}
-                    onChange={(value) => debugSetWhiteWage(value, "user input")}
+                    onChange={(value) => updateWhiteWage(value)}
                     disabled={editingRecord && !isEditMode}
                   />
                   <p className="text-xs text-muted-foreground">
