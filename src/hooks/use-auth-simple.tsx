@@ -333,37 +333,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
       // INSTANT: Build profile from authenticated session data (JWT)
+      // Active status is checked in login() via check_email_exists RPC
+      // and in background via tryLoadDbProfile + periodic status check
       const userProfile = buildProfileFromAuth(supabaseUser);
-
-      // Check if user is active against the database before allowing access
-      try {
-        const normalizedEmail = supabaseUser.email?.toLowerCase();
-        if (normalizedEmail) {
-          const { data: checkResult, error: checkError } = await supabase.rpc("check_email_exists", {
-            check_email: normalizedEmail,
-          });
-          if (checkResult) {
-            const info = typeof checkResult === "string" ? JSON.parse(checkResult) : checkResult;
-            if (info.exists && !info.is_active) {
-              await supabase.auth.signOut();
-              setUser(null);
-              setSession(null);
-              window.location.href = "/inactive";
-              return;
-            }
-          }
-        }
-      } catch (activeCheckError) {
-        // Active check failed, continue with JWT-based profile
-      }
-
-      if (!userProfile.is_active) {
-        await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
-        window.location.href = "/inactive";
-        return;
-      }
 
       const userData: User = {
         id: userProfile.id,
