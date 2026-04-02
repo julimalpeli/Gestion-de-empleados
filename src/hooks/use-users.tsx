@@ -385,164 +385,42 @@ export const useUsers = () => {
     }
   };
 
-  // Función para recrear usuario en Supabase Auth con nueva contraseña
-  const recreateAuthUser = async (email: string, password: string) => {
-    try {
-
-      // Paso 1: Intentar crear el usuario directamente (esto puede fallar si ya existe)
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          emailRedirectTo: undefined, // No enviar email de confirmación
-        }
-      });
-
-      if (signUpError) {
-        if (signUpError.message.includes('already exists') || signUpError.message.includes('registered')) {
-          console.log("🔄 User already exists, attempting workaround...");
-
-          // Workaround: Usar un método diferente para usuarios existentes
-          // Intentamos hacer un signIn temporal para "actualizar" la contraseña
-          try {
-            // Este es un hack: creamos una nueva sesión temporal con credenciales dummy
-            // y luego creamos el usuario con la nueva contraseña
-            const tempEmail = `temp_${Date.now()}@temp.com`;
-            await supabase.auth.signUp({
-              email: tempEmail,
-              password: password
-            });
-
-            // Luego eliminamos el temporal y creamos el real
-            // (Esto es un workaround para Supabase sin admin API)
-            console.log("⚠️ Workaround applied - user should be able to login with new password");
-            return { success: true, method: "workaround" };
-          } catch (workaroundError) {
-            console.error("❌ Workaround failed:", workaroundError);
-            return { success: false, error: "Usuario ya existe y no se puede actualizar sin acceso admin" };
-          }
-        } else {
-          throw signUpError;
-        }
-      }
-
-      console.log("✅ Auth user created/updated successfully");
-      return { success: true, method: "direct", authUser: signUpData.user };
-    } catch (error) {
-      console.error("❌ Error recreating auth user:", error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  // Método directo para actualizar contraseña (sin email)
-  const directPasswordUpdate = async (email: string, password: string) => {
-    try {
-
-      // Crear un nuevo usuario temporal para forzar la actualización
-      const timestamp = Date.now();
-      const tempUser = {
-        email: email,
-        password: password,
-        user_metadata: {
-          original_email: email,
-          password_updated: timestamp
-        }
-      };
-
-      // Intento 1: SignUp directo (puede funcionar si Supabase permite overwrites)
-      const { data, error } = await supabase.auth.signUp(tempUser);
-
-      if (error && error.message.includes('already exists')) {
-        console.log("🔄 User exists, trying alternative method...");
-
-        // Intento 2: Usar signIn para validar que las credenciales funcionan
-        const { data: testData, error: testError } = await supabase.auth.signInWithPassword({
-          email: email,
-          password: password
-        });
-
-        if (!testError) {
-          console.log("✅ Password is already correct!");
-          await supabase.auth.signOut(); // Cerrar la sesión de prueba
-          return { success: true, message: "La contraseña ya está configurada correctamente" };
-        }
-
-        // Si llega aquí, la contraseña no es correcta y necesitamos actualizar
-        console.log("❌ Password doesn't match, manual intervention required");
-        return {
-          success: false,
-          error: "La contraseña actual no coincide. Se requiere intervención manual.",
-          suggestion: "Ir al dashboard de Supabase Auth y actualizar manualmente la contraseña"
-        };
-      }
-
-      if (error) {
-        throw error;
-      }
-
-      console.log("✅ Direct password update successful");
-      return { success: true, message: "Contraseña actualizada directamente" };
-
-    } catch (error) {
-      console.error("❌ Direct password update failed:", error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  // Blanquear contraseña (resetear al DNI) - método directo sin email
+  // Blanquear contraseña usando RPC seguro (SECURITY DEFINER)
+  // Requiere que admin_reset_password() exista en la BD (ver database/admin_reset_password.sql)
   const resetPassword = async (
     userId: string,
     newPassword: string,
-    options?: { markNeedsPasswordChange?: boolean },
+    _options?: { markNeedsPasswordChange?: boolean },
   ) => {
     try {
+      // Call the SECURITY DEFINER RPC that directly updates auth.users
+      const { data, error } = await supabase.rpc("admin_reset_password", {
+        target_user_id: userId,
+        new_password: newPassword,
+      });
 
-      const { data: userData, error: fetchError } = await supabase
-        .from("users")
-        .select("email, username, name")
-        .eq("id", userId)
-        .single();
-
-      if (fetchError || !userData) {
-        throw new Error("Usuario no encontrado");
-      }
-
-      const directResult = await directPasswordUpdate(
-        userData.email,
-        newPassword,
-      );
-
-      if (!directResult.success) {
-        console.error("❌ Direct method failed:", directResult.error);
+      if (error) {
+        console.error("Error calling admin_reset_password RPC:", error);
         return {
           success: false,
-          error: directResult.error,
-          suggestion: directResult.suggestion,
-          email: userData.email,
+          error: `Error al blanquear contraseña: ${error.message}`,
         };
       }
 
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({
-          needs_password_change:
-            options?.markNeedsPasswordChange ?? false,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", userId);
+      const result = typeof data === "string" ? JSON.parse(data) : data;
 
-      if (updateError) {
-        console.warn(
-          "⚠️ Could not update needs_password_change flag:",
-          updateError,
-        );
+      if (!result?.success) {
+        return {
+          success: false,
+          error: result?.error || "Error desconocido al blanquear contraseña",
+        };
       }
 
       await fetchUsers();
 
       return {
         success: true,
-        email: userData.email,
+        email: result.email,
       };
     } catch (err) {
       console.error("❌ Full error:", err);

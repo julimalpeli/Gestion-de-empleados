@@ -245,7 +245,7 @@ const UserManagement = () => {
       setSelectedUser(null);
       setNewPassword("");
       alert(
-        `Contraseña actualizada para ${result.email}. Comparte las credenciales de forma segura.`,
+        `✅ Contraseña blanqueada exitosamente.\n\nEl usuario ${result.email} ahora debe ingresar con la nueva contraseña.\nSe le pedirá cambiarla en su próximo inicio de sesión.`,
       );
     } catch (error) {
       console.error("Error resetting password:", error);
@@ -321,7 +321,7 @@ const UserManagement = () => {
 
   const openResetPassword = (user) => {
     setSelectedUser(user);
-    setNewPassword(user.role === "employee" ? user.username : ""); // Default: DNI para empleados
+    setNewPassword(user.role === "employee" ? user.username : ""); // Default: DNI for employees
     setIsResetPasswordOpen(true);
   };
 
