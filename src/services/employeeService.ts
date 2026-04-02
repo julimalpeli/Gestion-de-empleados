@@ -61,12 +61,17 @@ export class SupabaseEmployeeService implements IEmployeeService {
       );
 
       if (!result || result.length === 0) {
-        return this.getFallbackEmployees();
+        return [];
       }
       return result.map((record) => this.mapFromSupabase(record));
     } catch (error) {
       logSupabaseError("getAllEmployees - Final error", error);
-      return this.getFallbackEmployees();
+      // Only use fallback on network errors, not on empty data
+      const msg = error instanceof Error ? error.message.toLowerCase() : "";
+      if (msg.includes("failed to fetch") || msg.includes("networkerror")) {
+        return this.getFallbackEmployees();
+      }
+      return [];
     }
   }
 
