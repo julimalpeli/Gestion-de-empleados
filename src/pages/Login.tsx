@@ -128,59 +128,46 @@ const Login = () => {
       return;
     }
 
-    try {
-      console.log("🔐 Attempting login for:", email);
-      await login(email, password);
+    setError("");
+    const result = await login(email, password);
 
-      console.log("✅ Login successful");
-      // Reset failed attempts and clear error on successful login
+    if (!result?.error) {
+      // Login successful
       setFailedAttempts(0);
-      setError(""); // Clear any previous error messages
+      setError("");
       localStorage.removeItem("loginBlock");
-
       // Navigation will be handled by the auth state change
-    } catch (error: any) {
-      console.error("❌ Login error:", error);
+      return;
+    }
 
-      // Incrementar contador de intentos fallidos
-      const newFailedAttempts = failedAttempts + 1;
-      setFailedAttempts(newFailedAttempts);
+    // Login failed - handle error
+    const newFailedAttempts = failedAttempts + 1;
+    setFailedAttempts(newFailedAttempts);
 
-      // Log failed login attempt
-      console.warn("❌ Failed login attempt:", {
-        email,
-        attempt: newFailedAttempts,
-        timestamp: new Date().toISOString(),
-        ip: "client-side",
-      });
+    // Bloquear después de 6 intentos
+    if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
+      const blockUntil = new Date().getTime() + BLOCK_DURATION;
+      localStorage.setItem(
+        "loginBlock",
+        JSON.stringify({
+          attempts: newFailedAttempts,
+          blockedUntil: blockUntil,
+        }),
+      );
+      setIsBlocked(true);
+      setBlockTimeRemaining(Math.ceil(BLOCK_DURATION / 1000));
 
-      // Bloquear después de 6 intentos
-      if (newFailedAttempts >= MAX_FAILED_ATTEMPTS) {
-        const blockUntil = new Date().getTime() + BLOCK_DURATION;
-        localStorage.setItem(
-          "loginBlock",
-          JSON.stringify({
-            attempts: newFailedAttempts,
-            blockedUntil: blockUntil,
-          }),
-        );
-        setIsBlocked(true);
-        setBlockTimeRemaining(Math.ceil(BLOCK_DURATION / 1000));
+      setError(
+        "Demasiados intentos fallidos. Acceso bloqueado por 5 minutos.",
+      );
+    } else {
+      const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
+      const baseMessage = result.error;
 
-        setError(
-          "Demasiados intentos fallidos. Acceso bloqueado por 5 minutos.",
-        );
+      if (remainingAttempts <= 2) {
+        setError(`${baseMessage} ⚠️ Solo te quedan ${remainingAttempts} intento(s) antes del bloqueo.`);
       } else {
-        const remainingAttempts = MAX_FAILED_ATTEMPTS - newFailedAttempts;
-
-        // Set error message - use the specific message from the auth hook
-        const baseMessage = error.message || "Error de autenticación.";
-
-        if (remainingAttempts <= 2) {
-          setError(`${baseMessage} \u26a0\ufe0f Solo te quedan ${remainingAttempts} intento(s) antes del bloqueo.`);
-        } else {
-          setError(baseMessage);
-        }
+        setError(baseMessage);
       }
     }
   };

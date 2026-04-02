@@ -399,23 +399,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Login - always through Supabase Auth
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<{ error?: string }> => {
     setLoading(true);
     try {
-      console.log(`🔐 Login attempt for: ${email.trim()}`);
-
       const trimmedEmail = email.trim();
       const normalizedEmail = trimmedEmail.toLowerCase();
 
-      console.log("📧 Attempting Supabase auth login...");
       const { data, error } = await supabase.auth.signInWithPassword({
         email: trimmedEmail,
         password,
       });
 
       if (error) {
-        console.error("❌ Supabase auth error:", error.message);
-
         if (error.message.includes("Invalid login credentials")) {
           // Check if the email exists using RPC (bypasses RLS via SECURITY DEFINER)
           try {
@@ -427,68 +422,40 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               const info = typeof checkResult === "string" ? JSON.parse(checkResult) : checkResult;
 
               if (!info.exists) {
-                throw new Error(
-                  "El email ingresado no está registrado en el sistema. Verificá que esté bien escrito o contactá al administrador.",
-                );
+                return { error: "El email ingresado no está registrado en el sistema. Verificá que esté bien escrito o contactá al administrador." };
               }
-
               if (!info.is_active) {
-                throw new Error(
-                  "Tu cuenta está desactivada. Contactá al administrador para reactivarla.",
-                );
+                return { error: "Tu cuenta está desactivada. Contactá al administrador para reactivarla." };
               }
-
               if (!info.has_auth) {
-                throw new Error(
-                  "Tu cuenta existe pero no tiene acceso de login configurado. Contactá al administrador.",
-                );
+                return { error: "Tu cuenta existe pero no tiene acceso de login configurado. Contactá al administrador." };
               }
-
               // Email exists, is active, has auth → password is wrong
-              throw new Error(
-                "La contraseña es incorrecta. Intentá de nuevo o usá '¿Olvidaste tu contraseña?' para restablecerla.",
-              );
+              return { error: "La contraseña es incorrecta. Intentá de nuevo o usá '¿Olvidaste tu contraseña?' para restablecerla." };
             }
           } catch (rpcError: any) {
-            // If the RPC itself threw one of our custom errors, re-throw it
-            if (rpcError.message && !rpcError.message.includes("rpc")) {
-              throw rpcError;
-            }
-            // If RPC failed for technical reasons, fall through to generic message
-            console.warn("⚠️ check_email_exists RPC failed:", rpcError);
+            // If RPC failed, fall through to generic message
           }
-
-          // Fallback generic message if RPC didn't work
-          throw new Error(
-            "Credenciales incorrectas. Verificá tu email y contraseña.",
-          );
+          return { error: "Credenciales incorrectas. Verificá tu email y contraseña." };
         }
 
         if (error.message.includes("Email not confirmed")) {
-          throw new Error(
-            "El email del usuario no está confirmado. Contacte al administrador para confirmar la cuenta.",
-          );
+          return { error: "El email del usuario no está confirmado. Contacte al administrador para confirmar la cuenta." };
         }
 
         if (error.message.includes("User not found")) {
-          throw new Error(
-            "Usuario no encontrado en el sistema de autenticación. Contacte al administrador.",
-          );
+          return { error: "Usuario no encontrado en el sistema de autenticación. Contacte al administrador." };
         }
 
-        throw new Error(`Error de autenticación: ${error.message}`);
+        return { error: `Error de autenticación: ${error.message}` };
       }
 
       if (!data || !data.user) {
-        throw new Error(
-          "No se pudo autenticar al usuario. Intente nuevamente.",
-        );
+        return { error: "No se pudo autenticar al usuario. Intente nuevamente." };
       }
 
       // Auth succeeded! Set session and load profile from JWT immediately
-      // The onAuthStateChange listener will also fire, but we handle it here first
       if (data.session) {
-        console.log("🔑 Auth successful, setting session and loading profile...");
         setSession(data.session);
         await loadUserProfile(data.user);
 
@@ -496,49 +463,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         auditService.auditLogin("LOGIN", data.user.id, {
           ip_address: "unknown",
           user_agent: navigator.userAgent,
-        }).catch((err) => console.warn("⚠️ Audit login failed:", err));
-      }
-    } catch (error) {
-      console.error("Login error details:", error);
-
-      // Handle email confirmation error
-      if (error.message?.includes("Email not confirmed")) {
-        throw new Error(
-          "Email no confirmado. Contacte al administrador para confirmar la cuenta.",
-        );
+        }).catch(() => {});
       }
 
+      return {}; // Success, no error
+    } catch (err: any) {
       // Handle network connectivity errors
       if (
-        error.message?.includes("Failed to fetch") ||
-        error.name === "AuthRetryableFetchError"
+        err.message?.includes("Failed to fetch") ||
+        err.name === "AuthRetryableFetchError"
       ) {
-        throw new Error(
-          "Error de conexión. Verifique su conexión a internet e intente nuevamente.",
-        );
+        return { error: "Error de conexión. Verificá tu conexión a internet e intentá nuevamente." };
       }
-
-      // Handle other auth errors
-      if (error.message?.includes("Invalid login credentials")) {
-        throw new Error(
-          "Credenciales incorrectas. Verifique su email y contraseña.",
-        );
-      }
-
-      // Handle inactive user error
-      if (
-        error.message?.includes("desactivada") ||
-        error.message?.includes("inactive")
-      ) {
-        throw new Error(
-          "Tu cuenta ha sido desactivada. Contacta al administrador.",
-        );
-      }
-
-      // Default error message
-      throw new Error(
-        error.message || "Error al iniciar sesión. Intente nuevamente.",
-      );
+      return { error: err.message || "Error al iniciar sesión. Intente nuevamente." };
     } finally {
       setLoading(false);
     }
