@@ -7,23 +7,42 @@ const ERROR_WINDOW = 30000; // 30 seconds
 const RELOAD_DELAY = 2000; // 2 seconds
 
 export const handleConnectivityError = (error: any) => {
+  const errorMessage = error?.message || '';
+
+  // Ignore authentication/login errors - these are expected user-facing errors
+  const isAuthError =
+    errorMessage.includes('contraseña') ||
+    errorMessage.includes('Credenciales') ||
+    errorMessage.includes('email ingresado') ||
+    errorMessage.includes('cuenta está desactivada') ||
+    errorMessage.includes('no tiene acceso') ||
+    errorMessage.includes('Email not confirmed') ||
+    errorMessage.includes('Invalid login') ||
+    errorMessage.includes('autenticación') ||
+    errorMessage.includes('permiso') ||
+    errorMessage.includes('no está registrado');
+
+  if (isAuthError) {
+    return; // Don't treat auth errors as connectivity issues
+  }
+
   const now = Date.now();
-  
+
   // Reset counter if enough time has passed
   if (now - lastErrorTime > ERROR_WINDOW) {
     errorCount = 0;
   }
-  
+
   errorCount++;
   lastErrorTime = now;
-  
-  console.log(`🚨 Connectivity error #${errorCount}:`, error.message);
-  
+
+  console.log(`🚨 Connectivity error #${errorCount}:`, errorMessage);
+
   // Check if it's a connectivity error
-  const isConnectivityError = 
-    error.message?.includes('Failed to fetch') ||
-    error.message?.includes('NetworkError') ||
-    error.message?.includes('fetch') ||
+  const isConnectivityError =
+    errorMessage.includes('Failed to fetch') ||
+    errorMessage.includes('NetworkError') ||
+    errorMessage.includes('fetch') ||
     error.code === 'NETWORK_ERROR';
   
   if (isConnectivityError) {
