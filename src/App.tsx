@@ -79,7 +79,7 @@ import InactiveUser from "./pages/InactiveUser";
 import NotFound from "./pages/NotFound";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { useAuth } from "@/hooks/use-auth-simple";
+import { useAuth, AuthProvider } from "@/hooks/use-auth-simple";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -282,9 +282,11 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider delayDuration={200}>
-      <Toaster />
-      <Sonner />
-      <AppContent />
+      <AuthProvider>
+        <Toaster />
+        <Sonner />
+        <AppContent />
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

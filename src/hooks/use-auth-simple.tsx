@@ -339,7 +339,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         const normalizedEmail = supabaseUser.email?.toLowerCase();
         if (normalizedEmail) {
-          const { data: checkResult } = await supabase.rpc("check_email_exists", {
+          const { data: checkResult, error: checkError } = await supabase.rpc("check_email_exists", {
             check_email: normalizedEmail,
           });
           if (checkResult) {
@@ -354,7 +354,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           }
         }
       } catch (activeCheckError) {
-        // If the check fails, allow access and let background sync handle it
+        // Active check failed, continue with JWT-based profile
       }
 
       if (!userProfile.is_active) {
@@ -384,7 +384,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Try to enrich with full DB profile in the background (non-blocking)
       tryLoadDbProfile(supabaseUser);
     } catch (error) {
-      // Profile loading failed silently
+      // Profile loading failed silently - user will see login page
     }
   };
 
