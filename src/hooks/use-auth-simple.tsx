@@ -417,29 +417,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         console.error("❌ Supabase auth error:", error.message);
 
         if (error.message.includes("Invalid login credentials")) {
-          // Check if the email exists in the system to give a more specific message
-          const { data: userExists } = await supabase
-            .from("users")
-            .select("email, is_active")
-            .eq("email", normalizedEmail)
-            .maybeSingle();
+          // Check if the email exists using RPC (bypasses RLS via SECURITY DEFINER)
+          try {
+            const { data: checkResult } = await supabase.rpc("check_email_exists", {
+              check_email: normalizedEmail,
+            });
 
-          if (!userExists) {
-            throw new Error(
-              "El email ingresado no está registrado en el sistema. Verificá que esté bien escrito o contactá al administrador.",
-            );
+            if (checkResult) {
+              const info = typeof checkResult === "string" ? JSON.parse(checkResult) : checkResult;
+
+              if (!info.exists) {
+                throw new Error(
+                  "El email ingresado no está registrado en el sistema. Verificá que esté bien escrito o contactá al administrador.",
+                );
+              }
+
+              if (!info.is_active) {
+                throw new Error(
+                  "Tu cuenta está desactivada. Contactá al administrador para reactivarla.",
+                );
+              }
+
+              if (!info.has_auth) {
+                throw new Error(
+                  "Tu cuenta existe pero no tiene acceso de login configurado. Contactá al administrador.",
+                );
+              }
+
+              // Email exists, is active, has auth → password is wrong
+              throw new Error(
+                "La contraseña es incorrecta. Intentá de nuevo o usá '¿Olvidaste tu contraseña?' para restablecerla.",
+              );
+            }
+          } catch (rpcError: any) {
+            // If the RPC itself threw one of our custom errors, re-throw it
+            if (rpcError.message && !rpcError.message.includes("rpc")) {
+              throw rpcError;
+            }
+            // If RPC failed for technical reasons, fall through to generic message
+            console.warn("⚠️ check_email_exists RPC failed:", rpcError);
           }
 
-          if (userExists && !userExists.is_active) {
-            throw new Error(
-              "Tu cuenta está desactivada. Contactá al administrador para reactivarla.",
-            );
-          }
-
-          // Check if the user exists in Supabase Auth
-          // If email exists in users table but auth fails, it's a password issue
+          // Fallback generic message if RPC didn't work
           throw new Error(
-            "La contraseña es incorrecta. Intentá de nuevo o usá '¿Olvidaste tu contraseña?' para restablecerla.",
+            "Credenciales incorrectas. Verificá tu email y contraseña.",
           );
         }
 
