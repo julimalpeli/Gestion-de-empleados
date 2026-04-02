@@ -197,14 +197,12 @@ export const useUsers = () => {
       return { success: true, emailUsed: existing.email, alreadyExisted: true };
     }
 
-    let normalizedEmail = employee.email?.trim()
+    const normalizedEmail = employee.email?.trim()
       ? normalizeEmail(employee.email)
       : "";
-    let fallbackEmailUsed = false;
 
     if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
-      normalizedEmail = `${username}@${EMAIL_FALLBACK_DOMAIN}`;
-      fallbackEmailUsed = true;
+      throw new Error("El empleado necesita un email válido para crear su cuenta de acceso al portal.");
     }
 
     try {
@@ -217,6 +215,7 @@ export const useUsers = () => {
             name: employee.name,
             role: "employee",
             employee_id: employee.id,
+            needs_password_change: true,
           },
         },
       });
@@ -289,7 +288,7 @@ export const useUsers = () => {
 
       await fetchUsers();
 
-      return { success: true, emailUsed: normalizedEmail, fallbackEmailUsed };
+      return { success: true, emailUsed: normalizedEmail };
     } catch (err) {
       throw new Error(
         err instanceof Error ? err.message : "Error creando usuario empleado",

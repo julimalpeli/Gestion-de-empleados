@@ -117,8 +117,6 @@ const Employees = () => {
     email: "",
   });
 
-  console.log("🔍 Employees component: Loading hooks...");
-
   const {
     employees,
     loading,
@@ -243,10 +241,11 @@ const Employees = () => {
         alert("La fecha de ingreso es requerida");
         return;
       }
-      if (
-        newEmployee.email &&
-        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmployee.email.trim())
-      ) {
+      if (!newEmployee.email?.trim()) {
+        alert("El email es obligatorio. El empleado lo necesita para ingresar al sistema.");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmployee.email.trim())) {
         alert("Por favor ingresa un email válido");
         return;
       }
@@ -284,11 +283,8 @@ const Employees = () => {
       }
 
       if (userCreated) {
-        const extra = fallbackEmailUsed && generatedEmail
-          ? ` (email generado: ${generatedEmail})`
-          : "";
         showSuccessMessage(
-          `Empleado ${newEmployeeRecord.name} creado exitosamente con usuario DNI: ${newEmployeeRecord.dni}${extra}`,
+          `Empleado ${newEmployeeRecord.name} creado exitosamente. Puede ingresar al portal con su email (${newEmployeeRecord.email}) y contraseña inicial: su DNI (${newEmployeeRecord.dni}).`,
         );
       } else {
         showSuccessMessage(
@@ -811,7 +807,9 @@ const Employees = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">
+                    Email <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="email"
                     type="email"
@@ -820,7 +818,11 @@ const Employees = () => {
                     onChange={(e) =>
                       setNewEmployee({ ...newEmployee, email: e.target.value })
                     }
+                    required
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Obligatorio: el empleado usará este email para ingresar al portal
+                  </p>
                 </div>
 
                 <div className="space-y-2 col-span-2">

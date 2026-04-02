@@ -291,7 +291,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       role,
       employee_id: metadata.employee_id || null,
       is_active: true,
-      needs_password_change: false,
+      needs_password_change: metadata.needs_password_change === true,
     };
   };
 
