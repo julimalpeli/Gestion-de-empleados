@@ -219,7 +219,7 @@ const UserManagement = () => {
     if (!selectedUser || !newPassword) return;
 
     if (newPassword.length < 6) {
-      alert("La contrase��a debe tener al menos 6 caracteres");
+      alert("La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
@@ -943,7 +943,7 @@ const UserManagement = () => {
                   className="w-full"
                   disabled={!newPassword}
                 >
-                  Blanquear Contrase��a
+                  Blanquear Contraseña
                 </Button>
                 <Button
                   variant="outline"

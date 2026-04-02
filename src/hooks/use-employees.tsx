@@ -62,36 +62,32 @@ export const useEmployees = () => {
   const { session, user, isAuthenticated } = useAuth();
   const { hasPermission } = usePermissions();
   const canLoadEmployees = isAuthenticated || !!session || !!user;
+  const retryCountRef = { current: 0 };
+  const MAX_RETRIES = 3;
 
   // Cargar empleados
   const fetchEmployees = useCallback(async () => {
     if (!canLoadEmployees) {
-      console.log(
-        "⏸️ Omitiendo carga de empleados: no hay sesión ni usuario autenticado",
-      );
       return;
     }
 
     try {
-      console.log("🔄 Iniciando carga de empleados...");
       setLoading(true);
       setError(null);
 
       const data = await employeeService.getAllEmployees();
-      console.log("✅ Empleados cargados exitosamente:", data.length);
       setEmployees(data.map(normalizeEmployeeRecord));
+      retryCountRef.current = 0; // Reset on success
     } catch (err) {
-      console.error("❌ Error cargando empleados:", err);
-      const errorMessage = err instanceof Error ? err.message : String(err);
+      setError("Error cargando empleados.");
 
-      // The service already handles fallback, so this should rarely happen
-      // But if it does, show a user-friendly error
-      setError("Error cargando empleados. Reintentando...");
-
-      // Try one more time after a short delay
-      setTimeout(() => {
-        fetchEmployees();
-      }, 2000);
+      // Retry with limit
+      if (retryCountRef.current < MAX_RETRIES) {
+        retryCountRef.current += 1;
+        setTimeout(() => {
+          fetchEmployees();
+        }, 2000 * retryCountRef.current);
+      }
     } finally {
       setLoading(false);
     }
@@ -110,7 +106,7 @@ export const useEmployees = () => {
       return newEmployee;
     } catch (err) {
       const errorMsg =
-        err instanceof Error ? err.message : "Error creating employee";
+        err instanceof Error ? err.message : "Error al crear empleado";
       setError(errorMsg);
       throw new Error(errorMsg);
     }
@@ -134,7 +130,6 @@ export const useEmployees = () => {
           updates.name = employeeData.name;
         }
 
-        // Sincronizar email si cambió (ya existía esta lógica)
         if (employeeData.email && employeeData.email !== associatedUser.email) {
           updates.email = employeeData.email;
         }
@@ -147,15 +142,10 @@ export const useEmployees = () => {
         // Aplicar actualizaciones si hay cambios
         if (Object.keys(updates).length > 0) {
           await updateUser(associatedUser.id, updates);
-          console.log(
-            `Usuario ${associatedUser.username} sincronizado:`,
-            updates,
-          );
         }
       }
     } catch (error) {
-      console.error("Error syncing user data:", error);
-      // No throw error here, just log it to avoid breaking the employee update
+      // Silently handle sync errors to avoid breaking the employee update
     }
   };
 
@@ -183,7 +173,6 @@ export const useEmployees = () => {
 
       return updatedEmployee;
     } catch (err) {
-      console.error("Employee update error:", err);
       const errorMsg =
         err instanceof Error
           ? err.message
@@ -203,7 +192,6 @@ export const useEmployees = () => {
       await employeeService.deleteEmployee(id);
       setEmployees((prev) => prev.filter((emp) => emp.id !== id));
     } catch (err) {
-      console.error("Delete employee error:", err);
       const errorMsg =
         err instanceof Error ? err.message : "Error eliminando empleado";
       setError(errorMsg);
@@ -271,7 +259,6 @@ export const useEmployees = () => {
   // Cargar datos cuando haya sesión autenticada
   useEffect(() => {
     if (!canLoadEmployees) {
-      console.log("🔒 Sin sesión ni usuario, esperando para cargar empleados");
       setEmployees([]);
       setLoading(false);
       return;

@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AlertCircle, Lock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 interface ForcePasswordChangeProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ const ForcePasswordChange = ({
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,65 +56,38 @@ const ForcePasswordChange = ({
     }
 
     try {
-      console.log("🔍 ForcePasswordChange Debug:");
-      console.log("  - Username:", username);
-      console.log("  - Current password entered:", currentPassword);
-
       // Verificar contraseña actual
       const { data: user, error: fetchError } = await supabase
         .from("users")
-        .select("id, password_hash, username, name")
+        .select("id, password_hash, username, name, email")
         .eq("username", username)
         .single();
 
-      console.log("  - User found:", user);
-      console.log("  - Fetch error:", fetchError);
-
       if (fetchError || !user) {
-        console.error("❌ User not found or error:", fetchError);
         setError("Error al verificar usuario");
         setIsLoading(false);
         return;
       }
 
-      console.log("  - Stored password_hash:", user.password_hash);
-
       // Verificar contraseña actual
       let isPasswordValid = false;
 
-      // Caso especial: Primera vez (Supabase Auth manejando la contraseña)
-      if (user.password_hash === "$supabase$auth$handled") {
-        console.log("  - First-time user detected (Supabase Auth handled)");
-        console.log("    Checking if entered password matches username/DNI");
-        console.log("    Username:", user.username);
-        console.log("    Entered password:", currentPassword);
-
-        // Para primera vez, la contraseña actual debe ser el DNI/username
+      if (user.password_hash === "$supabase$auth$handled" || user.password_hash === "$initial_password$") {
+        // Primera vez: la contraseña actual debe ser el DNI/username
         isPasswordValid = currentPassword === user.username;
-        console.log("    Password valid (DNI match):", isPasswordValid);
       } else {
-        // Caso normal: contraseña almacenada en base64
+        // Caso normal: contraseña almacenada en base64 (legacy)
         let storedPassword;
         try {
-          // Intentar decodificar como base64
           storedPassword = atob(user.password_hash);
-          console.log("  - Decoded password (base64):", storedPassword);
         } catch (e) {
-          // Si falla la decodificación, asumir que el hash no es base64
           storedPassword = user.password_hash;
-          console.log("  - Password (not base64):", storedPassword);
         }
-
-        console.log("  - Password comparison:");
-        console.log("    Current entered:", currentPassword);
-        console.log("    Stored decoded:", storedPassword);
-
         isPasswordValid = storedPassword === currentPassword;
-        console.log("    Match:", isPasswordValid);
       }
 
       if (!isPasswordValid) {
-        if (user.password_hash === "$supabase$auth$handled") {
+        if (user.password_hash === "$supabase$auth$handled" || user.password_hash === "$initial_password$") {
           setError(
             `La contraseña actual es incorrecta. Para el primer acceso, debes ingresar tu DNI: "${user.username}"`,
           );
@@ -123,117 +98,39 @@ const ForcePasswordChange = ({
         return;
       }
 
-      // Actualizar contraseña en Supabase Auth primero
-      console.log("🔑 Updating Supabase Auth password...");
+      // Actualizar contraseña en Supabase Auth usando updateUser (sesión activa)
+      const { error: authError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
 
-      // Obtener el email del usuario para Supabase Auth
-      let userEmail = user.email;
-
-      // Si no tenemos email en el user object, buscarlo en la tabla users
-      if (!userEmail) {
-        const { data: fullUser, error: emailError } = await supabase
-          .from("users")
-          .select("email")
-          .eq("username", username)
-          .single();
-
-        if (!emailError && fullUser?.email) {
-          userEmail = fullUser.email;
-          console.log("📧 Email found in users table:", userEmail);
-        } else {
-          console.warn("⚠️ No email found, using fallback");
-          userEmail = `${user.username}@cadizbar.com`; // Fallback si no hay email
-        }
+      if (authError) {
+        setError(`Error actualizando contraseña: ${authError.message}`);
+        setIsLoading(false);
+        return;
       }
 
-      try {
-        // Método 1: Intentar crear usuario en Supabase Auth con nueva contraseña
-        const { data: authData, error: authError } = await supabase.auth.signUp(
-          {
-            email: userEmail,
-            password: newPassword,
-            options: {
-              emailRedirectTo: undefined, // No enviar email de confirmación
-            },
-          },
-        );
-
-        if (authError && !authError.message.includes("already exists")) {
-          console.error("❌ Supabase Auth error:", authError);
-          throw new Error(
-            `Error actualizando autenticación: ${authError.message}`,
-          );
-        }
-
-        if (authError && authError.message.includes("already exists")) {
-          console.log("🔄 User already exists in Auth, testing password...");
-
-          // Verificar si la nueva contraseña ya funciona
-          const { data: testData, error: testError } =
-            await supabase.auth.signInWithPassword({
-              email: userEmail,
-              password: newPassword,
-            });
-
-          if (testError) {
-            console.log(
-              "❌ New password doesn't work, may need manual intervention",
-            );
-            // Continuar de todos modos para actualizar la tabla local
-          } else {
-            console.log("✅ New password already works in Auth!");
-            await supabase.auth.signOut(); // Cerrar la sesión de prueba
-          }
-        }
-
-        console.log("✅ Supabase Auth updated successfully");
-      } catch (authUpdateError) {
-        console.warn(
-          "⚠️ Auth update failed, continuing with local update:",
-          authUpdateError,
-        );
-        // No bloquear el proceso si falla Auth, continuar con actualización local
-      }
-
-      // Actualizar contraseña en tabla local
-      console.log("🔄 Updating local users table...");
-      const newPasswordHash = btoa(newPassword);
+      // Actualizar tabla users: limpiar flag y placeholder
       const { error: updateError } = await supabase
         .from("users")
         .update({
-          password_hash: newPasswordHash,
+          password_hash: "$supabase$auth$handled",
           needs_password_change: false,
         })
         .eq("id", user.id);
 
       if (updateError) {
-        console.error("❌ Local update error:", updateError);
-        setError("Error al actualizar contraseña en la base de datos local");
+        setError("Error al actualizar el estado en la base de datos");
         setIsLoading(false);
         return;
       }
 
-      console.log("✅ Password changed successfully in both Auth and local DB");
-      console.log("📝 Summary:");
-      console.log("   - User:", user.username, "(" + userEmail + ")");
-      console.log(
-        "   - Old password was:",
-        user.password_hash === "$supabase$auth$handled"
-          ? "First-time (DNI)"
-          : "Previous custom password",
-      );
-      console.log("   - New password set successfully");
-      console.log("   - User should now login with new password");
+      toast({
+        title: "Contraseña cambiada",
+        description: "Tu contraseña fue actualizada exitosamente. Ya podés usar la nueva contraseña.",
+      });
 
-      // Mostrar mensaje de éxito
-      alert(
-        "✅ Contraseña cambiada exitosamente!\n\nAhora puedes usar tu nueva contraseña para iniciar sesión.",
-      );
-
-      // Éxito
       onPasswordChanged();
     } catch (error) {
-      console.error("Error changing password:", error);
       setError("Error inesperado al cambiar contraseña");
     } finally {
       setIsLoading(false);

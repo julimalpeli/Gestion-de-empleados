@@ -17,47 +17,34 @@ import type {
 export class SupabaseEmployeeService implements IEmployeeService {
   async getAllEmployees(): Promise<Employee[]> {
     try {
-      console.log("🔄 Consultando empleados en Supabase...");
-
       let activeSession: any = null;
       try {
         const {
           data: { session },
         } = await supabase.auth.getSession();
         activeSession = session;
-        console.log("🆔 Supabase session status:", !!session?.user);
       } catch (sessionError) {
-        console.warn("⚠️ No se pudo obtener la sesión actual:", sessionError);
+        // Session check failed
       }
 
       if (!activeSession?.user) {
-        console.log(
-          "⏸️ No Supabase session available, skipping employee load",
-        );
         return [];
       }
 
-      // Check connection health first
       const health = getConnectionHealth();
-      console.log("💊 Connection health:", health);
 
       if (health.state === "disconnected" && health.retries >= 3) {
-        console.log("🚨 Connection unhealthy, using fallback immediately");
         return this.getFallbackEmployees();
       }
 
       const result = await withRetry(
         async () => {
-          console.log("🔍 Executing employees query...");
-
           const { data, error } = await supabase
             .from("employees")
             .select("*")
             .order("created_at", { ascending: false });
 
           if (error) {
-            console.error("❌ Supabase query error:", error);
-
             if (error instanceof Error) {
               throw error;
             }
@@ -67,7 +54,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
             );
           }
 
-          console.log(`✅ Supabase returned ${data?.length || 0} employees`);
           return data ?? [];
         },
         "getAllEmployees",
@@ -75,20 +61,11 @@ export class SupabaseEmployeeService implements IEmployeeService {
       );
 
       if (!result || result.length === 0) {
-        console.warn(
-          "⚠️ Supabase returned no employees; loading fallback dataset instead",
-        );
         return this.getFallbackEmployees();
       }
-
-      console.log(`✅ Successfully fetched ${result.length} employees`);
       return result.map((record) => this.mapFromSupabase(record));
     } catch (error) {
-      console.error("❌ getAllEmployees final error:", error);
       logSupabaseError("getAllEmployees - Final error", error);
-
-      // Always fall back to offline data on any error
-      console.log("🔄 Falling back to offline employee data...");
       return this.getFallbackEmployees();
     }
   }
@@ -99,11 +76,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
         "@/utils/offlineFallback"
       );
       const fallbackData = getFallbackEmployeesData();
-      console.log(
-        "✅ Using fallback employees:",
-        fallbackData.length,
-        "employees",
-      );
       return fallbackData.map((employee) =>
         this.mapFromSupabase({
           ...employee,
@@ -145,10 +117,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
         }),
       );
     } catch (fallbackError) {
-      console.error(
-        "❌ Critical: Fallback employee data failed:",
-        fallbackError,
-      );
       // Return minimal fallback as last resort
       return [
         {
@@ -176,41 +144,25 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
   async getEmployeeById(id: string): Promise<Employee | null> {
     try {
-      console.log(`🔍 Looking for employee with ID: ${id}`);
-
       const { data, error } = await supabase
         .from("employees")
         .select("*")
         .eq("id", id);
 
-      console.log("📊 Employee lookup result:", {
-        data,
-        error,
-        found: data?.length,
-      });
-
-      if (error) {
-        console.error("Error in getEmployeeById:", error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (!data || data.length === 0) {
-        console.log("❌ Employee not found");
         return null;
       }
 
-      console.log("✅ Employee found:", data[0].name);
       return this.mapFromSupabase(data[0]);
     } catch (error) {
-      console.error("Error fetching employee:", error);
       throw new Error("Failed to fetch employee");
     }
   }
 
   async createEmployee(employee: CreateEmployeeRequest): Promise<Employee> {
     try {
-      console.log("Creating employee with input:", employee);
-
       const sueldoBase = this.toNumber(employee.sueldoBase);
       const dailyWage = sueldoBase / 30;
       const vacationInfo = this.calculateVacationDays(employee.startDate);
@@ -240,8 +192,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
         newEmployee.receives_presentismo = employee.receives_presentismo;
       }
 
-      console.log("Sending to Supabase:", newEmployee);
-
       let { data, error } = await supabase
         .from("employees")
         .insert(newEmployee)
@@ -254,15 +204,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         error.message?.includes("receives_presentismo") &&
         error.message?.includes("column")
       ) {
-        console.warn(
-          "⚠️ Column 'receives_presentismo' not found in DB schema.",
-        );
-        console.warn(
-          "💡 To fix: Execute the SQL migration in Supabase: database/add_receives_presentismo.sql",
-        );
-        console.log("🔄 Retrying create without receives_presentismo field...");
-
-        // Remove receives_presentismo and retry
+        // Column doesn't exist yet, retry without it
         delete newEmployee.receives_presentismo;
         const retryResult = await supabase
           .from("employees")
@@ -273,8 +215,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
         data = retryResult.data;
         error = retryResult.error;
       }
-
-      console.log("Supabase response:", { data, error });
 
       if (error) throw error;
 
@@ -297,12 +237,11 @@ export class SupabaseEmployeeService implements IEmployeeService {
           },
         );
       } catch (auditError) {
-        console.error("Error auditing employee creation:", auditError);
+        // Audit errors should not block the operation
       }
 
       return mappedEmployee;
     } catch (error) {
-      console.error("Error creating employee:", error);
       if (error && typeof error === "object" && "message" in error) {
         throw new Error(`Failed to create employee: ${error.message}`);
       }
@@ -315,36 +254,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
     employee: UpdateEmployeeRequest,
   ): Promise<Employee> {
     try {
-      console.log(`🔄 Updating employee ${id} with data:`, employee);
-
-      // Check for problematic ID and provide specific diagnostics
-      if (id === "f33d0128-11b8-4ff2-b226-c6e9a2014fed") {
-        console.warn(
-          "⚠️ Problematic employee ID detected, running full diagnostics...",
-        );
-
-        // Get all employees to see what's available
-        const { data: allEmployees, error: allError } = await supabase
-          .from("employees")
-          .select("id, name, status")
-          .limit(5);
-
-        console.log(
-          "📊 Sample employees:",
-          JSON.stringify(allEmployees, null, 2),
-        );
-        console.log("📊 Total query error:", JSON.stringify(allError, null, 2));
-
-        const found = allEmployees?.find((emp) => emp.id === id);
-        if (!found) {
-          throw new Error(
-            `Employee ${id} does not exist. Available employees: ${allEmployees?.length || 0}. This may be a stale ID from the frontend.`,
-          );
-        }
-      }
-
-      console.log("⚡ Proceeding with update...");
-
       const updateData: any = {};
 
       if (employee.name) updateData.name = employee.name;
@@ -375,14 +284,9 @@ export class SupabaseEmployeeService implements IEmployeeService {
         const vacationInfo = this.calculateVacationDays(employee.startDate);
         updateData.vacation_days = vacationInfo.vacationDays;
         updateData.start_date = employee.startDate;
-        console.log(
-          `🔄 Recalculando vacaciones para nueva fecha: ${employee.startDate} → ${vacationInfo.vacationDays} días`,
-        );
       }
 
       updateData.updated_at = new Date().toISOString();
-
-      console.log("📝 Update data prepared:", updateData);
 
       // First try to update with receives_presentismo if provided
       let updatePayload = { ...updateData };
@@ -402,15 +306,7 @@ export class SupabaseEmployeeService implements IEmployeeService {
         error.message?.includes("receives_presentismo") &&
         error.message?.includes("column")
       ) {
-        console.warn(
-          "⚠️ Column 'receives_presentismo' not found in DB schema. Running migration would fix this.",
-        );
-        console.warn(
-          "💡 To fix: Execute the SQL migration in Supabase: database/add_receives_presentismo.sql",
-        );
-        console.log("🔄 Retrying update without receives_presentismo field...");
-
-        // Remove receives_presentismo from payload and retry
+        // Column doesn't exist yet, retry without it
         const fallbackPayload = { ...updateData };
         delete fallbackPayload.receives_presentismo;
 
@@ -424,63 +320,12 @@ export class SupabaseEmployeeService implements IEmployeeService {
         error = retryResult.error;
       }
 
-      console.log("📊 Update query result:", {
-        data,
-        error,
-        rowsAffected: data?.length,
-      });
+      if (error) throw error;
 
-      if (error) {
-        console.error("Supabase update error:", {
-          error,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          updateData,
-          employeeId: id,
-        });
-        throw error;
-      }
-
-      // Check if any rows were updated
       if (!data || data.length === 0) {
-        console.error("❌ No rows were updated. Running diagnostics...");
-
-        // Try a simple count query to check if employee exists
-        try {
-          const { data: checkData, error: checkError } = await supabase
-            .from("employees")
-            .select("count", { count: "exact", head: true })
-            .eq("id", id);
-
-          console.error("🔍 Employee existence check:");
-          console.error("   - Data:", JSON.stringify(checkData, null, 2));
-          console.error("   - Error:", JSON.stringify(checkError, null, 2));
-
-          // Also try to get the actual employee record
-          const { data: employeeData, error: employeeError } = await supabase
-            .from("employees")
-            .select("id, name, status")
-            .eq("id", id);
-
-          console.error("🔍 Employee record check:");
-          console.error("   - Data:", JSON.stringify(employeeData, null, 2));
-          console.error("   - Error:", JSON.stringify(employeeError, null, 2));
-        } catch (checkErr) {
-          console.error(
-            "❌ Error checking employee existence:",
-            JSON.stringify(checkErr, null, 2),
-          );
-        }
-
         throw new Error(
           `Employee with ID ${id} not found or could not be updated`,
         );
-      }
-
-      if (data.length > 1) {
-        console.warn(`Multiple employees found with ID ${id}, using first one`);
       }
 
       const updatedEmployee = this.mapFromSupabase(data[0]);
@@ -511,12 +356,11 @@ export class SupabaseEmployeeService implements IEmployeeService {
           },
         );
       } catch (auditError) {
-        console.error("Error auditing employee update:", auditError);
+        // Audit errors should not block the operation
       }
 
       return updatedEmployee;
     } catch (error) {
-      console.error("Error updating employee:", error);
       if (error && typeof error === "object" && "message" in error) {
         throw new Error(`Failed to update employee: ${(error as any).message}`);
       }
@@ -529,7 +373,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const { error } = await supabase.from("employees").delete().eq("id", id);
 
       if (error) {
-        console.error("Supabase delete error:", JSON.stringify(error, null, 2));
 
         // Handle specific database errors
         if (error.code === "23503") {
@@ -563,7 +406,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
         );
       }
     } catch (error) {
-      console.error("Error deleting employee:", error);
 
       // If it's already our custom error, re-throw it
       if (
@@ -588,7 +430,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
       const newStatus = current.status === "active" ? "inactive" : "active";
       return await this.updateEmployee(id, { status: newStatus });
     } catch (error) {
-      console.error("Error toggling employee status:", error);
       throw new Error("Failed to toggle employee status");
     }
   }
@@ -605,7 +446,6 @@ export class SupabaseEmployeeService implements IEmployeeService {
 
       return data.map((employee) => this.mapFromSupabase(employee));
     } catch (error) {
-      console.error("Error searching employees:", error);
       throw new Error("Failed to search employees");
     }
   }

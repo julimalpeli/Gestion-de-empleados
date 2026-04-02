@@ -19,15 +19,10 @@ export const usePayroll = () => {
 
   // Cargar registros de liquidaciones
   const fetchPayrollRecords = async () => {
-    console.log("🔄 Payroll: Starting to load records...");
     setLoading(true);
     setError(null);
 
     const loadFallbackPayroll = async (reason: string) => {
-      console.log(
-        `🚨 🚨 🚨 ACTIVATING EMERGENCY FALLBACK (${reason}) 🚨 🚨 🚨`,
-      );
-      console.log("🔄 Loading cached payroll data...");
 
       try {
         const { getFallbackPayrollData } = await import(
@@ -37,29 +32,12 @@ export const usePayroll = () => {
 
         if (fallbackData && fallbackData.length > 0) {
           setPayrollRecords(fallbackData.map(normalizePayrollRecord));
-          console.log("🎉 🎉 🎉 FALLBACK SUCCESS! 🎉 🎉 🎉");
-          console.log(`✅ ${fallbackData.length} payroll records loaded`);
-          console.log("📶 OFFLINE MODE ACTIVE - You can work normally!");
           setError(null);
-
-          if (
-            typeof window !== "undefined" &&
-            (window.location.pathname.includes("liquidaciones") ||
-              window.location.pathname.includes("payroll"))
-          ) {
-            setTimeout(() => {
-              console.log(
-                "💡 TIP: All payroll features available in offline mode",
-              );
-            }, 1000);
-          }
-
           return true;
         }
 
         throw new Error("Fallback data is empty");
       } catch (fallbackError) {
-        console.error("💥 FALLBACK FAILED:", fallbackError);
         setError("Error crítico: No se pueden cargar las liquidaciones");
         setPayrollRecords([]);
         return false;
@@ -69,22 +47,12 @@ export const usePayroll = () => {
     const hasSupabaseSession = !!session?.user;
 
     if (!hasSupabaseSession) {
-      console.log(
-        "⏸️ No Supabase session available, skipping payroll load until login completes",
-      );
       setPayrollRecords([]);
       setLoading(false);
       return;
     }
 
     try {
-      console.log("🔄 Testing Supabase connection for payroll...");
-      console.log("🔧 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
-      console.log(
-        "🔧 Supabase Key configured:",
-        !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-      );
-
       const { data, error } = await withRetry(
         async () => {
           const res = await supabase
@@ -125,14 +93,9 @@ export const usePayroll = () => {
         2,
       );
 
-      console.log("🔄 Supabase payroll query result:");
-      console.log("  - Data:", data);
-      console.log("  - Error:", error);
-
       if (error) throw error;
 
       if (!data || data.length === 0) {
-        console.warn("⚠️ Supabase returned 0 payroll records.");
         setPayrollRecords([]);
         return;
       }
@@ -141,27 +104,6 @@ export const usePayroll = () => {
 
       setPayrollRecords(mappedRecords);
     } catch (err) {
-      console.error("❌ PAYROLL ERROR DETECTED:", err);
-
-      if (err && typeof err === "object") {
-        console.error(
-          "❌ Payroll error details:",
-          JSON.stringify(
-            {
-              message: (err as any).message,
-              code: (err as any).code,
-              details: (err as any).details,
-              hint: (err as any).hint,
-              errorType: typeof err,
-              errorConstructor: err.constructor?.name,
-            },
-            null,
-            2,
-          ),
-        );
-        console.error("❌ Full error object:", err);
-      }
-
       const normalizedMessage =
         err instanceof Error
           ? err.message
@@ -173,11 +115,8 @@ export const usePayroll = () => {
         normalizedMessage.toLowerCase().includes("networkerror") ||
         err instanceof TypeError;
 
-      const shouldFallbackToOffline = bypassActive || isNetworkError;
-      if (shouldFallbackToOffline) {
-        const fallbackReason = bypassActive
-          ? "query-error-bypass"
-          : isNetworkError
+      if (isNetworkError) {
+        const fallbackReason = isNetworkError
             ? "network-error"
             : "query-error";
         const fallbackActivated = await loadFallbackPayroll(fallbackReason);
@@ -209,18 +148,11 @@ export const usePayroll = () => {
         .single();
 
       if (error && error.code !== "PGRST116") {
-        // PGRST116 = no rows found
         throw error;
       }
 
       return data;
     } catch (err) {
-      console.error("Error checking existing payroll:", {
-        message: err?.message,
-        details: err?.details,
-        code: err?.code,
-        full: err,
-      });
       return null;
     }
   };
@@ -259,13 +191,6 @@ export const usePayroll = () => {
         .single();
 
       if (error) {
-        console.error("Supabase error details:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          full: error,
-        });
         throw new Error(
           `Database error: ${error.message || error.details || "Unknown error"}`,
         );
@@ -288,17 +213,12 @@ export const usePayroll = () => {
           },
         );
       } catch (auditError) {
-        console.error("Error auditing payroll creation:", auditError);
+        // Audit errors should not block the operation
       }
 
       await fetchPayrollRecords();
       return data;
     } catch (err) {
-      console.error("Full error details:", {
-        message: err.message,
-        stack: err.stack,
-        full: err,
-      });
       throw new Error(
         err instanceof Error ? err.message : "Error creating payroll record",
       );
@@ -357,14 +277,6 @@ export const usePayroll = () => {
         .eq("id", id);
 
       if (error) {
-        console.error("Supabase update error:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code,
-          updateData: updateData,
-          id: id,
-        });
         throw new Error(error.message || "Database update error");
       }
 
@@ -392,12 +304,11 @@ export const usePayroll = () => {
           },
         );
       } catch (auditError) {
-        console.error("Error auditing payroll update:", auditError);
+        // Audit errors should not block the operation
       }
 
       await fetchPayrollRecords();
     } catch (err) {
-      console.error("Update error details:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error updating payroll record",
       );
@@ -437,7 +348,7 @@ export const usePayroll = () => {
           null, // No hay valores nuevos en DELETE
         );
       } catch (auditError) {
-        console.error("Error auditing payroll deletion:", auditError);
+        // Audit errors should not block the operation
       }
 
       await fetchPayrollRecords();
@@ -452,27 +363,6 @@ export const usePayroll = () => {
   useEffect(() => {
     fetchPayrollRecords();
 
-    const handleEmergencyFallback = (event: any) => {
-      if (event.detail?.data) {
-        console.log("🚨 Emergency fallback received!");
-        setPayrollRecords(event.detail.data);
-        setError(null);
-        setLoading(false);
-        console.log("✅ Payroll records restored from emergency fallback");
-      }
-    };
-
-    window.addEventListener(
-      "emergency-payroll-fallback",
-      handleEmergencyFallback,
-    );
-
-    return () => {
-      window.removeEventListener(
-        "emergency-payroll-fallback",
-        handleEmergencyFallback,
-      );
-    };
   }, [session?.access_token, user?.id]);
 
   return {

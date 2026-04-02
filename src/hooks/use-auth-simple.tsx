@@ -155,7 +155,7 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ error?: string }>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   hasPermission: (permission: string) => boolean;
@@ -214,7 +214,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (error) {
-          console.warn("⚠️ Error getting session:", error.message);
           setSession(null);
           setUser(null);
           return;
@@ -233,7 +232,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        console.error("❌ Error loading initial session:", error);
         setUser(null);
       } finally {
         if (isMounted) {
@@ -247,7 +245,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Safety net: force loading=false after 5s to prevent UI lockup
     const safetyTimeout = setTimeout(() => {
       if (isMounted && loading) {
-        console.warn("⚠️ Auth loading safety timeout - forcing loading=false");
         setLoading(false);
       }
     }, 5000);
@@ -258,8 +255,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!isMounted) {
         return;
       }
-
-      console.log("🔄 Auth state change:", event, session?.user?.email);
 
       if (event === "SIGNED_OUT" || !session?.user) {
         setSession(null);
@@ -306,7 +301,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     supabase.rpc("get_my_profile").then(({ data, error }) => {
       if (!error && data && data.length > 0) {
         const dbProfile = data[0];
-        console.log("✅ DB profile loaded in background:", dbProfile.name, dbProfile.role);
 
         // Update user state with full DB profile
         const userData: User = {
@@ -331,41 +325,42 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .eq("id", dbProfile.id)
           .then(() => {})
           .catch(() => {});
-      } else {
-        console.warn("⚠️ Background DB profile load failed:", error?.message || "no data");
       }
-    }).catch((err) => {
-      console.warn("⚠️ Background DB profile load error:", err);
-    });
+    }).catch(() => {});
   };
 
   // Load user profile - instant from JWT, then enrich from DB in background
   const loadUserProfile = async (supabaseUser: SupabaseUser) => {
     try {
-      console.log("🔄 Loading user profile...");
-
       // INSTANT: Build profile from authenticated session data (JWT)
       const userProfile = buildProfileFromAuth(supabaseUser);
-      console.log("✅ Profile built from auth session:", userProfile.name, "role:", userProfile.role);
 
-      console.log("📊 Profile ready:", {
-        name: userProfile.name,
-        role: userProfile.role,
-        active: userProfile.is_active,
-      });
+      // Check if user is active against the database before allowing access
+      try {
+        const normalizedEmail = supabaseUser.email?.toLowerCase();
+        if (normalizedEmail) {
+          const { data: checkResult } = await supabase.rpc("check_email_exists", {
+            check_email: normalizedEmail,
+          });
+          if (checkResult) {
+            const info = typeof checkResult === "string" ? JSON.parse(checkResult) : checkResult;
+            if (info.exists && !info.is_active) {
+              await supabase.auth.signOut();
+              setUser(null);
+              setSession(null);
+              window.location.href = "/inactive";
+              return;
+            }
+          }
+        }
+      } catch (activeCheckError) {
+        // If the check fails, allow access and let background sync handle it
+      }
 
-      // 🚫 CRITICAL: Check if user is active before proceeding
       if (!userProfile.is_active) {
-        console.log("🚫 USER IS INACTIVE - Redirecting to inactive page");
-
-        // Sign out immediately
         await supabase.auth.signOut();
-
-        // Clear any stored state
         setUser(null);
         setSession(null);
-
-        // Redirect to inactive page
         window.location.href = "/inactive";
         return;
       }
@@ -385,16 +380,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
 
       setUser(userData);
-      console.log(
-        "🎯 User profile loaded successfully:",
-        userData.name,
-        userData.role,
-      );
 
       // Try to enrich with full DB profile in the background (non-blocking)
       tryLoadDbProfile(supabaseUser);
     } catch (error) {
-      console.error("❌ Error loading user profile:", error);
+      // Profile loading failed silently
     }
   };
 
@@ -484,7 +474,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout
   const logout = async () => {
     try {
-      console.log("🚪 Logging out user...");
 
       // Auditar logout antes de cerrar sesión
       if (user) {
@@ -512,25 +501,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } = await supabase.auth.getSession();
 
         if (session) {
-          console.log("📤 Active session found, signing out from Supabase...");
-          const { error } = await supabase.auth.signOut();
-
-          if (error) {
-            console.warn("⚠️ Supabase logout error (ignoring):", error.message);
-          }
-        } else {
-          console.log("📭 No active session found, local logout only");
+          await supabase.auth.signOut();
         }
       } catch (sessionError) {
-        console.warn(
-          "⚠️ Could not check session status:",
-          sessionError.message,
-        );
+        // Ignore session check errors during logout
       }
-
-      console.log("✅ Logout completed");
     } catch (error) {
-      console.error("❌ Logout error:", error);
       // Ensure state is cleared even if there's an error
       setUser(null);
       setSession(null);
@@ -552,12 +528,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .single();
 
         if (!error && userCheck && !userCheck.is_active) {
-          console.log("🚫 User became inactive, logging out");
           await logout();
           window.location.href = "/inactive";
         }
       } catch (error) {
-        console.warn("Could not check user status:", error);
+        // Silently handle status check errors
       }
     };
 
@@ -617,16 +592,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      console.log("✅ Reset password email sent successfully");
     } catch (error) {
-      console.error("Error sending reset email:", error);
       throw error;
     }
   };
 
   // Export security logs
   const exportSecurityLogs = () => {
-    console.log("Security logs export requested");
+    // Security logs export - to be implemented
   };
 
   const value: AuthContextType = {

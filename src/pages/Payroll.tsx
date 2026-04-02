@@ -2143,7 +2143,7 @@ const Payroll = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminar�� permanentemente
+              Esta acción no se puede deshacer. Esto eliminará permanentemente
               la liquidación de {recordToDelete?.employeeName} para el período{" "}
               {recordToDelete ? formatPeriod(recordToDelete.period) : ""}.
             </AlertDialogDescription>

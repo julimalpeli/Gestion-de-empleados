@@ -105,7 +105,6 @@ export const useUsers = () => {
         throw new Error("La contraseña es obligatoria");
       }
 
-      console.log("🔄 Creating user in Supabase Auth...", email);
 
       const { data: authUserData, error: authError } = await supabase.auth.signUp({
         email,
@@ -126,7 +125,6 @@ export const useUsers = () => {
         console.error("❌ Auth creation failed:", authError.message);
 
         if (authError.message.includes("already registered")) {
-          console.log("ℹ️ User already exists in auth, trying to sign in...");
           const { data: signInData, error: signInError } =
             await supabase.auth.signInWithPassword({
               email,
@@ -136,20 +134,18 @@ export const useUsers = () => {
           if (!signInError && signInData.user) {
             authUserId = signInData.user.id;
             await supabase.auth.signOut();
-            console.log("✅ User exists in auth, using existing user");
           } else {
-            throw new Error(`Auth error: ${authError.message}`);
-          }
-        } else {
-          throw new Error(`Auth error: ${authError.message}`);
+          throw new Error(`Error de autenticación: ${authError.message}`);
         }
+      } else {
+        throw new Error(`Error de autenticación: ${authError.message}`);
+      }
       }
 
       if (!authUserId) {
         throw new Error("No se pudo obtener el identificador del usuario de autenticación");
       }
 
-      console.log("✅ Auth user created/found:", email);
 
       const nowIso = new Date().toISOString();
       const { data, error } = await supabase
@@ -171,24 +167,12 @@ export const useUsers = () => {
         .single();
 
       if (error) {
-        console.error("❌ Database creation failed:", error);
-        console.warn("⚠️ Auth user created but database insertion failed", {
-          email,
-          username,
-        });
         throw error;
       }
-
-      console.log("✅ Database user created successfully", {
-        email,
-        username,
-        role: userRequest.role,
-      });
 
       await fetchUsers();
       return data;
     } catch (err) {
-      console.error("❌ Complete user creation failed:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error creating user",
       );
@@ -210,7 +194,6 @@ export const useUsers = () => {
 
     const existing = users.find((u) => u.employeeId === employee.id);
     if (existing) {
-      console.log("ℹ️ Employee user already linked", existing);
       return { success: true, emailUsed: existing.email, alreadyExisted: true };
     }
 
@@ -222,10 +205,6 @@ export const useUsers = () => {
     if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
       normalizedEmail = `${username}@${EMAIL_FALLBACK_DOMAIN}`;
       fallbackEmailUsed = true;
-      console.warn(
-        "⚠️ Using fallback email for employee user creation",
-        normalizedEmail,
-      );
     }
 
     try {
@@ -246,7 +225,6 @@ export const useUsers = () => {
 
       if (authError) {
         if (authError.message.includes("already registered")) {
-          console.log("ℹ️ Employee auth user already exists, attempting sign-in");
           const { data: signInData, error: signInError } =
             await supabase.auth.signInWithPassword({
               email: normalizedEmail,
@@ -256,11 +234,6 @@ export const useUsers = () => {
           if (!signInError && signInData.user) {
             authUserId = signInData.user.id;
             await supabase.auth.signOut();
-          } else {
-            console.warn(
-              "⚠️ Could not sign in existing employee user, attempting database lookup",
-              signInError,
-            );
           }
         } else {
           throw authError;
@@ -304,7 +277,6 @@ export const useUsers = () => {
 
       if (dbError) {
         if (dbError.message?.includes("duplicate key")) {
-          console.warn("ℹ️ Employee user already exists in database");
           return {
             success: true,
             emailUsed: normalizedEmail,
@@ -315,17 +287,10 @@ export const useUsers = () => {
         throw dbError;
       }
 
-      console.log("✅ Employee user created successfully", {
-        employee: employee.name,
-        email: normalizedEmail,
-        fallbackEmailUsed,
-      });
-
       await fetchUsers();
 
       return { success: true, emailUsed: normalizedEmail, fallbackEmailUsed };
     } catch (err) {
-      console.error("❌ Error creating employee user:", err);
       throw new Error(
         err instanceof Error ? err.message : "Error creando usuario empleado",
       );
@@ -347,7 +312,7 @@ export const useUsers = () => {
       const isTargetAdmin = targetUser.role === "admin";
 
       if (isTargetAdmin && targetUser.isActive) {
-        if (updates.role && updates.role !== "admin") {
+        if (updates.role !== undefined && updates.role !== "admin") {
           if (activeAdmins.length <= 1) {
             throw new Error(
               "No se puede cambiar el rol del último administrador activo",
@@ -362,9 +327,6 @@ export const useUsers = () => {
         }
       }
 
-      if (updates.role === "admin" && targetUser.role !== "admin") {
-        console.log("🔐 Promoting user to admin", targetUser.username);
-      }
 
       const nowIso = new Date().toISOString();
       const updateData: Record<string, unknown> = {
@@ -404,10 +366,6 @@ export const useUsers = () => {
           .single();
 
         if (!userFetchError && userData?.employee_id) {
-          console.log(
-            `🔄 Syncing employee status: ${userData.employee_id} -> ${updates.isActive ? "active" : "inactive"}`,
-          );
-
           const { error: employeeError } = await supabase
             .from("employees")
             .update({
@@ -416,11 +374,7 @@ export const useUsers = () => {
             })
             .eq("id", userData.employee_id);
 
-          if (employeeError) {
-            console.error("❌ Error syncing employee status:", employeeError);
-          } else {
-            console.log("✅ Employee status synced successfully");
-          }
+          // Silently handle sync errors
         }
       }
 
@@ -435,7 +389,6 @@ export const useUsers = () => {
   // Función para recrear usuario en Supabase Auth con nueva contraseña
   const recreateAuthUser = async (email: string, password: string) => {
     try {
-      console.log(`🔄 Recreating auth user for: ${email}`);
 
       // Paso 1: Intentar crear el usuario directamente (esto puede fallar si ya existe)
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -485,7 +438,6 @@ export const useUsers = () => {
   // Método directo para actualizar contraseña (sin email)
   const directPasswordUpdate = async (email: string, password: string) => {
     try {
-      console.log(`🔑 Direct password update for: ${email}`);
 
       // Crear un nuevo usuario temporal para forzar la actualización
       const timestamp = Date.now();
@@ -545,7 +497,6 @@ export const useUsers = () => {
     options?: { markNeedsPasswordChange?: boolean },
   ) => {
     try {
-      console.log("🔄 Resetting password for user", userId);
 
       const { data: userData, error: fetchError } = await supabase
         .from("users")

@@ -42,6 +42,7 @@ import {
 } from "@/utils/receiptGenerator";
 import { supabase } from "@/lib/supabase";
 import { getDocumentSystemStatus } from "@/utils/documentSystemChecker";
+import { useToast } from "@/hooks/use-toast";
 
 const EmployeePortal = () => {
   const { user, logout } = useAuth();
@@ -49,6 +50,7 @@ const EmployeePortal = () => {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
   const { vacationRequests, loading: vacationsLoading } = useVacations();
+  const { toast } = useToast();
 
   // Get current employee data safely first
   const currentEmployee =
@@ -70,11 +72,7 @@ const EmployeePortal = () => {
       setDocumentsLoading(true);
       setDocumentsError(null);
 
-      console.log("Loading documents for employee:", employeeId);
-
-      // Check document system availability first
       const systemStatus = await getDocumentSystemStatus();
-      console.log("Document system status:", systemStatus);
 
       if (!systemStatus.canShowDocuments) {
         setDocumentsError(systemStatus.message);
@@ -90,10 +88,8 @@ const EmployeePortal = () => {
       try {
         employeeDocuments =
           await documentService.getEmployeeDocuments(employeeId);
-        console.log("Employee documents loaded:", employeeDocuments.length);
         hasAnySuccess = true;
       } catch (error) {
-        console.warn("Could not load employee documents:", error.message);
 
         // Try alternative method using files table
         try {
@@ -116,85 +112,51 @@ const EmployeePortal = () => {
               uploadedBy: "Sistema",
               fileUrl: file.url || "#",
             }));
-            console.log(
-              "Employee documents from files table:",
-              employeeDocuments.length,
-            );
             hasAnySuccess = true;
           }
         } catch (fallbackError) {
-          console.warn(
-            "Fallback files query also failed:",
-            fallbackError.message,
-          );
+          // Silently handle fallback errors
         }
       }
 
-      // Try to load payroll documents for this employee
+      // Load payroll documents for this employee in a single query
       const employeePayrollRecords = (payrollRecords || []).filter(
         (record) => record.employeeId === employeeId,
       );
 
       if (employeePayrollRecords.length > 0) {
-        console.log(
-          "Loading payroll documents for",
-          employeePayrollRecords.length,
-          "payroll records",
-        );
+        const payrollRecordIds = employeePayrollRecords.map((r) => r.id);
 
-        for (const record of employeePayrollRecords) {
-          try {
-            const docs = await documentService.getPayrollDocuments(record.id);
-            payrollDocuments.push(...docs);
+        try {
+          // Single query for all payroll documents using IN filter
+          const { data: payrollFiles, error: payrollFilesError } =
+            await supabase
+              .from("files")
+              .select("*")
+              .eq("entity_type", "payroll")
+              .in("entity_id", payrollRecordIds);
+
+          if (!payrollFilesError && payrollFiles) {
+            const payrollDocs = payrollFiles.map((file) => ({
+              id: file.id,
+              employeeId: employeeId,
+              payrollId: file.entity_id,
+              fileName: file.name,
+              originalFileName: file.name,
+              fileType: file.type,
+              fileSize: file.size || 0,
+              category: "recibo_sueldo",
+              uploadedAt: file.upload_date || file.created_at,
+              uploadedBy: "Sistema",
+              fileUrl: file.url || "#",
+            }));
+            payrollDocuments.push(...payrollDocs);
             hasAnySuccess = true;
-          } catch (error) {
-            console.warn(
-              "Could not load payroll documents for record:",
-              record.id,
-            );
-
-            // Try alternative method for payroll documents
-            try {
-              const { data: payrollFiles, error: payrollFilesError } =
-                await supabase
-                  .from("files")
-                  .select("*")
-                  .eq("entity_type", "payroll")
-                  .eq("entity_id", record.id);
-
-              if (!payrollFilesError && payrollFiles) {
-                const payrollDocs = payrollFiles.map((file) => ({
-                  id: file.id,
-                  employeeId: employeeId,
-                  payrollId: record.id,
-                  fileName: file.name,
-                  originalFileName: file.name,
-                  fileType: file.type,
-                  fileSize: file.size || 0,
-                  category: "recibo_sueldo",
-                  uploadedAt: file.upload_date || file.created_at,
-                  uploadedBy: "Sistema",
-                  fileUrl: file.url || "#",
-                }));
-                payrollDocuments.push(...payrollDocs);
-                hasAnySuccess = true;
-              }
-            } catch (fallbackError) {
-              console.warn(
-                "Fallback payroll files query failed:",
-                fallbackError.message,
-              );
-            }
           }
+        } catch (payrollDocsError) {
+          // Silently handle payroll document loading errors
         }
       }
-
-      console.log(
-        "Total documents loaded - Employee:",
-        employeeDocuments.length,
-        "Payroll:",
-        payrollDocuments.length,
-      );
 
       // Combine all documents
       const combinedDocuments = [...employeeDocuments, ...payrollDocuments];
@@ -209,7 +171,6 @@ const EmployeePortal = () => {
         setDocumentsError(null); // Services work but no documents exist
       }
     } catch (error) {
-      console.error("Error loading documents:", error);
       setDocumentsError(
         "Error al cargar documentos. Verifique su conexión e intente nuevamente.",
       );
@@ -229,16 +190,11 @@ const EmployeePortal = () => {
 
   const downloadDocument = async (docId, fileName) => {
     try {
-      console.log("Downloading document:", docId, fileName);
-
-      // Obtener la URL del documento
       const downloadUrl = await documentService.downloadDocument(docId);
 
       if (!downloadUrl) {
         throw new Error("No se pudo obtener la URL del documento");
       }
-
-      console.log("Download URL:", downloadUrl);
 
       // Crear un elemento <a> temporal para forzar la descarga
       const link = document.createElement("a");
@@ -255,10 +211,8 @@ const EmployeePortal = () => {
       // Remover el elemento temporal
       document.body.removeChild(link);
 
-      console.log("✅ Document download initiated successfully");
-    } catch (error) {
-      console.error("❌ Error downloading document:", error);
-      alert("Error descargando documento: " + error.message);
+    } catch (error: any) {
+      toast({ title: "Error", description: "Error descargando documento: " + error.message, variant: "destructive" });
     }
   };
 
@@ -274,15 +228,12 @@ const EmployeePortal = () => {
 
   // Debug logging for documents (reduced frequency)
   // Only log when there are actual changes or errors
-  if (documentsError) {
-    console.error("EmployeePortal documents error:", documentsError);
-  }
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
-      console.error("Error during logout:", error);
+      // Ignore logout errors
     } finally {
       // Always navigate to login, even if logout fails
       navigate("/login");
@@ -293,7 +244,7 @@ const EmployeePortal = () => {
     try {
       const employee = currentEmployee;
       if (!employee) {
-        alert("No se encontró la información del empleado");
+        toast({ title: "Error", description: "No se encontró la información del empleado", variant: "destructive" });
         return;
       }
 
@@ -303,7 +254,7 @@ const EmployeePortal = () => {
       );
 
       if (!fullPayrollRecord) {
-        alert("No se encontró el registro de liquidación completo");
+        toast({ title: "Error", description: "No se encontró el registro de liquidación completo", variant: "destructive" });
         return;
       }
 
@@ -333,9 +284,8 @@ const EmployeePortal = () => {
       } else {
         await generatePayrollReceiptExcel(receiptData);
       }
-    } catch (error) {
-      console.error("Error generating payslip:", error);
-      alert(`Error al generar el recibo: ${error.message}`);
+    } catch (error: any) {
+      toast({ title: "Error", description: `Error al generar el recibo: ${error.message}`, variant: "destructive" });
     }
   };
 
@@ -449,12 +399,10 @@ const EmployeePortal = () => {
   // Additional safety check - prevent crashes
   try {
     if (!user.email) {
-      console.error("User has no email, redirecting to login");
       navigate("/login");
       return null;
     }
   } catch (error) {
-    console.error("Error in user safety check:", error);
     navigate("/login");
     return null;
   }
@@ -506,9 +454,6 @@ const EmployeePortal = () => {
       };
 
   // Show warning if no employee found but continue with fallback data
-  if (!currentEmployee) {
-    console.warn("No employee data found, using fallback");
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
@@ -929,6 +874,7 @@ const EmployeePortal = () => {
                                 size="sm"
                                 disabled={!record.hasDocument}
                                 title="Generar recibo"
+                                aria-label="Descargar recibo de sueldo"
                                 onClick={() => handleDownloadReceipt(record)}
                               >
                                 <Download className="h-4 w-4" />
@@ -1171,6 +1117,7 @@ const EmployeePortal = () => {
                               <Button
                                 variant="ghost"
                                 size="sm"
+                                aria-label="Descargar documento"
                                 onClick={() =>
                                   downloadDocument(doc.id, doc.originalFileName)
                                 }

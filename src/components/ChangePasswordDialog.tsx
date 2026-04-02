@@ -12,46 +12,61 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Lock } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth-simple";
+import { supabase } from "@/lib/supabase";
+import { useToast } from "@/hooks/use-toast";
 
 export const ChangePasswordDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { changePassword } = useAuth();
+  const { changePassword, user } = useAuth();
+  const { toast } = useToast();
 
   const handleChangePassword = async () => {
-    // Validaciones
     if (!newPassword || !confirmPassword) {
-      alert("Por favor complete todos los campos");
+      toast({ title: "Error", description: "Por favor completá todos los campos", variant: "destructive" });
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      alert("Las contraseñas no coinciden");
+      toast({ title: "Error", description: "Las contraseñas no coinciden", variant: "destructive" });
       return;
     }
 
     if (newPassword.length < 6) {
-      alert("La contraseña debe tener al menos 6 caracteres");
+      toast({ title: "Error", description: "La contraseña debe tener al menos 6 caracteres", variant: "destructive" });
       return;
     }
 
     setIsLoading(true);
     try {
       await changePassword(newPassword);
+
+      // Clear needs_password_change flag in users table
+      if (user?.id) {
+        await supabase
+          .from("users")
+          .update({
+            needs_password_change: false,
+            password_hash: "$supabase$auth$handled",
+          })
+          .eq("id", user.id);
+      }
+
       setIsOpen(false);
       setNewPassword("");
       setConfirmPassword("");
-      alert(
-        "¡Contraseña cambiada exitosamente! Por seguridad, la sesión se mantendrá activa.",
-      );
-    } catch (error) {
-      console.error("Error changing password:", error);
-      alert(
-        "Error al cambiar contraseña: " +
-          (error?.message || "Error desconocido"),
-      );
+      toast({
+        title: "Contraseña cambiada",
+        description: "Tu contraseña fue actualizada exitosamente.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Error al cambiar contraseña: " + (error?.message || "Error desconocido"),
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
