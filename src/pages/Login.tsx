@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import {
   Card,
@@ -32,6 +33,7 @@ const Login = () => {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const navigate = useNavigate();
   const { login, isAuthenticated, user, loading, resetPassword } = useAuth();
+  const { toast } = useToast();
 
   const MAX_FAILED_ATTEMPTS = 6;
   const BLOCK_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
@@ -84,14 +86,6 @@ const Login = () => {
       return;
     }
 
-    console.log("🔄 Login redirect check:", {
-      isAuthenticated,
-      user: user?.name,
-      role: user?.role,
-      loading,
-      path: window.location.pathname,
-    });
-
     // Don't redirect if still loading
     if (loading) return;
 
@@ -99,10 +93,8 @@ const Login = () => {
       // Add small delay to ensure state is stable
       setTimeout(() => {
         if (user.role === "employee") {
-          console.log("👤 Redirecting employee to portal");
           navigate("/portal-empleado", { replace: true });
         } else {
-          console.log("👑 Redirecting admin/manager to dashboard");
           navigate("/", { replace: true });
         }
       }, 100);
@@ -177,9 +169,10 @@ const Login = () => {
 
     try {
       await resetPassword(email);
-      alert(
-        "Se ha enviado un email con instrucciones para restablecer tu contraseña",
-      );
+      toast({
+        title: "Email enviado",
+        description: "Se ha enviado un email con instrucciones para restablecer tu contraseña",
+      });
       setShowResetPassword(false);
     } catch (error: any) {
       console.error("Error sending reset email:", error);

@@ -29,24 +29,12 @@ const ProtectedRoute = ({
       isEmployee,
     } = usePermissions();
 
-    // Debug logging
-    console.log("🛡️ ProtectedRoute check:", {
-      isAuthenticated,
-      user: user?.name,
-      role: user?.role,
-      path: window.location.pathname,
-    });
-
     if (!isAuthenticated) {
-      console.log("❌ Not authenticated, redirecting to login");
       return <Navigate to="/login" replace />;
     }
 
     // Check if user is active
     if (user && user.isActive === false) {
-      console.log(
-        "🚫 SECURITY: User is inactive, redirecting to inactive page",
-      );
       return <Navigate to="/inactive" replace />;
     }
 
@@ -80,11 +68,9 @@ const ProtectedRoute = ({
       }
     }
 
-    console.log("✅ ProtectedRoute: All checks passed, rendering children");
     return <>{children}</>;
   } catch (error) {
-    console.error("💥 ProtectedRoute error:", error);
-    console.error("💥 Error details:", error.message, error.stack);
+    console.error("ProtectedRoute error:", error);
     // If there's an error with auth context, redirect to login
     return <Navigate to="/login" replace />;
   }

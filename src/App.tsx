@@ -11,7 +11,6 @@ import { WifiOff } from "lucide-react";
 // Load dev utilities only in development mode
 if (import.meta.env.DEV) {
   Promise.all([
-    import("@/utils/quickFixEmployee"),
     import("@/utils/connectionTest"),
     import("@/utils/connectionDebug"),
     import("@/utils/syncVacations"),
@@ -26,7 +25,6 @@ if (import.meta.env.DEV) {
   ])
     .then(
       ([
-        quickFixModule,
         connectionModule,
         _connectionDebugModule,
         syncModule,
@@ -39,8 +37,6 @@ if (import.meta.env.DEV) {
         _emergencyNavModule,
         recalculateAguinaldosModule,
       ]) => {
-        (window as any).recreateEmployee44586777 =
-          quickFixModule.recreateEmployee44586777;
         (window as any).testConnection = connectionModule.testConnection;
         (window as any).syncVacationsTaken = syncModule.syncVacationsTaken;
         (window as any).manualSyncVacations = syncModule.manualSyncVacations;
