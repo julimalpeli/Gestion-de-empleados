@@ -44,38 +44,44 @@ RETURNS TABLE(
     white_wage DECIMAL(12,2),
     informal_wage DECIMAL(12,2),
     presentismo DECIMAL(12,2),
+    base_wage DECIMAL(12,2),
     source VARCHAR(20)
 ) AS $$
 DECLARE
     target_date DATE;
+    end_of_month_date DATE;
     history_record RECORD;
     employee_record RECORD;
+    year_val INTEGER;
+    month_val INTEGER;
 BEGIN
-    -- Convertir período a fecha (primer día del mes)
-    target_date := (target_period || '-01')::DATE;
+    -- Convertir período (YYYY-MM) a fecha del último día del mes
+    year_val := (split_part(target_period, '-', 1))::INTEGER;
+    month_val := (split_part(target_period, '-', 2))::INTEGER;
+    end_of_month_date := (DATE_TRUNC('MONTH', (year_val || '-' || month_val || '-01')::DATE) + INTERVAL '1 month' - INTERVAL '1 day')::DATE;
 
-    -- Buscar el último cambio antes o igual al período objetivo
+    -- Buscar el último cambio que sea efectivo en o antes del último día del período
     SELECT * INTO history_record
     FROM salary_history
     WHERE employee_id = emp_id
-      AND effective_date <= target_date
+      AND effective_date <= end_of_month_date
     ORDER BY effective_date DESC, created_at DESC
     LIMIT 1;
 
     -- Si encontramos historial, usar esos valores
     IF FOUND THEN
-        RETURN QUERY SELECT history_record.white_wage, history_record.informal_wage, history_record.presentismo, 'history'::VARCHAR(20);
+        RETURN QUERY SELECT history_record.white_wage, history_record.informal_wage, history_record.presentismo, history_record.base_wage, 'history'::VARCHAR(20);
     ELSE
         -- Si no hay historial, usar valores actuales del empleado
-        SELECT e.white_wage, e.informal_wage, e.presentismo INTO employee_record
+        SELECT e.white_wage, e.informal_wage, e.presentismo, e.sueldo_base INTO employee_record
         FROM employees e
         WHERE e.id = emp_id;
 
         IF FOUND THEN
-            RETURN QUERY SELECT employee_record.white_wage, employee_record.informal_wage, employee_record.presentismo, 'current'::VARCHAR(20);
+            RETURN QUERY SELECT employee_record.white_wage, employee_record.informal_wage, employee_record.presentismo, employee_record.sueldo_base, 'current'::VARCHAR(20);
         ELSE
             -- Empleado no encontrado
-            RETURN QUERY SELECT 0::DECIMAL(12,2), 0::DECIMAL(12,2), 0::DECIMAL(12,2), 'not_found'::VARCHAR(20);
+            RETURN QUERY SELECT 0::DECIMAL(12,2), 0::DECIMAL(12,2), 0::DECIMAL(12,2), 0::DECIMAL(12,2), 'not_found'::VARCHAR(20);
         END IF;
     END IF;
 END;
