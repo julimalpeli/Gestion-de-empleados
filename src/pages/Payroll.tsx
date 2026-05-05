@@ -300,6 +300,34 @@ const Payroll = () => {
   // No cambiar automáticamente si el usuario ya eligió "all"
   const [hasAutoSelected, setHasAutoSelected] = useState(false);
 
+  // Load historical salary when creating a new payroll for a specific period
+  useEffect(() => {
+    const loadHistoricalSalaryForNewPayroll = async () => {
+      // Only load if we're in create mode (not edit mode) and have both employee and period
+      if (
+        selectedEmployee &&
+        selectedPeriod &&
+        !editingRecord &&
+        isNewPayrollOpen
+      ) {
+        try {
+          const historicalSalaryData =
+            await salaryHistoryService.getSalaryForPeriod(
+              selectedEmployee,
+              selectedPeriod,
+            );
+          setHistoricalSalary(historicalSalaryData);
+        } catch (error) {
+          console.error("Error loading historical salary for new payroll:", error);
+          // If we can't load historical salary, that's okay - we'll use current salary
+          setHistoricalSalary(null);
+        }
+      }
+    };
+
+    loadHistoricalSalaryForNewPayroll();
+  }, [selectedEmployee, selectedPeriod, editingRecord, isNewPayrollOpen]);
+
   useEffect(() => {
     if (
       payrollRecords &&
