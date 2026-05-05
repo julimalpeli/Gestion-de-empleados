@@ -1689,8 +1689,11 @@ const Employees = () => {
 
             // Si es aumento, crear historial; si es corrección, solo actualizar
             if (changeType === "aumento") {
-              const today = new Date();
-              const currentPeriod = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
+              // Calculate impact_period based on the effective_date, not today's date
+              // This ensures that if an increase is dated April 15, it applies to April period
+              // even if the record is created on May 5
+              const [year, month] = effectiveDate.split("-");
+              const impactPeriod = `${year}-${month}`;
 
               await updateEmployeeSalaryWithHistory(
                 editingEmployee.id,
@@ -1701,7 +1704,7 @@ const Employees = () => {
                 {
                   change_type: changeType,
                   effective_date: effectiveDate,
-                  impact_period: currentPeriod,
+                  impact_period: impactPeriod,
                   reason: reason,
                 },
               );
