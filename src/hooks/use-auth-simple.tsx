@@ -214,6 +214,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (error) {
+          console.error("❌ Error loading session:", error.message);
+
+          // Handle refresh token errors by clearing corrupted storage
+          if (
+            error.message?.includes("Refresh Token") ||
+            error.message?.includes("refresh token") ||
+            error.message?.includes("Invalid Refresh Token")
+          ) {
+            console.warn("🔄 Refresh token error detected, clearing Supabase storage...");
+
+            // Clear all Supabase auth keys to prevent token corruption
+            const keysToRemove = Object.keys(localStorage).filter(
+              (key) => key.includes("supabase") || key.includes("sb-")
+            );
+            keysToRemove.forEach((key) => {
+              localStorage.removeItem(key);
+            });
+
+            console.log(`✅ Cleared ${keysToRemove.length} Supabase storage keys`);
+          }
+
           setSession(null);
           setUser(null);
           return;
@@ -230,6 +251,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         if (!isMounted) {
           return;
+        }
+
+        console.error("❌ Unexpected error during session load:", error);
+
+        // If we hit any auth-related exception, try clearing Supabase storage
+        if (error instanceof Error && error.message?.includes("Refresh Token")) {
+          console.warn("🔄 Clearing Supabase storage due to refresh token error...");
+          const keysToRemove = Object.keys(localStorage).filter(
+            (key) => key.includes("supabase") || key.includes("sb-")
+          );
+          keysToRemove.forEach((key) => {
+            localStorage.removeItem(key);
+          });
         }
 
         setUser(null);
@@ -460,10 +494,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
       setSession(null);
 
-      // Clear any stored auth data
-      localStorage.removeItem("supabase.auth.token");
-      localStorage.removeItem("emergency-auth");
-      localStorage.removeItem("admin-bypass");
+      // Clear all Supabase auth storage keys to prevent refresh token errors
+      // Supabase stores session data with keys like "sb-{projectId}-auth-token"
+      const keysToRemove = Object.keys(localStorage).filter(
+        (key) =>
+          key.includes("supabase") ||
+          key.includes("sb-") ||
+          key === "emergency-auth" ||
+          key === "admin-bypass"
+      );
+
+      keysToRemove.forEach((key) => {
+        localStorage.removeItem(key);
+      });
+
+      // Also clear sessionStorage
       sessionStorage.clear();
 
       // Check if there's an active session before trying to sign out
@@ -476,7 +521,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           await supabase.auth.signOut();
         }
       } catch (sessionError) {
-        // Ignore session check errors during logout
+        // Ignore session check errors during logout - storage is already cleared
       }
     } catch (error) {
       // Ensure state is cleared even if there's an error
