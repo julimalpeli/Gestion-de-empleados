@@ -18,6 +18,7 @@ import {
   Edit3,
   Plane,
   Calendar,
+  CheckIcon,
 } from "lucide-react";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useEmployees } from "@/hooks/use-employees";
@@ -188,6 +189,29 @@ const Dashboard = () => {
           new Date(a.startDate).getTime() - new Date(b.startDate).getTime(),
       ),
     [upcomingVacations],
+  );
+
+  // Past vacations (last 2 months)
+  const twoMonthsAgo = new Date();
+  twoMonthsAgo.setMonth(today.getMonth() - 2);
+  twoMonthsAgo.setHours(0, 0, 0, 0);
+
+  const pastVacations = vacations.filter((vacation) => {
+    if (vacation.status !== "approved") return false;
+    const endDate = new Date(vacation.endDate);
+    endDate.setHours(23, 59, 59, 999);
+    return endDate < today && endDate >= twoMonthsAgo;
+  });
+
+  console.log("  - Past vacations found:", pastVacations.length);
+
+  const sortedPastVacations = useMemo(
+    () =>
+      [...pastVacations].sort(
+        (a, b) =>
+          new Date(b.endDate).getTime() - new Date(a.endDate).getTime(),
+      ),
+    [pastVacations],
   );
 
   // Get employee names for vacations
@@ -405,7 +429,7 @@ const Dashboard = () => {
       </div>
 
       {/* Vacation Status */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">En Vacaciones</CardTitle>
@@ -518,6 +542,63 @@ const Dashboard = () => {
                       ? "Ver menos"
                       : `Ver ${sortedUpcomingVacations.length - 2} más`}
                   </button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Vacaciones Pasadas
+            </CardTitle>
+            <CheckIcon className="h-4 w-4 text-green-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {sortedPastVacations.length}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {sortedPastVacations.length === 0
+                ? "Últimos 2 meses"
+                : `${sortedPastVacations.length} empleado${sortedPastVacations.length > 1 ? "s" : ""} en los últimos 2 meses`}
+            </p>
+            {sortedPastVacations.length > 0 && (
+              <div className="mt-2 space-y-1">
+                {sortedPastVacations.slice(0, 2).map((vacation) => {
+                  const startDate = new Date(vacation.startDate + "T00:00:00");
+                  const endDate = new Date(vacation.endDate + "T00:00:00");
+                  const daysDiff =
+                    Math.ceil(
+                      (endDate.getTime() - startDate.getTime()) /
+                        (1000 * 60 * 60 * 24),
+                    ) + 1;
+
+                  return (
+                    <div
+                      key={vacation.id}
+                      className="text-xs bg-green-50 p-2 rounded"
+                    >
+                      <div className="font-medium">
+                        {getEmployeeName(vacation.employeeId)}
+                      </div>
+                      <div className="text-muted-foreground mt-1">
+                        <div>
+                          Desde: {startDate.toLocaleDateString("es-AR")}
+                        </div>
+                        <div>Hasta: {endDate.toLocaleDateString("es-AR")}</div>
+                        <div>
+                          {daysDiff} día{daysDiff !== 1 ? "s" : ""}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                {sortedPastVacations.length > 2 && (
+                  <p className="text-xs text-muted-foreground">
+                    y {sortedPastVacations.length - 2} más...
+                  </p>
                 )}
               </div>
             )}
