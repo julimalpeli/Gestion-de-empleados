@@ -176,15 +176,18 @@ export async function preGenerateAguinaldosForPeriod(
 }
 
 /**
- * Extracts actual June/December periods from payroll records
- * Only shows periods that have real liquidations (no projections)
+ * Generates aguinaldo periods from payroll records + next upcoming period
+ * Shows: All past/existing periods + only the next June/December to come
  */
 export function generateAguinaldoPeriods(
   payrollRecords: PayrollRecord[],
 ): Array<{ value: string; label: string }> {
   const periods = new Set<string>();
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // 1-12
 
-  // Extract all unique periods from payroll records
+  // Extract all existing periods from payroll records (past)
   payrollRecords.forEach((record) => {
     if (record.period) {
       const [year, month] = record.period.split("-");
@@ -194,6 +197,23 @@ export function generateAguinaldoPeriods(
       }
     }
   });
+
+  // Calculate the NEXT June or December (only one upcoming, not multiple years)
+  let nextAguinaldoYear = currentYear;
+  let nextAguinaldoMonth = 6; // Start with June
+
+  if (currentMonth > 6 && currentMonth < 12) {
+    // We're between July and November, next is December of current year
+    nextAguinaldoMonth = 12;
+  } else if (currentMonth >= 12) {
+    // We're in December or after, next is June of next year
+    nextAguinaldoYear = currentYear + 1;
+    nextAguinaldoMonth = 6;
+  }
+  // else: currentMonth <= 6, next is June of current year
+
+  const nextPeriod = `${nextAguinaldoYear}-${String(nextAguinaldoMonth).padStart(2, "0")}`;
+  periods.add(nextPeriod);
 
   // Convert to label format
   const periodArray: Array<{ value: string; label: string }> = Array.from(
