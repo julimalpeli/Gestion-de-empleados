@@ -354,41 +354,30 @@ const Reports = () => {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {generateAguinaldoPeriods().map((period) => {
-                          const isPaid = isPeriodPaid(
-                            period.value,
-                            payrollRecords,
-                          );
-                          const paidCount = getPaidCountForPeriod(
-                            period.value,
-                            payrollRecords,
-                          );
-                          return (
-                            <SelectItem
-                              key={period.value}
-                              value={period.value}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span>{period.label}</span>
-                                {isPaid ? (
+                        {generateAguinaldoPeriods(payrollRecords).map(
+                          (period) => {
+                            const paidCount = getPaidCountForPeriod(
+                              period.value,
+                              payrollRecords,
+                            );
+                            return (
+                              <SelectItem
+                                key={period.value}
+                                value={period.value}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span>{period.label}</span>
                                   <Badge
-                                    variant="default"
-                                    className="text-xs"
+                                    variant="outline"
+                                    className="text-xs bg-green-50"
                                   >
-                                    ✓ Pagado ({paidCount})
+                                    ({paidCount})
                                   </Badge>
-                                ) : (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs"
-                                  >
-                                    📊 Proyectado
-                                  </Badge>
-                                )}
-                              </div>
-                            </SelectItem>
-                          );
-                        })}
+                                </div>
+                              </SelectItem>
+                            );
+                          },
+                        )}
                       </SelectContent>
                     </Select>
 
@@ -408,15 +397,13 @@ const Reports = () => {
                 <div className="ml-auto">
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">
-                      Total {isPeriodPaid(selectedPeriod, payrollRecords) ? "Pagado" : "Proyectado"}:
+                      Total a Pagar:
                     </p>
                     <p className="text-2xl font-bold text-primary">
                       {formatCurrency(totalAguinaldos)}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {isPeriodPaid(selectedPeriod, payrollRecords)
-                        ? `${getPaidCountForPeriod(selectedPeriod, payrollRecords)} empleados`
-                        : "No pagado aún"}
+                      {getPaidCountForPeriod(selectedPeriod, payrollRecords)} empleados
                     </p>
                   </div>
                 </div>
