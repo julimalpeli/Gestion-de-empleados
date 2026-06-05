@@ -58,7 +58,6 @@ import { calculateAguinaldo } from "@/utils/aguinaldo";
 import {
   preGenerateAguinaldosForPeriod,
   generateAguinaldoPeriods,
-  isPeriodPaid,
   getPaidCountForPeriod,
 } from "@/utils/preGenerateAguinaldos";
 
@@ -454,28 +453,14 @@ const Reports = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {aguinaldoCalculations.map((emp) => {
-                    const isPaid = isPeriodPaid(selectedPeriod, payrollRecords);
-                    return (
-                      <TableRow
-                        key={emp.id}
-                        className={
-                          isPaid ? "" : "bg-blue-50 hover:bg-blue-100"
-                        }
-                      >
+                  {aguinaldoCalculations.map((emp) => (
+                      <TableRow key={emp.id}>
                         <TableCell className="font-medium">
-                          <div className="flex items-center gap-2">
-                            <div>
-                              <p>{emp.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                DNI: {emp.dni || "N/A"} • {emp.position}
-                              </p>
-                            </div>
-                            {!isPaid && (
-                              <Badge variant="secondary" className="text-xs whitespace-nowrap ml-2">
-                                📊 Proyectado
-                              </Badge>
-                            )}
+                          <div>
+                            <p>{emp.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              DNI: {emp.dni || "N/A"} • {emp.position}
+                            </p>
                           </div>
                         </TableCell>
                         <TableCell>{formatDate(emp.startDate)}</TableCell>
@@ -541,8 +526,7 @@ const Reports = () => {
                           <div className="text-xs">{emp.aguinaldo.reason}</div>
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
+                    ))}
                 </TableBody>
               </Table>
             </CardContent>
@@ -1057,7 +1041,7 @@ const Reports = () => {
                   Período seleccionado:
                 </p>
                 <p className="text-lg font-bold text-blue-600 mt-1">
-                  {generateAguinaldoPeriods().find(
+                  {generateAguinaldoPeriods(payrollRecords).find(
                     (p) => p.value === selectedPeriod,
                   )?.label || selectedPeriod}
                 </p>

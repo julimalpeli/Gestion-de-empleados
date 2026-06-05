@@ -310,7 +310,7 @@ export default function AguinaldoReport() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {generateAguinaldoPeriods().map((period) => (
+                  {generateAguinaldoPeriods(payrollRecords).map((period) => (
                     <SelectItem key={period.value} value={period.value}>
                       {period.label}
                     </SelectItem>
