@@ -176,29 +176,47 @@ export async function preGenerateAguinaldosForPeriod(
 }
 
 /**
- * Generates all June/December periods for the last 3 years and next 3 years
+ * Generates June/December periods: past records + 2-3 semesters ahead
+ * Shows only periods that are relevant for the current year and forward planning
  */
 export function generateAguinaldoPeriods(): Array<{ value: string; label: string }> {
   const periods: Array<{ value: string; label: string }> = [];
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth() + 1; // 1-12
 
-  // Generate 3 years back to 3 years forward
-  for (let year = currentYear - 3; year <= currentYear + 3; year++) {
-    // June (semester 1)
-    periods.push({
-      value: `${year}-06`,
-      label: `Junio ${year}`,
-    });
+  // Determine the next aguinaldo period
+  let nextAguinaldoYear = currentYear;
+  let nextAguinaldoMonth = currentMonth <= 6 ? 6 : 12;
 
-    // December (semester 2)
-    periods.push({
-      value: `${year}-12`,
-      label: `Diciembre ${year}`,
-    });
+  if (currentMonth > 6 && nextAguinaldoMonth === 12) {
+    // Next aguinaldo is in December of current year
+    nextAguinaldoMonth = 12;
+  } else if (currentMonth === 6 || currentMonth < 6) {
+    // Next aguinaldo is in June of current year
+    nextAguinaldoMonth = 6;
+  } else {
+    // We're past June and not at December, so next is December of current year
+    nextAguinaldoMonth = 12;
   }
 
-  // Sort by year and month descending
+  // Add past records: 2 years back
+  for (let year = currentYear - 2; year < currentYear; year++) {
+    periods.push({ value: `${year}-06`, label: `Junio ${year}` });
+    periods.push({ value: `${year}-12`, label: `Diciembre ${year}` });
+  }
+
+  // Add current year periods (if not passed)
+  if (currentMonth <= 6) {
+    periods.push({ value: `${currentYear}-06`, label: `Junio ${currentYear}` });
+  }
+  periods.push({ value: `${currentYear}-12`, label: `Diciembre ${currentYear}` });
+
+  // Add next year: June and December (2 periods ahead)
+  periods.push({ value: `${currentYear + 1}-06`, label: `Junio ${currentYear + 1}` });
+  periods.push({ value: `${currentYear + 1}-12`, label: `Diciembre ${currentYear + 1}` });
+
+  // Sort by year and month descending (newest first)
   return periods.sort((a, b) => {
     const [aYear, aMonth] = a.value.split("-").map(Number);
     const [bYear, bMonth] = b.value.split("-").map(Number);
