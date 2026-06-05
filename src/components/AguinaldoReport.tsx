@@ -30,13 +30,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
 import { Download, DollarSign, Info } from "lucide-react";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useEmployees } from "@/hooks/use-employees";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
+import { generateAguinaldoPeriods } from "@/utils/preGenerateAguinaldos";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useState, useEffect } from "react";
 
 interface AguinaldoReportRecord {
   id: string;
@@ -94,6 +95,11 @@ export default function AguinaldoReport() {
         (p) => p.employeeId === emp.id && p.period === selectedPeriod,
       );
 
+      // For pre-generated records (draft status with no payment split), show the calculated amount
+      const isPregeneratedDraft = payrollRecord?.status === "draft" &&
+        (payrollRecord?.aguinaldoPagoEfectivo || 0) === 0 &&
+        (payrollRecord?.aguinaldoPagoDeposito || 0) === 0;
+
       return {
         id: emp.id.toString(),
         employeeName: emp.name,
@@ -107,7 +113,7 @@ export default function AguinaldoReport() {
         totalDays: aguinaldoResult.totalDays,
         proportional: aguinaldoResult.proportional,
         startDate: emp.startDate,
-        status: payrollRecord?.status || "sin_liquidacion",
+        status: isPregeneratedDraft ? "pre-generado" : (payrollRecord?.status || "sin_liquidacion"),
       };
     });
 
@@ -304,10 +310,11 @@ export default function AguinaldoReport() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2024-1">Primer Semestre 2024</SelectItem>
-                  <SelectItem value="2024-2">Segundo Semestre 2024</SelectItem>
-                  <SelectItem value="2025-1">Primer Semestre 2025</SelectItem>
-                  <SelectItem value="2025-2">Segundo Semestre 2025</SelectItem>
+                  {generateAguinaldoPeriods().map((period) => (
+                    <SelectItem key={period.value} value={period.value}>
+                      {period.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -332,6 +339,10 @@ export default function AguinaldoReport() {
                 Este reporte muestra el cálculo completo del aguinaldo (SAC) incluyendo
                 los montos ingresados para pago en efectivo y depósito. Si los valores
                 de pago no coinciden con el total calculado, aparecerá una alerta.
+              </p>
+              <p className="text-blue-700 mt-2">
+                <strong>📊 Registros "Por completar":</strong> Son registros pre-generados desde la Calculadora.
+                Completa el monto a pagar en efectivo/depósito en la sección de Liquidaciones.
               </p>
             </div>
           </div>
@@ -419,7 +430,11 @@ export default function AguinaldoReport() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        {hasDiscrepancy ? (
+                        {record.status === "pre-generado" ? (
+                          <Badge variant="secondary" className="bg-yellow-100 text-yellow-900 cursor-help" title="Pre-generado. Completa el pago en efectivo/depósito.">
+                            🔄 Por completar
+                          </Badge>
+                        ) : hasDiscrepancy ? (
                           <Dialog>
                             <DialogTrigger asChild>
                               <Badge variant="destructive" className="cursor-pointer">
