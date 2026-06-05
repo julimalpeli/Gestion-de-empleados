@@ -23,6 +23,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
   FileBarChart,
@@ -34,6 +42,10 @@ import {
   Info,
   Users,
   Scissors,
+  Wand2,
+  AlertCircle,
+  CheckCircle2,
+  Loader2,
 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import LiquidationsReport from "@/components/LiquidationsReport";
@@ -43,6 +55,12 @@ import AguinaldoReport from "@/components/AguinaldoReport";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
+import {
+  preGenerateAguinaldosForPeriod,
+  generateAguinaldoPeriods,
+  isPeriodPaid,
+  getPaidCountForPeriod,
+} from "@/utils/preGenerateAguinaldos";
 
 // Mock employees data - COMENTADO porque ahora usamos Supabase
 /* const mockEmployees = [
@@ -109,7 +127,7 @@ import { calculateAguinaldo } from "@/utils/aguinaldo";
 ]; */
 
 const Reports = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState("2024-2");
+  const [selectedPeriod, setSelectedPeriod] = useState("2026-06");
 
   // Usar hooks de Supabase
   const {
@@ -122,6 +140,7 @@ const Reports = () => {
     payrollRecords,
     loading: payrollLoading,
     error: payrollError,
+    fetchPayrollRecords: refetchPayroll,
   } = usePayroll();
   const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
     useState(false);
@@ -129,6 +148,14 @@ const Reports = () => {
     useState(false);
   const [isMultipleReceiptsReportOpen, setIsMultipleReceiptsReportOpen] =
     useState(false);
+  const [isPreGenerateDialogOpen, setIsPreGenerateDialogOpen] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationResult, setGenerationResult] = useState<{
+    success: boolean;
+    message: string;
+    createdCount?: number;
+    failedCount?: number;
+  } | null>(null);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("es-AR", {
@@ -143,6 +170,40 @@ const Reports = () => {
     return new Date(dateString + "T00:00:00").toLocaleDateString("es-AR");
   };
 
+  const handlePreGenerateAguinaldos = async () => {
+    setIsGenerating(true);
+    setGenerationResult(null);
+
+    try {
+      const result = await preGenerateAguinaldosForPeriod({
+        period: selectedPeriod,
+        employees,
+        payrollRecords,
+      });
+
+      setGenerationResult({
+        success: result.success,
+        message: result.message,
+        createdCount: result.createdCount,
+        failedCount: result.failedCount,
+      });
+
+      if (result.success) {
+        // Refresh payroll records after successful generation
+        setTimeout(() => {
+          refetchPayroll();
+          setIsPreGenerateDialogOpen(false);
+        }, 1000);
+      }
+    } catch (error) {
+      setGenerationResult({
+        success: false,
+        message: `Error inesperado: ${error instanceof Error ? error.message : "Error desconocido"}`,
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const activeEmployees = employees.filter((emp) => emp.status === "active");
   const aguinaldoCalculations = activeEmployees.map((emp) => ({
@@ -284,37 +345,78 @@ const Reports = () => {
                   <label className="text-sm font-medium">
                     Período a calcular:
                   </label>
-                  <Select
-                    value={selectedPeriod}
-                    onValueChange={setSelectedPeriod}
-                  >
-                    <SelectTrigger className="w-48">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="2024-1">
-                        Primer Semestre 2024
-                      </SelectItem>
-                      <SelectItem value="2024-2">
-                        Segundo Semestre 2024
-                      </SelectItem>
-                      <SelectItem value="2025-1">
-                        Primer Semestre 2025
-                      </SelectItem>
-                      <SelectItem value="2025-2">
-                        Segundo Semestre 2025
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select
+                      value={selectedPeriod}
+                      onValueChange={setSelectedPeriod}
+                    >
+                      <SelectTrigger className="w-48">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {generateAguinaldoPeriods().map((period) => {
+                          const isPaid = isPeriodPaid(
+                            period.value,
+                            payrollRecords,
+                          );
+                          const paidCount = getPaidCountForPeriod(
+                            period.value,
+                            payrollRecords,
+                          );
+                          return (
+                            <SelectItem
+                              key={period.value}
+                              value={period.value}
+                            >
+                              <div className="flex items-center gap-2">
+                                <span>{period.label}</span>
+                                {isPaid ? (
+                                  <Badge
+                                    variant="default"
+                                    className="text-xs"
+                                  >
+                                    ✓ Pagado ({paidCount})
+                                  </Badge>
+                                ) : (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    📊 Proyectado
+                                  </Badge>
+                                )}
+                              </div>
+                            </SelectItem>
+                          );
+                        })}
+                      </SelectContent>
+                    </Select>
+
+                    <Button
+                      onClick={() => setIsPreGenerateDialogOpen(true)}
+                      size="sm"
+                      variant="outline"
+                      className="gap-2"
+                      title="Pre-generar aguinaldos para todos los empleados"
+                    >
+                      <Wand2 className="h-4 w-4" />
+                      Pre-generar
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="ml-auto">
                   <div className="text-right">
                     <p className="text-sm text-muted-foreground">
-                      Total a pagar:
+                      Total {isPeriodPaid(selectedPeriod, payrollRecords) ? "Pagado" : "Proyectado"}:
                     </p>
                     <p className="text-2xl font-bold text-primary">
                       {formatCurrency(totalAguinaldos)}
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {isPeriodPaid(selectedPeriod, payrollRecords)
+                        ? `${getPaidCountForPeriod(selectedPeriod, payrollRecords)} empleados`
+                        : "No pagado aún"}
                     </p>
                   </div>
                 </div>
@@ -365,80 +467,95 @@ const Reports = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {aguinaldoCalculations.map((emp) => (
-                    <TableRow key={emp.id}>
-                      <TableCell className="font-medium">
-                        <div>
-                          <p>{emp.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            DNI: {emp.dni || "N/A"} • {emp.position}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>{formatDate(emp.startDate)}</TableCell>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">
-                            {formatCurrency(emp.aguinaldo.bestSalary || 0)}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {emp.aguinaldo.bestSalaryPeriod || "Sueldo base"}
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {emp.aguinaldo.corresponds ? (
-                          <div className="text-center">
-                            <div className="font-medium">
-                              {emp.aguinaldo.daysWorked}
+                  {aguinaldoCalculations.map((emp) => {
+                    const isPaid = isPeriodPaid(selectedPeriod, payrollRecords);
+                    return (
+                      <TableRow
+                        key={emp.id}
+                        className={
+                          isPaid ? "" : "bg-blue-50 hover:bg-blue-100"
+                        }
+                      >
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <div>
+                              <p>{emp.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                DNI: {emp.dni || "N/A"} • {emp.position}
+                              </p>
                             </div>
-                            <div className="text-xs text-muted-foreground">
-                              de {emp.aguinaldo.totalDays} días
-                            </div>
-                          </div>
-                        ) : (
-                          <span className="text-muted-foreground">-</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {emp.aguinaldo.corresponds ? (
-                          <Badge
-                            variant={
-                              emp.aguinaldo.proportional
-                                ? "secondary"
-                                : "default"
-                            }
-                          >
-                            {emp.aguinaldo.proportional
-                              ? "Proporcional"
-                              : "Completo"}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline">No corresponde</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="font-bold">
-                        {emp.aguinaldo.corresponds ? (
-                          <div>
-                            <div className="text-lg">
-                              {formatCurrency(emp.aguinaldo.amount)}
-                            </div>
-                            {emp.aguinaldo.proportional && (
-                              <div className="text-xs text-muted-foreground">
-                                Completo:{" "}
-                                {formatCurrency(emp.aguinaldo.fullAguinaldo)}
-                              </div>
+                            {!isPaid && (
+                              <Badge variant="secondary" className="text-xs whitespace-nowrap ml-2">
+                                📊 Proyectado
+                              </Badge>
                             )}
                           </div>
-                        ) : (
-                          <span className="text-muted-foreground">$0</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-xs">{emp.aguinaldo.reason}</div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        </TableCell>
+                        <TableCell>{formatDate(emp.startDate)}</TableCell>
+                        <TableCell>
+                          <div>
+                            <div className="font-medium">
+                              {formatCurrency(emp.aguinaldo.bestSalary || 0)}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {emp.aguinaldo.bestSalaryPeriod || "Sueldo base"}
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {emp.aguinaldo.corresponds ? (
+                            <div className="text-center">
+                              <div className="font-medium">
+                                {emp.aguinaldo.daysWorked}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                de {emp.aguinaldo.totalDays} días
+                              </div>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {emp.aguinaldo.corresponds ? (
+                            <Badge
+                              variant={
+                                emp.aguinaldo.proportional
+                                  ? "secondary"
+                                  : "default"
+                              }
+                            >
+                              {emp.aguinaldo.proportional
+                                ? "Proporcional"
+                                : "Completo"}
+                            </Badge>
+                          ) : (
+                            <Badge variant="outline">No corresponde</Badge>
+                          )}
+                        </TableCell>
+                        <TableCell className="font-bold">
+                          {emp.aguinaldo.corresponds ? (
+                            <div>
+                              <div className="text-lg">
+                                {formatCurrency(emp.aguinaldo.amount)}
+                              </div>
+                              {emp.aguinaldo.proportional && (
+                                <div className="text-xs text-muted-foreground">
+                                  Completo:{" "}
+                                  {formatCurrency(emp.aguinaldo.fullAguinaldo)}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">$0</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <div className="text-xs">{emp.aguinaldo.reason}</div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>
@@ -931,6 +1048,152 @@ const Reports = () => {
         isOpen={isMultipleReceiptsReportOpen}
         onClose={() => setIsMultipleReceiptsReportOpen(false)}
       />
+
+      {/* Pre-Generate Aguinaldos Dialog */}
+      <Dialog
+        open={isPreGenerateDialogOpen}
+        onOpenChange={setIsPreGenerateDialogOpen}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pre-generar Aguinaldos</DialogTitle>
+            <DialogDescription>
+              Se crearán registros de liquidación para todos los empleados
+              activos del período seleccionado
+            </DialogDescription>
+          </DialogHeader>
+
+          {!generationResult ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm font-medium text-blue-900">
+                  Período seleccionado:
+                </p>
+                <p className="text-lg font-bold text-blue-600 mt-1">
+                  {generateAguinaldoPeriods().find(
+                    (p) => p.value === selectedPeriod,
+                  )?.label || selectedPeriod}
+                </p>
+                <p className="text-xs text-blue-700 mt-2">
+                  Se generarán registros para{" "}
+                  <strong>{activeEmployees.length} empleados activos</strong>
+                </p>
+              </div>
+
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Los registros se crearán en estado "borrador". Podrás
+                  editarlos antes de confirmar el pago.
+                </AlertDescription>
+              </Alert>
+
+              <div className="flex gap-2 justify-end">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsPreGenerateDialogOpen(false);
+                    setGenerationResult(null);
+                  }}
+                  disabled={isGenerating}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  onClick={handlePreGenerateAguinaldos}
+                  disabled={isGenerating}
+                  className="gap-2"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Generando...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4" />
+                      Generar Ahora
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {generationResult.success ? (
+                <>
+                  <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <CheckCircle2 className="h-6 w-6 text-green-600 flex-shrink-0" />
+                    <div className="text-sm">
+                      <p className="font-medium text-green-900">¡Éxito!</p>
+                      <p className="text-green-700 mt-1">
+                        {generationResult.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-green-100 rounded-lg">
+                    <p className="text-sm text-green-900">
+                      <strong>{generationResult.createdCount}</strong> aguinaldo
+                      {generationResult.createdCount !== 1 ? "s" : ""} generado
+                      {generationResult.createdCount !== 1 ? "s" : ""}
+                      {generationResult.failedCount ? (
+                        <>
+                          <br />
+                          <strong>{generationResult.failedCount}</strong> no pudo
+                          {generationResult.failedCount !== 1 ? "n" : ""} ser
+                          procesado{generationResult.failedCount !== 1 ? "s" : ""}
+                        </>
+                      ) : null}
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      setIsPreGenerateDialogOpen(false);
+                      setGenerationResult(null);
+                    }}
+                    className="w-full"
+                  >
+                    Cerrar
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0" />
+                    <div className="text-sm">
+                      <p className="font-medium text-red-900">Error</p>
+                      <p className="text-red-700 mt-1">
+                        {generationResult.message}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      onClick={() => {
+                        setGenerationResult(null);
+                      }}
+                      variant="outline"
+                    >
+                      Reintentar
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setIsPreGenerateDialogOpen(false);
+                        setGenerationResult(null);
+                      }}
+                    >
+                      Cerrar
+                    </Button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
