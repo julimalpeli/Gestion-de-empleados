@@ -154,9 +154,20 @@ const Reports = () => {
   };
 
   const activeEmployees = employees.filter((emp) => emp.status === "active");
+
+  // Convert monthly period (e.g., "2026-06") to semester period (e.g., "2026-1")
+  const toSemesterPeriod = (monthPeriod: string): string => {
+    const [year, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month, 10);
+    const semester = monthNum <= 6 ? "1" : "2";
+    return `${year}-${semester}`;
+  };
+
+  const semesterPeriod = toSemesterPeriod(selectedPeriod);
+
   const aguinaldoCalculations = activeEmployees.map((emp) => ({
     ...emp,
-    aguinaldo: calculateAguinaldo(emp, selectedPeriod, payrollRecords),
+    aguinaldo: calculateAguinaldo(emp, semesterPeriod, payrollRecords),
   }));
 
   const totalAguinaldos = aguinaldoCalculations.reduce(

@@ -96,10 +96,20 @@ export default function AguinaldoReport() {
     return new Date(dateString + "T00:00:00").toLocaleDateString("es-AR");
   };
 
+  // Convert monthly period (e.g., "2026-06") to semester period (e.g., "2026-1")
+  const toSemesterPeriod = (monthPeriod: string): string => {
+    const [year, month] = monthPeriod.split("-");
+    const monthNum = parseInt(month, 10);
+    const semester = monthNum <= 6 ? "1" : "2";
+    return `${year}-${semester}`;
+  };
+
+  const semesterPeriod = toSemesterPeriod(selectedPeriod);
+
   const reportData: AguinaldoReportRecord[] = employees
     .filter((emp) => emp.status === "active")
     .map((emp) => {
-      const aguinaldoResult = calculateAguinaldo(emp, selectedPeriod, payrollRecords);
+      const aguinaldoResult = calculateAguinaldo(emp, semesterPeriod, payrollRecords);
       const payrollRecord = payrollRecords.find(
         (p) => p.employeeId === emp.id && p.period === selectedPeriod,
       );
