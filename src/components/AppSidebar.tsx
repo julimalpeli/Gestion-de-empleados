@@ -6,6 +6,7 @@ import {
   Shield,
   UserCog,
   LogOut,
+  MailPlus,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -57,6 +58,11 @@ const items: MenuItem[] = [
     title: "Roles y Permisos",
     url: "/roles",
     icon: Shield,
+  },
+  {
+    title: "Recibos",
+    url: "/recibos",
+    icon: MailPlus,
   },
   {
     title: "Gestión de Usuarios",

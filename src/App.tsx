@@ -68,6 +68,7 @@ import Payroll from "./pages/Payroll";
 import Reports from "./pages/Reports";
 import UserRoles from "./pages/UserRoles";
 import UserManagement from "./pages/UserManagement";
+import Recibos from "./pages/Recibos";
 import EmployeePortal from "./pages/EmployeePortal";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
@@ -249,6 +250,21 @@ const AppContent = () => {
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
                       <UserManagement />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Recibos - Envío automático de recibos */}
+            <Route
+              path="/recibos"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Recibos />
                     </main>
                   </SidebarProvider>
                 </ProtectedRoute>
