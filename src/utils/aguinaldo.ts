@@ -187,14 +187,15 @@ export const calculateAguinaldo = (
           ? salaryCalculations.indexOf(maxHistoricalSalary)
           : -1;
 
-      const baseSalary = employee.sueldoBase || 0;
-
-      if (maxSalaryIndex >= 0 && maxHistoricalSalary > baseSalary) {
+      // ✅ CORRECCIÓN: Usar SIEMPRE el máximo de los payrolls si existen
+      // No comparar con sueldoBase - si hay payrolls, usarlos
+      if (maxSalaryIndex >= 0) {
         bestSalary = maxHistoricalSalary;
         bestSalaryPeriod = relevantPayrolls[maxSalaryIndex].period;
       } else {
-        bestSalary = baseSalary;
-        bestSalaryPeriod = "Sueldo base";
+        // Solo usar sueldoBase si NO hay payrolls en el semestre
+        bestSalary = employee.sueldoBase || 0;
+        bestSalaryPeriod = "Sueldo base (sin registros en semestre)";
       }
 
       console.log(
