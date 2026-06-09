@@ -43,7 +43,7 @@ class EmployeeMatcher:
             
             # Query employees table
             response = supabase.table("employees").select(
-                "id, name, email, phone, cuil, dni"
+                "id, name, email, cuil, dni"
             ).eq("cuil", cuil).execute()
             
             if response.data and len(response.data) > 0:
@@ -77,7 +77,7 @@ class EmployeeMatcher:
             
             # Query employees table
             response = supabase.table("employees").select(
-                "id, name, email, phone, cuil, dni"
+                "id, name, email, cuil, dni"
             ).eq("dni", dni).execute()
             
             if response.data and len(response.data) > 0:
@@ -171,7 +171,7 @@ class EmployeeMatcher:
         try:
             supabase = cls._get_supabase()
             response = supabase.table("employees").select(
-                "id, name, email, phone, cuil, dni"
+                "id, name, email, cuil, dni"
             ).execute()
             
             return response.data if response.data else []

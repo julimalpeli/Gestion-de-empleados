@@ -37,7 +37,6 @@ class EmployeeMatch(BaseModel):
     email: Optional[str]
     cuil: Optional[str]
     dni: Optional[str]
-    phone: Optional[str]
 
 class PreviewReceipt(BaseModel):
     """Preview of receipt before sending"""

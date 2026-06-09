@@ -8,7 +8,6 @@ export interface EmployeeMatch {
   email?: string;
   cuil?: string;
   dni?: string;
-  phone?: string;
 }
 
 export interface ProcessedReceipt {
