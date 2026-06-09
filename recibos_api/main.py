@@ -14,17 +14,15 @@ app = FastAPI(
 )
 
 # Configure CORS
-origins = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:8080",
-    os.getenv("FRONTEND_URL", "http://localhost:5173")
-]
+# allow_origins=["*"] works for Fly.io + Builder.io cloud environments.
+# If ALLOWED_ORIGINS is set (comma-separated), use that list instead.
+_raw_origins = os.getenv("ALLOWED_ORIGINS", "")
+origins = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_origins else ["*"]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
+    allow_credentials=origins != ["*"],  # credentials can't be used with wildcard
     allow_methods=["*"],
     allow_headers=["*"],
 )
