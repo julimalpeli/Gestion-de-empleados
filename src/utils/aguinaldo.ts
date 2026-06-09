@@ -150,31 +150,30 @@ export const calculateAguinaldo = (
     // If there are payrolls in the semester, find the best one
     if (relevantPayrolls.length > 0) {
       const salaryCalculations = relevantPayrolls.map((payroll) => {
-        const depositoAmount = payroll.whiteAmount || 0;
-        const efectivoAmount = payroll.informalAmount || 0;
-        const presentismoAmount = payroll.presentismoAmount || 0;
-        const aguinaldoAmount = payroll.aguinaldo || 0;
+        // ✅ FORMULA CORRECTA: SOLO sueldo base + feriados + horas extras
+        // NO incluir: antigüedad, presentismo, adicionales, bonificaciones
+        const baseAmount = payroll.whiteAmount || 0;
+        const holidayBonusAmount = payroll.holidayBonus || 0;
+        const overtimeAmount = payroll.overtimeAmount || 0;
 
-        const totalPaid = depositoAmount + efectivoAmount;
-        const excludedConcepts = presentismoAmount + aguinaldoAmount;
-        const adjustedSalary = Math.max(totalPaid - excludedConcepts, 0);
+        const adjustedSalary = baseAmount + holidayBonusAmount + overtimeAmount;
 
         if (
           employee.name?.includes("Daiana") ||
           employee.name?.includes("Porras") ||
           employee.name?.includes("Carlos") ||
-          employee.name?.includes("Bustamante")
+          employee.name?.includes("Bustamante") ||
+          employee.name?.includes("Gutierrez") ||
+          employee.name?.includes("Amprimo")
         ) {
           console.log(`🔍 Aguinaldo debug para ${employee.name}:`, {
             period: payroll.period,
-            depositoAmount,
-            efectivoAmount,
-            presentismoAmount,
-            aguinaldoAmount,
-            totalPaid,
-            excludedConcepts,
+            baseAmount,
+            holidayBonusAmount,
+            overtimeAmount,
             bestSalaryForAguinaldo: adjustedSalary,
-            formula: "(depósito + efectivo) - (presentismo + aguinaldo)",
+            formula: "SOLO: sueldo base + feriados + horas extras",
+            excluded: "antigüedad, presentismo, adicionales, bonificaciones",
           });
         }
 
