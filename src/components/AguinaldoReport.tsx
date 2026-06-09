@@ -30,11 +30,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Download, DollarSign, Info } from "lucide-react";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useEmployees } from "@/hooks/use-employees";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
+import { generateAguinaldoPeriods } from "@/utils/preGenerateAguinaldos";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
@@ -57,7 +58,16 @@ interface AguinaldoReportRecord {
 export default function AguinaldoReport() {
   const { employees, loading: employeesLoading } = useEmployees();
   const { payrollRecords, loading: payrollLoading } = usePayroll();
-  const [selectedPeriod, setSelectedPeriod] = useState("2025-2");
+
+  // Generate available aguinaldo periods dynamically
+  const aguinaldoPeriods = useMemo(
+    () => generateAguinaldoPeriods(payrollRecords),
+    [payrollRecords]
+  );
+
+  // Set initial period to the most recent one, or fallback to hardcoded default
+  const initialPeriod = aguinaldoPeriods.length > 0 ? aguinaldoPeriods[0].value : "2025-2";
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod);
 
   // Debug: Log loaded payroll records to verify aguinaldo split data
   useEffect(() => {
@@ -304,10 +314,17 @@ export default function AguinaldoReport() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="2024-1">Primer Semestre 2024</SelectItem>
-                  <SelectItem value="2024-2">Segundo Semestre 2024</SelectItem>
-                  <SelectItem value="2025-1">Primer Semestre 2025</SelectItem>
-                  <SelectItem value="2025-2">Segundo Semestre 2025</SelectItem>
+                  {aguinaldoPeriods.length > 0 ? (
+                    aguinaldoPeriods.map((period) => (
+                      <SelectItem key={period.value} value={period.value}>
+                        {period.label}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      No hay períodos de aguinaldo disponibles
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Card,
   CardContent,
@@ -43,6 +43,7 @@ import AguinaldoReport from "@/components/AguinaldoReport";
 import { useEmployees } from "@/hooks/use-employees";
 import { usePayroll } from "@/hooks/use-payroll";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
+import { generateAguinaldoPeriods } from "@/utils/preGenerateAguinaldos";
 
 // Mock employees data - COMENTADO porque ahora usamos Supabase
 /* const mockEmployees = [
@@ -109,8 +110,6 @@ import { calculateAguinaldo } from "@/utils/aguinaldo";
 ]; */
 
 const Reports = () => {
-  const [selectedPeriod, setSelectedPeriod] = useState("2024-2");
-
   // Usar hooks de Supabase
   const {
     employees,
@@ -123,6 +122,17 @@ const Reports = () => {
     loading: payrollLoading,
     error: payrollError,
   } = usePayroll();
+
+  // Generate available aguinaldo periods dynamically
+  const aguinaldoPeriods = useMemo(
+    () => generateAguinaldoPeriods(payrollRecords),
+    [payrollRecords]
+  );
+
+  // Set initial period to the most recent one, or fallback to hardcoded default
+  const initialPeriod = aguinaldoPeriods.length > 0 ? aguinaldoPeriods[0].value : "2025-2";
+  const [selectedPeriod, setSelectedPeriod] = useState(initialPeriod);
+
   const [isLiquidationsReportOpen, setIsLiquidationsReportOpen] =
     useState(false);
   const [isSimpleLiquidationsReportOpen, setIsSimpleLiquidationsReportOpen] =
@@ -291,18 +301,17 @@ const Reports = () => {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="2024-1">
-                        Primer Semestre 2024
-                      </SelectItem>
-                      <SelectItem value="2024-2">
-                        Segundo Semestre 2024
-                      </SelectItem>
-                      <SelectItem value="2025-1">
-                        Primer Semestre 2025
-                      </SelectItem>
-                      <SelectItem value="2025-2">
-                        Segundo Semestre 2025
-                      </SelectItem>
+                      {aguinaldoPeriods.length > 0 ? (
+                        aguinaldoPeriods.map((period) => (
+                          <SelectItem key={period.value} value={period.value}>
+                            {period.label}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="" disabled>
+                          No hay períodos de aguinaldo disponibles
+                        </SelectItem>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
