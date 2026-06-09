@@ -128,6 +128,12 @@ export const calculateAguinaldo = (
       {
         employeeId: employee.id,
         periods: employeePayrolls.map((p) => p.period),
+        semester: period,
+        payrollDetails: employeePayrolls.map((p) => ({
+          period: p.period,
+          baseAmount: p.baseAmount,
+          holidayBonus: p.holidayBonus,
+        })),
       }
     );
   }
