@@ -3,13 +3,14 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { Upload, ScanSearch, Eye, CheckCircle, Send, WifiOff } from "lucide-react";
+import { Upload, ScanSearch, Eye, CheckCircle, Send, WifiOff, AlertTriangle } from "lucide-react";
 import { useRecibosWorkflow } from "@/hooks/useRecibosWorkflow";
 import { UploadStep } from "@/components/steps/UploadStep";
 import { PreviewStep } from "@/components/steps/PreviewStep";
 import { ConfirmStep } from "@/components/steps/ConfirmStep";
 import { SendStep } from "@/components/steps/SendStep";
 import { checkApiHealth } from "@/services/recibosService";
+import type { ApiStatus } from "@/services/recibosService";
 import type { WorkflowStep } from "@/types/recibos";
 
 const STEPS: { id: WorkflowStep; label: string; icon: React.ElementType }[] = [
@@ -21,7 +22,7 @@ const STEPS: { id: WorkflowStep; label: string; icon: React.ElementType }[] = [
 ];
 
 export default function Recibos() {
-  const [apiOnline, setApiOnline] = useState<boolean | null>(null);
+  const [apiStatus, setApiStatus] = useState<ApiStatus | null>(null);
   // Local file state, isolated from the workflow hook so reset works cleanly
   const [localFiles, setLocalFiles] = useState<File[]>([]);
 
@@ -44,7 +45,7 @@ export default function Recibos() {
 
   // Check if Python API is reachable on mount
   useEffect(() => {
-    checkApiHealth().then(setApiOnline);
+    checkApiHealth().then(setApiStatus);
   }, []);
 
   return (
@@ -58,32 +59,54 @@ export default function Recibos() {
             Procesá y enviá recibos de sueldo por email a los empleados
           </p>
         </div>
-        {apiOnline === false && (
-          <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-200 gap-1">
+
+        {apiStatus === null && (
+          <Badge variant="outline" className="text-muted-foreground">
+            Verificando API…
+          </Badge>
+        )}
+        {apiStatus === "online" && (
+          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+            ✓ API conectada
+          </Badge>
+        )}
+        {apiStatus === "cors-error" && (
+          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200 gap-1">
+            <AlertTriangle className="h-3 w-3" />
+            API online · CORS pendiente
+          </Badge>
+        )}
+        {apiStatus === "offline" && (
+          <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 gap-1">
             <WifiOff className="h-3 w-3" />
             API offline
           </Badge>
         )}
-        {apiOnline === true && (
-          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-            API conectada
-          </Badge>
-        )}
       </div>
 
-      {/* API offline banner */}
-      {apiOnline === false && (
+      {/* CORS error banner */}
+      {apiStatus === "cors-error" && (
         <Alert>
+          <AlertTriangle className="h-4 w-4" />
+          <AlertDescription>
+            La API está online pero falta configurar CORS. Ejecutá{" "}
+            <code className="text-xs bg-muted px-1 py-0.5 rounded">fly deploy</code>{" "}
+            desde tu terminal para aplicar la corrección. Mientras tanto, la carga de PDFs
+            puede fallar desde el browser.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* API offline banner */}
+      {apiStatus === "offline" && (
+        <Alert variant="destructive">
           <WifiOff className="h-4 w-4" />
           <AlertDescription>
-            La API de procesamiento de recibos no está disponible en{" "}
+            La API no responde en{" "}
             <code className="text-xs bg-muted px-1 py-0.5 rounded">
               {import.meta.env.VITE_RECIBOS_API_URL || "http://localhost:8000"}
             </code>
-            . Para usar este módulo, iniciá el backend Python:{" "}
-            <code className="text-xs bg-muted px-1 py-0.5 rounded">
-              docker-compose up -d
-            </code>
+            . Verificá que el servidor esté corriendo.
           </AlertDescription>
         </Alert>
       )}

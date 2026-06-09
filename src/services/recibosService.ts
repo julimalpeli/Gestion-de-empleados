@@ -10,16 +10,44 @@ async function handleResponse<T>(res: Response): Promise<T> {
   return res.json();
 }
 
+export type ApiStatus = "online" | "cors-error" | "offline";
+
 /**
- * Check if the Python API is reachable
+ * Check if the Python API is reachable.
+ * Returns:
+ *  - "online"     → server up + CORS configured correctly
+ *  - "cors-error" → server up but CORS blocks browser requests
+ *  - "offline"    → server unreachable
  */
-export async function checkApiHealth(): Promise<boolean> {
+export async function checkApiHealth(): Promise<ApiStatus> {
+  // 1. Try a normal CORS request
   try {
-    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(3000) });
-    return res.ok;
+    const res = await fetch(`${API_BASE}/health`, {
+      signal: AbortSignal.timeout(5000),
+      mode: "cors",
+    });
+    if (res.ok) return "online";
   } catch {
-    return false;
+    // CORS or network error — continue to step 2
   }
+
+  // 2. Try no-cors to detect if the server is at least reachable
+  try {
+    await fetch(`${API_BASE}/health`, {
+      signal: AbortSignal.timeout(5000),
+      mode: "no-cors",
+    });
+    // Opaque response → server responded, CORS is the only issue
+    return "cors-error";
+  } catch {
+    return "offline";
+  }
+}
+
+/** @deprecated use checkApiHealth() which returns ApiStatus */
+export async function checkApiHealthBool(): Promise<boolean> {
+  const s = await checkApiHealth();
+  return s === "online";
 }
 
 /**
