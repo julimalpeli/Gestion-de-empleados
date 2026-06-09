@@ -117,6 +117,21 @@ export const calculateAguinaldo = (
     (p) => p.employeeId === employee.id,
   );
 
+  // 🔍 DEBUG: Log how many payrolls were loaded
+  if (
+    employee.name?.includes("Tablar") ||
+    employee.name?.includes("Amprimo") ||
+    employee.name?.includes("Gutierrez")
+  ) {
+    console.log(
+      `👤 Employee: ${employee.name}, Total payrolls loaded: ${employeePayrolls.length}`,
+      {
+        employeeId: employee.id,
+        periods: employeePayrolls.map((p) => p.period),
+      }
+    );
+  }
+
   let bestSalary = employee.sueldoBase || 0;
   let bestSalaryPeriod = "Sueldo base";
 
@@ -137,10 +152,28 @@ export const calculateAguinaldo = (
         return false;
       }
       const recordDate = new Date(recordYear, recordMonth - 1, 1);
-      return (
+      const isInSemester =
         recordDate.getTime() >= semesterStart.getTime() &&
-        recordDate.getTime() <= semesterEnd.getTime()
-      );
+        recordDate.getTime() <= semesterEnd.getTime();
+
+      // 🔍 DEBUG: Log payroll filtering
+      if (
+        employee.name?.includes("Tablar") ||
+        employee.name?.includes("Amprimo") ||
+        employee.name?.includes("Gutierrez")
+      ) {
+        console.log(`📋 Checking payroll for ${employee.name}:`, {
+          payrollPeriod: payroll.period,
+          recordYear,
+          recordMonth,
+          recordDate: recordDate.toLocaleDateString("es-AR"),
+          semesterStart: semesterStart.toLocaleDateString("es-AR"),
+          semesterEnd: semesterEnd.toLocaleDateString("es-AR"),
+          isInSemester,
+        });
+      }
+
+      return isInSemester;
     });
 
     // ⚠️ CRITICAL: Only use payrolls from CURRENT semester
