@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  recibos-api:
+    build:
+      context: .
+      dockerfile: recibos_api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+    volumes:
+      - ./recibos_api:/app/recibos_api
+    command: uvicorn recibos_api.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - recibos-network
+
+networks:
+  recibos-network:
+    driver: bridge
