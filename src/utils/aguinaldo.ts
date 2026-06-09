@@ -185,7 +185,8 @@ export const calculateAguinaldo = (
       const salaryCalculations = relevantPayrolls.map((payroll) => {
         // ✅ FORMULA CORRECTA: SOLO sueldo base + feriados + horas extras
         // NO incluir: antigüedad, presentismo, adicionales, bonificaciones
-        const baseAmount = payroll.whiteAmount || 0;
+        // Nota: baseAmount incluye el sueldo base sin importar si se pagó en depósito o efectivo
+        const baseAmount = payroll.baseAmount || 0;
         const holidayBonusAmount = payroll.holidayBonus || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
 
@@ -205,8 +206,8 @@ export const calculateAguinaldo = (
             holidayBonusAmount,
             overtimeAmount,
             bestSalaryForAguinaldo: adjustedSalary,
-            formula: "SOLO: sueldo base + feriados + horas extras",
-            excluded: "antigüedad, presentismo, adicionales, bonificaciones",
+            formula: "SOLO: baseAmount (sueldo base) + feriados + horas extras",
+            excluded: "antigüedad, presentismo, adicionales, bonificaciones, white/informal split",
           });
         }
 
