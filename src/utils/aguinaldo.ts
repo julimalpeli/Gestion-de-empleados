@@ -143,77 +143,89 @@ export const calculateAguinaldo = (
       );
     });
 
-    const relevantPayrolls =
-      payrollsInSemester.length > 0 ? payrollsInSemester : employeePayrolls;
+    // ⚠️ CRITICAL: Only use payrolls from CURRENT semester
+    // Do NOT fall back to older periods - that would violate SAC calculation rules
+    const relevantPayrolls = payrollsInSemester;
 
-    const salaryCalculations = relevantPayrolls.map((payroll) => {
-      const depositoAmount = payroll.whiteAmount || 0;
-      const efectivoAmount = payroll.informalAmount || 0;
-      const presentismoAmount = payroll.presentismoAmount || 0;
-      const aguinaldoAmount = payroll.aguinaldo || 0;
+    // If there are payrolls in the semester, find the best one
+    if (relevantPayrolls.length > 0) {
+      const salaryCalculations = relevantPayrolls.map((payroll) => {
+        const depositoAmount = payroll.whiteAmount || 0;
+        const efectivoAmount = payroll.informalAmount || 0;
+        const presentismoAmount = payroll.presentismoAmount || 0;
+        const aguinaldoAmount = payroll.aguinaldo || 0;
 
-      const totalPaid = depositoAmount + efectivoAmount;
-      const excludedConcepts = presentismoAmount + aguinaldoAmount;
-      const adjustedSalary = Math.max(totalPaid - excludedConcepts, 0);
+        const totalPaid = depositoAmount + efectivoAmount;
+        const excludedConcepts = presentismoAmount + aguinaldoAmount;
+        const adjustedSalary = Math.max(totalPaid - excludedConcepts, 0);
 
-      if (
-        employee.name?.includes("Daiana") ||
-        employee.name?.includes("Porras") ||
-        employee.name?.includes("Carlos") ||
-        employee.name?.includes("Bustamante")
-      ) {
-        console.log(`🔍 Aguinaldo debug para ${employee.name}:`, {
-          period: payroll.period,
-          depositoAmount,
-          efectivoAmount,
-          presentismoAmount,
-          aguinaldoAmount,
-          totalPaid,
-          excludedConcepts,
-          bestSalaryForAguinaldo: adjustedSalary,
-          formula: "(depósito + efectivo) - (presentismo + aguinaldo)",
-        });
+        if (
+          employee.name?.includes("Daiana") ||
+          employee.name?.includes("Porras") ||
+          employee.name?.includes("Carlos") ||
+          employee.name?.includes("Bustamante")
+        ) {
+          console.log(`🔍 Aguinaldo debug para ${employee.name}:`, {
+            period: payroll.period,
+            depositoAmount,
+            efectivoAmount,
+            presentismoAmount,
+            aguinaldoAmount,
+            totalPaid,
+            excludedConcepts,
+            bestSalaryForAguinaldo: adjustedSalary,
+            formula: "(depósito + efectivo) - (presentismo + aguinaldo)",
+          });
+        }
+
+        return adjustedSalary;
+      });
+
+      const maxHistoricalSalary =
+        salaryCalculations.length > 0 ? Math.max(...salaryCalculations) : 0;
+      const maxSalaryIndex =
+        salaryCalculations.length > 0
+          ? salaryCalculations.indexOf(maxHistoricalSalary)
+          : -1;
+
+      const baseSalary = employee.sueldoBase || 0;
+
+      if (maxSalaryIndex >= 0 && maxHistoricalSalary > baseSalary) {
+        bestSalary = maxHistoricalSalary;
+        bestSalaryPeriod = relevantPayrolls[maxSalaryIndex].period;
+      } else {
+        bestSalary = baseSalary;
+        bestSalaryPeriod = "Sueldo base";
       }
 
-      return adjustedSalary;
-    });
-
-    const maxHistoricalSalary =
-      salaryCalculations.length > 0 ? Math.max(...salaryCalculations) : 0;
-    const maxSalaryIndex =
-      salaryCalculations.length > 0
-        ? salaryCalculations.indexOf(maxHistoricalSalary)
-        : -1;
-
-    const baseSalary = employee.sueldoBase || 0;
-
-    if (maxSalaryIndex >= 0 && maxHistoricalSalary > baseSalary) {
-      bestSalary = maxHistoricalSalary;
-      bestSalaryPeriod = relevantPayrolls[maxSalaryIndex].period;
+      console.log(
+        `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
+        {
+          baseSalary: employee.sueldoBase || 0,
+          salaryTotalsInRange: salaryCalculations,
+          maxHistoricalSalary,
+          maxSalaryIndex,
+          bestPeriod: bestSalaryPeriod,
+          consideredPayrolls: relevantPayrolls.map((p) => ({
+            period: p.period,
+            amount: Math.max(
+              (p.whiteAmount || 0) +
+                (p.informalAmount || 0) -
+                ((p.presentismoAmount || 0) + (p.aguinaldo || 0)),
+              0,
+            ),
+          })),
+        },
+      );
     } else {
-      bestSalary = baseSalary;
-      bestSalaryPeriod = "Sueldo base";
-    }
+      // No payrolls in this semester - use base salary and flag it
+      bestSalary = employee.sueldoBase || 0;
+      bestSalaryPeriod = "Sueldo base (sin registros en semestre)";
 
-    console.log(
-      `🎯 Mejor sueldo calculado para ${employee.name}: ${bestSalary}`,
-      {
-        baseSalary: employee.sueldoBase || 0,
-        salaryTotalsInRange: salaryCalculations,
-        maxHistoricalSalary,
-        maxSalaryIndex,
-        bestPeriod: bestSalaryPeriod,
-        consideredPayrolls: relevantPayrolls.map((p) => ({
-          period: p.period,
-          amount: Math.max(
-            (p.whiteAmount || 0) +
-              (p.informalAmount || 0) -
-              ((p.presentismoAmount || 0) + (p.aguinaldo || 0)),
-            0,
-          ),
-        })),
-      },
-    );
+      console.warn(
+        `⚠️ No payroll records found for ${employee.name} in semester ${period}. Using base salary.`,
+      );
+    }
   }
 
   const fullAguinaldo = (bestSalary / 12) * 6;
@@ -221,6 +233,14 @@ export const calculateAguinaldo = (
 
   const isProportional = daysWorked < totalSemesterDays;
   const finalAmount = isProportional ? proportionalAguinaldo : fullAguinaldo;
+
+  // Generate descriptive reason
+  let reason = "";
+  if (isProportional) {
+    reason = `Aguinaldo proporcional: ${daysWorked} días de ${totalSemesterDays} (fórmula: mejor sueldo/12 × días/30)`;
+  } else {
+    reason = `Aguinaldo completo: ${totalSemesterDays} días trabajados (fórmula: mejor sueldo/12 × 6)`;
+  }
 
   return {
     corresponds: true,
@@ -231,8 +251,6 @@ export const calculateAguinaldo = (
     bestSalary,
     bestSalaryPeriod,
     fullAguinaldo: Math.round(fullAguinaldo),
-    reason: isProportional
-      ? "Aguinaldo proporcional por días trabajados"
-      : "Aguinaldo completo",
+    reason,
   };
 };
