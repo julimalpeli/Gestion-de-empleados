@@ -92,17 +92,32 @@ class EmployeeMatcher:
             logger.error(f"Error matching employee by DNI: {str(e)}")
             return None
     
+    @staticmethod
+    def extract_dni_from_cuil(cuil: str) -> Optional[str]:
+        """
+        Extract the DNI from a CUIL number.
+        CUIL format: XX-XXXXXXXX-X (11 digits total)
+        The 8-digit DNI is at positions 2–9 (0-indexed).
+        Example: 27445867778 → DNI = 44586777
+        """
+        clean = cuil.replace("-", "").replace(" ", "")
+        if len(clean) == 11 and clean.isdigit():
+            return clean[2:10]
+        return None
+
     @classmethod
     async def match_by_cuil_or_dni(
-        cls, 
-        cuil: Optional[str] = None, 
+        cls,
+        cuil: Optional[str] = None,
         dni: Optional[str] = None
     ) -> Optional[Dict]:
         """
-        Match employee by CUIL first, then fallback to DNI
-        
+        Match employee by CUIL first, then fallback to DNI.
+        If CUIL is provided but no direct match found, extracts the DNI
+        embedded in the CUIL (positions 2–9) and tries again.
+
         This is the primary method to use for employee matching
-        
+
         Args:
             cuil: CUIL string
             dni: DNI string (fallback)
@@ -110,18 +125,38 @@ class EmployeeMatcher:
         Returns:
             Employee data if found, None otherwise
         """
-        # Try CUIL first
+        # 1. Try CUIL directly
         if cuil:
             employee = await cls.match_by_cuil(cuil)
             if employee:
                 return employee
-        
-        # Fallback to DNI
+
+        # 2. Try explicit DNI from text
         if dni:
             employee = await cls.match_by_dni(dni)
             if employee:
                 return employee
-        
+
+        # 3. Derive DNI from CUIL (CUIL = XX + DNI[8 digits] + verifier)
+        #    This covers the common case where employees have no cuil loaded yet
+        if cuil:
+            dni_from_cuil = cls.extract_dni_from_cuil(cuil)
+            if dni_from_cuil and dni_from_cuil != dni:
+                logger.info(f"Trying DNI derived from CUIL: {dni_from_cuil}")
+                employee = await cls.match_by_dni(dni_from_cuil)
+                if employee:
+                    # Also save the CUIL on the employee record for future lookups
+                    try:
+                        supabase = cls._get_supabase()
+                        supabase.table("employees").update(
+                            {"cuil": cuil}
+                        ).eq("id", employee["id"]).execute()
+                        employee["cuil"] = cuil
+                        logger.info(f"Auto-saved CUIL {cuil} for employee {employee['id']}")
+                    except Exception as e:
+                        logger.warning(f"Could not auto-save CUIL: {e}")
+                    return employee
+
         logger.warning(f"No employee found for CUIL={cuil}, DNI={dni}")
         return None
     
