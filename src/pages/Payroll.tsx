@@ -952,7 +952,7 @@ const Payroll = () => {
                 </Button>
               </DialogTrigger>
             </PermissionGate>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="flex flex-col max-w-4xl max-h-[85dvh] overflow-hidden">
               <DialogHeader>
                 <DialogTitle>
                   {editingRecord && !isEditMode
@@ -1387,7 +1387,7 @@ const Payroll = () => {
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-4">
+              <div className="sticky bottom-0 -mx-4 sm:-mx-6 mt-4 flex gap-2 border-t bg-background px-4 sm:px-6 pt-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
                 {/* Solo mostrar botón de guardar si no es solo lectura */}
                 {(isEditMode || !editingRecord) && (
                   <Button
