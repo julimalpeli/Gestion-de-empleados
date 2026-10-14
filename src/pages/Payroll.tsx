@@ -45,6 +45,15 @@ import {
 } from "@/utils/receiptGenerator";
 import { calculateAguinaldo } from "@/utils/aguinaldo";
 import {
+  calculatePayrollAmounts,
+  getNextPayrollStatus,
+  isAguinaldoPeriod,
+  PAYROLL_STATUS_LABELS,
+  toSemesterPeriod,
+} from "@/utils/payrollCalculation";
+import BulkPayrollDialog from "@/components/BulkPayrollDialog";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
   Plus,
   Calculator,
   DollarSign,
@@ -127,6 +136,8 @@ const Payroll = () => {
   const [isPayrollDocManagerOpen, setIsPayrollDocManagerOpen] = useState(false);
   const [selectedPayrollRecord, setSelectedPayrollRecord] = useState(null);
   const [selectedEmployeeForDocs, setSelectedEmployeeForDocs] = useState(null);
+  const [isBulkCreateOpen, setIsBulkCreateOpen] = useState(false);
+  const [selectedRecordIds, setSelectedRecordIds] = useState<string[]>([]);
 
   // Estado para valores históricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
@@ -138,7 +149,9 @@ const Payroll = () => {
     error: payrollError,
     getExistingPayrollRecord,
     createPayrollRecord,
+    createPayrollRecordsBulk,
     updatePayrollRecord,
+    updatePayrollStatusBulk,
     deletePayrollRecord,
   } = usePayroll();
 
@@ -867,6 +880,48 @@ const Payroll = () => {
     );
   }
 
+  const selectedRecords = filteredRecords.filter((record) =>
+    selectedRecordIds.includes(record.id),
+  );
+  const bulkCurrentStatus = selectedRecords[0]?.status;
+  const bulkNextStatus =
+    bulkCurrentStatus &&
+    selectedRecords.every((record) => record.status === bulkCurrentStatus)
+      ? getNextPayrollStatus(bulkCurrentStatus)
+      : null;
+  const canBulkAdvance =
+    !!bulkNextStatus &&
+    (bulkCurrentStatus === "draft"
+      ? hasPermission("payroll", "edit")
+      : isManager());
+
+  const handleBulkAdvance = async () => {
+    if (!bulkNextStatus || !canBulkAdvance) return;
+    if (
+      bulkNextStatus === "paid" &&
+      !confirm(
+        `¿Confirma que desea marcar ${selectedRecords.length} liquidaciones como pagadas? Esta acción no se puede deshacer.`,
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await updatePayrollStatusBulk(
+        selectedRecords.map((record) => record.id),
+        bulkNextStatus,
+      );
+      setSelectedRecordIds([]);
+      setSuccessMessage(
+        `${selectedRecords.length} liquidaciones actualizadas a estado: ${PAYROLL_STATUS_LABELS[bulkNextStatus]}`,
+      );
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error("Error updating payroll statuses:", error);
+      alert(`Error al actualizar las liquidaciones: ${error.message}`);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-6 p-6">
       {/* Header */}
@@ -881,478 +936,497 @@ const Payroll = () => {
           </div>
         </div>
 
-        <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
+        <div className="flex gap-2">
           <PermissionGate module="payroll" action="create">
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Nueva Liquidación
-              </Button>
-            </DialogTrigger>
+            <Button variant="outline" onClick={() => setIsBulkCreateOpen(true)}>
+              <Users className="h-4 w-4 mr-2" />
+              Liquidación masiva
+            </Button>
           </PermissionGate>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>
-                {editingRecord && !isEditMode
-                  ? "Ver Liquidación"
-                  : isEditMode
-                    ? "Editar Liquidación"
-                    : "Nueva Liquidación"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingRecord && !isEditMode
-                  ? "Detalles de la liquidación (solo lectura)"
-                  : isEditMode
-                    ? "Modifica los datos de la liquidación existente"
-                    : "Completa los datos para crear una nueva liquidación"}
-              </DialogDescription>
-            </DialogHeader>
+          <Dialog open={isNewPayrollOpen} onOpenChange={setIsNewPayrollOpen}>
+            <PermissionGate module="payroll" action="create">
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nueva Liquidación
+                </Button>
+              </DialogTrigger>
+            </PermissionGate>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>
+                  {editingRecord && !isEditMode
+                    ? "Ver Liquidación"
+                    : isEditMode
+                      ? "Editar Liquidación"
+                      : "Nueva Liquidación"}
+                </DialogTitle>
+                <DialogDescription>
+                  {editingRecord && !isEditMode
+                    ? "Detalles de la liquidación (solo lectura)"
+                    : isEditMode
+                      ? "Modifica los datos de la liquidación existente"
+                      : "Completa los datos para crear una nueva liquidación"}
+                </DialogDescription>
+              </DialogHeader>
 
-            <div className="grid gap-6 py-4 lg:grid-cols-2">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="employee">
-                    Empleado <span className="text-red-500">*</span>
-                  </Label>
-                  <Select
-                    value={selectedEmployee}
-                    onValueChange={setSelectedEmployee}
-                    disabled={isEditMode || (editingRecord && !isEditMode)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar empleado" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {employees
-                        .filter((emp) => emp.status === "active")
-                        .map((employee) => (
-                          <SelectItem
-                            key={employee.id}
-                            value={employee.id.toString()}
-                          >
-                            {employee.name} - {employee.position}
-                          </SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
-                  {selectedEmployee && (
-                    <p className="text-xs text-muted-foreground">
-                      Sueldo diario:{" "}
-                      {(() => {
-                        const emp = employees.find(
-                          (e) => e.id.toString() === selectedEmployee,
-                        );
-                        let daily = (emp?.sueldoBase || 0) / 30;
+              <div className="grid gap-6 py-4 lg:grid-cols-2">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="employee">
+                      Empleado <span className="text-red-500">*</span>
+                    </Label>
+                    <Select
+                      value={selectedEmployee}
+                      onValueChange={setSelectedEmployee}
+                      disabled={isEditMode || (editingRecord && !isEditMode)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Seleccionar empleado" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees
+                          .filter((emp) => emp.status === "active")
+                          .map((employee) => (
+                            <SelectItem
+                              key={employee.id}
+                              value={employee.id.toString()}
+                            >
+                              {employee.name} - {employee.position}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                    {selectedEmployee && (
+                      <p className="text-xs text-muted-foreground">
+                        Sueldo diario:{" "}
+                        {(() => {
+                          const emp = employees.find(
+                            (e) => e.id.toString() === selectedEmployee,
+                          );
+                          let daily = (emp?.sueldoBase || 0) / 30;
 
-                        if (editingRecord && editingRecord.baseAmount != null) {
-                          const baseDays = editingRecord.baseDays || 0;
-                          if (baseDays > 0) {
-                            daily = editingRecord.baseAmount / baseDays;
+                          if (editingRecord && editingRecord.baseAmount != null) {
+                            const baseDays = editingRecord.baseDays || 0;
+                            if (baseDays > 0) {
+                              daily = editingRecord.baseAmount / baseDays;
+                            }
+                          } else if (
+                            historicalSalary &&
+                            historicalSalary.white_wage !== undefined &&
+                            historicalSalary.informal_wage !== undefined
+                          ) {
+                            daily =
+                              (historicalSalary.white_wage +
+                                historicalSalary.informal_wage) /
+                                30;
                           }
-                        } else if (
-                          historicalSalary &&
-                          historicalSalary.white_wage !== undefined &&
-                          historicalSalary.informal_wage !== undefined
-                        ) {
-                          daily =
-                            (historicalSalary.white_wage +
-                              historicalSalary.informal_wage) /
-                              30;
-                        }
 
-                        return formatCurrency(daily);
-                      })()}
-                    </p>
-                  )}
-                </div>
+                          return formatCurrency(daily);
+                        })()}
+                      </p>
+                    )}
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="period">
-                    Período <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="period"
-                    type="month"
-                    value={selectedPeriod}
-                    onChange={(e) => setSelectedPeriod(e.target.value)}
-                    disabled={isEditMode || (editingRecord && !isEditMode)}
-                  />
-                  {selectedPeriod && isAguinaldoPeriod(selectedPeriod) && (
-                    <p className="text-xs text-green-600">
-                      ✨ Período con aguinaldo (SAC)
-                    </p>
-                  )}
-                </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="period">
+                      Período <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="period"
+                      type="month"
+                      value={selectedPeriod}
+                      onChange={(e) => setSelectedPeriod(e.target.value)}
+                      disabled={isEditMode || (editingRecord && !isEditMode)}
+                    />
+                    {selectedPeriod && isAguinaldoPeriod(selectedPeriod) && (
+                      <p className="text-xs text-green-600">
+                        ✨ Período con aguinaldo (SAC)
+                      </p>
+                    )}
+                  </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="workDays">
-                    Días Trabajados <span className="text-red-500">*</span>
-                  </Label>
-                  <Input
-                    id="workDays"
-                    type="number"
-                    min="1"
-                    max="31"
-                    value={workDays}
-                    onChange={(e) => setWorkDays(e.target.value)}
-                    disabled={editingRecord && !isEditMode}
-                  />
-                  {selectedEmployee && (
-                    <p className="text-xs text-muted-foreground">
-                      Sueldo base:{" "}
-                      {(() => {
-                        if (editingRecord && editingRecord.baseAmount != null) {
-                          return formatCurrency(editingRecord.baseAmount || 0);
-                        }
-
-                        const emp = employees.find(
-                          (e) => e.id.toString() === selectedEmployee,
-                        );
-                        let daily = (emp?.sueldoBase || 0) / 30;
-                        if (
-                          historicalSalary &&
-                          historicalSalary.white_wage !== undefined &&
-                          historicalSalary.informal_wage !== undefined
-                        ) {
-                          daily =
-                            (historicalSalary.white_wage +
-                              historicalSalary.informal_wage) /
-                              30;
-                        }
-                        return formatCurrency(
-                          daily * (parseInt(workDays) || 0),
-                        );
-                      })()}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="holidayDays">
-                    Días Feriados (doble pago)
-                  </Label>
-                  <Input
-                    id="holidayDays"
-                    type="number"
-                    placeholder="0"
-                    value={holidayDays}
-                    onChange={(e) => setHolidayDays(e.target.value)}
-                    disabled={editingRecord && !isEditMode}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="overtimeToggle"
-                      checked={overtimeEnabled}
-                      onChange={(e) => setOvertimeEnabled(e.target.checked)}
-                      className="rounded border-gray-300"
+                  <div className="space-y-2">
+                    <Label htmlFor="workDays">
+                      Días Trabajados <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="workDays"
+                      type="number"
+                      min="1"
+                      max="31"
+                      value={workDays}
+                      onChange={(e) => setWorkDays(e.target.value)}
                       disabled={editingRecord && !isEditMode}
                     />
-                    <Label htmlFor="overtimeToggle">Horas Extra</Label>
+                    {selectedEmployee && (
+                      <p className="text-xs text-muted-foreground">
+                        Sueldo base:{" "}
+                        {(() => {
+                          if (editingRecord && editingRecord.baseAmount != null) {
+                            return formatCurrency(editingRecord.baseAmount || 0);
+                          }
+
+                          const emp = employees.find(
+                            (e) => e.id.toString() === selectedEmployee,
+                          );
+                          let daily = (emp?.sueldoBase || 0) / 30;
+                          if (
+                            historicalSalary &&
+                            historicalSalary.white_wage !== undefined &&
+                            historicalSalary.informal_wage !== undefined
+                          ) {
+                            daily =
+                              (historicalSalary.white_wage +
+                                historicalSalary.informal_wage) /
+                                30;
+                          }
+                          return formatCurrency(
+                            daily * (parseInt(workDays) || 0),
+                          );
+                        })()}
+                      </p>
+                    )}
                   </div>
-                  {overtimeEnabled && (
-                    <div className="space-y-2">
-                      <Input
-                        id="overtimeHours"
-                        type="number"
-                        placeholder="0"
-                        value={overtimeHours}
-                        onChange={(e) => setOvertimeHours(e.target.value)}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="holidayDays">
+                      Días Feriados (doble pago)
+                    </Label>
+                    <Input
+                      id="holidayDays"
+                      type="number"
+                      placeholder="0"
+                      value={holidayDays}
+                      onChange={(e) => setHolidayDays(e.target.value)}
+                      disabled={editingRecord && !isEditMode}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="overtimeToggle"
+                        checked={overtimeEnabled}
+                        onChange={(e) => setOvertimeEnabled(e.target.checked)}
+                        className="rounded border-gray-300"
                         disabled={editingRecord && !isEditMode}
                       />
-                      {selectedEmployee && (
-                        <p className="text-xs text-muted-foreground">
-                          Tarifa por hora:{" "}
-                          {(() => {
-                            let daily: number | undefined;
+                      <Label htmlFor="overtimeToggle">Horas Extra</Label>
+                    </div>
+                    {overtimeEnabled && (
+                      <div className="space-y-2">
+                        <Input
+                          id="overtimeHours"
+                          type="number"
+                          placeholder="0"
+                          value={overtimeHours}
+                          onChange={(e) => setOvertimeHours(e.target.value)}
+                          disabled={editingRecord && !isEditMode}
+                        />
+                        {selectedEmployee && (
+                          <p className="text-xs text-muted-foreground">
+                            Tarifa por hora:{" "}
+                            {(() => {
+                              let daily: number | undefined;
 
-                            if (
-                              editingRecord &&
-                              editingRecord.baseAmount != null
-                            ) {
-                              const baseDays = editingRecord.baseDays || 0;
-                              if (baseDays > 0) {
-                                daily = editingRecord.baseAmount / baseDays;
+                              if (
+                                editingRecord &&
+                                editingRecord.baseAmount != null
+                              ) {
+                                const baseDays = editingRecord.baseDays || 0;
+                                if (baseDays > 0) {
+                                  daily = editingRecord.baseAmount / baseDays;
+                                }
                               }
-                            }
 
-                            if (daily === undefined) {
-                              const emp = employees.find(
+                              if (daily === undefined) {
+                                const emp = employees.find(
+                                  (e) => e.id.toString() === selectedEmployee,
+                                );
+                                daily = (emp?.sueldoBase || 0) / 30;
+                                if (
+                                  historicalSalary &&
+                                  historicalSalary.white_wage !== undefined &&
+                                  historicalSalary.informal_wage !== undefined
+                                ) {
+                                  daily =
+                                    (historicalSalary.white_wage +
+                                      historicalSalary.informal_wage) /
+                                      30;
+                                }
+                              }
+
+                              return formatCurrency((daily || 0) / 8);
+                            })()}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedEmployee &&
+                    employees.find((e) => e.id.toString() === selectedEmployee)
+                      ?.receives_presentismo !== false && (
+                      <div className="space-y-2">
+                        <Label htmlFor="presentismo">Presentismo</Label>
+                        <Select
+                          value={presentismoStatus}
+                          onValueChange={setPresentismoStatus}
+                          disabled={editingRecord && !isEditMode}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="mantiene">
+                              Mantiene{" "}
+                              {selectedEmployee && (
+                                <span>
+                                  (
+                                  {formatCurrency(
+                                    employees.find(
+                                      (e) => e.id.toString() === selectedEmployee,
+                                    )?.presentismo || 0,
+                                  )}
+                                  )
+                                </span>
+                              )}
+                            </SelectItem>
+                            <SelectItem value="perdido">Perdido</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  {selectedEmployee &&
+                    employees.find((e) => e.id.toString() === selectedEmployee)
+                      ?.receives_presentismo === false && (
+                      <div className="space-y-2 p-3 bg-gray-100 rounded border border-gray-300">
+                        <p className="text-sm text-gray-700">
+                          ℹ️ Este empleado no percibe presentismo
+                        </p>
+                      </div>
+                    )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="bonusAmount">Bono Libre</Label>
+                    <CurrencyInput
+                      id="bonusAmount"
+                      placeholder="$ 0,00"
+                      value={bonusAmount}
+                      onChange={(value) => setBonusAmount(value)}
+                      disabled={editingRecord && !isEditMode}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="advances">Adelantos</Label>
+                    <CurrencyInput
+                      id="advances"
+                      placeholder="$ 0,00"
+                      value={advances}
+                      onChange={(value) => setAdvances(value)}
+                      disabled={editingRecord && !isEditMode}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="discounts">Descuentos</Label>
+                    <CurrencyInput
+                      id="discounts"
+                      placeholder="$ 0,00"
+                      value={discounts}
+                      onChange={(value) => setDiscounts(value)}
+                      disabled={editingRecord && !isEditMode}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="whiteWage">Sueldo Depósito</Label>
+                    <CurrencyInput
+                      id="whiteWage"
+                      placeholder="$ 0,00"
+                      value={whiteWage}
+                      onChange={(value) => updateWhiteWage(value)}
+                      disabled={editingRecord && !isEditMode}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      El resto se calculará como sueldo en efectivo
+                    </p>
+                  </div>
+                </div>
+
+                {/* Preview */}
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg">Vista Previa</h3>
+                  {calculation ? (
+                    <Card>
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex justify-between">
+                          <span>Sueldo base:</span>
+                          <span>{formatCurrency(calculation.basePay)}</span>
+                        </div>
+                        {calculation.holidayPay > 0 && (
+                          <div className="flex justify-between">
+                            <span>Feriados (doble):</span>
+                            <span>{formatCurrency(calculation.holidayPay)}</span>
+                          </div>
+                        )}
+                        {calculation.overtimePay > 0 && (
+                          <div className="flex justify-between text-blue-600">
+                            <span>Horas extra ({overtimeHours}h):</span>
+                            <span>
+                              +{formatCurrency(calculation.overtimePay)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.presentismoAmount > 0 && (
+                          <div className="flex justify-between text-green-600">
+                            <span>Presentismo:</span>
+                            <span>
+                              +{formatCurrency(calculation.presentismoAmount)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.bonusPay > 0 && (
+                          <div className="flex justify-between text-purple-600">
+                            <span>Bono:</span>
+                            <span>+{formatCurrency(calculation.bonusPay)}</span>
+                          </div>
+                        )}
+                        {calculation.aguinaldo > 0 && selectedEmployee && (
+                          <div className="space-y-1">
+                            <div className="flex justify-between text-green-600">
+                              <span>
+                                Aguinaldo ({formatPeriod(selectedPeriod)}):
+                              </span>
+                              <span>
+                                +{formatCurrency(calculation.aguinaldo)}
+                              </span>
+                            </div>
+                            {(() => {
+                              const employee = employees.find(
                                 (e) => e.id.toString() === selectedEmployee,
                               );
-                              daily = (emp?.sueldoBase || 0) / 30;
-                              if (
-                                historicalSalary &&
-                                historicalSalary.white_wage !== undefined &&
-                                historicalSalary.informal_wage !== undefined
-                              ) {
-                                daily =
-                                  (historicalSalary.white_wage +
-                                    historicalSalary.informal_wage) /
-                                    30;
-                              }
-                            }
+                              if (!employee) return null;
 
-                            return formatCurrency((daily || 0) / 8);
-                          })()}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                {selectedEmployee &&
-                  employees.find((e) => e.id.toString() === selectedEmployee)
-                    ?.receives_presentismo !== false && (
-                    <div className="space-y-2">
-                      <Label htmlFor="presentismo">Presentismo</Label>
-                      <Select
-                        value={presentismoStatus}
-                        onValueChange={setPresentismoStatus}
-                        disabled={editingRecord && !isEditMode}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="mantiene">
-                            Mantiene{" "}
-                            {selectedEmployee && (
-                              <span>
-                                (
-                                {formatCurrency(
-                                  employees.find(
-                                    (e) => e.id.toString() === selectedEmployee,
-                                  )?.presentismo || 0,
-                                )}
-                                )
-                              </span>
-                            )}
-                          </SelectItem>
-                          <SelectItem value="perdido">Perdido</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                {selectedEmployee &&
-                  employees.find((e) => e.id.toString() === selectedEmployee)
-                    ?.receives_presentismo === false && (
-                    <div className="space-y-2 p-3 bg-gray-100 rounded border border-gray-300">
-                      <p className="text-sm text-gray-700">
-                        ℹ️ Este empleado no percibe presentismo
-                      </p>
-                    </div>
-                  )}
-
-                <div className="space-y-2">
-                  <Label htmlFor="bonusAmount">Bono Libre</Label>
-                  <CurrencyInput
-                    id="bonusAmount"
-                    placeholder="$ 0,00"
-                    value={bonusAmount}
-                    onChange={(value) => setBonusAmount(value)}
-                    disabled={editingRecord && !isEditMode}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="advances">Adelantos</Label>
-                  <CurrencyInput
-                    id="advances"
-                    placeholder="$ 0,00"
-                    value={advances}
-                    onChange={(value) => setAdvances(value)}
-                    disabled={editingRecord && !isEditMode}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="discounts">Descuentos</Label>
-                  <CurrencyInput
-                    id="discounts"
-                    placeholder="$ 0,00"
-                    value={discounts}
-                    onChange={(value) => setDiscounts(value)}
-                    disabled={editingRecord && !isEditMode}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="whiteWage">Sueldo Depósito</Label>
-                  <CurrencyInput
-                    id="whiteWage"
-                    placeholder="$ 0,00"
-                    value={whiteWage}
-                    onChange={(value) => updateWhiteWage(value)}
-                    disabled={editingRecord && !isEditMode}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    El resto se calculará como sueldo en efectivo
-                  </p>
-                </div>
-              </div>
-
-              {/* Preview */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg">Vista Previa</h3>
-                {calculation ? (
-                  <Card>
-                    <CardContent className="p-4 space-y-3">
-                      <div className="flex justify-between">
-                        <span>Sueldo base:</span>
-                        <span>{formatCurrency(calculation.basePay)}</span>
-                      </div>
-                      {calculation.holidayPay > 0 && (
-                        <div className="flex justify-between">
-                          <span>Feriados (doble):</span>
-                          <span>{formatCurrency(calculation.holidayPay)}</span>
-                        </div>
-                      )}
-                      {calculation.overtimePay > 0 && (
-                        <div className="flex justify-between text-blue-600">
-                          <span>Horas extra ({overtimeHours}h):</span>
-                          <span>
-                            +{formatCurrency(calculation.overtimePay)}
-                          </span>
-                        </div>
-                      )}
-                      {calculation.presentismoAmount > 0 && (
-                        <div className="flex justify-between text-green-600">
-                          <span>Presentismo:</span>
-                          <span>
-                            +{formatCurrency(calculation.presentismoAmount)}
-                          </span>
-                        </div>
-                      )}
-                      {calculation.bonusPay > 0 && (
-                        <div className="flex justify-between text-purple-600">
-                          <span>Bono:</span>
-                          <span>+{formatCurrency(calculation.bonusPay)}</span>
-                        </div>
-                      )}
-                      {calculation.aguinaldo > 0 && selectedEmployee && (
-                        <div className="space-y-1">
-                          <div className="flex justify-between text-green-600">
-                            <span>
-                              Aguinaldo ({formatPeriod(selectedPeriod)}):
-                            </span>
-                            <span>
-                              +{formatCurrency(calculation.aguinaldo)}
-                            </span>
-                          </div>
-                          {(() => {
-                            const employee = employees.find(
-                              (e) => e.id.toString() === selectedEmployee,
-                            );
-                            if (!employee) return null;
-
-                            const startDate = new Date(employee.startDate);
-                            const [year, month] = selectedPeriod.split("-");
-                            const liquidationDate = new Date(
-                              parseInt(year),
-                              parseInt(month) - 1,
-                              1,
-                            );
-                            const hasMoreThanSixMonths =
-                              (liquidationDate - startDate) /
-                                (1000 * 60 * 60 * 24) >=
-                              180;
-
-                            if (!hasMoreThanSixMonths) {
-                              return (
-                                <div className="text-xs text-green-700">
-                                  Proporcional - Ingreso:{" "}
-                                  {new Date(
-                                    employee.startDate,
-                                  ).toLocaleDateString("es-AR")}
-                                </div>
+                              const startDate = new Date(employee.startDate);
+                              const [year, month] = selectedPeriod.split("-");
+                              const liquidationDate = new Date(
+                                parseInt(year),
+                                parseInt(month) - 1,
+                                1,
                               );
-                            }
-                            return null;
-                          })()}
-                        </div>
-                      )}
-                      <div className="flex justify-between font-medium">
-                        <span>Subtotal bruto:</span>
-                        <span>{formatCurrency(calculation.grossTotal)}</span>
-                      </div>
-                      {calculation.totalAdvances > 0 && (
-                        <div className="flex justify-between text-red-600">
-                          <span>Adelantos:</span>
-                          <span>
-                            -{formatCurrency(calculation.totalAdvances)}
-                          </span>
-                        </div>
-                      )}
-                      {calculation.totalDiscounts > 0 && (
-                        <div className="flex justify-between text-red-600">
-                          <span>Descuentos:</span>
-                          <span>
-                            -{formatCurrency(calculation.totalDiscounts)}
-                          </span>
-                        </div>
-                      )}
-                      <div className="border-t pt-2">
-                        <div className="flex justify-between text-lg font-bold">
-                          <span>Total Neto:</span>
-                          <span>{formatCurrency(calculation.netTotal)}</span>
-                        </div>
-                        <div className="text-sm space-y-1 mt-2">
-                          <div className="flex justify-between">
-                            <span>Depósito:</span>
-                            <span>
-                              {formatCurrency(calculation.whiteAmount)}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Efectivo:</span>
-                            <span>
-                              {formatCurrency(calculation.informalAmount)}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ) : (
-                  <p className="text-muted-foreground">
-                    Selecciona un empleado para ver la vista previa
-                  </p>
-                )}
-              </div>
-            </div>
+                              const hasMoreThanSixMonths =
+                                (liquidationDate - startDate) /
+                                  (1000 * 60 * 60 * 24) >=
+                                180;
 
-            <div className="flex gap-2 pt-4">
-              {/* Solo mostrar botón de guardar si no es solo lectura */}
-              {(isEditMode || !editingRecord) && (
+                              if (!hasMoreThanSixMonths) {
+                                return (
+                                  <div className="text-xs text-green-700">
+                                    Proporcional - Ingreso:{" "}
+                                    {new Date(
+                                      employee.startDate,
+                                    ).toLocaleDateString("es-AR")}
+                                  </div>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
+                        )}
+                        <div className="flex justify-between font-medium">
+                          <span>Subtotal bruto:</span>
+                          <span>{formatCurrency(calculation.grossTotal)}</span>
+                        </div>
+                        {calculation.totalAdvances > 0 && (
+                          <div className="flex justify-between text-red-600">
+                            <span>Adelantos:</span>
+                            <span>
+                              -{formatCurrency(calculation.totalAdvances)}
+                            </span>
+                          </div>
+                        )}
+                        {calculation.totalDiscounts > 0 && (
+                          <div className="flex justify-between text-red-600">
+                            <span>Descuentos:</span>
+                            <span>
+                              -{formatCurrency(calculation.totalDiscounts)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="border-t pt-2">
+                          <div className="flex justify-between text-lg font-bold">
+                            <span>Total Neto:</span>
+                            <span>{formatCurrency(calculation.netTotal)}</span>
+                          </div>
+                          <div className="text-sm space-y-1 mt-2">
+                            <div className="flex justify-between">
+                              <span>Depósito:</span>
+                              <span>
+                                {formatCurrency(calculation.whiteAmount)}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Efectivo:</span>
+                              <span>
+                                {formatCurrency(calculation.informalAmount)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ) : (
+                    <p className="text-muted-foreground">
+                      Selecciona un empleado para ver la vista previa
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                {/* Solo mostrar botón de guardar si no es solo lectura */}
+                {(isEditMode || !editingRecord) && (
+                  <Button
+                    onClick={
+                      isEditMode ? handleUpdatePayroll : handleCreatePayroll
+                    }
+                    disabled={!selectedEmployee || !selectedPeriod}
+                    className="flex-1"
+                  >
+                    {isEditMode ? "Actualizar Liquidación" : "Crear Liquidación"}
+                  </Button>
+                )}
                 <Button
-                  onClick={
-                    isEditMode ? handleUpdatePayroll : handleCreatePayroll
-                  }
-                  disabled={!selectedEmployee || !selectedPeriod}
+                  variant="outline"
+                  onClick={() => {
+                    setIsNewPayrollOpen(false);
+                    setIsEditMode(false);
+                    setEditingRecord(null);
+                    setHistoricalSalary(null);
+                  }}
                   className="flex-1"
                 >
-                  {isEditMode ? "Actualizar Liquidación" : "Crear Liquidación"}
+                  {isEditMode || !editingRecord ? "Cancelar" : "Cerrar"}
                 </Button>
-              )}
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsNewPayrollOpen(false);
-                  setIsEditMode(false);
-                  setEditingRecord(null);
-                  setHistoricalSalary(null);
-                }}
-                className="flex-1"
-              >
-                {isEditMode || !editingRecord ? "Cancelar" : "Cerrar"}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <BulkPayrollDialog
+            open={isBulkCreateOpen}
+            onOpenChange={setIsBulkCreateOpen}
+            employees={employees}
+            payrollRecords={payrollRecords}
+            createPayrollRecordsBulk={createPayrollRecordsBulk}
+            onCreated={(count) => {
+              setSuccessMessage(`${count} liquidaciones creadas como borrador`);
+              setTimeout(() => setSuccessMessage(""), 3000);
+            }}
+          />
+        </div>
       </div>
 
       {/* Success Message */}
@@ -1551,10 +1625,52 @@ const Payroll = () => {
             </Select>
           </div>
 
+          {selectedRecords.length > 0 && (
+            <div className="mb-4 flex items-center justify-between rounded-md border bg-muted/40 p-3">
+              <span className="text-sm font-medium">
+                {selectedRecords.length}{" "}
+                {selectedRecords.length === 1 ? "seleccionada" : "seleccionadas"}
+              </span>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedRecordIds([])}
+                >
+                  Limpiar selección
+                </Button>
+                {canBulkAdvance && bulkNextStatus && (
+                  <Button size="sm" onClick={handleBulkAdvance}>
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                    Pasar a {PAYROLL_STATUS_LABELS[bulkNextStatus]}
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-10">
+                    <Checkbox
+                      aria-label="Seleccionar todas las liquidaciones"
+                      checked={
+                        filteredRecords.length > 0 &&
+                        filteredRecords.every((record) =>
+                          selectedRecordIds.includes(record.id),
+                        )
+                      }
+                      onCheckedChange={(checked) =>
+                        setSelectedRecordIds(
+                          checked === true
+                            ? filteredRecords.map((record) => record.id)
+                            : [],
+                        )
+                      }
+                    />
+                  </TableHead>
                   <TableHead>Empleado</TableHead>
                   <TableHead>Período</TableHead>
                   <TableHead>Días</TableHead>
@@ -1585,6 +1701,19 @@ const Payroll = () => {
                     );
                     return (
                       <TableRow key={record.id}>
+                        <TableCell>
+                          <Checkbox
+                            aria-label={`Seleccionar liquidación de ${record.employeeName}`}
+                            checked={selectedRecordIds.includes(record.id)}
+                            onCheckedChange={(checked) =>
+                              setSelectedRecordIds((prev) =>
+                                checked === true
+                                  ? [...prev, record.id]
+                                  : prev.filter((id) => id !== record.id),
+                              )
+                            }
+                          />
+                        </TableCell>
                         <TableCell className="font-medium">
                           <div>
                             <p>{record.employeeName}</p>

@@ -9,6 +9,31 @@ import type {
   CreatePayrollRequest,
 } from "@/services/interfaces";
 
+type PayrollInsertInput = CreatePayrollRequest & { employeeName?: string };
+
+const toPayrollRow = (payroll: PayrollInsertInput) => ({
+  employee_id: payroll.employeeId,
+  period: payroll.period,
+  base_days: payroll.baseDays,
+  holiday_days: payroll.holidayDays || 0,
+  base_amount: payroll.baseAmount,
+  holiday_bonus: payroll.holidayBonus || 0,
+  aguinaldo: payroll.aguinaldo || 0,
+  discounts: payroll.discounts || 0,
+  advances: payroll.advances || 0,
+  white_amount: payroll.whiteAmount,
+  informal_amount: payroll.informalAmount,
+  presentismo_amount: payroll.presentismoAmount || 0,
+  overtime_hours: payroll.overtimeHours || 0,
+  overtime_amount: payroll.overtimeAmount || 0,
+  bonus_amount: payroll.bonusAmount || 0,
+  net_total: payroll.netTotal,
+  status: payroll.status,
+  processed_date: payroll.processedDate,
+  processed_by: payroll.processedBy,
+  notes: payroll.notes,
+});
+
 export const usePayroll = () => {
   const [payrollRecords, setPayrollRecords] = useState<PayrollRecord[]>([]);
   const [loading, setLoading] = useState(true);
@@ -158,35 +183,14 @@ export const usePayroll = () => {
   };
 
   // Crear registro de liquidación
-  const createPayrollRecord = async (payroll: CreatePayrollRequest) => {
+  const createPayrollRecord = async (payroll: PayrollInsertInput) => {
     if (!hasPermission("payroll", "create")) {
       throw new Error("No tenés permiso para crear liquidaciones. Solo admin, gerente y RRHH pueden hacerlo.");
     }
     try {
       const { data, error } = await supabase
         .from("payroll_records")
-        .insert({
-          employee_id: payroll.employeeId,
-          period: payroll.period,
-          base_days: payroll.baseDays,
-          holiday_days: payroll.holidayDays || 0,
-          base_amount: payroll.baseAmount,
-          holiday_bonus: payroll.holidayBonus || 0,
-          aguinaldo: payroll.aguinaldo || 0,
-          discounts: payroll.discounts || 0,
-          advances: payroll.advances || 0,
-          white_amount: payroll.whiteAmount,
-          informal_amount: payroll.informalAmount,
-          presentismo_amount: payroll.presentismoAmount || 0,
-          overtime_hours: payroll.overtimeHours || 0,
-          overtime_amount: payroll.overtimeAmount || 0,
-          bonus_amount: payroll.bonusAmount || 0,
-          net_total: payroll.netTotal,
-          status: payroll.status,
-          processed_date: payroll.processedDate,
-          processed_by: payroll.processedBy,
-          notes: payroll.notes,
-        })
+        .insert(toPayrollRow(payroll))
         .select()
         .single();
 
@@ -223,6 +227,83 @@ export const usePayroll = () => {
         err instanceof Error ? err.message : "Error creating payroll record",
       );
     }
+  };
+
+  const createPayrollRecordsBulk = async (payrolls: PayrollInsertInput[]) => {
+    if (!hasPermission("payroll", "create")) {
+      throw new Error("No tenés permiso para crear liquidaciones. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
+    if (payrolls.length === 0) return [];
+
+    const { data, error } = await supabase
+      .from("payroll_records")
+      .insert(payrolls.map(toPayrollRow))
+      .select();
+
+    if (error) {
+      throw new Error(
+        `Database error: ${error.message || error.details || "Unknown error"}`,
+      );
+    }
+
+    for (const [index, payroll] of payrolls.entries()) {
+      try {
+        await auditPayroll("INSERT", data[index].id, null, {
+          employeeId: payroll.employeeId,
+          employeeName: payroll.employeeName,
+          period: payroll.period,
+          netTotal: payroll.netTotal,
+          status: payroll.status,
+          whiteAmount: payroll.whiteAmount,
+          informalAmount: payroll.informalAmount,
+        });
+      } catch (auditError) {
+        // Audit errors should not block the operation
+      }
+    }
+
+    await fetchPayrollRecords();
+    return data;
+  };
+
+  const updatePayrollStatusBulk = async (
+    ids: string[],
+    status: PayrollRecord["status"],
+  ) => {
+    if (!hasPermission("payroll", "edit")) {
+      throw new Error("No tenés permiso para editar liquidaciones. Solo admin, gerente y RRHH pueden hacerlo.");
+    }
+    if (ids.length === 0) return;
+
+    const updateData: { status: string; processed_date?: string } = { status };
+    if (status === "paid") {
+      updateData.processed_date = new Date().toISOString();
+    }
+
+    const { error } = await supabase
+      .from("payroll_records")
+      .update(updateData)
+      .in("id", ids);
+
+    if (error) {
+      throw new Error(error.message || "Database update error");
+    }
+
+    for (const id of ids) {
+      try {
+        const oldRecord = payrollRecords.find((record) => record.id === id);
+        await auditPayroll(
+          "UPDATE",
+          id,
+          oldRecord ? { status: oldRecord.status } : null,
+          { status },
+        );
+      } catch (auditError) {
+        // Audit errors should not block the operation
+      }
+    }
+
+    await fetchPayrollRecords();
   };
 
   // Actualizar registro de liquidación
@@ -372,7 +453,9 @@ export const usePayroll = () => {
     fetchPayrollRecords,
     getExistingPayrollRecord,
     createPayrollRecord,
+    createPayrollRecordsBulk,
     updatePayrollRecord,
+    updatePayrollStatusBulk,
     deletePayrollRecord,
   };
 };
