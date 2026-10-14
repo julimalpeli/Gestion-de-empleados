@@ -69,6 +69,7 @@ import Reports from "./pages/Reports";
 import UserRoles from "./pages/UserRoles";
 import UserManagement from "./pages/UserManagement";
 import Recibos from "./pages/Recibos";
+import Documents from "./pages/Documents";
 import EmployeePortal from "./pages/EmployeePortal";
 import Login from "./pages/Login";
 import Unauthorized from "./pages/Unauthorized";
@@ -265,6 +266,21 @@ const AppContent = () => {
                     <AppSidebar />
                     <main className="flex-1 overflow-auto">
                       <Recibos />
+                    </main>
+                  </SidebarProvider>
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Documentos y reglamentos - Solo administración y RRHH */}
+            <Route
+              path="/documentos"
+              element={
+                <ProtectedRoute allowedRoles={["admin", "manager", "hr"]}>
+                  <SidebarProvider>
+                    <AppSidebar />
+                    <main className="flex-1 overflow-auto">
+                      <Documents />
                     </main>
                   </SidebarProvider>
                 </ProtectedRoute>

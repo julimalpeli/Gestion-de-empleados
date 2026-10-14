@@ -120,6 +120,28 @@ const PERMISSIONS = {
     description: "Eliminar archivos",
   },
 
+  // Company documents and labor regulations
+  DOCUMENTS_VIEW: {
+    module: "documents",
+    action: "view",
+    description: "Ver documentos de la empresa",
+  },
+  DOCUMENTS_CREATE: {
+    module: "documents",
+    action: "create",
+    description: "Crear documentos de la empresa",
+  },
+  DOCUMENTS_EDIT: {
+    module: "documents",
+    action: "edit",
+    description: "Editar documentos de la empresa",
+  },
+  DOCUMENTS_DELETE: {
+    module: "documents",
+    action: "delete",
+    description: "Eliminar documentos de la empresa",
+  },
+
   // System administration
   SYSTEM_USERS: {
     module: "system",
@@ -168,6 +190,10 @@ const ROLES: Role[] = [
       PERMISSIONS.FILES_VIEW,
       PERMISSIONS.FILES_UPLOAD,
       PERMISSIONS.FILES_DELETE,
+      PERMISSIONS.DOCUMENTS_VIEW,
+      PERMISSIONS.DOCUMENTS_CREATE,
+      PERMISSIONS.DOCUMENTS_EDIT,
+      PERMISSIONS.DOCUMENTS_DELETE,
     ],
   },
   {
@@ -190,6 +216,10 @@ const ROLES: Role[] = [
       PERMISSIONS.REPORTS_GENERATE,
       PERMISSIONS.FILES_VIEW,
       PERMISSIONS.FILES_UPLOAD,
+      PERMISSIONS.DOCUMENTS_VIEW,
+      PERMISSIONS.DOCUMENTS_CREATE,
+      PERMISSIONS.DOCUMENTS_EDIT,
+      PERMISSIONS.DOCUMENTS_DELETE,
     ],
   },
   {

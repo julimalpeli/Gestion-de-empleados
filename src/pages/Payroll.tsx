@@ -952,7 +952,7 @@ const Payroll = () => {
                 </Button>
               </DialogTrigger>
             </PermissionGate>
-            <DialogContent className="flex flex-col max-w-4xl max-h-[85dvh] overflow-hidden">
+            <DialogContent className="max-w-4xl max-h-[85dvh] overflow-y-auto overscroll-contain">
               <DialogHeader>
                 <DialogTitle>
                   {editingRecord && !isEditMode

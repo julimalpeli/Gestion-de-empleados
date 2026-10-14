@@ -7,6 +7,7 @@ import {
   UserCog,
   LogOut,
   MailPlus,
+  FolderOpen,
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -24,6 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth-simple";
+import usePermissions from "@/hooks/use-permissions";
 import { getVersionString } from "@/config/version";
 
 interface MenuItem {
@@ -31,6 +33,7 @@ interface MenuItem {
   url: string;
   icon: any;
   adminOnly?: boolean;
+  permission?: [module: string, action: string];
 }
 
 const items: MenuItem[] = [
@@ -65,6 +68,12 @@ const items: MenuItem[] = [
     icon: MailPlus,
   },
   {
+    title: "Documentos",
+    url: "/documentos",
+    icon: FolderOpen,
+    permission: ["documents", "view"],
+  },
+  {
     title: "Gestión de Usuarios",
     url: "/usuarios",
     icon: UserCog,
@@ -75,6 +84,7 @@ const items: MenuItem[] = [
 export function AppSidebar() {
   const { setOpenMobile, isMobile } = useSidebar();
   const { logout, user } = useAuth();
+  const { hasPermission } = usePermissions();
   const navigate = useNavigate();
 
   const handleLinkClick = () => {
@@ -113,6 +123,11 @@ export function AppSidebar() {
             <SidebarMenu>
               {items
                 .filter((item) => !item.adminOnly || user?.role === "admin")
+                .filter(
+                  (item) =>
+                    !item.permission ||
+                    hasPermission(item.permission[0], item.permission[1]),
+                )
                 .map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
