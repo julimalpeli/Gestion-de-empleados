@@ -94,7 +94,7 @@ export const companyDocumentsService = {
   async listDocuments(): Promise<CompanyDocument[]> {
     const { data, error } = await supabase
       .from("company_documents")
-      .select("*, versions:company_document_versions(*)")
+      .select("*, versions:company_document_versions!document_id(*)")
       .order("title", { ascending: true });
 
     if (error) throw new Error(`Error al cargar documentos: ${error.message}`);
