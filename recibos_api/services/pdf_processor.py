@@ -3,11 +3,25 @@ import io
 from typing import Dict, List, Tuple
 import logging
 
+import pytesseract
+from PIL import Image
+
 logger = logging.getLogger(__name__)
 
 class PDFProcessor:
     """Service to process PDF files and extract text"""
-    
+
+    @staticmethod
+    def ocr_page(pdf_bytes: bytes, page_index: int) -> str:
+        """Render one page at 300 DPI and read it with Tesseract (Spanish)"""
+        pdf_doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        try:
+            pixmap = pdf_doc[page_index].get_pixmap(dpi=300)
+            image = Image.open(io.BytesIO(pixmap.tobytes("png")))
+            return pytesseract.image_to_string(image, lang="spa")
+        finally:
+            pdf_doc.close()
+
     @staticmethod
     def extract_text(pdf_bytes: bytes) -> str:
         """

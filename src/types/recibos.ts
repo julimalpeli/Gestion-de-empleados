@@ -26,6 +26,29 @@ export interface ProcessedReceipt {
   selected: boolean;
 }
 
+export interface ReceiptPage {
+  page_number: number;
+  file_name: string;
+  cuil?: string;
+  period?: string;
+  employee?: EmployeeMatch;
+  pdf_base64: string;
+}
+
+export type AttachStatus =
+  | "adjuntado"
+  | "duplicado"
+  | "sin-empleado"
+  | "sin-periodo"
+  | "sin-liquidacion";
+
+export interface AttachResult {
+  fileName: string;
+  employeeName?: string;
+  period?: string;
+  status: AttachStatus;
+}
+
 export interface SendResult {
   batch_id: string;
   total_sent: number;

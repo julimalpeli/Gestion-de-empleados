@@ -6,7 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import type { ProcessedReceipt } from "@/types/recibos";
+import type { AttachResult, AttachStatus, ProcessedReceipt } from "@/types/recibos";
 
 interface PreviewStepProps {
   receipts: ProcessedReceipt[];
@@ -14,7 +14,18 @@ interface PreviewStepProps {
   onSelectAll: (selected: boolean) => void;
   onNext: () => void;
   onBack: () => void;
+  onAdjuntar: () => void;
+  isAttaching: boolean;
+  attachResults: AttachResult[];
 }
+
+const ATTACH_STATUS_LABELS: Record<AttachStatus, { label: string; className: string }> = {
+  adjuntado: { label: "Adjuntado", className: "bg-green-50 text-green-700 border-green-200" },
+  duplicado: { label: "Ya estaba adjunto", className: "bg-blue-50 text-blue-700 border-blue-200" },
+  "sin-empleado": { label: "Sin empleado", className: "bg-orange-50 text-orange-700 border-orange-200" },
+  "sin-periodo": { label: "Sin período", className: "bg-orange-50 text-orange-700 border-orange-200" },
+  "sin-liquidacion": { label: "Sin liquidación", className: "bg-orange-50 text-orange-700 border-orange-200" },
+};
 
 const RECEIPT_TYPE_LABELS: Record<string, { label: string; className: string }> = {
   normal: { label: "Normal", className: "bg-blue-50 text-blue-700 border-blue-200" },
@@ -22,7 +33,16 @@ const RECEIPT_TYPE_LABELS: Record<string, { label: string; className: string }> 
   retenciones: { label: "Retenciones", className: "bg-purple-50 text-purple-700 border-purple-200" },
 };
 
-export function PreviewStep({ receipts, onToggle, onSelectAll, onNext, onBack }: PreviewStepProps) {
+export function PreviewStep({
+  receipts,
+  onToggle,
+  onSelectAll,
+  onNext,
+  onBack,
+  onAdjuntar,
+  isAttaching,
+  attachResults,
+}: PreviewStepProps) {
   const allSelected = receipts.every((r) => r.selected);
   const selectedCount = receipts.filter((r) => r.selected).length;
   const noMatchCount = receipts.filter((r) => r.status === "no-match").length;
@@ -135,10 +155,35 @@ export function PreviewStep({ receipts, onToggle, onSelectAll, onNext, onBack }:
         </Table>
       </div>
 
+      {attachResults.length > 0 && (
+        <div className="rounded-lg border divide-y">
+          {attachResults.map((result, i) => {
+            const status = ATTACH_STATUS_LABELS[result.status];
+            return (
+              <div key={i} className="flex items-center justify-between gap-3 px-4 py-2 text-sm">
+                <span className="truncate">
+                  {result.fileName}
+                  {result.employeeName ? ` · ${result.employeeName}` : ""}
+                  {result.period ? ` · ${result.period}` : ""}
+                </span>
+                <Badge variant="outline" className={status.className}>
+                  {status.label}
+                </Badge>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {selectedCount} seleccionado(s) · {withEmail} con email para enviar
-        </p>
+        <div className="flex flex-col gap-2 items-start">
+          <p className="text-sm text-muted-foreground">
+            {selectedCount} seleccionado(s) · {withEmail} con email para enviar
+          </p>
+          <Button variant="outline" onClick={onAdjuntar} disabled={isAttaching}>
+            {isAttaching ? "Adjuntando…" : "Adjuntar a liquidaciones"}
+          </Button>
+        </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={onBack}>Volver</Button>
           <Button onClick={onNext} disabled={withEmail === 0}>

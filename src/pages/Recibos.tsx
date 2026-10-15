@@ -34,6 +34,9 @@ export default function Recibos() {
     isLoading,
     error,
     handleProcesar,
+    handleAdjuntar,
+    attachResults,
+    isAttaching,
     toggleSelection,
     selectAll,
     handleEnviar,
@@ -169,6 +172,9 @@ export default function Recibos() {
             onSelectAll={selectAll}
             onNext={() => goToStep(4)}
             onBack={() => goToStep(1)}
+            onAdjuntar={handleAdjuntar}
+            isAttaching={isAttaching}
+            attachResults={attachResults}
           />
         )}
 

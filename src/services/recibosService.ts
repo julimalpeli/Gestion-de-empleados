@@ -1,4 +1,4 @@
-import type { ProcessedReceipt, SendResult, BatchHistory } from "@/types/recibos";
+import type { ProcessedReceipt, ReceiptPage, SendResult, BatchHistory } from "@/types/recibos";
 
 const API_BASE = import.meta.env.VITE_RECIBOS_API_URL || "http://localhost:8000";
 
@@ -65,6 +65,21 @@ export async function procesarPDFs(files: File[]): Promise<ProcessedReceipt[]> {
 
   const data = await handleResponse<ProcessedReceipt[]>(res);
   return data.map((r) => ({ ...r, selected: true }));
+}
+
+/**
+ * Split a PDF into one page per receipt, OCR each page and match the employee.
+ */
+export async function separarPaginasRecibos(file: File): Promise<ReceiptPage[]> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`${API_BASE}/api/pdf/separar-paginas-recibos`, {
+    method: "POST",
+    body: form,
+  });
+
+  return handleResponse<ReceiptPage[]>(res);
 }
 
 /**

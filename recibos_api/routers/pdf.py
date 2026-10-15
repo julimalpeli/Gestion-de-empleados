@@ -8,6 +8,7 @@ from services.period_normalizer import PeriodNormalizer
 from services.receipt_type_detector import ReceiptTypeDetector
 from services.dni_extractor import DNIExtractor
 from services.employee_matcher import EmployeeMatcher
+from services.receipt_page_parser import parse_cuil, parse_pay_period
 from models.schemas import ProcessPDFResponse, PreviewReceipt, ReceiptType
 
 logger = logging.getLogger(__name__)
@@ -135,6 +136,46 @@ async def separar_y_enriquecer(files: List[UploadFile] = File(...)):
             )
     
     return results
+
+
+@router.post("/separar-paginas-recibos")
+async def separar_paginas_recibos(file: UploadFile = File(...)):
+    """
+    Split a multi-receipt PDF into one PDF per page, read each page with OCR,
+    and match it to an employee by CUIL.
+    """
+    content = await file.read()
+    stem = (file.filename or "recibo").rsplit(".", 1)[0]
+
+    try:
+        page_pdfs = PDFProcessor.split_pdf_by_pages(content, 1)
+        pages = []
+
+        for index, page_pdf in enumerate(page_pdfs):
+            text = PDFProcessor.ocr_page(content, index)
+            cuil = parse_cuil(text)
+            period = parse_pay_period(text)
+            employee = await EmployeeMatcher.match_by_cuil_or_dni(cuil, None) if cuil else None
+
+            pages.append({
+                "page_number": index + 1,
+                "file_name": f"{stem}_pag{index + 1}.pdf",
+                "cuil": cuil,
+                "period": period,
+                "employee": employee,
+                "pdf_base64": base64.b64encode(page_pdf).decode("ascii"),
+                "ocr_text": text[:1000],
+            })
+
+            logger.info(f"Page {index + 1} of {file.filename}: cuil={cuil}, period={period}")
+
+        return pages
+    except Exception as e:
+        logger.error(f"Error splitting receipts {file.filename}: {str(e)}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Error processing {file.filename}: {str(e)}"
+        )
 
 
 @router.post("/buscar-texto")

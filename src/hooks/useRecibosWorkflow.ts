@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
-import type { ProcessedReceipt, WorkflowStep, SendResult, BatchHistory } from "@/types/recibos";
+import type { AttachResult, ProcessedReceipt, WorkflowStep, SendResult, BatchHistory } from "@/types/recibos";
 import { procesarPDFs, enviarRecibos, obtenerHistorial, reintentar } from "@/services/recibosService";
+import { adjuntarRecibosALiquidaciones } from "@/services/recibosAttachmentService";
 import { toast } from "@/hooks/use-toast";
 
 export function useRecibosWorkflow() {
@@ -11,6 +12,8 @@ export function useRecibosWorkflow() {
   const [batchHistory, setBatchHistory] = useState<BatchHistory[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [attachResults, setAttachResults] = useState<AttachResult[]>([]);
+  const [isAttaching, setIsAttaching] = useState(false);
 
   /** Step 1 → 2: Upload files and process them */
   const handleProcesar = useCallback(async (files: File[]) => {
@@ -31,6 +34,27 @@ export function useRecibosWorkflow() {
       setIsLoading(false);
     }
   }, []);
+
+  /** Attach each receipt page to its employee's payroll record (no email) */
+  const handleAdjuntar = useCallback(async () => {
+    if (!uploadedFiles.length) return;
+    setIsAttaching(true);
+    setAttachResults([]);
+
+    try {
+      const results = await adjuntarRecibosALiquidaciones(uploadedFiles);
+      setAttachResults(results);
+      const attached = results.filter((r) => r.status === "adjuntado").length;
+      toast({
+        title: "Adjuntos finalizados",
+        description: `${attached} de ${results.length} recibo(s) adjuntado(s) a liquidaciones.`,
+      });
+    } catch (err: any) {
+      toast({ title: "Error al adjuntar", description: err.message, variant: "destructive" });
+    } finally {
+      setIsAttaching(false);
+    }
+  }, [uploadedFiles]);
 
   /** Toggle selection of a receipt */
   const toggleSelection = useCallback((index: number) => {
@@ -132,6 +156,7 @@ export function useRecibosWorkflow() {
     setSendResult(undefined);
     setError(undefined);
     setIsLoading(false);
+    setAttachResults([]);
   }, []);
 
   return {
@@ -143,6 +168,9 @@ export function useRecibosWorkflow() {
     isLoading,
     error,
     handleProcesar,
+    handleAdjuntar,
+    attachResults,
+    isAttaching,
     toggleSelection,
     selectAll,
     handleEnviar,
