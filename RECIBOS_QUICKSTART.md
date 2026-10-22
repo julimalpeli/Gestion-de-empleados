@@ -113,7 +113,7 @@ CREATE POLICY "View payroll sends for company"
 
 ```bash
 # Terminal 1: Backend Python
-python -m uvicorn recibos_api.main:app --reload --port 8000
+cd recibos_api && python -m uvicorn main:app --reload --port 8000
 ```
 
 ### Con Docker
@@ -279,13 +279,13 @@ python -c "import os; print(os.getenv('SUPABASE_URL'))"
 
 ### Error: "Module not found: recibos_api"
 
-**Solución:** Asegúrate de ejecutar desde raíz del proyecto:
+**Solución:** Ejecuta uvicorn desde la carpeta `recibos_api`:
 ```bash
-# ❌ Incorrecto
-cd recibos_api && python -m uvicorn main:app
+# ❌ Incorrecto (desde la raíz del proyecto)
+python -m uvicorn recibos_api.main:app
 
 # ✅ Correcto
-python -m uvicorn recibos_api.main:app
+cd recibos_api && python -m uvicorn main:app
 ```
 
 ### Error: "SUPABASE_KEY not found"
