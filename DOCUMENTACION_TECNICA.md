@@ -4,9 +4,9 @@
 
 ---
 
-**Versión:** 1.1.0
-**Fecha:** Marzo 2026
-**Última Actualización:** Sistema de Presentismo avanzado, nuevos puestos, validaciones mejoradas
+**Versión:** 1.5.0
+**Fecha:** Octubre 2026
+**Última Actualización:** Módulo Recibos con API de OCR y adjuntos por liquidación; módulo Documentos y Reglamentos con versiones y firmas
 **Desarrollado con:** React + TypeScript + Supabase + PostgreSQL
 
 ---
@@ -18,13 +18,15 @@
 3. [Estructura de la Base de Datos](#estructura-de-la-base-de-datos)
 4. [Arquitectura Frontend](#arquitectura-frontend)
 5. [Servicios y APIs](#servicios-y-apis)
-6. [Autenticación y Seguridad](#autenticación-y-seguridad)
-7. [Gestión de Estado](#gestión-de-estado)
-8. [Componentes y UI](#componentes-y-ui)
-9. [Despliegue e Infraestructura](#despliegue-e-infraestructura)
-10. [Performance y Optimización](#performance-y-optimización)
-11. [Monitoreo y Logs](#monitoreo-y-logs)
-12. [Mantenimiento](#mantenimiento)
+6. [Módulo Recibos y API de Recibos](#módulo-recibos-y-api-de-recibos)
+7. [Módulo Documentos y Reglamentos](#módulo-documentos-y-reglamentos)
+8. [Autenticación y Seguridad](#autenticación-y-seguridad)
+9. [Gestión de Estado](#gestión-de-estado)
+10. [Componentes y UI](#componentes-y-ui)
+11. [Despliegue e Infraestructura](#despliegue-e-infraestructura)
+12. [Performance y Optimización](#performance-y-optimización)
+13. [Monitoreo y Logs](#monitoreo-y-logs)
+14. [Mantenimiento](#mantenimiento)
 
 ---
 
@@ -1026,6 +1028,84 @@ export const usePayroll = () => {
 ```
 
 ---
+
+## Módulo Recibos y API de Recibos
+
+### Componentes
+
+- **Frontend:** `src/pages/Recibos.tsx`, `src/hooks/useRecibosWorkflow.ts`, pasos en `src/components/steps/` (Upload, Preview, Confirm, Send), cliente HTTP en `src/services/recibosService.ts` y adjuntos en `src/services/recibosAttachmentService.ts`.
+- **API:** servicio FastAPI en `recibos_api/`. Routers `routers/pdf.py` (prefijo `/api/pdf`) y `routers/envio.py` (prefijo `/api/envio`). Servicios en `services/`: `pdf_processor.py` (PyMuPDF y OCR), `receipt_page_parser.py` (CUIL y período), `employee_matcher.py`, `gmail_provider.py`, `storage_uploader.py`.
+- **Variable de entorno:** `VITE_RECIBOS_API_URL` apunta a la API desplegada.
+
+### Endpoints
+
+| Ruta | Uso |
+|---|---|
+| `/health` | Estado de la API |
+| `/api/pdf/separar-paginas-recibos` | Separa el PDF por página, hace OCR en español, extrae CUIL y período y devuelve cada página como PDF en base64 |
+| `/api/pdf/separar-y-enriquecer` | Flujo previo: separa y enriquece por PDF completo |
+| `/api/pdf/procesar-pdf` | Procesamiento previo de PDF |
+| `/api/envio/enviar` | Envío de recibos por Gmail |
+| `/api/envio/reintentar` | Reintento de envíos fallidos |
+| `/api/envio/historial` | Historial de envíos |
+
+### Flujo "Adjuntar a liquidaciones"
+
+La función `adjuntarRecibosALiquidaciones` en `src/services/recibosAttachmentService.ts` procesa cada archivo cargado y, por cada página devuelta por la API:
+
+1. Si no hay empleado identificado, marca `sin-empleado`. Si no hay período, marca `sin-periodo`.
+2. Busca en `payroll_records` la liquidación por `employee_id` y `period` (formato `YYYY-MM`). Si no existe, marca `sin-liquidacion`.
+3. Verifica en `employee_documents` si ya existe un documento con el mismo `payroll_id`, categoría `recibo_sueldo` y nombre original. Si existe, marca `duplicado`.
+4. Convierte el base64 en `File` y llama a `documentService.uploadDocument` con `employeeId`, `payrollId` y `category: "recibo_sueldo"`.
+
+Los estados posibles están tipados en `AttachStatus` (`src/types/recibos.ts`).
+
+### Extracción de datos del recibo
+
+- **OCR:** cada página se renderiza a 300 DPI con PyMuPDF y se lee con Tesseract (`lang="spa"`) mediante `pytesseract`.
+- **CUIL:** se excluye el CUIT patronal (constante `PATRONAL_CUIT` en `receipt_page_parser.py`) y las coincidencias precedidas por "CUIT".
+- **Período:** se prioriza el texto posterior a "PERIODO DE PAGO". Como alternativa se reconoce "MES ...". El período de cabecera no se usa si hay período de pago.
+- El campo `ocr_text` de cada página (primeros 1000 caracteres) permite ajustar los patrones cuando el OCR falla.
+
+### Imagen de la API
+
+- Base: `python:3.11-slim`.
+- Paquetes del sistema: `tesseract-ocr` y `tesseract-ocr-spa` (en `recibos_api/Dockerfile`).
+- Dependencias Python: `recibos_api/requirements.txt`, incluido `pytesseract`.
+
+### Despliegue
+
+```bash
+fly deploy --dockerfile recibos_api/Dockerfile -a recibos-api
+```
+
+El comando se ejecuta desde la raíz del repositorio. Verificar luego en `https://recibos-api.fly.dev/docs` que aparezca `/api/pdf/separar-paginas-recibos`.
+
+## Módulo Documentos y Reglamentos
+
+### Componentes
+
+- **Página:** `src/pages/Documents.tsx` (ruta `/documentos`, roles admin, manager y hr).
+- **Servicio:** `src/services/companyDocumentsService.ts`, con operaciones sobre `company_documents`, `company_document_versions` y `company_document_signatures`.
+- **Validación:** `src/services/companyDocumentsValidation.ts` (tipos PDF, Word e imagen JPG/PNG; tamaño máximo 10 MB).
+- **Tipos:** `src/types/companyDocuments.ts` (`COMPANY_DOCUMENT_CATEGORIES`: `reglamento`, `vacaciones`, `contrato`, `regla_interna`, `otro`).
+- **Permisos:** módulo `documents` con acciones `view`, `create`, `edit` y `delete` en `src/hooks/use-permissions.tsx`, asignado a admin, manager y hr.
+
+### Modelo de datos
+
+Script: `database/create_company_documents.sql`.
+
+- `company_documents`: metadatos del documento, categoría, descripción, bandera `requires_signature` y `current_version_id`.
+- `company_document_versions`: versiones con `version_number`, `file_path`, `file_name`, `mime_type`, `size`, autor y notas. Cada reemplazo crea una nueva versión y la anterior se conserva.
+- `company_document_signatures`: firma por empleado, asociada a `document_version_id`, con `signed_file_path` y `signed_at`.
+- Bucket de Storage privado `company-documents`. Las políticas de Storage y de tablas permiten acceso solo a administración y RRHH mediante `public.is_company_documents_manager()`.
+
+### Flujos
+
+- **Alta:** crea el documento y su versión 1, y lo marca como versión actual.
+- **Nueva versión:** sube el archivo, crea la versión siguiente y actualiza `current_version_id`.
+- **Firma:** para documentos con `requires_signature`, sube la copia firmada de cada empleado activo y la asocia a la versión actual. Al subir de nuevo para el mismo empleado se reemplaza la firma anterior y se elimina su archivo.
+- **Descarga:** las rutas de archivo se resuelven con URL firmada del bucket privado.
 
 ## Autenticación y Seguridad
 

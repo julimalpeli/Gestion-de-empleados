@@ -4,9 +4,9 @@
 
 ---
 
-**Versión:** 1.1.0
-**Fecha:** Marzo 2026
-**Última Actualización:** Presentismo avanzado, nuevos puestos (Gerente, Administrativo, Ventas, Marketing)
+**Versión:** 1.5.0
+**Fecha:** Octubre 2026
+**Última Actualización:** Recibos con adjunto a liquidaciones y sección Documentos y Reglamentos
 **Destinado a:** Administradores, Gerentes y Empleados
 
 ---
@@ -19,12 +19,14 @@
 4. [Entendiendo el Presentismo](#entendiendo-el-presentismo)
 5. [Gestión de Empleados](#gestión-de-empleados)
 6. [Sistema de Liquidaciones](#sistema-de-liquidaciones)
-7. [Gestión de Documentos](#gestión-de-documentos)
-8. [Sistema de Vacaciones](#sistema-de-vacaciones)
-9. [Portal del Empleado](#portal-del-empleado)
-10. [Gestión de Usuarios](#gestión-de-usuarios)
-11. [Reportes](#reportes)
-12. [Solución de Problemas](#solución-de-problemas)
+7. [Recibos](#recibos)
+8. [Documentos de Empleados y Liquidaciones](#documentos-de-empleados-y-liquidaciones)
+9. [Documentos y Reglamentos](#documentos-y-reglamentos)
+10. [Sistema de Vacaciones](#sistema-de-vacaciones)
+11. [Portal del Empleado](#portal-del-empleado)
+12. [Gestión de Usuarios](#gestión-de-usuarios)
+13. [Reportes](#reportes)
+14. [Solución de Problemas](#solución-de-problemas)
 
 ---
 
@@ -105,8 +107,12 @@ El dashboard es la pantalla principal del sistema y muestra información clave d
 - Empleados
 - Liquidaciones
 - Reportes
+- Recibos
+- Documentos y Reglamentos
+- Roles y Permisos
 - Gestión de Usuarios
-- Roles de Usuario
+
+Los ítems visibles dependen del rol de cada usuario (ver [Roles del Sistema](#roles-del-sistema)).
 
 ---
 
@@ -460,7 +466,38 @@ El módulo de liquidaciones es el corazón del sistema, permitiendo gestionar su
 
 ---
 
-## Gestión de Documentos
+## Recibos
+
+El módulo Recibos permite cargar los PDF de recibos de sueldo, revisarlos, enviarlos por correo y adjuntarlos a cada liquidación. Está disponible para Administración, Gerencia y Recursos Humanos.
+
+### Pasos del flujo
+
+1. **Cargar:** seleccionar uno o más PDF de recibos.
+2. **Detectar:** el sistema procesa los archivos.
+3. **Revisar:** ver los resultados antes de actuar.
+4. **Confirmar:** revisar la selección antes de enviar.
+5. **Historial:** consultar los envíos realizados.
+
+### Adjuntar a liquidaciones
+
+En la pantalla **Revisar** está el botón **Adjuntar a liquidaciones**. Al usarlo:
+
+- Se separa el PDF en un archivo por página, es decir, un recibo por empleado.
+- Se identifica el CUIL del empleado y el período de pago de cada recibo.
+- Se busca la liquidación de ese empleado para ese período.
+- Cada recibo se guarda como documento de su liquidación. Se ve en la columna **Documentos** de la tabla de liquidaciones.
+
+**Importante:** el botón procesa todas las páginas de los archivos cargados, no solo las seleccionadas en la vista previa.
+
+Resultados posibles para cada recibo:
+
+- **Adjuntado:** quedó guardado en la liquidación.
+- **Ya estaba adjunto:** ese recibo ya existe en la liquidación; no se duplica.
+- **Sin empleado:** no se encontró un empleado con ese CUIL.
+- **Sin período:** no se pudo leer el período de pago.
+- **Sin liquidación:** el empleado no tiene liquidación para ese período. Crearla en Liquidaciones y volver a adjuntar.
+
+## Documentos de Empleados y Liquidaciones
 
 El sistema permite gestionar documentos tanto generales de empleados como específicos de liquidaciones.
 
@@ -532,6 +569,56 @@ El sistema permite gestionar documentos tanto generales de empleados como espec�
 - Documentos de liquidación solo visibles para empleado relacionado
 
 ---
+
+## Documentos y Reglamentos
+
+Esta sección guarda reglamentos laborales, reglas de vacaciones, formatos de contrato, reglas internas y otros documentos de la empresa. Solo la ven Administración y Recursos Humanos. Los empleados no la ven en su portal.
+
+### Crear un documento
+
+1. Clic en **Nuevo documento**.
+2. Completar título, categoría y descripción (opcional).
+3. Marcar **Requiere firma de empleados** si el documento debe firmarse.
+4. Seleccionar el archivo: PDF, Word o imagen (JPG/PNG), máximo 10 MB.
+5. Agregar notas (opcional) y clic en **Crear documento**.
+
+El documento queda guardado como versión 1.
+
+### Categorías
+
+- **Reglamento**
+- **Vacaciones**
+- **Contrato**
+- **Regla interna**
+- **Otro**
+
+La pantalla agrupa los documentos por categoría. El buscador filtra por título o descripción, y el selector filtra por categoría.
+
+### Actualizar un documento (nueva versión)
+
+1. Clic en **Nueva versión** en la tarjeta del documento.
+2. Seleccionar el archivo y, si corresponde, escribir una nota de cambio.
+3. Clic en **Subir versión**.
+
+La versión anterior no se borra: queda en el historial.
+
+### Historial de versiones
+
+El botón **Historial** muestra todas las versiones, de la más reciente a la más antigua. La versión vigente aparece marcada como **Actual**, y cada versión se puede descargar.
+
+### Ver o descargar
+
+El botón **Ver / descargar** abre la versión vigente del documento.
+
+### Firmas de empleados
+
+Para documentos que requieren firma:
+
+1. Clic en **Firmas**.
+2. Se muestra la lista de empleados activos, con estado **Firmado** (con la fecha) o **Pendiente**.
+3. Para cada empleado, subir la copia firmada (escaneo o foto). El sistema guarda la copia y la asocia a la versión sobre la que se firmó.
+
+La firma se hace a mano; el sistema guarda la copia digital para consulta.
 
 ## Sistema de Vacaciones
 
@@ -712,14 +799,14 @@ La gestión de usuarios permite administrar el acceso y permisos del sistema.
    - **Nombre completo**
    - **Username (DNI)**
    - **Email**
-   - **Rol:** Admin, Manager, Employee
+   - **Rol:** Administrador, Gerente, Recursos Humanos, Empleado o Solo lectura
    - **Empleado asociado** (si aplica)
 3. Contraseña temporal generada automáticamente
 4. Usuario debe cambiar contraseña en primer login
 
 ### Roles del Sistema
 
-#### 1. Administrator (Admin)
+#### 1. Administrador
 
 **Permisos completos:**
 
@@ -729,16 +816,23 @@ La gestión de usuarios permite administrar el acceso y permisos del sistema.
 - Acceso a todos los reportes
 - Gestión de documentos de todos los empleados
 
-#### 2. Manager (Gerente)
+#### 2. Gerente
 
-**Permisos limitados:**
+**Permisos:**
 
-- Gestión de empleados (crear, editar)
+- Gestión de empleados (crear, editar, exportar)
 - Liquidaciones (crear, editar hasta estado procesada)
 - Visualización de reportes
-- Gestión de documentos de empleados a cargo
+- Recibos y Documentos y Reglamentos
+- Roles y Permisos (consulta)
 
-#### 3. Employee (Empleado)
+#### 3. Recursos Humanos
+
+- Gestión de empleados (crear, editar, exportar)
+- Liquidaciones, Recibos y Documentos y Reglamentos
+- Reportes
+
+#### 4. Empleado
 
 **Permisos mínimos:**
 
@@ -918,6 +1012,14 @@ Si esto no debería ocurrir:
 - Contactar administrador
 - Actualizar página del navegador
 
+#### 6. Un recibo aparece como "Sin liquidación" o "Sin empleado"
+
+**Explicación:**
+
+- **Sin liquidación:** el empleado no tiene liquidación cargada para el período del recibo. Crearla en Liquidaciones y volver a usar **Adjuntar a liquidaciones**.
+- **Sin empleado:** el CUIL del recibo no coincide con el de ningún empleado. Revisar el CUIL cargado en la ficha del empleado.
+- **Sin período:** no se pudo leer el período de pago del recibo. Revisar que el PDF sea legible.
+
 ### Contacto de Soporte
 
 **Para problemas técnicos:**
@@ -968,6 +1070,11 @@ Si esto no debería ocurrir:
 **Marzo 2026**
 
 ---
+
+**Cambios en v1.5.0:**
+- Nueva sección Recibos con botón Adjuntar a liquidaciones.
+- Nueva sección Documentos y Reglamentos con categorías, versiones, historial y firmas de empleados.
+- Roles actualizados: Administrador, Gerente, Recursos Humanos, Empleado y Solo lectura.
 
 **Cambios en v1.1:**
 - Implementación de sistema de Presentismo avanzado (receives_presentismo)

@@ -1,311 +1,192 @@
 # Sistema de Gestión de Recursos Humanos - Cádiz Bar de Tapas
 
-Un sistema completo de gestión de recursos humanos desarrollado con React, TypeScript y Supabase, diseñado específicamente para la gestión de empleados, liquidaciones de sueldos, vacaciones y documentos laborales.
+Aplicación web para administrar el personal de Cádiz Bar de Tapas: empleados, liquidaciones de sueldo, envío de recibos, documentos y reglamentos laborales, vacaciones y un portal de autoconsulta para cada empleado.
 
-## 🚀 Características Principales
+**Versión actual:** 1.5.0 (`src/config/version.ts`)
 
-### 👥 Gestión de Empleados
+## Módulos
 
-- **CRUD completo** de empleados con validación de datos
-- **Estados de empleado** (activo/inactivo) con sincronización automática
-- **Campos personalizados**: DNI, dirección, email, teléfono, fecha de ingreso
-- **Cálculo automático** de antigüedad y elegibilidad para vacaciones
-- **Restricciones de edición** en campos críticos como DNI
+| Módulo | Ruta | Roles con acceso | Descripción |
+|---|---|---|---|
+| Dashboard | `/` | Admin, Gerente, RRHH, Solo lectura | Resumen de empleados, liquidaciones recientes y montos del período. |
+| Empleados | `/empleados` | Admin, Gerente, RRHH | Alta, edición y activación/desactivación de empleados, con documentos asociados. |
+| Liquidaciones | `/liquidaciones` | Admin, Gerente, RRHH | Liquidaciones mensuales, aguinaldo, presentismo, estados y recibos PDF/Excel. |
+| Reportes | `/reportes` | Admin, Gerente, RRHH, Solo lectura | Reportes de liquidaciones y presentismo por período. |
+| Recibos | `/recibos` | Admin, Gerente, RRHH | Carga de PDFs de recibos, revisión, envío por correo e historial de envíos. Incluye adjuntar cada recibo a su liquidación. |
+| Documentos y Reglamentos | `/documentos` | Admin, Gerente, RRHH | Reglamentos, vacaciones, contratos y reglas internas, con versiones, historial y firmas de empleados. |
+| Roles y Permisos | `/roles` | Admin, Gerente | Consulta de roles y permisos por módulo. |
+| Gestión de Usuarios | `/usuarios` | Admin | Alta y administración de usuarios del sistema. |
+| Portal del Empleado | `/portal-empleado` | Empleado | Datos personales, liquidaciones propias, vacaciones y documentos propios. |
 
-### 💰 Sistema de Liquidaciones
+## Funcionalidades principales
 
-- **Liquidación de sueldos** con cálculos automáticos
-- **Período actual vs historial** con filtros avanzados
-- **Conceptos incluidos**: sueldo base, horas extras, feriados, presentismo, aguinaldo, adelantos, descuentos
-- **Estados de liquidación**: borrador, pendiente, aprobada, procesada, pagada
-- **Generación de recibos** en PDF y Excel con datos de la empresa
-- **Gestión de permisos** por rol de usuario
+### Empleados
 
-### 📄 Gestión de Documentos
+- Alta y edición con validación de datos (documento único, fecha de ingreso no futura, sueldo mayor a cero).
+- Indicador "¿Percibe presentismo?" por empleado. Los cambios afectan solo liquidaciones futuras.
+- Cálculo automático de antigüedad y elegibilidad para vacaciones (mínimo 6 meses).
 
-- **Documentos por empleado** y **por liquidación específica**
-- **Categorías**: recibos de sueldo, SAC, documentos generales, formularios
-- **Validación de archivos**: tipos permitidos (PDF, imágenes, Word, Excel) y tamaño máximo (10MB)
-- **Acceso controlado** con Row Level Security (RLS)
-- **Almacenamiento seguro** en Supabase Storage
+### Liquidaciones
 
-### 🏖️ Sistema de Vacaciones
+- Conceptos: sueldo base, horas extras, feriados, presentismo (Mantiene / Perdido), aguinaldo, bono libre, adelantos y descuentos.
+- Pago dividido entre depósito en blanco e importe informal.
+- Estados: borrador, pendiente, aprobada, procesada y pagada.
+- Generación de recibos en PDF y Excel, y adjuntos de documentos por liquidación.
 
-- **Regla de 6 meses** de antigüedad mínima
-- **Cálculo automático** de días disponibles según antigüedad
-- **Historial de solicitudes** con estados (pendiente, aprobada, rechazada)
-- **Advertencias de elegibilidad** para empleados nuevos
+### Recibos (envío y adjuntos)
 
-### 👨‍💼 Portal del Empleado
+- Flujo en cinco pasos: Cargar, Detectar, Revisar, Confirmar e Historial.
+- Envío de recibos por correo con historial y reintento de fallidos.
+- Botón "Adjuntar a liquidaciones" en la pantalla de revisión: separa un PDF por página, identifica empleado y período, y guarda cada recibo como documento de la liquidación correspondiente. Requiere la API de Recibos desplegada con OCR (ver sección de API).
 
-- **Interfaz dedicada** para consulta personal
-- **Información personal**: datos, antigüedad, estado
-- **Historial de liquidaciones** con descarga de recibos
-- **Estado de vacaciones** y saldo disponible
-- **Acceso a documentos** propios únicamente
+### Documentos y Reglamentos
 
-### 🔐 Sistema de Autenticación y Permisos
+- Categorías: Reglamento, Vacaciones, Contrato, Regla interna y Otro.
+- Búsqueda por título o descripción y filtro por categoría.
+- Cada documento se crea como versión 1. Al reemplazarlo se sube una nueva versión y la anterior queda en el historial.
+- Documentos marcados como "Requiere firma" permiten subir, por empleado activo, la copia firmada a mano.
+- Archivos permitidos: PDF, Word o imagen (JPG/PNG), hasta 10 MB.
+- Acceso restringido a administración y RRHH. Los empleados no ven esta sección.
 
-- **Autenticación segura** con Supabase Auth
-- **Roles de usuario**: Admin, Manager, Employee
-- **Permisos granulares** por módulo
-- **Protección de rutas** según permisos
-- **Forzar cambio de contraseña** en primer login
+### Vacaciones
 
-### 📊 Reportes y Dashboards
+- Elegibilidad a partir de 6 meses de antigüedad.
+- Días anuales según antigüedad (14, 21, 28 o 35 días).
+- Solicitudes con estados pendiente, aprobada y rechazada.
 
-- **Dashboard ejecutivo** con métricas clave
-- **Reportes de liquidaciones** por período
-- **Filtros avanzados** por empleado, estado, fecha
-- **Visualización de datos** con gráficos y tablas
+### Autenticación y permisos
 
-## 🛠️ Tecnologías Utilizadas
+- Autenticación con Supabase Auth y cambio obligatorio de contraseña en el primer ingreso.
+- Roles: Administrador, Gerente, Recursos Humanos, Empleado y Solo lectura.
+- Permisos por módulo (empleados, liquidaciones, documentos, usuarios, etc.) y protección de rutas en frontend, con Row Level Security en la base de datos.
+
+## Arquitectura
+
+- **Frontend:** aplicación React en `src/`, servida por Vite.
+- **Base de datos y archivos:** Supabase (PostgreSQL, Auth, Storage y RLS).
+- **API de Recibos:** servicio FastAPI en `recibos_api/`, desplegado en Fly.io. Procesa los PDF de recibos, hace OCR con Tesseract (español) y se comunica con Gmail para los envíos.
+
+## Tecnologías
 
 ### Frontend
 
-- **React 18** - Biblioteca de interfaz de usuario
-- **TypeScript** - Tipado estático
-- **Vite** - Herramienta de construcción y desarrollo
-- **Tailwind CSS** - Framework de CSS
-- **Radix UI** - Componentes de interfaz accesibles
-- **Lucide React** - Iconografía
-- **React Router DOM** - Enrutamiento
-- **React Hook Form** - Manejo de formularios
-- **Recharts** - Gráficos y visualizaciones
+- React 18 y TypeScript
+- Vite 6
+- Tailwind CSS y componentes Radix UI
+- React Router
+- React Hook Form y Zod
+- Recharts
+- Vitest para pruebas
 
-### Backend y Base de Datos
+### Backend
 
-- **Supabase** - Backend as a Service
-- **PostgreSQL** - Base de datos relacional
-- **Row Level Security (RLS)** - Seguridad a nivel de fila
-- **Supabase Auth** - Autenticación
-- **Supabase Storage** - Almacenamiento de archivos
+- Supabase (PostgreSQL, Auth, Storage)
+- API de Recibos: Python 3.11, FastAPI, PyMuPDF, Pillow, Tesseract OCR con `pytesseract`
 
-### Librerías de Utilidad
+## Requisitos previos
 
-- **date-fns** - Manipulación de fechas
-- **clsx** - Concatenación condicional de clases CSS
-- **zod** - Validación de esquemas
-- **framer-motion** - Animaciones
+- Node.js 18 o superior
+- Proyecto de Supabase configurado
+- Python 3.11 y Tesseract con idioma español (solo para correr la API de Recibos en local)
+- CLI de Fly.io para desplegar la API
 
-## 📋 Requisitos Previos
+## Instalación
 
-- **Node.js** 18.x o superior
-- **npm** o **yarn**
-- **Cuenta de Supabase** configurada
-- **Variables de entorno** configuradas
-
-## 🚀 Instalación
-
-### 1. Clonar el Repositorio
+### 1. Clonar el repositorio
 
 ```bash
-git clone <repository-url>
-cd hr-management-system
+git clone https://github.com/julimalpeli/Gestion-de-empleados.git
+cd Gestion-de-empleados
 ```
 
-### 2. Instalar Dependencias
+### 2. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 3. Configurar Variables de Entorno
+### 3. Configurar variables de entorno
 
-Crear archivo `.env.local`:
+Crear `.env.local` a partir de `.env.example`:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=tu_url_de_supabase
+VITE_SUPABASE_ANON_KEY=tu_anon_key
+VITE_RECIBOS_API_URL=https://recibos-api.fly.dev
 ```
 
-### 4. Configurar Base de Datos
+### 4. Preparar la base de datos
 
-Ejecutar scripts SQL en orden desde la carpeta `/database/`:
+Ejecutar en el SQL Editor de Supabase los scripts de `database/` según la configuración del proyecto. Los principales son:
 
-```bash
-# Scripts principales
-schema.sql
-create_payroll_records_table.sql
-create_employee_documents_table.sql
-setup_storage_employee_documents.sql
-add_payroll_id_to_documents.sql
-```
+- `schema.sql`
+- `create_payroll_records_table.sql`
+- `create_employee_documents_table.sql`
+- `setup_storage_employee_documents.sql`
+- `add_payroll_id_to_documents.sql`
+- `create_company_documents.sql` (módulo Documentos y Reglamentos)
 
-### 5. Ejecutar la Aplicación
+### 5. Ejecutar la aplicación
 
 ```bash
 npm run dev
 ```
 
-La aplicación estará disponible en `http://localhost:5173`
+La aplicación queda disponible en `http://localhost:5173`.
 
-## 🗄️ Estructura de la Base de Datos
+## API de Recibos
 
-### Tablas Principales
+La API se despliega desde la raíz del repositorio, porque el Dockerfile copia archivos desde `recibos_api/`:
 
-#### `employees`
+```bash
+fly deploy --dockerfile recibos_api/Dockerfile -a recibos-api
+```
 
-- Información completa de empleados
-- Cálculos automáticos de vacaciones
-- Estados activo/inactivo
+Después del deploy, `https://recibos-api.fly.dev/docs` lista los endpoints disponibles, incluido `/api/pdf/separar-paginas-recibos` usado por "Adjuntar a liquidaciones".
 
-#### `users`
-
-- Autenticación y permisos
-- Roles de sistema
-- Sincronización con empleados
-
-#### `payroll_records`
-
-- Registros de liquidaciones
-- Todos los conceptos salariales
-- Estados de procesamiento
-
-#### `employee_documents`
-
-- Documentos por empleado y liquidación
-- Categorización automática
-- Metadatos de archivos
-
-#### `vacation_requests`
-
-- Solicitudes de vacaciones
-- Estados de aprobación
-- Historial completo
-
-## 📁 Estructura del Proyecto
+## Estructura del proyecto
 
 ```
 src/
-├── components/          # Componentes reutilizables
-│   ├── ui/             # Componentes base de UI
-│   ├── DocumentManager.tsx
-│   ├── VacationManager.tsx
-│   └── ...
-├── pages/              # Páginas principales
-│   ├── Dashboard.tsx
-│   ├── Employees.tsx
-│   ├── Payroll.tsx
-│   ├── EmployeePortal.tsx
-│   └── ...
-├── hooks/              # Hooks personalizados
-│   ├── use-employees.tsx
-│   ├── use-payroll.tsx
-│   ├── use-auth.tsx
-│   └── ...
-├── services/           # Servicios de datos
-│   ├── employeeService.ts
-│   ├── documentService.ts
-│   └── interfaces.ts
-├── utils/              # Utilidades
-│   └── receiptGenerator.ts
-└── lib/                # Configuraciones
-    └── supabase.ts
+├── components/          # Componentes reutilizables y pasos del flujo de Recibos
+├── config/              # Configuración de la app (versión)
+├── hooks/               # Hooks (permisos, empleados, liquidaciones, documentos, recibos)
+├── pages/               # Páginas: Dashboard, Employees, Payroll, Recibos, Documents, etc.
+├── services/            # Servicios de datos y de integración con la API de Recibos
+├── types/               # Tipos TypeScript
+└── lib/                 # Cliente de Supabase
+database/                # Scripts SQL de tablas, políticas RLS y storage
+recibos_api/             # API de Recibos (FastAPI)
+docs/                    # Documentación técnica de seguridad y componentes
 ```
 
-## 🔧 Scripts Disponibles
+## Scripts disponibles
 
-- `npm run dev` - Ejecutar en modo desarrollo
-- `npm run build` - Construir para producción
-- `npm run test` - Ejecutar pruebas
-- `npm run format.fix` - Formatear código
-- `npm run typecheck` - Verificar tipos TypeScript
+- `npm run dev` - Modo desarrollo
+- `npm run build` - Build de producción
+- `npm run test` - Pruebas con Vitest
+- `npm run typecheck` - Verificación de tipos
+- `npm run format.fix` - Formateo con Prettier
 
-## 🚀 Despliegue
+## Despliegue
 
-### Vercel (Recomendado)
+- **Frontend:** configuración para Vercel (`vercel.json`) y Netlify (`netlify.toml`). Cargar las variables de entorno en la plataforma de despliegue.
+- **API de Recibos:** Fly.io, según la sección anterior.
 
-```bash
-npm run build
-vercel --prod
-```
+## Seguridad
 
-### Netlify
+- RLS habilitado en las tablas con datos sensibles.
+- Validación de permisos en frontend y, para datos, en la base de datos.
+- Documentos y archivos en buckets privados, accedidos con URL firmada.
+- Autenticación con Supabase Auth.
 
-```bash
-npm run build
-# Subir carpeta dist/ a Netlify
-```
+## Documentación
 
-Asegurar configurar las variables de entorno en la plataforma de despliegue.
+- `MANUAL_USUARIO.md`: guía funcional para administración, RRHH y empleados.
+- `DOCUMENTACION_TECNICA.md`: arquitectura, base de datos, servicios y componentes.
+- `RECIBOS_ARCHITECTURE.md`: arquitectura del módulo Recibos.
+- `SUPABASE_SETUP.md`: configuración de Supabase.
 
-## 🔒 Seguridad
+## Soporte
 
-- **RLS habilitado** en todas las tablas críticas
-- **Validación de permisos** en frontend y backend
-- **Sanitización de datos** en todos los formularios
-- **Encriptación** de contraseñas con Supabase Auth
-- **Tokens JWT** para autenticación de sesiones
-
-## 📝 Funcionalidades Destacadas
-
-### Cálculo Automático de Liquidaciones
-
-```typescript
-// Ejemplo de cálculo automático
-const calculatePayroll = (employee, period) => {
-  const basePay = employee.dailyWage * workDays;
-  const overtimePay = overtimeHours * (hourlyRate * 1.5);
-  const holidayPay = holidayDays * employee.dailyWage * 2;
-  // ... más cálculos
-  return totalCalculation;
-};
-```
-
-### Generación de Recibos
-
-- **PDF profesional** con datos de la empresa
-- **Excel/CSV** para procesamiento adicional
-- **Datos completos** de liquidación y empleado
-
-### Sistema de Permisos
-
-```typescript
-// Ejemplo de verificación de permisos
-const canEditPayroll = isAdmin() || canEditModule("payroll");
-const canViewEmployeeData = hasPermission("employees", "read");
-```
-
-## 🤝 Contribuir
-
-1. Fork del proyecto
-2. Crear rama de feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit de cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear Pull Request
-
-## 📄 Licencia
-
-Este proyecto está bajo licencia MIT. Ver archivo `LICENSE` para más detalles.
-
-## 📞 Soporte
-
-Para soporte técnico o consultas:
-
-- Crear un issue en GitHub
-- Contactar al equipo de desarrollo
-- Revisar la documentación técnica
-
-## 🔄 Actualizaciones
-
-### Versión Actual: 1.0.0
-
-- ✅ Sistema completo de empleados
-- ✅ Liquidaciones automáticas
-- ✅ Gestión de documentos
-- ✅ Portal del empleado
-- ✅ Sistema de vacaciones
-- ✅ Reportes y dashboards
-
-### Roadmap Futuro
-
-- 🔄 Módulo de evaluaciones de desempeño
-- 🔄 Integración con sistemas contables
-- 🔄 Notificaciones automáticas
-- 🔄 App móvil nativa
-- 🔄 Análisis avanzado con IA
-
----
-
-**Desarrollado con ❤️ para Cádiz Bar de Tapas**
+Para consultas técnicas, crear un issue en GitHub o contactar al equipo de desarrollo.
