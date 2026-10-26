@@ -368,6 +368,7 @@ export interface PayrollRecord {
   overtime_hours?: number;
   overtime_amount?: number;
   bonus_amount?: number;
+  vacation_bonus_amount?: number;
   net_total: number;
   status: "draft" | "pending" | "processed";
   processed_date?: string;

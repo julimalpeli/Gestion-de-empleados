@@ -41,6 +41,7 @@ export interface PayrollRecord {
   extraHours?: number;
   extraHoursAmount?: number;
   bonusAmount?: number;
+  vacationBonusAmount?: number;
   paidDate?: string;
   hasDocument?: boolean;
 }

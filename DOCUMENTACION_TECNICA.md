@@ -4,7 +4,7 @@
 
 ---
 
-**Versión:** 1.5.0
+**Versión:** 1.6.0
 **Fecha:** Octubre 2026
 **Última Actualización:** Módulo Recibos con API de OCR y adjuntos por liquidación; módulo Documentos y Reglamentos con versiones y firmas
 **Desarrollado con:** React + TypeScript + Supabase + PostgreSQL
@@ -238,6 +238,7 @@ CREATE TABLE payroll_records (
     white_amount DECIMAL(10,2) DEFAULT 0,
     informal_amount DECIMAL(10,2) DEFAULT 0,
     bonus_amount DECIMAL(10,2) DEFAULT 0,
+    vacation_bonus_amount DECIMAL(12,2) DEFAULT 0,
     presentismo_amount DECIMAL(10,2) DEFAULT 0,
     aguinaldo DECIMAL(10,2) DEFAULT 0,
     net_total DECIMAL(10,2) NOT NULL,

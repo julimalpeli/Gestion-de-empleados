@@ -331,6 +331,7 @@ const EmployeePortal = () => {
       overtimeHours: record.overtimeHours,
       overtimeAmount: record.overtimeAmount,
       bonusAmount: record.bonusAmount,
+      vacationBonusAmount: record.vacationBonusAmount,
       holidayBonus: record.holidayBonus,
       status: record.status,
       paidDate: record.processedDate
@@ -735,6 +736,7 @@ const EmployeePortal = () => {
                         <TableHead>Horas Extra</TableHead>
                         <TableHead>Feriados</TableHead>
                         <TableHead>Bono</TableHead>
+                        <TableHead>Plus vac.</TableHead>
                         <TableHead>Aguinaldo</TableHead>
                         <TableHead>Presentismo</TableHead>
                         <TableHead>Sueldo</TableHead>
@@ -793,6 +795,9 @@ const EmployeePortal = () => {
                             </TableCell>
                             <TableCell className="font-medium text-blue-600">
                               {formatCurrency(record.bonusAmount || 0)}
+                            </TableCell>
+                            <TableCell className="font-medium text-blue-600">
+                              {formatCurrency(record.vacationBonusAmount || 0)}
                             </TableCell>
                             <TableCell className="font-medium text-blue-600">
                               {record.aguinaldo > 0

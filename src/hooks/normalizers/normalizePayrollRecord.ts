@@ -90,6 +90,9 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
   const bonusAmount = toNumber(
     readField(record, "bonus_amount", "bonusAmount"),
   );
+  const vacationBonusAmount = toNumber(
+    readField(record, "vacation_bonus_amount", "vacationBonusAmount"),
+  );
   const netTotal =
     toOptionalNumber(readField(record, "net_total", "netTotal")) ??
     resolvedWhiteAmount +
@@ -98,7 +101,8 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
       holidayBonus +
       aguinaldo +
       overtimeAmount +
-      bonusAmount -
+      bonusAmount +
+      vacationBonusAmount -
       advances -
       discounts;
 
@@ -129,6 +133,7 @@ export const normalizePayrollRecord = (record: any): PayrollRecord => {
     overtimeHours: overtimeHours ?? 0,
     overtimeAmount,
     bonusAmount,
+    vacationBonusAmount,
     netTotal,
     status:
       (readField(record, "status", "status") as PayrollRecord["status"]) ??

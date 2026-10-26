@@ -160,6 +160,7 @@ const BulkPayrollDialog = ({
           overtimeHours: 0,
           overtimeAmount: calculation.overtimeAmount,
           bonusAmount: 0,
+          vacationBonusAmount: 0,
           netTotal: calculation.netTotal,
           status: "draft",
         });

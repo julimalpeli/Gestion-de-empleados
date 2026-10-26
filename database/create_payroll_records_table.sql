@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS payroll_records (
     overtime_hours DECIMAL(8,2) DEFAULT 0,
     overtime_amount DECIMAL(12,2) DEFAULT 0,
     bonus_amount DECIMAL(12,2) DEFAULT 0,
+    vacation_bonus_amount DECIMAL(12,2) DEFAULT 0,
     net_total DECIMAL(12,2) NOT NULL DEFAULT 0,
     status VARCHAR(20) NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'pending', 'approved', 'processed', 'paid')),
     processed_date TIMESTAMP WITH TIME ZONE,

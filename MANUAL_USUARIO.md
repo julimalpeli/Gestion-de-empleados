@@ -4,7 +4,7 @@
 
 ---
 
-**Versión:** 1.5.0
+**Versión:** 1.6.0
 **Fecha:** Octubre 2026
 **Última Actualización:** Recibos con adjunto a liquidaciones y sección Documentos y Reglamentos
 **Destinado a:** Administradores, Gerentes y Empleados
@@ -362,6 +362,7 @@ El módulo de liquidaciones es el corazón del sistema, permitiendo gestionar su
   - Opciones: **Mantiene** (incluye monto) o **Perdido** ($0)
   - El sistema muestra el monto configurado para ese empleado
 - **Bono libre:** Monto adicional por bonificaciones o incentivos
+- **Plus vacacional:** Monto adicional que se carga igual que el bono libre, pensado para empleados que se tomaron vacaciones. Si el empleado no tiene vacaciones aprobadas en el periodo, el sistema muestra un aviso amarillo, pero permite guardar igual. Se incluye en el sueldo bruto y neto, y en el cálculo del aguinaldo solo desde el semestre jul-dic 2026
 - **Adelantos:** Montos entregados durante el mes (se descuentan)
 - **Descuentos:** Deducciones aplicables (descuentos, retenciones, etc.)
 
@@ -1070,6 +1071,10 @@ Si esto no debería ocurrir:
 **Marzo 2026**
 
 ---
+
+**Cambios en v1.6.0:**
+- Nuevo campo Plus vacacional en liquidaciones (columna `vacation_bonus_amount`). Antes de usarlo, ejecutar `database/add_vacation_bonus_to_payroll.sql` en el SQL Editor de Supabase.
+- El plus vacacional se suma al mejor sueldo del aguinaldo solo desde el semestre jul-dic 2026. Los periodos anteriores no cambian.
 
 **Cambios en v1.5.0:**
 - Nueva sección Recibos con botón Adjuntar a liquidaciones.

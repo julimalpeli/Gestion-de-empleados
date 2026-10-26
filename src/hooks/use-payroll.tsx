@@ -27,6 +27,7 @@ const toPayrollRow = (payroll: PayrollInsertInput) => ({
   overtime_hours: payroll.overtimeHours || 0,
   overtime_amount: payroll.overtimeAmount || 0,
   bonus_amount: payroll.bonusAmount || 0,
+  vacation_bonus_amount: payroll.vacationBonusAmount || 0,
   net_total: payroll.netTotal,
   status: payroll.status,
   processed_date: payroll.processedDate,
@@ -100,6 +101,7 @@ export const usePayroll = () => {
               overtime_hours,
               overtime_amount,
               bonus_amount,
+              vacation_bonus_amount,
               net_total,
               status,
               processed_date,
@@ -343,6 +345,8 @@ export const usePayroll = () => {
         updateData.overtime_amount = updates.overtimeAmount;
       if (updates.bonusAmount !== undefined)
         updateData.bonus_amount = updates.bonusAmount;
+      if (updates.vacationBonusAmount !== undefined)
+        updateData.vacation_bonus_amount = updates.vacationBonusAmount;
       if (updates.netTotal !== undefined)
         updateData.net_total = updates.netTotal;
       if (updates.status !== undefined) updateData.status = updates.status;

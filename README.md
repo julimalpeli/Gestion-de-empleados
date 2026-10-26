@@ -2,7 +2,7 @@
 
 Aplicación web para administrar el personal de Cádiz Bar de Tapas: empleados, liquidaciones de sueldo, envío de recibos, documentos y reglamentos laborales, vacaciones y un portal de autoconsulta para cada empleado.
 
-**Versión actual:** 1.5.0 (`src/config/version.ts`)
+**Versión actual:** 1.6.0 (`src/config/version.ts`)
 
 ## Módulos
 
@@ -28,7 +28,7 @@ Aplicación web para administrar el personal de Cádiz Bar de Tapas: empleados, 
 
 ### Liquidaciones
 
-- Conceptos: sueldo base, horas extras, feriados, presentismo (Mantiene / Perdido), aguinaldo, bono libre, adelantos y descuentos.
+- Conceptos: sueldo base, horas extras, feriados, presentismo (Mantiene / Perdido), aguinaldo, bono libre, plus vacacional, adelantos y descuentos.
 - Pago dividido entre depósito en blanco e importe informal.
 - Estados: borrador, pendiente, aprobada, procesada y pagada.
 - Generación de recibos en PDF y Excel, y adjuntos de documentos por liquidación.

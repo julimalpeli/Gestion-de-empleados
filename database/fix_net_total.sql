@@ -10,7 +10,8 @@ BEGIN
         COALESCE(NEW.aguinaldo, 0) + 
         COALESCE(NEW.presentismo_amount, 0) +
         COALESCE(NEW.overtime_amount, 0) +
-        COALESCE(NEW.bonus_amount, 0) -
+        COALESCE(NEW.bonus_amount, 0) +
+        COALESCE(NEW.vacation_bonus_amount, 0) -
         COALESCE(NEW.discounts, 0) -
         COALESCE(NEW.advances, 0)
     );
@@ -35,7 +36,8 @@ SET net_total = (
     COALESCE(aguinaldo, 0) + 
     COALESCE(presentismo_amount, 0) +
     COALESCE(overtime_amount, 0) +
-    COALESCE(bonus_amount, 0) -
+    COALESCE(bonus_amount, 0) +
+    COALESCE(vacation_bonus_amount, 0) -
     COALESCE(discounts, 0) -
     COALESCE(advances, 0)
 )

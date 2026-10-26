@@ -145,6 +145,7 @@ export interface PayrollRecord {
   overtimeHours?: number;
   overtimeAmount?: number;
   bonusAmount?: number;
+  vacationBonusAmount?: number;
   netTotal: number;
   status: "draft" | "pending" | "approved" | "processed" | "paid";
   processedDate?: string;
@@ -170,6 +171,7 @@ export interface CreatePayrollRequest {
   overtimeHours?: number;
   overtimeAmount?: number;
   bonusAmount?: number;
+  vacationBonusAmount?: number;
   netTotal: number;
   status: "draft" | "pending" | "approved" | "processed" | "paid";
   processedDate?: string;
@@ -265,6 +267,7 @@ export interface PayrollCalculation {
   overtimePay: number;
   presentismoAmount: number;
   bonusPay: number;
+  vacationBonusPay: number;
   grossTotal: number;
   totalAdvances: number;
   totalDiscounts: number;

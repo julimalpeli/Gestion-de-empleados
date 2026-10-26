@@ -75,6 +75,29 @@ describe("normalizePayrollRecord", () => {
     });
   });
 
+  it("lee vacation_bonus_amount y lo suma al netTotal calculado", () => {
+    const result = normalizePayrollRecord({
+      employee_id: "emp-3",
+      period: "2026-08",
+      white_amount: "10000",
+      vacation_bonus_amount: "4000",
+    });
+
+    expect(result.vacationBonusAmount).toBe(4000);
+    expect(result.netTotal).toBe(14000);
+  });
+
+  it("usa 0 como plus vacacional cuando el registro no tiene la columna", () => {
+    const result = normalizePayrollRecord({
+      employee_id: "emp-4",
+      period: "2026-08",
+      white_amount: 10000,
+    });
+
+    expect(result.vacationBonusAmount).toBe(0);
+    expect(result.netTotal).toBe(10000);
+  });
+
   it("derives fallback values when numeric fields or identifiers are missing", () => {
     const record = {
       employee_id: "emp-2",

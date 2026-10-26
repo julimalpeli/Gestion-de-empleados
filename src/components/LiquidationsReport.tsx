@@ -98,6 +98,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       const overtimeAmount = record.overtimeAmount || 0;
       const presentismo = record.presentismoAmount || 0;
       const bonusAmount = record.bonusAmount || 0;
+      const vacationBonusAmount = record.vacationBonusAmount || 0;
       const advances = record.advances || 0;
       const discounts = record.discounts || 0;
       const holidayBonus = record.holidayBonus || 0;
@@ -123,6 +124,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         presentismo -
         overtimeAmount -
         bonusAmount -
+        vacationBonusAmount -
         holidayBonus -
         calculatedAguinaldo +
         advances +
@@ -146,6 +148,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         presentismo,
         overtimeAmount,
         bonusAmount,
+        vacationBonusAmount,
         advances,
         discounts,
         holidayBonus,
@@ -185,6 +188,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       presentismo: acc.presentismo + record.presentismo,
       overtimeAmount: acc.overtimeAmount + record.overtimeAmount,
       bonusAmount: acc.bonusAmount + record.bonusAmount,
+      vacationBonusAmount: acc.vacationBonusAmount + record.vacationBonusAmount,
       advances: acc.advances + record.advances,
       discounts: acc.discounts + record.discounts,
       holidayBonus: acc.holidayBonus + record.holidayBonus,
@@ -202,6 +206,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       presentismo: 0,
       overtimeAmount: 0,
       bonusAmount: 0,
+      vacationBonusAmount: 0,
       advances: 0,
       discounts: 0,
       holidayBonus: 0,
@@ -225,6 +230,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       "Horas Extra",
       "Monto H.Extra",
       "Bonificaciones",
+      "Plus Vacacional",
       "Adelantos",
       "Descuentos",
       "Feriado Doble",
@@ -246,6 +252,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
           record.overtimeHours,
           record.overtimeAmount,
           record.bonusAmount,
+          record.vacationBonusAmount,
           -record.advances, // Negativo para mostrar como descuento
           -record.discounts, // Negativo para mostrar como descuento
           record.holidayBonus,
@@ -322,6 +329,9 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       record.presentismo > 0 ? formatCurrency(record.presentismo) : "-",
       record.overtimeHours > 0 ? `${record.overtimeHours}h` : "-",
       record.bonusAmount > 0 ? formatCurrency(record.bonusAmount) : "-",
+      record.vacationBonusAmount > 0
+        ? formatCurrency(record.vacationBonusAmount)
+        : "-",
       record.advances > 0 ? formatCurrency(-record.advances) : "-", // Adelantos
       record.discounts > 0 ? formatCurrency(-record.discounts) : "-", // Descuentos
       record.holidayBonus > 0 ? formatCurrency(record.holidayBonus) : "-", // Feriados
@@ -348,6 +358,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
       formatCurrency(totals.presentismo),
       "",
       formatCurrency(totals.bonusAmount),
+      formatCurrency(totals.vacationBonusAmount),
       formatCurrency(-totals.advances), // Total adelantos
       formatCurrency(-totals.discounts), // Total descuentos
       formatCurrency(totals.holidayBonus), // Total de feriados
@@ -367,6 +378,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
           "Presentismo",
           "H.Extra",
           "Bonificac.",
+          "Plus vac.",
           "Adelantos",
           "Descuentos",
           "Feriados",
@@ -395,20 +407,21 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
         halign: "center",
       },
       columnStyles: {
-        0: { cellWidth: 35, halign: "left" }, // Empleado
+        0: { cellWidth: 30, halign: "left" }, // Empleado
         1: { cellWidth: 16, halign: "center" }, // Período
         2: { cellWidth: 10, halign: "center" }, // Días
-        3: { cellWidth: 22, halign: "right" }, // Sueldo Base
-        4: { cellWidth: 20, halign: "right" }, // Presentismo
+        3: { cellWidth: 21, halign: "right" }, // Sueldo Base
+        4: { cellWidth: 18, halign: "right" }, // Presentismo
         5: { cellWidth: 12, halign: "center" }, // H.Extra
         6: { cellWidth: 18, halign: "right" }, // Bonificaciones
-        7: { cellWidth: 18, halign: "right" }, // Adelantos
-        8: { cellWidth: 18, halign: "right" }, // Descuentos
-        9: { cellWidth: 16, halign: "right" }, // Feriados
-        10: { cellWidth: 22, halign: "right" }, // Efectivo
-        11: { cellWidth: 22, halign: "right" }, // Depósito
-        12: { cellWidth: 25, halign: "right" }, // Total Neto
-        13: { cellWidth: 16, halign: "center" }, // Estado
+        7: { cellWidth: 16, halign: "right" }, // Plus vacacional
+        8: { cellWidth: 18, halign: "right" }, // Adelantos
+        9: { cellWidth: 18, halign: "right" }, // Descuentos
+        10: { cellWidth: 16, halign: "right" }, // Feriados
+        11: { cellWidth: 22, halign: "right" }, // Efectivo
+        12: { cellWidth: 20, halign: "right" }, // Depósito
+        13: { cellWidth: 24, halign: "right" }, // Total Neto
+        14: { cellWidth: 16, halign: "center" }, // Estado
       },
       headStyles: { fillColor: [41, 128, 185] },
       didParseCell: function (data: any) {
@@ -609,6 +622,7 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       <TableHead className="text-center">H.Extra</TableHead>
                       <TableHead className="text-right">Monto H.E</TableHead>
                       <TableHead className="text-right">Bonificac.</TableHead>
+                      <TableHead className="text-right">Plus vac.</TableHead>
                       <TableHead className="text-right">Adelantos</TableHead>
                       <TableHead className="text-right">Descuentos</TableHead>
                       <TableHead className="text-right">Fer.Doble</TableHead>
@@ -653,6 +667,11 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                         <TableCell className="text-right text-purple-600">
                           {record.bonusAmount > 0
                             ? formatCurrency(record.bonusAmount)
+                            : "-"}
+                        </TableCell>
+                        <TableCell className="text-right text-purple-600">
+                          {record.vacationBonusAmount > 0
+                            ? formatCurrency(record.vacationBonusAmount)
                             : "-"}
                         </TableCell>
                         <TableCell className="text-right text-red-600">
@@ -728,6 +747,9 @@ const LiquidationsReport = ({ isOpen, onClose }: LiquidationsReportProps) => {
                       </TableCell>
                       <TableCell className="text-right text-purple-600">
                         {formatCurrency(totals.bonusAmount)}
+                      </TableCell>
+                      <TableCell className="text-right text-purple-600">
+                        {formatCurrency(totals.vacationBonusAmount)}
                       </TableCell>
                       <TableCell className="text-right text-red-600">
                         {formatCurrency(-totals.advances)}

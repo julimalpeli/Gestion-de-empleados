@@ -65,6 +65,7 @@ CREATE TABLE payroll_records (
     overtime_hours DECIMAL(5,2) DEFAULT 0, -- Horas extra trabajadas
     overtime_amount DECIMAL(10,2) DEFAULT 0, -- Pago por horas extra
     bonus_amount DECIMAL(10,2) DEFAULT 0, -- Bonos adicionales
+    vacation_bonus_amount DECIMAL(12,2) DEFAULT 0, -- Plus vacacional
     net_total DECIMAL(12,2) NOT NULL DEFAULT 0, -- Total neto a pagar
     status VARCHAR(20) CHECK (status IN ('draft', 'pending', 'processed')) DEFAULT 'draft',
     processed_date TIMESTAMP WITH TIME ZONE,

@@ -42,6 +42,28 @@ describe("getNextPayrollStatus", () => {
 });
 
 describe("calculatePayrollAmounts", () => {
+  it("con plus vacacional en 0 el neto y el bruto no cambian", () => {
+    const result = calculatePayrollAmounts({
+      ...baseInput,
+      vacationBonusAmount: 0,
+    });
+
+    expect(result.vacationBonusPay).toBe(0);
+    expect(result.grossTotal).toBe(330000);
+    expect(result.netTotal).toBe(330000);
+  });
+
+  it("suma el plus vacacional al bruto y al neto", () => {
+    const result = calculatePayrollAmounts({
+      ...baseInput,
+      vacationBonusAmount: 45000,
+    });
+
+    expect(result.vacationBonusPay).toBe(45000);
+    expect(result.grossTotal).toBe(375000);
+    expect(result.netTotal).toBe(375000);
+  });
+
   it("calcula sueldo base proporcional y presentismo para un mes completo", () => {
     const result = calculatePayrollAmounts(baseInput);
 

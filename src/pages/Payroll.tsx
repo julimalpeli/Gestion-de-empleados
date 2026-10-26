@@ -39,6 +39,7 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { usePayroll } from "@/hooks/use-payroll";
 import { useEmployees } from "@/hooks/use-employees";
+import { useVacations } from "@/hooks/use-vacations";
 import {
   generatePayrollReceiptPDF,
   generatePayrollReceiptExcel,
@@ -123,6 +124,7 @@ const Payroll = () => {
   const [overtimeEnabled, setOvertimeEnabled] = useState(false);
   const [overtimeHours, setOvertimeHours] = useState("");
   const [bonusAmount, setBonusAmount] = useState("");
+  const [vacationBonusAmount, setVacationBonusAmount] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [searchTerm, setSearchTerm] = useState(""); // Campo de búsqueda
@@ -141,6 +143,8 @@ const Payroll = () => {
 
   // Estado para valores históricos (cuando editamos liquidaciones pasadas)
   const [historicalSalary, setHistoricalSalary] = useState(null);
+
+  const { vacations } = useVacations();
 
   // Usar hooks de Supabase
   const {
@@ -262,6 +266,7 @@ const Payroll = () => {
       setDiscounts(record.discounts?.toString() || "");
       updateWhiteWage(record.whiteAmount?.toString() || "");
       setBonusAmount(record.bonusAmount?.toString() || "");
+      setVacationBonusAmount(record.vacationBonusAmount?.toString() || "");
 
       // Set overtime data
       if (record.overtimeHours && record.overtimeHours > 0) {
@@ -426,6 +431,7 @@ const Payroll = () => {
         whiteAmount: calculation.whiteAmount || 0, // Guardar monto del depósito (valor ingresado por usuario)
         informalAmount: calculation.informalAmount || 0, // Guardar monto del efectivo (calculado)
         bonusAmount: parseFloat(bonusAmount) || 0,
+        vacationBonusAmount: parseFloat(vacationBonusAmount) || 0,
         presentismoAmount: calculation.presentismoAmount || 0,
         aguinaldo: calculation.aguinaldo || 0,
         netTotal: calculation.netTotal,
@@ -448,6 +454,7 @@ const Payroll = () => {
       setOvertimeEnabled(false);
       setOvertimeHours("");
       setBonusAmount("");
+      setVacationBonusAmount("");
       setHistoricalSalary(null);
       setIsNewPayrollOpen(false);
 
@@ -469,6 +476,7 @@ const Payroll = () => {
     setAdvances(record.advances?.toString() || "0");
     setDiscounts(record.discounts?.toString() || "0");
     setBonusAmount(record.bonusAmount?.toString() || "0");
+    setVacationBonusAmount(record.vacationBonusAmount?.toString() || "0");
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
@@ -506,6 +514,7 @@ const Payroll = () => {
     setAdvances(record.advances?.toString() || "0");
     setDiscounts(record.discounts?.toString() || "0");
     setBonusAmount(record.bonusAmount?.toString() || "0");
+    setVacationBonusAmount(record.vacationBonusAmount?.toString() || "0");
     setOvertimeHours(record.overtimeHours?.toString() || "0");
     setOvertimeEnabled(record.overtimeHours > 0);
     setPresentismoStatus(record.presentismoAmount > 0 ? "mantiene" : "perdido");
@@ -575,6 +584,7 @@ const Payroll = () => {
         whiteAmount: calculation.whiteAmount || 0, // Guardar monto del depósito (valor ingresado por usuario)
         informalAmount: calculation.informalAmount || 0, // Guardar monto del efectivo (calculado)
         bonusAmount: parseFloat(bonusAmount) || 0,
+        vacationBonusAmount: parseFloat(vacationBonusAmount) || 0,
         presentismoAmount: calculation.presentismoAmount || 0,
         aguinaldo: calculation.aguinaldo || 0,
         netTotal: calculation.netTotal,
@@ -598,6 +608,7 @@ const Payroll = () => {
       setOvertimeEnabled(false);
       setOvertimeHours("");
       setBonusAmount("");
+      setVacationBonusAmount("");
       setHistoricalSalary(null);
       setIsNewPayrollOpen(false);
 
@@ -623,6 +634,15 @@ const Payroll = () => {
     }
   };
 
+  const hasApprovedVacationInPeriod = (employeeId: string, period: string) =>
+    vacations.some(
+      (v) =>
+        String(v.employeeId) === employeeId &&
+        v.status === "approved" &&
+        v.startDate <= `${period}-31` &&
+        v.endDate >= `${period}-01`,
+    );
+
   // Calcular datos de liquidación
   const calculatePayroll = () => {
     if (!selectedEmployee) return null;
@@ -638,6 +658,7 @@ const Payroll = () => {
       ? parseFloat(overtimeHours) || 0
       : 0;
     const bonusNum = parseFloat(bonusAmount) || 0;
+    const vacationBonusNum = parseFloat(vacationBonusAmount) || 0;
     const advancesNum = parseFloat(advances) || 0;
     const discountsNum = parseFloat(discounts) || 0;
 
@@ -688,10 +709,16 @@ const Payroll = () => {
     }
 
     const bonusPay = bonusNum;
+    const vacationBonusPay = vacationBonusNum;
 
     // Total bruto
     const grossTotal =
-      basePay + holidayPay + overtimePay + presentismoAmount + bonusPay;
+      basePay +
+      holidayPay +
+      overtimePay +
+      presentismoAmount +
+      bonusPay +
+      vacationBonusPay;
 
     // Deducciones
     const totalAdvances = advancesNum;
@@ -736,6 +763,7 @@ const Payroll = () => {
       presentismoAmount +
       overtimePay +
       bonusPay +
+      vacationBonusPay +
       holidayPay +
       aguinaldoAmount -
       totalAdvances -
@@ -748,6 +776,7 @@ const Payroll = () => {
       hourlyRate,
       presentismoAmount,
       bonusPay,
+      vacationBonusPay,
       grossTotal,
       totalAdvances,
       totalDiscounts,
@@ -1221,6 +1250,28 @@ const Payroll = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="vacationBonusAmount">Plus vacacional</Label>
+                    <CurrencyInput
+                      id="vacationBonusAmount"
+                      placeholder="$ 0,00"
+                      value={vacationBonusAmount}
+                      onChange={(value) => setVacationBonusAmount(value)}
+                      disabled={editingRecord && !isEditMode}
+                    />
+                    {parseFloat(vacationBonusAmount) > 0 &&
+                      selectedEmployee &&
+                      selectedPeriod &&
+                      !hasApprovedVacationInPeriod(
+                        selectedEmployee,
+                        selectedPeriod,
+                      ) && (
+                        <p className="text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded px-2 py-1">
+                          El empleado no tiene vacaciones aprobadas en este periodo. Se puede guardar igual.
+                        </p>
+                      )}
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="advances">Adelantos</Label>
                     <CurrencyInput
                       id="advances"
@@ -1293,6 +1344,14 @@ const Payroll = () => {
                           <div className="flex justify-between text-purple-600">
                             <span>Bono:</span>
                             <span>+{formatCurrency(calculation.bonusPay)}</span>
+                          </div>
+                        )}
+                        {calculation.vacationBonusPay > 0 && (
+                          <div className="flex justify-between text-purple-600">
+                            <span>Plus vacacional:</span>
+                            <span>
+                              +{formatCurrency(calculation.vacationBonusPay)}
+                            </span>
                           </div>
                         )}
                         {calculation.aguinaldo > 0 && selectedEmployee && (
@@ -1679,6 +1738,7 @@ const Payroll = () => {
                   <TableHead>Horas Extra</TableHead>
                   <TableHead>Feriados</TableHead>
                   <TableHead>Bono</TableHead>
+                  <TableHead>Plus vac.</TableHead>
                   <TableHead>Aguinaldo</TableHead>
                   <TableHead>Presentismo</TableHead>
                   <TableHead>Depósito</TableHead>
@@ -1773,6 +1833,9 @@ const Payroll = () => {
                         </TableCell>
                         <TableCell className="font-medium text-blue-600">
                           {formatCurrency(record.bonusAmount || 0)}
+                        </TableCell>
+                        <TableCell className="font-medium text-blue-600">
+                          {formatCurrency(record.vacationBonusAmount || 0)}
                         </TableCell>
                         <TableCell className="font-medium text-blue-600">
                           {isAguinaldoPeriod(record.period)

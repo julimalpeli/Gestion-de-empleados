@@ -48,6 +48,7 @@ export interface PayrollCalculationInput {
   holidayDays: number;
   overtimeHours: number;
   bonusAmount: number;
+  vacationBonusAmount?: number;
   advances: number;
   discounts: number;
   whiteWage: number;
@@ -63,6 +64,7 @@ export const calculatePayrollAmounts = ({
   holidayDays,
   overtimeHours,
   bonusAmount,
+  vacationBonusAmount = 0,
   advances,
   discounts,
   whiteWage,
@@ -102,8 +104,14 @@ export const calculatePayrollAmounts = ({
   }
 
   const bonusPay = bonusAmount;
+  const vacationBonusPay = vacationBonusAmount;
   const grossTotal =
-    basePay + holidayPay + overtimePay + presentismoAmount + bonusPay;
+    basePay +
+    holidayPay +
+    overtimePay +
+    presentismoAmount +
+    bonusPay +
+    vacationBonusPay;
   const totalAfterDeductions = grossTotal - advances - discounts;
 
   let realWhiteAmount = 0;
@@ -132,6 +140,7 @@ export const calculatePayrollAmounts = ({
     presentismoAmount +
     overtimePay +
     bonusPay +
+    vacationBonusPay +
     holidayPay +
     aguinaldoAmount -
     advances -
@@ -144,6 +153,7 @@ export const calculatePayrollAmounts = ({
     hourlyRate,
     presentismoAmount,
     bonusPay,
+    vacationBonusPay,
     grossTotal,
     totalAdvances: advances,
     totalDiscounts: discounts,

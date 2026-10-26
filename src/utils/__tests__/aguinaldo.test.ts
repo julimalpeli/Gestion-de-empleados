@@ -188,6 +188,56 @@ describe("calculateAguinaldo", () => {
     expect(result.bestSalaryPeriod).toBe("2024-10");
   });
 
+  it("suma el plus vacacional al mejor sueldo desde el semestre jul-dic 2026", () => {
+    const employee = {
+      id: "emp-6",
+      name: "Fernanda",
+      startDate: "2020-01-01",
+      sueldoBase: 100000,
+    };
+
+    const payrollRecords: PayrollRecord[] = [
+      baseRecord({
+        id: "p-ago-2026",
+        employeeId: "emp-6",
+        employeeName: "Fernanda",
+        period: "2026-08",
+        baseAmount: 100000,
+        vacationBonusAmount: 30000,
+      }),
+    ];
+
+    const result = calculateAguinaldo(employee, "2026-2", payrollRecords);
+
+    expect(result.bestSalary).toBe(130000);
+    expect(result.bestSalaryPeriod).toBe("2026-08");
+  });
+
+  it("no suma el plus vacacional en periodos anteriores a jul-2026", () => {
+    const employee = {
+      id: "emp-7",
+      name: "Gaston",
+      startDate: "2020-01-01",
+      sueldoBase: 100000,
+    };
+
+    const payrollRecords: PayrollRecord[] = [
+      baseRecord({
+        id: "p-mar-2026",
+        employeeId: "emp-7",
+        employeeName: "Gaston",
+        period: "2026-03",
+        baseAmount: 100000,
+        vacationBonusAmount: 30000,
+      }),
+    ];
+
+    const result = calculateAguinaldo(employee, "2026-1", payrollRecords);
+
+    expect(result.bestSalary).toBe(100000);
+    expect(result.bestSalaryPeriod).toBe("2026-03");
+  });
+
   it("returns zero when the employee started after the semester ended", () => {
     const employee = {
       id: "emp-3",

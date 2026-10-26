@@ -12,6 +12,8 @@ export interface AguinaldoCalculationResult {
   reason: string;
 }
 
+const VACATION_BONUS_AGUINALDO_FROM_PERIOD = "2026-07";
+
 type AguinaldoEmployee = {
   id: string;
   name?: string;
@@ -189,14 +191,19 @@ export const calculateAguinaldo = (
     // If there are payrolls in the semester, find the best one
     if (relevantPayrolls.length > 0) {
       const salaryCalculations = relevantPayrolls.map((payroll) => {
-        // ✅ FORMULA CORRECTA: SOLO sueldo base + feriados + horas extras
-        // NO incluir: antigüedad, presentismo, adicionales, bonificaciones
+        // Sueldo base + feriados + horas extras; el plus vacacional entra solo desde VACATION_BONUS_AGUINALDO_FROM_PERIOD
+        // NO incluir: antigüedad, presentismo, bonificaciones
         // Nota: baseAmount incluye el sueldo base sin importar si se pagó en depósito o efectivo
         const baseAmount = payroll.baseAmount || 0;
         const holidayBonusAmount = payroll.holidayBonus || 0;
         const overtimeAmount = payroll.overtimeAmount || 0;
+        const vacationBonusAmount =
+          payroll.period >= VACATION_BONUS_AGUINALDO_FROM_PERIOD
+            ? payroll.vacationBonusAmount || 0
+            : 0;
 
-        const adjustedSalary = baseAmount + holidayBonusAmount + overtimeAmount;
+        const adjustedSalary =
+          baseAmount + holidayBonusAmount + overtimeAmount + vacationBonusAmount;
 
         if (
           employee.name?.includes("Daiana") ||
@@ -211,9 +218,10 @@ export const calculateAguinaldo = (
             baseAmount,
             holidayBonusAmount,
             overtimeAmount,
+            vacationBonusAmount,
             bestSalaryForAguinaldo: adjustedSalary,
-            formula: "SOLO: baseAmount (sueldo base) + feriados + horas extras",
-            excluded: "antigüedad, presentismo, adicionales, bonificaciones, white/informal split",
+            formula: "baseAmount (sueldo base) + feriados + horas extras + plus vacacional (desde jul-2026)",
+            excluded: "antigüedad, presentismo, bonificaciones, white/informal split",
           });
         }
 

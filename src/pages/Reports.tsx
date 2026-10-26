@@ -645,6 +645,7 @@ const Reports = () => {
                       <TableHead>Presentismo</TableHead>
                       <TableHead>Horas Extras</TableHead>
                       <TableHead>Bonos</TableHead>
+                      <TableHead>Plus vac.</TableHead>
                       <TableHead>Total</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -677,6 +678,10 @@ const Reports = () => {
                         (sum, record) => sum + (record.bonusAmount || 0),
                         0,
                       );
+                      const vacationBonusTotal = employeePayrolls.reduce(
+                        (sum, record) => sum + (record.vacationBonusAmount || 0),
+                        0,
+                      );
 
                       return (
                         <TableRow key={employee.id}>
@@ -698,6 +703,9 @@ const Reports = () => {
                           </TableCell>
                           <TableCell>{formatCurrency(overtimeTotal)}</TableCell>
                           <TableCell>{formatCurrency(bonusTotal)}</TableCell>
+                          <TableCell>
+                            {formatCurrency(vacationBonusTotal)}
+                          </TableCell>
                           <TableCell className="font-bold">
                             {formatCurrency(totalPayroll)}
                           </TableCell>
